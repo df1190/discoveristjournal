@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel Comparison Tool — Compare Alpine &amp; Boutique Hotels | The Discoverist Journal</title>
+  <meta name="description" content="Compare boutique and luxury hotels side by side across Switzerland, Italy, Norway, and beyond. Ratings, amenities, price, and booking links in one place.">
+  <link rel="canonical" href="https://discoveristjournal.com/tools/hotel-comparison">
+  <meta property="og:site_name" content="The Discoverist Journal">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Hotel Comparison Tool | The Discoverist Journal">
+  <meta property="og:description" content="Compare boutique and luxury hotels side by side across Switzerland, Italy, Norway, and beyond.">
+  <meta property="og:image" content="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg">
+  <meta property="og:url" content="https://discoveristjournal.com/tools/hotel-comparison">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hotel Comparison Tool | The Discoverist Journal">
+  <meta name="twitter:description" content="Compare boutique and luxury hotels side by side across Switzerland, Italy, Norway, and beyond.">
+  <meta name="twitter:image" content="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#fdfcfb">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Hotel Comparison Tool",
+    "description": "Compare boutique and luxury hotels side by side across Switzerland, Italy, Norway, and beyond. Ratings, amenities, price, and booking links.",
+    "url": "https://discoveristjournal.com/tools/hotel-comparison",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Web",
+    "author": { "@type": "Organization", "name": "The Discoverist Journal" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --white:    #fdfcfb;
+      --cream:    #f5f0ea;
+      --sand:     #e8ddd0;
+      --clay:     #c9b49a;
+      --ink:      #2c2c2a;
+      --charcoal: #1a1a18;
+      --moto-red: #d64230;
+      --sage:     #8a9e8a;
+    }
+    html { scroll-behavior:smooth; }
+    body { background:var(--white); color:var(--ink); font-family:'DM Sans',sans-serif; font-weight:400; font-size:15px; line-height:1.7; }
+    ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:var(--sand)} ::-webkit-scrollbar-thumb{background:var(--clay)}
+
+    .tool-header { padding:80px 48px 56px; background:var(--charcoal); border-bottom:1px solid rgba(255,255,255,0.06); text-align:center; }
+    .back-link { display:inline-flex; align-items:center; gap:8px; font-size:10px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--clay); text-decoration:none; margin-bottom:32px; transition:color 0.2s; }
+    .back-link:hover { color:var(--moto-red); }
+    .tool-eyebrow { font-size:10px; font-weight:500; letter-spacing:0.3em; text-transform:uppercase; color:var(--clay); margin-bottom:12px; }
+    .tool-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(48px,7vw,88px); letter-spacing:0.05em; color:var(--white); line-height:0.95; }
+    .tool-title em { font-family:'Playfair Display',serif; font-style:italic; color:var(--moto-red); font-size:0.8em; }
+    .tool-sub { font-size:13px; font-weight:300; color:rgba(253,252,251,0.5); margin-top:14px; max-width:480px; margin-left:auto; margin-right:auto; }
+
+    /* DESTINATION TABS */
+    .dest-tabs { padding:32px 48px 0; background:var(--white); max-width:1200px; margin:0 auto; }
+    .tabs-label { font-size:10px; font-weight:500; letter-spacing:0.25em; text-transform:uppercase; color:var(--clay); margin-bottom:12px; }
+    .tabs-row { display:flex; gap:4px; flex-wrap:wrap; }
+    .tab { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; padding:9px 20px; border:1px solid var(--sand); color:var(--clay); background:none; cursor:pointer; transition:all 0.2s; }
+    .tab:hover, .tab.active { border-color:var(--moto-red); color:var(--moto-red); background:rgba(214,66,48,0.04); }
+
+    /* MAIN CONTENT */
+    .main { max-width:1200px; margin:0 auto; padding:48px 48px 80px; }
+
+    /* COMPARISON GRID */
+    .comp-grid { display:grid; gap:2px; margin-bottom:48px; }
+    .comp-grid.cols-3 { grid-template-columns: 200px repeat(3,1fr); }
+    .comp-grid.cols-2 { grid-template-columns: 200px repeat(2,1fr); }
+
+    /* HEADER ROW */
+    .hotel-header { background:var(--cream); padding:0; overflow:hidden; border:1px solid var(--sand); }
+    .hotel-header-img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; filter:brightness(0.95); transition:filter 0.3s; }
+    .hotel-header:hover .hotel-header-img { filter:brightness(1); }
+    .hotel-header-info { padding:20px; }
+    .hotel-country { font-size:9px; font-weight:500; letter-spacing:0.25em; text-transform:uppercase; color:var(--moto-red); margin-bottom:4px; }
+    .hotel-name { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.06em; color:var(--charcoal); line-height:1.2; margin-bottom:6px; }
+    .hotel-stars { color:var(--moto-red); font-size:12px; margin-bottom:10px; }
+    .hotel-discoverist-pick { font-size:9px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; color:var(--white); background:var(--moto-red); padding:3px 8px; width:fit-content; margin-bottom:10px; display:block; }
+    .hotel-book-btn { display:block; text-align:center; font-size:9px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; background:var(--moto-red); color:var(--white); padding:10px; text-decoration:none; transition:background 0.2s; margin-top:8px; }
+    .hotel-book-btn:hover { background:var(--charcoal); }
+
+    /* ROW LABELS */
+    .row-label-col { display:contents; }
+    .cell-label { background:var(--cream); padding:14px 18px; display:flex; align-items:center; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--clay); border-bottom:1px solid var(--sand); }
+    .cell { background:var(--white); padding:14px 18px; display:flex; align-items:center; border-bottom:1px solid var(--sand); font-size:13px; font-weight:300; color:var(--ink); transition:background 0.15s; border:1px solid var(--sand); }
+    .cell:hover { background:var(--cream); }
+    .cell.best { color:var(--moto-red); font-weight:500; }
+    .cell-rating { display:flex; gap:2px; }
+    .star-filled { color:var(--moto-red); font-size:13px; }
+    .star-empty { color:var(--sand); font-size:13px; }
+    .cell-tag { font-size:9px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; padding:3px 8px; background:rgba(214,66,48,0.08); color:var(--moto-red); margin-right:4px; }
+    .tick { color:var(--moto-red); font-size:16px; }
+    .cross { color:var(--clay); font-size:14px; }
+
+    /* PLACEHOLDER (empty column header) */
+    .corner-cell { background:var(--cream); border:1px solid var(--sand); }
+
+    /* VERDICT */
+    .verdict-section { background:var(--cream); padding:32px 40px; border-top:3px solid var(--moto-red); margin-top:40px; border:1px solid var(--sand); border-top:3px solid var(--moto-red); }
+    .verdict-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:0.05em; color:var(--charcoal); margin-bottom:20px; }
+    .verdict-title em { font-family:'Playfair Display',serif; font-style:italic; color:var(--moto-red); font-size:0.8em; }
+    .verdict-grid { display:grid; gap:16px; }
+    .verdict-grid.cols-3 { grid-template-columns:repeat(3,1fr); }
+    .verdict-grid.cols-2 { grid-template-columns:repeat(2,1fr); }
+    .verdict-item { background:var(--white); padding:20px; border:1px solid var(--sand); border-top:2px solid var(--moto-red); }
+    .verdict-hotel { font-size:10px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--moto-red); margin-bottom:8px; }
+    .verdict-text { font-size:13px; font-weight:300; color:var(--ink); line-height:1.75; }
+    .verdict-score { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:0.05em; color:var(--charcoal); line-height:1; margin-bottom:4px; }
+
+    /* AFFILIATE BAR */
+    .aff-bar { background:var(--charcoal); padding:20px 40px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-top:4px; }
+    .aff-bar p { font-size:11px; font-weight:300; color:var(--clay); }
+    .aff-bar a { font-size:10px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:var(--white); text-decoration:none; border-bottom:1px solid rgba(253,252,251,0.3); padding-bottom:1px; transition:color 0.2s; }
+    .aff-bar a:hover { color:var(--moto-red); }
+
+    @media(max-width:900px) { .comp-grid.cols-3,.comp-grid.cols-2 { grid-template-columns:1fr; } .cell-label{display:none} .verdict-grid.cols-3{grid-template-columns:1fr} .main,.dest-tabs{padding-left:20px;padding-right:20px} .tool-header{padding:56px 20px 40px} }
+  </style>
+</head>
+<body>
+
+<div class="tool-header">
+  <a href="/" class="back-link">← The Discoverist Journal</a>
+  <p class="tool-eyebrow">Side by Side</p>
+  <h1 class="tool-title">Hotel <em>Comparison</em></h1>
+  <p class="tool-sub">Compare curated stays across design, value, location, and experience. All reviewed personally.</p>
+</div>
+
+<div class="dest-tabs">
+  <p class="tabs-label">Choose a Destination</p>
+  <div class="tabs-row">
+    <button class="tab active" onclick="showDest('switzerland', this)">Switzerland</button>
+    <button class="tab" onclick="showDest('italy', this)">Italy / South Tyrol</button>
+    <button class="tab" onclick="showDest('norway', this)">Norway</button>
+    <button class="tab" onclick="showDest('alpine', this)">Best of Alps</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- SWITZERLAND -->
+  <div id="dest-switzerland" class="dest-section">
+    <div class="comp-grid cols-3" id="grid-switzerland">
+
+      <div class="corner-cell"></div>
+
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="The Cambrian" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇨🇭 Adelboden, Switzerland</p>
+          <h3 class="hotel-name">The Cambrian</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <span class="hotel-discoverist-pick">Discoverist Pick</span>
+          <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_023-768x1024.jpg" alt="The Hotel Lucerne" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇨🇭 Lucerne, Switzerland</p>
+          <h3 class="hotel-name">The Hotel Lucerne</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <a href="https://prf.hn/l/3PGgpkE/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Park Gstaad" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇨🇭 Gstaad, Switzerland</p>
+          <h3 class="hotel-name">The Park Gstaad</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+
+      <div class="cell-label">Price Range / Night</div>
+      <div class="cell best">$280 – $480</div>
+      <div class="cell">$320 – $600</div>
+      <div class="cell">$480 – $1,200</div>
+
+      <div class="cell-label">Location Type</div>
+      <div class="cell"><span class="cell-tag">Alpine Village</span></div>
+      <div class="cell"><span class="cell-tag">Lakeside City</span></div>
+      <div class="cell"><span class="cell-tag">Ski Resort</span></div>
+
+      <div class="cell-label">Design Style</div>
+      <div class="cell">Contemporary Alpine</div>
+      <div class="cell">Jean Nouvel Architecture</div>
+      <div class="cell">Grand Swiss Classic</div>
+
+      <div class="cell-label">Best For</div>
+      <div class="cell">Couples, Ski Season</div>
+      <div class="cell">City Break, Architecture</div>
+      <div class="cell">Luxury, Celebrity</div>
+
+      <div class="cell-label">Loyalty Points</div>
+      <div class="cell"><span class="tick">✓</span>&nbsp;Marriott Bonvoy</div>
+      <div class="cell"><span class="tick">✓</span>&nbsp;Marriott Bonvoy</div>
+      <div class="cell"><span class="tick">✓</span>&nbsp;Leading Hotels</div>
+
+      <div class="cell-label">Spa / Wellness</div>
+      <div class="cell"><span class="tick">✓</span>&nbsp;Full Spa</div>
+      <div class="cell"><span class="cross">○</span>&nbsp;Limited</div>
+      <div class="cell"><span class="tick">✓</span>&nbsp;Full Spa + Pool</div>
+
+      <div class="cell-label">Restaurant Quality</div>
+      <div class="cell-rating cell"><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span></div>
+      <div class="cell-rating cell best"><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span></div>
+      <div class="cell-rating cell"><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span></div>
+
+      <div class="cell-label">Discoverist Score</div>
+      <div class="cell best" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">9.2</div>
+      <div class="cell" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">9.0</div>
+      <div class="cell" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">8.7</div>
+
+    </div>
+
+    <div class="aff-bar">
+      <p>All rates are indicative. Book through our links to support independent travel writing.</p>
+      <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener">Search All Switzerland Hotels via Travelpayouts →</a>
+    </div>
+
+    <div class="verdict-section">
+      <h3 class="verdict-title">The <em>Verdicts</em></h3>
+      <div class="verdict-grid cols-3">
+        <div class="verdict-item">
+          <div class="verdict-score">9.2</div>
+          <p class="verdict-hotel">The Cambrian</p>
+          <p class="verdict-text">The best all-round alpine stay in Switzerland at this price point. Design is confident without being cold. The ski-in access and spa make winter the obvious season.</p>
+        </div>
+        <div class="verdict-item">
+          <div class="verdict-score">9.0</div>
+          <p class="verdict-hotel">The Hotel Lucerne</p>
+          <p class="verdict-text">Jean Nouvel's building is reason enough to stay. The restaurant is the best of the three. Go for architecture and the lake — not a typical resort experience.</p>
+        </div>
+        <div class="verdict-item">
+          <div class="verdict-score">8.7</div>
+          <p class="verdict-hotel">The Park Gstaad</p>
+          <p class="verdict-text">Grand, famous, and expensive. Delivers on the classic Swiss luxury promise. Better for special occasions than everyday stays. The pool and spa are exceptional.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ITALY -->
+  <div id="dest-italy" class="dest-section" style="display:none;">
+    <div class="comp-grid cols-2">
+      <div class="corner-cell"></div>
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="Vigilius" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇮🇹 Lana, South Tyrol</p>
+          <h3 class="hotel-name">Vigilius Mountain Resort</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <span class="hotel-discoverist-pick">Discoverist Pick</span>
+          <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_4857-576x1024.jpg" alt="Castel" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇮🇹 Tirol, South Tyrol</p>
+          <h3 class="hotel-name">Castel Hotel</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+
+      <div class="cell-label">Price Range / Night</div>
+      <div class="cell best">€350 – €700</div>
+      <div class="cell">€280 – €550</div>
+
+      <div class="cell-label">Access</div>
+      <div class="cell best">Cable car only</div>
+      <div class="cell">Road access, hilltop</div>
+
+      <div class="cell-label">Design</div>
+      <div class="cell">Matteo Thun — minimalist</div>
+      <div class="cell">Converted 12th-c castle</div>
+
+      <div class="cell-label">Spa</div>
+      <div class="cell"><span class="tick">✓</span>&nbsp;Mountain spa + infinity pool</div>
+      <div class="cell"><span class="tick">✓</span>&nbsp;Full spa + outdoor pool</div>
+
+      <div class="cell-label">Restaurant</div>
+      <div class="cell-rating cell best"><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span></div>
+      <div class="cell-rating cell"><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span></div>
+
+      <div class="cell-label">Discoverist Score</div>
+      <div class="cell best" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">9.4</div>
+      <div class="cell" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">8.9</div>
+    </div>
+
+    <div class="aff-bar">
+      <p>All rates indicative. Booking links support this journal.</p>
+      <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener">Search South Tyrol Hotels via Travelpayouts →</a>
+    </div>
+
+    <div class="verdict-section">
+      <h3 class="verdict-title">The <em>Verdicts</em></h3>
+      <div class="verdict-grid cols-2">
+        <div class="verdict-item">
+          <div class="verdict-score">9.4</div>
+          <p class="verdict-hotel">Vigilius Mountain Resort</p>
+          <p class="verdict-text">One of Europe's finest mountain hotels. The cable car access, Matteo Thun design, and total commitment to silence make this unmissable. Best in January or October.</p>
+        </div>
+        <div class="verdict-item">
+          <div class="verdict-score">8.9</div>
+          <p class="verdict-hotel">Castel Hotel</p>
+          <p class="verdict-text">A historic castle turned into a genuinely luxurious stay with spectacular valley views. Excellent pool. More accessible than Vigilius but equally memorable.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NORWAY — placeholder -->
+  <div id="dest-norway" class="dest-section" style="display:none;">
+    <div style="padding:80px 40px;text-align:center;background:var(--cream);border:1px solid var(--sand);border-top:3px solid var(--moto-red);">
+      <p style="font-size:10px;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:12px;">Coming Soon</p>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:0.05em;color:var(--charcoal);margin-bottom:16px;">Norway Comparisons</h2>
+      <p style="font-size:14px;font-weight:300;color:var(--clay);max-width:400px;margin:0 auto 28px;">Norway hotel comparisons are being written up. Subscribe to be notified when published.</p>
+      <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" style="display:inline-block;font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;background:var(--moto-red);color:#fdfcfb;padding:14px 32px;text-decoration:none;">Search Norway Hotels →</a>
+    </div>
+  </div>
+
+  <!-- BEST OF ALPS -->
+  <div id="dest-alpine" class="dest-section" style="display:none;">
+    <div class="comp-grid cols-3">
+      <div class="corner-cell"></div>
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="Vigilius" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇮🇹 South Tyrol</p>
+          <h3 class="hotel-name">Vigilius Mountain Resort</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <span class="hotel-discoverist-pick">#1 Alpine Pick</span>
+          <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="Cambrian" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇨🇭 Adelboden</p>
+          <h3 class="hotel-name">The Cambrian</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+      <div class="hotel-header">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_023-768x1024.jpg" alt="Hotel Lucerne" class="hotel-header-img">
+        <div class="hotel-header-info">
+          <p class="hotel-country">🇨🇭 Lucerne</p>
+          <h3 class="hotel-name">The Hotel Lucerne</h3>
+          <div class="hotel-stars">★★★★★</div>
+          <a href="https://prf.hn/l/3PGgpkE/" target="_blank" rel="noopener" class="hotel-book-btn">Check Rates →</a>
+        </div>
+      </div>
+
+      <div class="cell-label">Country</div>
+      <div class="cell">Italy</div><div class="cell">Switzerland</div><div class="cell">Switzerland</div>
+
+      <div class="cell-label">Setting</div>
+      <div class="cell best">Mountain (cable car)</div><div class="cell">Alpine Village</div><div class="cell">Lakeside City</div>
+
+      <div class="cell-label">Best Season</div>
+      <div class="cell">Jan, Oct</div><div class="cell">Dec–Mar, Jul</div><div class="cell">Year-round</div>
+
+      <div class="cell-label">Discoverist Score</div>
+      <div class="cell best" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">9.4</div>
+      <div class="cell" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">9.2</div>
+      <div class="cell" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.05em;">9.0</div>
+    </div>
+    <div class="aff-bar">
+      <p>Personal reviews — all stays paid for or redeemed with loyalty points.</p>
+      <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener">Browse All Alpine Hotels →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showDest(dest, btn) {
+    document.querySelectorAll('.dest-section').forEach(d => d.style.display = 'none');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('dest-' + dest).style.display = 'block';
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
