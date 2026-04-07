@@ -22,15 +22,13 @@
     .nav-links a{font-size:0.78rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);text-decoration:none;position:relative;padding-bottom:3px}
     .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--ktm-orange);transition:width 0.3s}
     .nav-links a:hover::after,.nav-links a.active::after{width:100%}
-    .nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
-    .nav-hamburger span{display:block;width:24px;height:2px;background:var(--charcoal);border-radius:2px;transition:transform 0.3s,opacity 0.3s;transform-origin:center}
-    .nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-    .nav-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
-    .nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-    .nav-drawer{display:none;position:fixed;inset:0;background:var(--white);z-index:150;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;opacity:0;pointer-events:none;transition:opacity 0.35s}
-    .nav-drawer.open{opacity:1;pointer-events:all}
-    .nav-drawer a{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:0.1em;color:var(--charcoal);text-decoration:none;transition:color 0.2s}
-    .nav-drawer a:hover{color:var(--ktm-orange)}
+    .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer}
+    .nav-burger span{width:22px;height:1px;background:var(--charcoal);display:block}
+    .mobile-menu{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,26,24,0.98);flex-direction:column;align-items:center;justify-content:center;gap:32px}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.08em;color:var(--white);text-decoration:none;transition:color 0.2s}
+    .mobile-menu a:hover{color:var(--ktm-orange)}
+    .mobile-close{position:absolute;top:24px;right:3rem;font-size:28px;color:var(--clay);cursor:pointer;background:none;border:none}
 
     /* SCROLL HERO */
     .hero-wrapper{position:relative;height:320vh}
@@ -120,7 +118,7 @@
 
     /* RESPONSIVE */
     @media(max-width:768px){
-      .nav-links{display:none}.nav-hamburger{display:flex}
+      .nav-links{display:none}.nav-burger{display:flex}
       nav{padding:1.1rem 1.4rem}
       .hero-wrapper{height:280vh}.hero-media{transform:scale(0.55) translateY(6%)}
       .about-strip{flex-direction:column;padding:3.5rem 1.4rem;align-items:flex-start}
@@ -148,9 +146,7 @@
     nav{background:rgba(10,10,9,0.92)!important;border-bottom-color:rgba(255,255,255,0.07)!important}
     .nav-logo{color:#f0ede8!important}
     .nav-links a:hover,.nav-links a.active{color:#fff!important}
-    .nav-hamburger span{background:#c0bcb6!important}
-    .nav-drawer{background:#0d0d0b!important}
-    .nav-drawer a{color:#f0ede8!important}
+    .nav-burger span{background:#c0bcb6!important}
     .trips-section{background:#0d0d0b!important}
     .section-title{color:#f0ede8!important}
     .footer-col h5{color:#f0ede8!important}
@@ -166,24 +162,25 @@
 <div class="cursor-ring" id="cursorRing"></div>
 
 <!-- NAV -->
-<nav id="mainNav">
-  <a href="index.html" class="nav-logo">MOTO<span>×</span>TRAVEL</a>
-  <ul class="nav-links">
-    <li><a href="journeys.html">Journeys</a></li>
-    <li><a href="moto-ktm-rally.html" class="active">KTM Rally</a></li>
-    <li><a href="alpine-passes.html">Passes</a></li>
-    <li><a href="tools.html">Tools</a></li>
-    <li><a href="about.html">About</a></li>
-  </ul>
-  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
-</nav>
-
-<div class="nav-drawer" id="navDrawer">
-  <a href="journeys.html" class="drawer-link">Journeys</a>
-  <a href="moto-ktm-rally.html" class="drawer-link">KTM Rally</a>
-  <a href="alpine-passes.html" class="drawer-link">Passes</a>
-  <a href="about.html" class="drawer-link">About</a>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">✕</button>
+  <a href="/">Home</a>
+  <a href="/moto/ktm-rally">KTM Rally</a>
+  <a href="/moto/alpine-passes">Passes</a>
+  <a href="/moto/tools">Tools</a>
+  <a href="/about">About</a>
 </div>
+
+<nav id="mainNav">
+  <a href="/" class="nav-logo">MOTO <span>×</span> TRAVEL</a>
+  <ul class="nav-links">
+    <li><a href="/moto/ktm-rally" class="active">KTM Rally</a></li>
+    <li><a href="/moto/alpine-passes">Passes</a></li>
+    <li><a href="/journeys">Journeys</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <div class="nav-burger" onclick="document.getElementById('mobileMenu').classList.add('open')"><span></span><span></span><span></span></div>
+</nav>
 
 <!-- HERO -->
 <div class="hero-wrapper" id="heroWrapper">
@@ -382,10 +379,6 @@
   const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}}),{threshold:0.1});
   document.querySelectorAll('.trip-card,.chip').forEach(el=>obs.observe(el));
 
-  /* Mobile menu */
-  const ham=document.getElementById('hamburger'),drawer=document.getElementById('navDrawer');
-  ham.addEventListener('click',()=>{ham.classList.toggle('open');drawer.classList.toggle('open')});
-  document.querySelectorAll('.drawer-link').forEach(l=>l.addEventListener('click',()=>{ham.classList.remove('open');drawer.classList.remove('open')}));
 </script>
 </body>
 </html>
