@@ -2,3 +2,11 @@
 **/.DS_Store
 Thumbs.db
 *.log
+
+# Video files — host on YouTube/Vimeo, not in git
+*.MOV
+*.mov
+*.mp4
+*.MP4
+*.avi
+*.AVI
