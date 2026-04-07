@@ -1,5 +1,15 @@
 RewriteEngine On
 
+# Redirect old moto-* URLs to new clean paths
+Redirect 301 /moto/moto-ktm-rally /moto/ktm-rally
+Redirect 301 /moto/moto-ktm-bosnia /moto/ktm-bosnia
+Redirect 301 /moto/moto-ktm-france /moto/ktm-france
+Redirect 301 /moto/moto-ktm-norway /moto/ktm-norway
+Redirect 301 /moto/moto-ktm-romania /moto/ktm-romania
+Redirect 301 /moto/moto-ktm-italy /moto/ktm-italy
+Redirect 301 /moto/moto-alpine-passes /moto/alpine-passes
+Redirect 301 /moto/moto-tools /moto/tools
+
 # Remove .html extension — serve /journeys as journeys.html
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
