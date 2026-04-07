@@ -133,7 +133,7 @@
     .moto-section .section-label { color: var(--clay); }
     .moto-section .section-title { color: var(--white); }
     .moto-section .section-title em { color: var(--clay); }
-    .moto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 56px; }
+    .moto-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 56px; }
     .moto-card { position: relative; overflow: hidden; aspect-ratio: 4/3; text-decoration: none; display: block; }
     .moto-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
     .moto-card:hover img { transform: scale(1.06); }
@@ -191,7 +191,7 @@
       .filters, .featured-journey, .journey-grid-section, .moto-section, .load-more { padding-left: 1.25rem; padding-right: 1.25rem; }
       .journey-grid { grid-template-columns: 1fr; }
       .journey-card.wide { grid-column: span 1; aspect-ratio: 4/3; }
-      .moto-grid { grid-template-columns: 1fr; }
+      .moto-grid { grid-template-columns: 1fr 1fr; }
       .footer-top { grid-template-columns: 1fr; gap: 32px; } .footer-affiliate { text-align: left; }
     }
   </style>
@@ -212,6 +212,7 @@
   <ul class="nav-links">
     <li><a href="/hotels">Hotel Reviews</a></li>
     <li><a href="/journeys" class="active">Trips & Journeys</a></li>
+    <li><a href="/moto/ktm-rally">Moto</a></li>
     <li><a href="/store">POD Store</a></li>
     <li><a href="/about">About</a></li>
   </ul>
@@ -366,6 +367,14 @@
         <div class="moto-card-info">
           <p class="moto-card-tag">Italy · Alpine Route</p>
           <h3 class="moto-card-title">Stelvio & Gavia: Two-Day Moto Loop</h3>
+        </div>
+      </a>
+      <a href="/moto/ktm-rally" class="moto-card reveal reveal-delay-2">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="KTM Adventure Rally Europe series" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <p class="moto-card-tag">Europe · Rally Series</p>
+          <h3 class="moto-card-title">KTM Adventure Rally: 5 Countries</h3>
         </div>
       </a>
     </div>
