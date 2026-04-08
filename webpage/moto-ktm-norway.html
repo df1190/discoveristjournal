@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KTM Adventure Rally: Norway — MOTO×TRAVEL</title>
+  <meta name="description" content="KTM Adventure rally trip — Norway. Fjords, switchbacks and midnight sun. On-board video and photography.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cream:#f5f0ea;--sand:#e8ddd0;--clay:#c9b49a;--charcoal:#1a1a18;--moto-red:#d64230;--ink:#2c2c2a;--white:#fdfcfb}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--charcoal);overflow-x:hidden}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.4rem 3rem;background:rgba(253,252,251,0.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,0.06);transition:padding 0.3s}
+    nav.shrink{padding:0.8rem 3rem}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.15em;color:var(--charcoal);text-decoration:none}
+    .nav-logo span{color:var(--moto-red)}
+    .nav-links{display:flex;gap:2.2rem;list-style:none}
+    .nav-links a{font-size:0.78rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);text-decoration:none;position:relative;padding-bottom:3px}
+    .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--moto-red);transition:width 0.3s}
+    .nav-links a:hover::after{width:100%}
+    .nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+    .nav-hamburger span{display:block;width:24px;height:2px;background:var(--charcoal);border-radius:2px;transition:transform 0.3s,opacity 0.3s;transform-origin:center}
+    .nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .nav-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+    .nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .nav-drawer{display:none;position:fixed;inset:0;background:var(--white);z-index:150;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;opacity:0;pointer-events:none;transition:opacity 0.35s}
+    .nav-drawer.open{opacity:1;pointer-events:all}
+    .nav-drawer a{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:0.1em;color:var(--charcoal);text-decoration:none;transition:color 0.2s}
+    .nav-drawer a:hover{color:var(--moto-red)}
+    .progress-bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:200}
+    .progress-fill{height:100%;background:var(--moto-red);width:0%;transition:width 0.1s linear}
+    .post-hero{position:relative;height:90vh;min-height:560px;display:flex;align-items:flex-end;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;background:url('https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg') center/cover no-repeat;/* REPLACE */}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.75) 100%)}
+    .hero-content{position:relative;z-index:2;padding:0 3rem 4rem;opacity:0;transform:translateY(20px);animation:fadeUp 0.9s 0.3s forwards;max-width:900px}
+    @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+    .breadcrumb{display:flex;gap:8px;align-items:center;margin-bottom:1.2rem}
+    .breadcrumb a{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s}
+    .breadcrumb a:hover{color:rgba(255,255,255,0.9)}
+    .breadcrumb span{color:rgba(255,255,255,0.25);font-size:0.65rem}
+    .hero-tag{display:inline-block;background:var(--moto-red);color:#fff;font-size:0.6rem;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;padding:0.3rem 0.8rem;border-radius:100px;margin-bottom:1rem}
+    .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,10vw,9rem);line-height:0.9;color:#fff;letter-spacing:0.04em;margin-bottom:1rem}
+    .hero-title em{font-family:'Playfair Display',serif;font-style:italic;color:var(--clay)}
+    .hero-meta{display:flex;gap:1.8rem;flex-wrap:wrap}
+    .hero-meta span{font-size:0.72rem;color:rgba(255,255,255,0.55);letter-spacing:0.12em;display:flex;align-items:center;gap:0.4rem}
+    .hero-meta span::before{content:'';width:4px;height:4px;background:var(--moto-red);border-radius:50%;display:inline-block}
+    .stats-band{background:var(--charcoal);display:grid;grid-template-columns:repeat(5,1fr);gap:1px}
+    .stat-box{background:var(--charcoal);padding:1.4rem 1.6rem;text-align:center;border-right:1px solid rgba(255,255,255,0.06)}
+    .stat-box:last-child{border-right:none}
+    .sb-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--clay);line-height:1}
+    .sb-lbl{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,180,154,0.5);margin-top:0.3rem}
+    .post-body{max-width:1100px;margin:0 auto;padding:5rem 3rem;display:grid;grid-template-columns:1fr 280px;gap:5rem;align-items:start}
+    .post-intro{font-size:1.15rem;font-weight:300;line-height:1.85;color:rgba(28,28,26,0.82);margin-bottom:3.5rem;padding-bottom:3.5rem;border-bottom:1px solid var(--sand)}
+    .post-intro strong{color:var(--charcoal);font-weight:500}
+    h2.section-h2{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:0.04em;color:var(--charcoal);margin:3rem 0 1rem}
+    h2.section-h2 em{font-family:'Playfair Display',serif;font-style:italic;color:var(--moto-red)}
+    .post-p{font-size:0.95rem;font-weight:300;line-height:1.9;color:rgba(28,28,26,0.72);margin-bottom:1.2rem}
+    .placeholder-note{background:var(--sand);border-left:3px solid var(--moto-red);padding:1rem 1.2rem;font-size:0.82rem;color:rgba(28,28,26,0.55);margin:1.5rem 0;font-style:italic;border-radius:0 8px 8px 0}
+    .placeholder-note strong{color:var(--moto-red);font-style:normal;font-weight:500}
+    .video-section{margin:2.5rem 0}.video-label{font-size:0.65rem;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:0.8rem}
+    .video-wrap{position:relative;aspect-ratio:16/9;background:var(--sand);overflow:hidden;border-radius:14px}
+    .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:14px}
+    .video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+    .play-btn{width:64px;height:64px;border-radius:50%;background:rgba(214,66,48,0.15);border:2px solid rgba(214,66,48,0.4);display:flex;align-items:center;justify-content:center;transition:background 0.3s,transform 0.3s}
+    .play-btn:hover{background:var(--moto-red);border-color:var(--moto-red);transform:scale(1.1)}
+    .play-btn svg{fill:var(--moto-red);margin-left:4px}.play-btn:hover svg{fill:#fff}
+    .video-placeholder p{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(28,28,26,0.4)}
+    .gallery-section{margin:2.5rem 0}.gallery-label{font-size:0.65rem;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:0.8rem}
+    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .gallery-placeholder{aspect-ratio:4/3;background:var(--sand);border-radius:10px;border:1.5px dashed rgba(201,180,154,0.5);display:flex;align-items:center;justify-content:center}
+    .gallery-placeholder span{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(28,28,26,0.3)}
+    .gallery-item{aspect-ratio:4/3;overflow:hidden;border-radius:10px}.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s}.gallery-item:hover img{transform:scale(1.06)}
+    .sidebar{position:sticky;top:90px}
+    .sw{background:var(--cream);border:1px solid var(--sand);border-radius:14px;padding:1.6rem;margin-bottom:1.2rem}
+    .sw-label{font-size:0.6rem;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:0.8rem}
+    .sw-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.04em;color:var(--charcoal);margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid var(--sand)}
+    .info-row{display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid rgba(232,221,208,0.7)}.info-row:last-child{border-bottom:none}
+    .info-key{font-size:0.72rem;color:rgba(28,28,26,0.45)}.info-val{font-size:0.78rem;color:var(--charcoal);font-weight:500}
+    .other-trips{display:flex;flex-direction:column}
+    .other-trip{display:block;text-decoration:none;padding:0.7rem 0;border-bottom:1px solid rgba(232,221,208,0.7)}.other-trip:last-child{border-bottom:none}
+    .ot-country{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--moto-red);margin-bottom:2px}
+    .ot-name{font-size:0.82rem;color:var(--charcoal);transition:color 0.2s}.other-trip:hover .ot-name{color:var(--moto-red)}
+    .post-nav{background:var(--sand);padding:3rem;display:grid;grid-template-columns:1fr 1fr;gap:2px}
+    .pn-item{background:var(--cream);padding:2rem;text-decoration:none;transition:background 0.2s;border-radius:4px}.pn-item:hover{background:var(--white)}
+    .pn-dir{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(28,28,26,0.4);margin-bottom:0.5rem}
+    .pn-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.04em;color:var(--charcoal);transition:color 0.2s}.pn-item:hover .pn-title{color:var(--moto-red)}.pn-item.right{text-align:right}
+    footer{background:var(--cream);padding:3rem;border-top:1px solid var(--sand)}
+    .footer-bottom{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+    .footer-bottom p{font-size:0.72rem;color:rgba(28,28,26,0.4);letter-spacing:0.06em}
+    .cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--moto-red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+    .cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(214,66,48,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94)}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}.reveal.visible{opacity:1;transform:translateY(0)}
+    @media(max-width:1024px){.post-body{grid-template-columns:1fr}.sidebar{display:none}.stats-band{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:768px){.nav-links{display:none}.nav-hamburger{display:flex}nav{padding:1.1rem 1.4rem}.hero-content{padding:0 1.4rem 3rem}.post-body{padding:3rem 1.4rem}.stats-band{grid-template-columns:repeat(2,1fr)}.gallery-grid{grid-template-columns:1fr 1fr}.post-nav{padding:1.4rem;grid-template-columns:1fr}footer{padding:2rem 1.4rem}.cursor-dot,.cursor-ring{display:none}}
+  </style>
+</head>
+<body>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">MOTO<span>×</span>TRAVEL</a>
+  <ul class="nav-links">
+    <li><a href="journeys.html">Journeys</a></li>
+    <li><a href="moto-ktm-rally.html">KTM Rally</a></li>
+    <li><a href="moto-alpine-passes.html">Passes</a></li>
+    <li><a href="moto-tools.html">Tools</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="navDrawer">
+  <a href="journeys.html" class="drawer-link">Journeys</a>
+  <a href="moto-ktm-rally.html" class="drawer-link">KTM Rally</a>
+  <a href="moto-alpine-passes.html" class="drawer-link">Passes</a>
+  <a href="about.html" class="drawer-link">About</a>
+</div>
+
+<div class="post-hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="breadcrumb"><a href="index.html">Home</a><span>/</span><a href="moto-ktm-rally.html">KTM Rally</a><span>/</span><a href="#">Norway</a></div>
+    <span class="hero-tag">KTM Adventure Rally</span>
+    <h1 class="hero-title">Norway<br/><em>Fjords</em></h1>
+    <div class="hero-meta"><span>Fjords & Mountains</span><span>— add dates —</span><span>— add km —</span><span>KTM Adventure</span></div>
+  </div>
+</div>
+
+<div class="stats-band">
+  <div class="stat-box"><div class="sb-val">—</div><div class="sb-lbl">km Ridden</div></div>
+  <div class="stat-box"><div class="sb-val">—</div><div class="sb-lbl">Days</div></div>
+  <div class="stat-box"><div class="sb-val">NO</div><div class="sb-lbl">Country</div></div>
+  <div class="stat-box"><div class="sb-val">KTM</div><div class="sb-lbl">Bike</div></div>
+  <div class="stat-box"><div class="sb-val">—</div><div class="sb-lbl">Max Elevation</div></div>
+</div>
+
+<div class="post-body">
+  <article>
+    <p class="post-intro reveal"><strong>Norway was never going to be short.</strong> Add your opening paragraph — the draw of the fjords, the planning, what the first day of riding felt like.</p>
+    <div class="placeholder-note"><strong>Add:</strong> Intro — why Norway, route concept, first impressions.</div>
+
+    <div class="video-section reveal">
+      <p class="video-label">On-Board Video — YouTube</p>
+      <div class="video-wrap">
+        <div class="video-placeholder">
+          <div class="play-btn"><svg width="20" height="20" viewBox="0 0 20 20"><polygon points="5,3 18,10 5,17"/></svg></div>
+          <p>Add YouTube video ID</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-h2 reveal">The <em>Route</em></h2>
+    <p class="post-p reveal">— Route overview: start, end, key fjord roads, mountain sections, ferries. —</p>
+    <div class="placeholder-note"><strong>Add:</strong> Route breakdown, key waypoints, ferries if taken.</div>
+
+    <h2 class="section-h2 reveal">The <em>Roads</em></h2>
+    <p class="post-p reveal">— Norwegian roads: tarmac quality, fjord-side riding, switchbacks, traffic. —</p>
+    <div class="placeholder-note"><strong>Add:</strong> Road conditions, best and worst stretches, highlights.</div>
+
+    <div class="gallery-section reveal">
+      <p class="gallery-label">Photography — Norway</p>
+      <div class="gallery-grid">
+        <div class="gallery-placeholder"><span>Photo 1</span></div>
+        <div class="gallery-placeholder"><span>Photo 2</span></div>
+        <div class="gallery-placeholder"><span>Photo 3</span></div>
+        <div class="gallery-placeholder"><span>Photo 4</span></div>
+        <div class="gallery-placeholder"><span>Photo 5</span></div>
+        <div class="gallery-placeholder"><span>Photo 6</span></div>
+      </div>
+    </div>
+
+    <h2 class="section-h2 reveal">Where I <em>Stayed</em></h2>
+    <p class="post-p reveal">— Accommodation along the Norwegian route. —</p>
+    <div class="placeholder-note"><strong>Add:</strong> Accommodation details, what worked, what to avoid.</div>
+
+    <h2 class="section-h2 reveal">Final <em>Notes</em></h2>
+    <p class="post-p reveal">— Closing thoughts on Norway by KTM. —</p>
+    <div class="placeholder-note"><strong>Add:</strong> Summary, rating, best time of year, who it's for.</div>
+  </article>
+
+  <aside class="sidebar">
+    <div class="sw">
+      <p class="sw-label">Trip Details</p>
+      <div class="info-row"><span class="info-key">Country</span><span class="info-val">Norway</span></div>
+      <div class="info-row"><span class="info-key">Distance</span><span class="info-val">— km</span></div>
+      <div class="info-row"><span class="info-key">Duration</span><span class="info-val">— days</span></div>
+      <div class="info-row"><span class="info-key">Bike</span><span class="info-val">KTM Adventure</span></div>
+      <div class="info-row"><span class="info-key">Season</span><span class="info-val">— add —</span></div>
+    </div>
+    <div class="sw">
+      <p class="sw-label">KTM Rally Series</p>
+      <p class="sw-title">Other Trips</p>
+      <div class="other-trips">
+        <a href="moto-ktm-bosnia.html" class="other-trip"><p class="ot-country">Bosnia</p><p class="ot-name">KTM Rally: Bosnia</p></a>
+        <a href="moto-ktm-france.html" class="other-trip"><p class="ot-country">France</p><p class="ot-name">KTM Rally: France</p></a>
+        <a href="moto-ktm-romania.html" class="other-trip"><p class="ot-country">Romania</p><p class="ot-name">KTM Rally: Romania</p></a>
+        <a href="moto-ktm-italy.html" class="other-trip"><p class="ot-country">Italy</p><p class="ot-name">KTM Rally: Italy</p></a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="post-nav">
+  <a href="moto-ktm-france.html" class="pn-item"><p class="pn-dir">← Previous Trip</p><p class="pn-title">KTM Rally: France</p></a>
+  <a href="moto-ktm-romania.html" class="pn-item right"><p class="pn-dir">Next Trip →</p><p class="pn-title">KTM Rally: Romania</p></a>
+</div>
+
+<footer><div class="footer-bottom"><p>© 2026 The Discoverist Journal — MOTO×TRAVEL</p><p><a href="moto-ktm-rally.html" style="color:var(--moto-red);text-decoration:none;">← All KTM Rally Trips</a></p></div></footer>
+
+<script>
+  const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+  (function loop(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop)})();
+  window.addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('progressFill').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';document.getElementById('mainNav').classList.toggle('shrink',window.scrollY>80)});
+  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}}),{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  const ham=document.getElementById('hamburger'),drawer=document.getElementById('navDrawer');
+  ham.addEventListener('click',()=>{ham.classList.toggle('open');drawer.classList.toggle('open')});
+  document.querySelectorAll('.drawer-link').forEach(l=>l.addEventListener('click',()=>{ham.classList.remove('open');drawer.classList.remove('open')}));
+</script>
+</body>
+</html>

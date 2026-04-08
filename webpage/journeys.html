@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trips & Journeys — The Discoverist Journal</title>
+  <meta name="description" content="Trip reports, travel journals, and motorcycle routes from a life spent on the road.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --black:#0c0b09; --deep:#141210; --charcoal:#1e1b17; --stone:#2a2520; --warm:#c8a97e; --warm-lt:#e2c99f; --cream:#f2ece2; --muted:#7a7068; --white:#faf8f4; }
+    html { scroll-behavior:smooth; }
+    body { background:var(--black); color:var(--cream); font-family:'Barlow',sans-serif; font-weight:300; font-size:15px; line-height:1.7; overflow-x:hidden; }
+    ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:var(--black)} ::-webkit-scrollbar-thumb{background:var(--warm);border-radius:2px}
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:22px 48px; background:rgba(12,11,9,0.97); border-bottom:1px solid rgba(200,169,126,0.12); }
+    .nav-logo { font-family:'Playfair Display',serif; font-size:14px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--warm-lt); text-decoration:none; }
+    .nav-logo span { color:var(--muted); }
+    .nav-links { display:flex; gap:36px; list-style:none; }
+    .nav-links a { font-size:11px; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--cream); text-decoration:none; opacity:0.75; transition:opacity 0.2s,color 0.2s; }
+    .nav-links a:hover,.nav-links a.active { opacity:1; color:var(--warm-lt); }
+    .nav-cta { font-size:10px; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--warm); border:1px solid rgba(200,169,126,0.4); padding:9px 20px; text-decoration:none; transition:background 0.2s,color 0.2s; }
+    .nav-cta:hover { background:var(--warm); color:var(--black); }
+    .nav-burger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+    .nav-burger span { width:22px; height:1px; background:var(--cream); display:block; }
+
+    /* PAGE HEADER */
+    .page-header { position:relative; height:70vh; min-height:500px; display:flex; align-items:flex-end; overflow:hidden; }
+    .page-header-bg { position:absolute; inset:0; background-image:url('https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg'); background-size:cover; background-position:center; }
+    .page-header-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,rgba(12,11,9,0.3) 0%,rgba(12,11,9,0.85) 100%); }
+    .page-header-content { position:relative; z-index:2; padding:0 48px 72px; max-width:1200px; opacity:0; transform:translateY(20px); animation:fadeUp 1s 0.3s forwards; }
+    .page-eyebrow { font-size:10px; font-weight:400; letter-spacing:0.3em; text-transform:uppercase; color:var(--warm); margin-bottom:16px; }
+    .page-title { font-family:'Playfair Display',serif; font-size:clamp(44px,7vw,84px); font-weight:800; line-height:1.0; letter-spacing:-0.02em; color:var(--white); }
+    .page-title em { font-style:italic; color:var(--warm-lt); }
+    .page-sub { font-size:14px; color:rgba(242,236,226,0.6); margin-top:16px; max-width:480px; }
+    @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+    /* FILTERS */
+    .filters { background:var(--deep); padding:24px 48px; border-bottom:1px solid rgba(200,169,126,0.1); position:sticky; top:65px; z-index:50; }
+    .filters-inner { max-width:1200px; margin:0 auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .filter-label { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-right:8px; }
+    .filter-btn { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:7px 16px; border:1px solid rgba(200,169,126,0.2); color:var(--muted); background:none; cursor:pointer; transition:all 0.2s; font-family:'Barlow',sans-serif; }
+    .filter-btn:hover,.filter-btn.active { border-color:var(--warm); color:var(--warm-lt); background:rgba(200,169,126,0.06); }
+
+    /* FEATURED JOURNEY */
+    .featured-journey { padding:80px 48px; background:var(--black); }
+    .featured-inner { max-width:1200px; margin:0 auto; }
+    .featured-card { display:grid; grid-template-columns:1fr 1fr; gap:2px; }
+    .featured-img { position:relative; overflow:hidden; aspect-ratio:4/3; }
+    .featured-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.8s ease; }
+    .featured-card:hover .featured-img img { transform:scale(1.04); }
+    .featured-info { background:var(--charcoal); padding:56px 48px; display:flex; flex-direction:column; justify-content:center; }
+    .featured-badge { font-size:9px; letter-spacing:0.28em; text-transform:uppercase; color:var(--warm); margin-bottom:8px; display:inline-block; border:1px solid rgba(200,169,126,0.3); padding:5px 12px; width:fit-content; }
+    .featured-tag { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; margin-top:12px; }
+    .featured-title { font-family:'Playfair Display',serif; font-size:clamp(28px,3vw,40px); font-weight:800; letter-spacing:-0.01em; color:var(--white); line-height:1.1; margin-bottom:20px; }
+    .featured-title em { font-style:italic; color:var(--warm-lt); }
+    .featured-excerpt { font-size:14px; color:rgba(242,236,226,0.65); line-height:1.9; margin-bottom:32px; }
+    .featured-meta { display:flex; gap:24px; margin-bottom:32px; flex-wrap:wrap; }
+    .meta-item { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+    .meta-dot { width:4px; height:4px; background:var(--warm); border-radius:50%; display:inline-block; }
+    .btn-primary { font-size:10px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; background:var(--warm); color:var(--black); padding:14px 32px; text-decoration:none; transition:background 0.2s,transform 0.2s; display:inline-block; }
+    .btn-primary:hover { background:var(--warm-lt); transform:translateY(-1px); }
+
+    /* JOURNEY GRID */
+    .journey-grid-section { padding:80px 48px; background:var(--deep); }
+    .journey-grid-inner { max-width:1200px; margin:0 auto; }
+    .section-label { font-size:10px; font-weight:400; letter-spacing:0.3em; text-transform:uppercase; color:var(--warm); margin-bottom:12px; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(28px,3vw,42px); font-weight:800; letter-spacing:-0.01em; color:var(--white); margin-bottom:48px; line-height:1.1; }
+    .section-title em { font-style:italic; color:var(--warm-lt); }
+    .journey-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; }
+    .journey-card { position:relative; overflow:hidden; aspect-ratio:3/4; text-decoration:none; display:block; }
+    .journey-card.wide { grid-column:span 2; aspect-ratio:16/9; }
+    .journey-card img { width:100%; height:100%; object-fit:cover; transition:transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94); display:block; }
+    .journey-card:hover img { transform:scale(1.06); }
+    .journey-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(12,11,9,0.9) 0%,rgba(12,11,9,0.1) 55%,transparent 100%); }
+    .journey-info { position:absolute; bottom:0; left:0; right:0; padding:24px 28px; }
+    .journey-tag { font-size:9px; letter-spacing:0.28em; text-transform:uppercase; color:var(--warm); margin-bottom:8px; }
+    .journey-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--white); line-height:1.2; margin-bottom:8px; }
+    .journey-card.wide .journey-title { font-size:28px; font-weight:800; }
+    .journey-meta-sm { font-size:11px; color:var(--muted); }
+    .journey-link { display:inline-flex; align-items:center; gap:8px; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--warm); margin-top:10px; transition:gap 0.2s; }
+    .journey-card:hover .journey-link { gap:14px; }
+    .journey-link::after { content:'→'; }
+
+    /* MOTO SECTION */
+    .moto-section { padding:80px 48px; background:var(--charcoal); position:relative; overflow:hidden; }
+    .moto-section::before { content:'MOTO'; position:absolute; right:-20px; bottom:-40px; font-family:'Playfair Display',serif; font-size:220px; font-weight:800; color:rgba(200,169,126,0.04); pointer-events:none; line-height:1; }
+    .moto-inner { max-width:1200px; margin:0 auto; }
+    .moto-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-top:56px; }
+    .moto-card { position:relative; overflow:hidden; aspect-ratio:4/3; text-decoration:none; display:block; }
+    .moto-card img { width:100%; height:100%; object-fit:cover; transition:transform 0.8s ease; }
+    .moto-card:hover img { transform:scale(1.06); }
+    .moto-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(12,11,9,0.88) 0%,transparent 60%); }
+    .moto-card-info { position:absolute; bottom:0; left:0; right:0; padding:24px 28px; }
+    .moto-card-tag { font-size:9px; letter-spacing:0.28em; text-transform:uppercase; color:var(--warm); margin-bottom:8px; }
+    .moto-card-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--white); line-height:1.2; }
+
+    /* LOAD MORE */
+    .load-more { padding:60px 48px; background:var(--black); text-align:center; }
+    .btn-outline { font-size:10px; font-weight:400; letter-spacing:0.22em; text-transform:uppercase; color:var(--warm); border:1px solid rgba(200,169,126,0.4); padding:14px 40px; text-decoration:none; transition:background 0.2s,color 0.2s; display:inline-block; cursor:pointer; background:none; font-family:'Barlow',sans-serif; }
+    .btn-outline:hover { background:var(--warm); color:var(--black); }
+
+    /* FOOTER */
+    footer { background:var(--black); padding:64px 48px 36px; border-top:1px solid rgba(200,169,126,0.1); }
+    .footer-inner { max-width:1200px; margin:0 auto; }
+    .footer-top { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:60px; margin-bottom:56px; }
+    .footer-brand-name { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--warm-lt); margin-bottom:14px; }
+    .footer-brand-tagline { font-size:12px; color:var(--muted); line-height:1.8; max-width:260px; margin-bottom:24px; }
+    .footer-social { display:flex; gap:16px; }
+    .footer-social a { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+    .footer-social a:hover { color:var(--warm); }
+    .footer-col-title { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--warm); margin-bottom:20px; }
+    .footer-links { list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .footer-links a { font-size:13px; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--cream); }
+    .footer-bottom { border-top:1px solid rgba(200,169,126,0.08); padding-top:28px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+    .footer-copy { font-size:11px; color:rgba(122,112,104,0.5); }
+    .footer-affiliate { font-size:10px; color:rgba(122,112,104,0.4); max-width:500px; line-height:1.5; text-align:right; }
+
+    /* ANIMATION */
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.8s ease,transform 0.8s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-delay-1{transition-delay:0.1s} .reveal-delay-2{transition-delay:0.2s} .reveal-delay-3{transition-delay:0.3s}
+
+    /* MOBILE MENU */
+    .mobile-menu { display:none; position:fixed; inset:0; z-index:200; background:rgba(12,11,9,0.98); flex-direction:column; align-items:center; justify-content:center; gap:32px; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:'Playfair Display',serif; font-size:36px; font-weight:700; color:var(--cream); text-decoration:none; transition:color 0.2s; }
+    .mobile-menu a:hover { color:var(--warm-lt); }
+    .mobile-close { position:absolute; top:24px; right:48px; font-size:28px; color:var(--muted); cursor:pointer; background:none; border:none; }
+
+    /* RESPONSIVE */
+    @media(max-width:1024px) {
+      nav{padding:20px 28px} .featured-card{grid-template-columns:1fr} .journey-grid{grid-template-columns:1fr 1fr}
+      .journey-card.wide{grid-column:span 2} .footer-top{grid-template-columns:1fr 1fr;gap:40px}
+    }
+    @media(max-width:768px) {
+      nav{padding:18px 20px} .nav-links,.nav-cta{display:none} .nav-burger{display:flex}
+      .page-header-content,.filters,.featured-journey,.journey-grid-section,.moto-section,.load-more{padding-left:20px;padding-right:20px}
+      .journey-grid{grid-template-columns:1fr} .journey-card.wide{grid-column:span 1;aspect-ratio:4/3}
+      .moto-grid{grid-template-columns:1fr} .footer-top{grid-template-columns:1fr;gap:32px} .footer-affiliate{text-align:left}
+    }
+  </style>
+</head>
+<body>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="index.html" onclick="closeMobile()">Home</a>
+  <a href="hotels.html" onclick="closeMobile()">Hotels</a>
+  <a href="journeys.html" onclick="closeMobile()">Journeys</a>
+  <a href="store.html" onclick="closeMobile()">Store</a>
+  <a href="about.html" onclick="closeMobile()">About</a>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">The Discoverist <span>Journal</span></a>
+  <ul class="nav-links">
+    <li><a href="hotels.html">Hotel Reviews</a></li>
+    <li><a href="journeys.html" class="active">Trips & Journeys</a></li>
+    <li><a href="store.html">POD Store</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Subscribe</a>
+  <div class="nav-burger" onclick="openMobile()"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<div class="page-header">
+  <div class="page-header-bg"></div>
+  <div class="page-header-overlay"></div>
+  <div class="page-header-content">
+    <p class="page-eyebrow">Roads, Routes & Dispatches</p>
+    <h1 class="page-title">Trips &<br><em>Journeys</em></h1>
+    <p class="page-sub">Trip reports and travel journals from 40+ countries. Some by plane, some by road, some by motorcycle.</p>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <div class="filters-inner">
+    <span class="filter-label">Filter</span>
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Europe</button>
+    <button class="filter-btn">Americas</button>
+    <button class="filter-btn">Asia</button>
+    <button class="filter-btn">Motorcycle</button>
+    <button class="filter-btn">Winter</button>
+    <button class="filter-btn">Alpine</button>
+  </div>
+</div>
+
+<!-- FEATURED -->
+<section class="featured-journey">
+  <div class="featured-inner">
+    <div class="featured-card reveal">
+      <div class="featured-img">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_4857-576x1024.jpg" alt="Vigilius Mountain Resort">
+      </div>
+      <div class="featured-info">
+        <span class="featured-badge">Featured Journey</span>
+        <p class="featured-tag">Italy · South Tyrol · Alpine</p>
+        <h2 class="featured-title">Weekend in the <em>Italian Alps</em>: Vigilius Mountain Resort</h2>
+        <p class="featured-excerpt">No road leads here. You arrive by cable car, leave the valley behind, and find yourself at one of the most considered mountain hotels in Europe. Two nights above Lana, South Tyrol — in a place that earns its silence.</p>
+        <div class="featured-meta">
+          <span class="meta-item"><span class="meta-dot"></span> 2 Nights</span>
+          <span class="meta-item"><span class="meta-dot"></span> South Tyrol, Italy</span>
+          <span class="meta-item"><span class="meta-dot"></span> January 2026</span>
+        </div>
+        <a href="blog-post.html" class="btn-primary">Read the Journey</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY GRID -->
+<section class="journey-grid-section">
+  <div class="journey-grid-inner">
+    <p class="section-label reveal">All Journeys</p>
+    <h2 class="section-title reveal">From the <em>Archive</em></h2>
+    <div class="journey-grid">
+
+      <a href="blog-post.html" class="journey-card wide reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="British Columbia Snowbiking" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Canada · Winter · Backcountry</p>
+          <h3 class="journey-title">Snowbiking in British Columbia</h3>
+          <p class="journey-meta-sm">Deep powder, no signal, and the best kind of exhaustion</p>
+          <span class="journey-link">Read More</span>
+        </div>
+      </a>
+
+      <a href="blog-post.html" class="journey-card reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="Switzerland" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Switzerland · Alpine</p>
+          <h3 class="journey-title">The Cambrian, Adelboden</h3>
+          <p class="journey-meta-sm">Refined alpine stays in the Bernese Oberland</p>
+          <span class="journey-link">Read More</span>
+        </div>
+      </a>
+
+      <a href="blog-post.html" class="journey-card reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Alps Crossing" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Europe · Multi-Country</p>
+          <h3 class="journey-title">Alpine Crossing: Switzerland to Austria</h3>
+          <p class="journey-meta-sm">Passes, valleys, and villages that earn their stars</p>
+          <span class="journey-link">Read More</span>
+        </div>
+      </a>
+
+      <a href="blog-post.html" class="journey-card reveal reveal-delay-2">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="Norway Fjords" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Norway · Fjords</p>
+          <h3 class="journey-title">Norway: Fjords by Road</h3>
+          <p class="journey-meta-sm">Drone dispatches and quiet roads above the water</p>
+          <span class="journey-link">Read More</span>
+        </div>
+      </a>
+
+      <a href="blog-post.html" class="journey-card reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/7-dji_fly_20230721_112538_90_1690062080451_photo-576x1024.jpg" alt="Aerial" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Europe · Drone</p>
+          <h3 class="journey-title">Starlapse: Swiss Alps from Above</h3>
+          <p class="journey-meta-sm">Night photography and aerial work in the Oberland</p>
+          <span class="journey-link">Read More</span>
+        </div>
+      </a>
+
+      <a href="blog-post.html" class="journey-card reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_023-768x1024.jpg" alt="Lucerne" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Switzerland · City</p>
+          <h3 class="journey-title">Lucerne: A Long Weekend</h3>
+          <p class="journey-meta-sm">The lake, the old town, and the Hotel that sees it all</p>
+          <span class="journey-link">Read More</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- MOTO -->
+<section class="moto-section">
+  <div class="moto-inner">
+    <div class="reveal" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+      <div>
+        <p class="section-label">Motorcycle Trips · KTM Rally Series</p>
+        <h2 class="section-title" style="margin-bottom:0;">The <em>Long Road</em></h2>
+      </div>
+      <a href="moto-ktm-rally.html" style="font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--warm);text-decoration:none;border-bottom:1px solid rgba(200,169,126,0.3);padding-bottom:2px;white-space:nowrap;">All KTM Trips →</a>
+    </div>
+    <div class="moto-grid" style="grid-template-columns:repeat(3,1fr);">
+      <a href="moto-ktm-bosnia.html" class="moto-card reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="KTM Rally Bosnia" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <p class="moto-card-tag">Bosnia & Herzegovina · KTM Rally</p>
+          <h3 class="moto-card-title">KTM Rally: Bosnia</h3>
+        </div>
+      </a>
+      <a href="moto-ktm-norway.html" class="moto-card reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="KTM Rally Norway" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <p class="moto-card-tag">Norway · KTM Rally</p>
+          <h3 class="moto-card-title">KTM Rally: Norway</h3>
+        </div>
+      </a>
+      <a href="moto-ktm-romania.html" class="moto-card reveal reveal-delay-2">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/8-dji_fly_20230721_112524_87_1690062076550_photo-576x1024.jpg" alt="KTM Rally Romania" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <p class="moto-card-tag">Romania · KTM Rally</p>
+          <h3 class="moto-card-title">KTM Rally: Romania</h3>
+        </div>
+      </a>
+      <a href="moto-ktm-france.html" class="moto-card reveal reveal-delay-3">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="KTM Rally France" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <p class="moto-card-tag">France · KTM Rally</p>
+          <h3 class="moto-card-title">KTM Rally: France</h3>
+        </div>
+      </a>
+      <a href="moto-ktm-italy.html" class="moto-card reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="KTM Rally Italy" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <p class="moto-card-tag">Italy · KTM Rally</p>
+          <h3 class="moto-card-title">KTM Rally: Italy</h3>
+        </div>
+      </a>
+      <a href="moto-ktm-rally.html" class="moto-card reveal reveal-delay-2" style="background:var(--stone);display:flex;align-items:center;justify-content:center;text-decoration:none;">
+        <div style="text-align:center;padding:24px;">
+          <p style="font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:var(--warm);margin-bottom:12px;">KTM Rally</p>
+          <p style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);line-height:1.2;margin-bottom:16px;">Five Countries.<br><em style="color:var(--warm-lt);">One Series.</em></p>
+          <span style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm);">View All Trips →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- LOAD MORE -->
+<div class="load-more">
+  <button class="btn-outline">Load More Journeys</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">The Discoverist Journal</div>
+        <p class="footer-brand-tagline">Hotels, adventures, and journeys worth discovering. Real trips. Honest reviews. Written from the road.</p>
+        <div class="footer-social">
+          <a href="#">Instagram</a><a href="#">Reddit</a><a href="#">Facebook</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Navigate</p>
+        <ul class="footer-links">
+          <li><a href="hotels.html">Hotel Reviews</a></li>
+          <li><a href="journeys.html">Trips & Journeys</a></li>
+          <li><a href="store.html">POD Store</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Destinations</p>
+        <ul class="footer-links">
+          <li><a href="#">Switzerland</a></li><li><a href="#">Italy</a></li>
+          <li><a href="#">Norway</a></li><li><a href="#">Canada</a></li>
+          <li><a href="#">All Countries →</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Partners</p>
+        <ul class="footer-links">
+          <li><a href="https://prf.hn/l/kVGw1Zv/" target="_blank">Travelpayouts Hotels</a></li>
+          <li><a href="#" target="_blank">Marriott Bonvoy</a></li>
+          <li><a href="#" target="_blank">Amazon Travel</a></li>
+          <li><a href="#" target="_blank">Booking.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 The Discoverist Journal. All rights reserved.</p>
+      <p class="footer-affiliate">This site contains affiliate links. We may earn a commission when you book through our links, at no extra cost to you.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } }), { threshold:0.08, rootMargin:'0px 0px -30px 0px' });
+  reveals.forEach(el => obs.observe(el));
+  function openMobile(){ document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeMobile(){ document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
+</script>
+</body>
+</html>

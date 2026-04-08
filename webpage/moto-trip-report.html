@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stelvio & Gavia — Moto Trip Report — The Discoverist Journal</title>
+  <meta name="description" content="A two-day motorcycle route through the Stelvio and Gavia passes in northern Italy. Day-by-day report, road conditions, overnight hotels, and gear notes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--black:#0c0b09;--deep:#141210;--charcoal:#1e1b17;--stone:#2a2520;--warm:#c8a97e;--warm-lt:#e2c99f;--cream:#f2ece2;--muted:#7a7068;--white:#faf8f4}
+    html{scroll-behavior:smooth}
+    body{background:var(--black);color:var(--cream);font-family:'Barlow',sans-serif;font-weight:300;font-size:16px;line-height:1.8;overflow-x:hidden}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--black)}::-webkit-scrollbar-thumb{background:var(--warm);border-radius:2px}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:22px 48px;background:rgba(12,11,9,0.97);border-bottom:1px solid rgba(200,169,126,0.12)}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--warm-lt);text-decoration:none}
+    .nav-logo span{color:var(--muted)}
+    .nav-links{display:flex;gap:36px;list-style:none}
+    .nav-links a{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--cream);text-decoration:none;opacity:0.75;transition:opacity 0.2s,color 0.2s}
+    .nav-links a:hover{opacity:1;color:var(--warm-lt)}
+    .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer}
+    .nav-burger span{width:22px;height:1px;background:var(--cream);display:block}
+
+    /* PROGRESS BAR */
+    .progress-bar{position:fixed;top:65px;left:0;right:0;height:2px;background:rgba(200,169,126,0.1);z-index:99}
+    .progress-fill{height:100%;background:var(--warm);width:0%;transition:width 0.1s linear}
+
+    /* HERO */
+    .post-hero{position:relative;height:88vh;min-height:560px;display:flex;align-items:flex-end;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;background-image:url('https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg');background-size:cover;background-position:center 35%}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(12,11,9,0.15) 0%,rgba(12,11,9,0.95) 100%)}
+    .hero-content{position:relative;z-index:2;padding:0 48px 64px;max-width:960px;opacity:0;transform:translateY(20px);animation:fadeUp 1s 0.3s forwards}
+    @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+    .breadcrumb{display:flex;gap:8px;align-items:center;margin-bottom:18px}
+    .breadcrumb a{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s}
+    .breadcrumb a:hover{color:var(--warm)}
+    .breadcrumb span{color:rgba(122,112,104,0.4);font-size:10px}
+    .hero-cats{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .hero-cat{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--warm);border:1px solid rgba(200,169,126,0.3);padding:5px 12px}
+    .hero-title{font-family:'Playfair Display',serif;font-size:clamp(34px,5vw,64px);font-weight:800;line-height:1.05;letter-spacing:-0.02em;color:var(--white);margin-bottom:20px}
+    .hero-title em{font-style:italic;color:var(--warm-lt)}
+    .hero-meta{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+    .meta-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .meta-dot{width:3px;height:3px;background:var(--warm);border-radius:50%;display:inline-block}
+
+    /* ROUTE SUMMARY BAND */
+    .route-band{background:var(--stone);padding:0 48px;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+    .route-stat{background:var(--charcoal);padding:20px 24px;text-align:center}
+    .rs-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--warm-lt);line-height:1}
+    .rs-lbl{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+    /* BODY LAYOUT */
+    .post-body{padding:72px 48px;background:var(--black)}
+    .post-layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:72px;align-items:start}
+
+    /* ARTICLE */
+    .post-intro{font-size:18px;font-weight:400;color:rgba(242,236,226,0.85);line-height:1.85;margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid rgba(200,169,126,0.1)}
+    .post-intro strong{color:var(--warm-lt)}
+
+    /* DAY CARDS */
+    .day-card{background:var(--charcoal);margin:40px 0;overflow:hidden}
+    .day-header{padding:24px 28px;background:var(--stone);display:flex;align-items:center;gap:16px;border-left:3px solid var(--warm)}
+    .day-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:800;color:var(--warm-lt);line-height:1;min-width:48px}
+    .day-title-block{}
+    .day-label{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--warm);margin-bottom:4px}
+    .day-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);line-height:1.2}
+    .day-meta-row{display:flex;gap:20px;padding:16px 28px;background:rgba(200,169,126,0.04);border-bottom:1px solid rgba(200,169,126,0.08);flex-wrap:wrap}
+    .day-spec{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center}
+    .day-spec strong{color:var(--cream)}
+    .day-body{padding:24px 28px}
+
+    /* ROAD CONDITION ROW */
+    .road-conditions{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin:20px 0}
+    .rc-item{background:var(--stone);padding:14px 16px;text-align:center}
+    .rc-icon{font-size:20px;margin-bottom:6px}
+    .rc-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .rc-val{font-size:12px;color:var(--cream)}
+    .rc-val.good{color:#88c888}.rc-val.caution{color:var(--warm)}.rc-val.warning{color:#c88888}
+
+    /* WAYPOINT LIST */
+    .waypoints{margin:20px 0}
+    .waypoint-title{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--warm);margin-bottom:14px}
+    .waypoint{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(200,169,126,0.06)}
+    .waypoint:last-child{border-bottom:none}
+    .wp-marker{width:24px;height:24px;border:1px solid rgba(200,169,126,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:var(--warm);font-family:'Playfair Display',serif;font-weight:700}
+    .wp-name{font-size:13px;color:var(--cream);font-weight:400}
+    .wp-note{font-size:11px;color:var(--muted)}
+    .wp-dist{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap}
+
+    /* OVERNIGHT BOX */
+    .overnight-box{background:var(--stone);padding:20px 24px;margin:20px 0;display:flex;gap:16px;align-items:center;border-left:2px solid var(--warm)}
+    .ob-icon{font-size:24px;flex-shrink:0}
+    .ob-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--warm);margin-bottom:4px}
+    .ob-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--white);margin-bottom:4px}
+    .ob-meta{font-size:12px;color:var(--muted)}
+    .ob-cta{margin-left:auto;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;background:var(--warm);color:var(--black);padding:10px 16px;text-decoration:none;transition:background 0.2s;white-space:nowrap;flex-shrink:0}
+    .ob-cta:hover{background:var(--warm-lt)}
+
+    /* STANDARD POST ELEMENTS */
+    h2.post-h2{font-family:'Playfair Display',serif;font-size:clamp(22px,2.5vw,32px);font-weight:800;letter-spacing:-0.01em;color:var(--white);line-height:1.15;margin:48px 0 16px}
+    h2.post-h2 em{font-style:italic;color:var(--warm-lt)}
+    p.post-p{font-size:15px;color:rgba(242,236,226,0.72);line-height:1.9;margin-bottom:18px}
+    .post-quote{border-left:3px solid var(--warm);padding:20px 28px;margin:32px 0;background:rgba(200,169,126,0.04)}
+    .post-quote p{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;font-style:italic;color:var(--warm-lt);line-height:1.4;margin:0}
+    .post-img-full{margin:32px 0;overflow:hidden}
+    .post-img-full img{width:100%;display:block}
+    .img-caption{font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:0.08em}
+    .post-img-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin:32px 0}
+    .post-img-row img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+
+    /* GEAR USED */
+    .gear-used{background:var(--charcoal);padding:28px;margin:40px 0;border-top:2px solid var(--warm)}
+    .gear-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:16px}
+    .gear-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .gear-item{background:var(--stone);padding:12px 14px;text-decoration:none;display:block;transition:background 0.2s}
+    .gear-item:hover{background:#312b24}
+    .gear-cat{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--warm);margin-bottom:4px}
+    .gear-name{font-size:12px;color:var(--cream);line-height:1.3;transition:color 0.2s}
+    .gear-item:hover .gear-name{color:var(--warm-lt)}
+    .gear-cta{font-size:9px;color:var(--muted);margin-top:4px}
+
+    /* VERDICT */
+    .verdict{background:var(--charcoal);padding:32px;margin:40px 0;border-top:2px solid var(--warm)}
+    .verdict-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:var(--white);margin-bottom:16px}
+    .verdict-title em{font-style:italic;color:var(--warm-lt)}
+    .verdict-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+    .v-score-num{font-family:'Playfair Display',serif;font-size:34px;font-weight:800;color:var(--warm-lt);line-height:1}
+    .v-score-lbl{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+    .verdict-text{font-size:14px;color:rgba(242,236,226,0.7);line-height:1.85}
+    .post-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:40px;padding-top:28px;border-top:1px solid rgba(200,169,126,0.1)}
+    .p-tag{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;padding:5px 10px;border:1px solid rgba(200,169,126,0.12);color:var(--muted);text-decoration:none;transition:all 0.2s}
+    .p-tag:hover{border-color:var(--warm);color:var(--warm)}
+
+    /* SIDEBAR */
+    .sidebar{position:sticky;top:90px}
+    .sw{background:var(--charcoal);padding:24px;margin-bottom:20px}
+    .sw-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(200,169,126,0.1)}
+    .toc-list{list-style:none;display:flex;flex-direction:column;gap:0}
+    .toc-list li a{display:block;font-size:12px;color:var(--muted);text-decoration:none;padding:8px 0;border-bottom:1px solid rgba(200,169,126,0.06);transition:color 0.2s,padding-left 0.2s}
+    .toc-list li a:hover,.toc-list li a.active{color:var(--warm-lt);padding-left:8px}
+    .quick-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .qs{background:var(--stone);padding:12px 14px;text-align:center}
+    .qs-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--warm-lt);line-height:1}
+    .qs-lbl{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+    .rel-list{display:flex;flex-direction:column;gap:10px}
+    .rel-item{display:grid;grid-template-columns:56px 1fr;gap:10px;text-decoration:none}
+    .rel-thumb{overflow:hidden;aspect-ratio:1}
+    .rel-thumb img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
+    .rel-item:hover .rel-thumb img{transform:scale(1.1)}
+    .rel-cat{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--warm);margin-bottom:2px}
+    .rel-name{font-size:12px;color:var(--cream);line-height:1.3;transition:color 0.2s}
+    .rel-item:hover .rel-name{color:var(--warm-lt)}
+
+    /* POST NAV */
+    .post-nav{padding:48px;background:var(--deep);border-top:1px solid rgba(200,169,126,0.08)}
+    .post-nav-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:2px}
+    .pn-item{background:var(--charcoal);padding:28px;text-decoration:none;transition:background 0.2s;display:block}
+    .pn-item:hover{background:var(--stone)}
+    .pn-dir{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+    .pn-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--white);line-height:1.2;transition:color 0.2s}
+    .pn-item:hover .pn-title{color:var(--warm-lt)}
+    .pn-item.right{text-align:right}
+
+    footer{background:var(--black);padding:40px 48px 28px;border-top:1px solid rgba(200,169,126,0.1)}
+    .footer-bottom{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .footer-copy{font-size:11px;color:rgba(122,112,104,0.5)}
+    .footer-aff{font-size:10px;color:rgba(122,112,104,0.4);max-width:500px;text-align:right}
+
+    .reveal{opacity:0;transform:translateY(22px);transition:opacity 0.8s ease,transform 0.8s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .mobile-menu{display:none;position:fixed;inset:0;z-index:200;background:rgba(12,11,9,0.98);flex-direction:column;align-items:center;justify-content:center;gap:32px}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--cream);text-decoration:none}
+    .mobile-close{position:absolute;top:24px;right:48px;font-size:28px;color:var(--muted);cursor:pointer;background:none;border:none}
+
+    @media(max-width:1024px){.post-layout{grid-template-columns:1fr}.sidebar{display:none}.verdict-scores{grid-template-columns:repeat(2,1fr)}.route-band{grid-template-columns:repeat(3,1fr)}.gear-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:768px){nav{padding:18px 20px}.nav-links{display:none}.nav-burger{display:flex}.hero-content,.post-body,.post-nav{padding-left:20px;padding-right:20px}.route-band{grid-template-columns:repeat(2,1fr);padding:0 20px}.road-conditions{grid-template-columns:1fr 1fr}.post-img-row{grid-template-columns:1fr}.gear-grid{grid-template-columns:1fr}.post-nav-inner{grid-template-columns:1fr}.footer-bottom{flex-direction:column;text-align:center}.footer-aff{text-align:center}}
+  </style>
+</head>
+<body>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="index.html">Home</a><a href="moto-alpine-passes.html">Passes</a>
+  <a href="journeys.html">Journeys</a><a href="about.html">About</a>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">The Discoverist <span>Journal</span></a>
+  <ul class="nav-links">
+    <li><a href="hotels.html">Hotel Reviews</a></li>
+    <li><a href="journeys.html">Trips & Journeys</a></li>
+    <li><a href="moto-alpine-passes.html">Alpine Passes</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="nav-burger" onclick="openMobile()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- HERO -->
+<div class="post-hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="breadcrumb">
+      <a href="journeys.html">Journeys</a><span>/</span>
+      <a href="moto-alpine-passes.html">Alpine Passes</a><span>/</span>
+      <a href="#">Italy</a>
+    </div>
+    <div class="hero-cats">
+      <span class="hero-cat">Moto Trip Report</span>
+      <span class="hero-cat">Italy</span>
+      <span class="hero-cat">2 Days</span>
+    </div>
+    <h1 class="hero-title">Stelvio & Gavia:<br><em>Two Days, Two Passes,</em><br>One Standard Reset</h1>
+    <div class="hero-meta">
+      <span class="meta-item"><span class="meta-dot"></span>Northern Italy</span>
+      <span class="meta-item"><span class="meta-dot"></span>September 2025</span>
+      <span class="meta-item"><span class="meta-dot"></span>12 min read</span>
+      <span class="meta-item"><span class="meta-dot"></span>BMW R1250GS</span>
+    </div>
+  </div>
+</div>
+
+<!-- ROUTE STATS BAND -->
+<div class="route-band">
+  <div class="route-stat"><div class="rs-val">340</div><p class="rs-lbl">km Total</p></div>
+  <div class="route-stat"><div class="rs-val">2</div><p class="rs-lbl">Days</p></div>
+  <div class="route-stat"><div class="rs-val">2</div><p class="rs-lbl">Major Passes</p></div>
+  <div class="route-stat"><div class="rs-val">5,376m</div><p class="rs-lbl">Total Elevation</p></div>
+  <div class="route-stat"><div class="rs-val">Sep</div><p class="rs-lbl">Best Month</p></div>
+</div>
+
+<!-- BODY -->
+<div class="post-body">
+  <div class="post-layout">
+
+    <article>
+      <p class="post-intro reveal">The Stelvio needs no introduction. 48 hairpins, 2,758 metres, the most photographed road in the Alps. What it doesn't tell you is that the <strong>Gavia, 40 kilometres south-east, is harder, emptier, and in September, possibly more beautiful</strong>. This is the two-day route that chains them both.</p>
+
+      <!-- DAY 1 -->
+      <div class="day-card reveal" id="day1">
+        <div class="day-header">
+          <span class="day-num">01</span>
+          <div class="day-title-block">
+            <p class="day-label">Day One</p>
+            <h2 class="day-title">Bormio → Stelvio → Prad → Merano</h2>
+          </div>
+        </div>
+        <div class="day-meta-row">
+          <span class="day-spec"><strong>168km</strong> distance</span>
+          <span class="day-spec"><strong>2,758m</strong> max elevation</span>
+          <span class="day-spec"><strong>4h</strong> riding time</span>
+          <span class="day-spec"><strong>Fuel:</strong> Bormio before departure</span>
+        </div>
+        <div class="day-body">
+          <div class="road-conditions">
+            <div class="rc-item"><div class="rc-icon">🛣</div><p class="rc-label">Surface</p><p class="rc-val good">Good</p></div>
+            <div class="rc-item"><div class="rc-icon">🚦</div><p class="rc-label">Traffic</p><p class="rc-val caution">Moderate</p></div>
+            <div class="rc-item"><div class="rc-icon">🌡</div><p class="rc-label">Summit Temp</p><p class="rc-val">~8°C</p></div>
+            <div class="rc-item"><div class="rc-icon">🌤</div><p class="rc-label">Weather</p><p class="rc-val good">Clear</p></div>
+          </div>
+
+          <div class="waypoints">
+            <p class="waypoint-title">Waypoints</p>
+            <div class="waypoint"><div class="wp-marker">S</div><div><p class="wp-name">Bormio</p><p class="wp-note">Fill up. Last reliable fuel before the pass.</p></div><div class="wp-dist">0km</div></div>
+            <div class="waypoint"><div class="wp-marker">1</div><div><p class="wp-name">Passo dello Stelvio (east approach)</p><p class="wp-note">48 hairpins. Ride the east side up — more dramatic, better photography angles.</p></div><div class="wp-dist">24km</div></div>
+            <div class="waypoint"><div class="wp-marker">2</div><div><p class="wp-name">Summit Cafe — coffee stop</p><p class="wp-note">Busy but worth 20 minutes. The view earns it.</p></div><div class="wp-dist">25km</div></div>
+            <div class="waypoint"><div class="wp-marker">3</div><div><p class="wp-name">West descent to Prad</p><p class="wp-note">Longer, faster sweepers on the way down. Cleaner road than east.</p></div><div class="wp-dist">48km</div></div>
+            <div class="waypoint"><div class="wp-marker">4</div><div><p class="wp-name">Vinschgau Valley (SS38)</p><p class="wp-note">Fast valley run to Merano. Stop for wine if time allows.</p></div><div class="wp-dist">130km</div></div>
+            <div class="waypoint"><div class="wp-marker">E</div><div><p class="wp-name">Merano — overnight</p><p class="wp-note">Good base for Day 2. Secure hotel parking essential.</p></div><div class="wp-dist">168km</div></div>
+          </div>
+
+          <div class="overnight-box">
+            <div class="ob-icon">🏨</div>
+            <div>
+              <p class="ob-label">Overnight — Day 1</p>
+              <p class="ob-name">Vigilius Mountain Resort, Lana</p>
+              <p class="ob-meta">Cable car access · Spa · 15min from Merano · Secure parking in valley</p>
+            </div>
+            <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="ob-cta">Check Rates →</a>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="post-h2 reveal" id="stelvio">The <em>Stelvio</em> — What No One Tells You</h2>
+      <p class="post-p reveal">Everyone knows about the hairpins. What they don't tell you is that the east approach from Bormio is tighter, more exposed, and far more satisfying to ride than the west. The west descent is wider and faster. Ride up from the east. Descend west. That's the correct answer.</p>
+      <p class="post-p reveal">September is the optimal month. July and August bring coaches, cyclists and tour groups in volume. By September the coaches have mostly stopped, the road surface has dried from the summer rains, and the light in the afternoon turns the rock faces amber. If you can only pick one month, it's September.</p>
+
+      <div class="post-quote reveal">
+        <p>"48 hairpins going up. The view from the top is earned, not given. That's what makes it different."</p>
+      </div>
+
+      <div class="post-img-row reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="Stelvio approach" loading="lazy">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Summit view" loading="lazy">
+      </div>
+
+      <!-- DAY 2 -->
+      <div class="day-card reveal" id="day2">
+        <div class="day-header">
+          <span class="day-num">02</span>
+          <div class="day-title-block">
+            <p class="day-label">Day Two</p>
+            <h2 class="day-title">Lana → Santa Caterina → Gavia → Bormio</h2>
+          </div>
+        </div>
+        <div class="day-meta-row">
+          <span class="day-spec"><strong>172km</strong> distance</span>
+          <span class="day-spec"><strong>2,618m</strong> max elevation</span>
+          <span class="day-spec"><strong>5h</strong> riding time</span>
+          <span class="day-spec"><strong>Fuel:</strong> Santa Caterina — mandatory</span>
+        </div>
+        <div class="day-body">
+          <div class="road-conditions">
+            <div class="rc-item"><div class="rc-icon">🛣</div><p class="rc-label">Surface</p><p class="rc-val caution">Variable</p></div>
+            <div class="rc-item"><div class="rc-icon">🚦</div><p class="rc-label">Traffic</p><p class="rc-val good">Low</p></div>
+            <div class="rc-item"><div class="rc-icon">📏</div><p class="rc-label">Width</p><p class="rc-val warning">Narrow</p></div>
+            <div class="rc-item"><div class="rc-icon">⚠️</div><p class="rc-label">Difficulty</p><p class="rc-val warning">Extreme</p></div>
+          </div>
+
+          <div class="waypoints">
+            <p class="waypoint-title">Waypoints</p>
+            <div class="waypoint"><div class="wp-marker">S</div><div><p class="wp-name">Lana / Merano departure</p><p class="wp-note">Early start — the Gavia north approach gets afternoon shadow.</p></div><div class="wp-dist">0km</div></div>
+            <div class="waypoint"><div class="wp-marker">1</div><div><p class="wp-name">Santa Caterina Valfurva</p><p class="wp-note">Fuel here. Mandatory. Last station before the pass.</p></div><div class="wp-dist">80km</div></div>
+            <div class="waypoint"><div class="wp-marker">2</div><div><p class="wp-name">Passo Gavia — north approach</p><p class="wp-note">Single track in places. Sheer drops. No barriers. Slow down.</p></div><div class="wp-dist">104km</div></div>
+            <div class="waypoint"><div class="wp-marker">3</div><div><p class="wp-name">Summit — 2,618m</p><p class="wp-note">Small lake at the top. Worth stopping. Quiet on weekdays.</p></div><div class="wp-dist">110km</div></div>
+            <div class="waypoint"><div class="wp-marker">E</div><div><p class="wp-name">Bormio — end</p><p class="wp-note">Full loop back to start. Good restaurants in town.</p></div><div class="wp-dist">172km</div></div>
+          </div>
+
+          <div class="overnight-box">
+            <div class="ob-icon">🏠</div>
+            <div>
+              <p class="ob-label">End of Route</p>
+              <p class="ob-name">Bormio — optional extra night</p>
+              <p class="ob-meta">Spa town. Good hotels. Deserves more than a flythrough.</p>
+            </div>
+            <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="ob-cta">Hotels in Bormio →</a>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="post-h2 reveal" id="gavia">The <em>Gavia</em> — The One They Don't Write About</h2>
+      <p class="post-p reveal">The Gavia is where the Stelvio sends people who want to feel something more uncomfortable. The north approach is a single-track road cut into a cliff face with no armco and long drops to the valley. In places, two bikes passing requires one to pull in and wait. It is not suitable for large touring bikes or inexperienced riders. On a nimble mid-weight, it is extraordinary.</p>
+      <p class="post-p reveal">The summit has a small lake and a refuge that opens in summer. In September, on a Tuesday morning, I had it to myself for twenty minutes. That doesn't happen on the Stelvio.</p>
+
+      <!-- GEAR USED -->
+      <div class="gear-used reveal" id="gear">
+        <p class="gear-title">Gear Used on This Route</p>
+        <div class="gear-grid">
+          <a href="https://www.amazon.com/s?k=BMW+R1250GS+accessories&tag=tdjournal-20" target="_blank" rel="noopener" class="gear-item">
+            <p class="gear-cat">Bike</p><p class="gear-name">BMW R1250GS Adventure</p><p class="gear-cta">View on Amazon →</p>
+          </a>
+          <a href="https://www.amazon.com/s?k=Shoei+GT-Air+helmet&tag=tdjournal-20" target="_blank" rel="noopener" class="gear-item">
+            <p class="gear-cat">Helmet</p><p class="gear-name">Shoei GT-Air II</p><p class="gear-cta">View on Amazon →</p>
+          </a>
+          <a href="https://www.amazon.com/s?k=Rev+It+motorcycle+jacket&tag=tdjournal-20" target="_blank" rel="noopener" class="gear-item">
+            <p class="gear-cat">Jacket</p><p class="gear-name">Rev'It Dominator 3 GTX</p><p class="gear-cta">View on Amazon →</p>
+          </a>
+          <a href="https://www.amazon.com/s?k=Alpinestars+motorcycle+gloves&tag=tdjournal-20" target="_blank" rel="noopener" class="gear-item">
+            <p class="gear-cat">Gloves</p><p class="gear-name">Alpinestars SP-8 v3</p><p class="gear-cta">View on Amazon →</p>
+          </a>
+          <a href="https://www.amazon.com/s?k=Kriega+OS-32+motorcycle+luggage&tag=tdjournal-20" target="_blank" rel="noopener" class="gear-item">
+            <p class="gear-cat">Luggage</p><p class="gear-name">Kriega OS-32 Panniers</p><p class="gear-cta">View on Amazon →</p>
+          </a>
+          <a href="https://www.amazon.com/s?k=Garmin+Zumo+XT+motorcycle+GPS&tag=tdjournal-20" target="_blank" rel="noopener" class="gear-item">
+            <p class="gear-cat">Navigation</p><p class="gear-name">Garmin Zūmo XT2</p><p class="gear-cta">View on Amazon →</p>
+          </a>
+        </div>
+      </div>
+
+      <!-- VERDICT -->
+      <div class="verdict reveal" id="verdict">
+        <h3 class="verdict-title">The <em>Route Verdict</em></h3>
+        <div class="verdict-scores">
+          <div><div class="v-score-num">9.6</div><p class="v-score-lbl">Road Quality</p></div>
+          <div><div class="v-score-num">9.8</div><p class="v-score-lbl">Scenery</p></div>
+          <div><div class="v-score-num">8.2</div><p class="v-score-lbl">Traffic</p></div>
+          <div><div class="v-score-num">9.4</div><p class="v-score-lbl">Overall</p></div>
+        </div>
+        <p class="verdict-text">One of the best two-day moto routes in Europe. The Stelvio delivers exactly what it promises. The Gavia delivers more than most people expect. Ride them back to back and the contrast makes both better. September is the month. An early start on both days is non-negotiable.</p>
+      </div>
+
+      <div class="post-tags reveal">
+        <a href="#" class="p-tag">Italy</a><a href="#" class="p-tag">Alpine Passes</a>
+        <a href="#" class="p-tag">Stelvio</a><a href="#" class="p-tag">Gavia</a>
+        <a href="#" class="p-tag">BMW GS</a><a href="#" class="p-tag">Moto Trip</a>
+        <a href="#" class="p-tag">South Tyrol</a><a href="#" class="p-tag">September</a>
+      </div>
+    </article>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sw">
+        <p class="sw-title">Route Summary</p>
+        <div class="quick-stat-grid">
+          <div class="qs"><div class="qs-val">340</div><p class="qs-lbl">km</p></div>
+          <div class="qs"><div class="qs-val">2</div><p class="qs-lbl">Days</p></div>
+          <div class="qs"><div class="qs-val">2</div><p class="qs-lbl">Passes</p></div>
+          <div class="qs"><div class="qs-val">Sep</div><p class="qs-lbl">Best Month</p></div>
+        </div>
+      </div>
+      <div class="sw">
+        <p class="sw-title">In This Report</p>
+        <ul class="toc-list">
+          <li><a href="#day1" class="toc-link">Day 1 — Stelvio</a></li>
+          <li><a href="#stelvio" class="toc-link">The Stelvio — Field Notes</a></li>
+          <li><a href="#day2" class="toc-link">Day 2 — Gavia</a></li>
+          <li><a href="#gavia" class="toc-link">The Gavia — Field Notes</a></li>
+          <li><a href="#gear" class="toc-link">Gear Used</a></li>
+          <li><a href="#verdict" class="toc-link">Route Verdict</a></li>
+        </ul>
+      </div>
+      <div class="sw">
+        <p class="sw-title">Related Passes</p>
+        <div class="rel-list">
+          <a href="moto-alpine-passes.html" class="rel-item">
+            <div class="rel-thumb"><img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="" loading="lazy"></div>
+            <div><p class="rel-cat">Switzerland</p><p class="rel-name">Furka Pass</p></div>
+          </a>
+          <a href="moto-alpine-passes.html" class="rel-item">
+            <div class="rel-thumb"><img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="" loading="lazy"></div>
+            <div><p class="rel-cat">Austria</p><p class="rel-name">Grossglockner</p></div>
+          </a>
+          <a href="moto-alpine-passes.html" class="rel-item">
+            <div class="rel-thumb"><img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="" loading="lazy"></div>
+            <div><p class="rel-cat">France</p><p class="rel-name">Col du Galibier</p></div>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- POST NAV -->
+<div class="post-nav">
+  <div class="post-nav-inner">
+    <a href="moto-alpine-passes.html" class="pn-item"><p class="pn-dir">← Back to</p><p class="pn-title">Alpine Passes Guide</p></a>
+    <a href="blog-post.html" class="pn-item right"><p class="pn-dir">Next Journey →</p><p class="pn-title">Vigilius Mountain Resort: Above the World</p></a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 The Discoverist Journal</p>
+    <p class="footer-aff">Gear links are Amazon affiliate links. Hotel links via Travelpayouts. Your booking supports independent moto journalism.</p>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('scroll',()=>{
+    const el=document.documentElement;
+    document.getElementById('progressFill').style.width=(el.scrollTop/(el.scrollHeight-el.clientHeight)*100)+'%';
+  });
+  const headings=document.querySelectorAll('[id]');
+  const tocLinks=document.querySelectorAll('.toc-link');
+  window.addEventListener('scroll',()=>{
+    let cur='';
+    headings.forEach(h=>{if(window.scrollY>=h.offsetTop-120)cur=h.id;});
+    tocLinks.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+cur));
+  });
+  const reveals=document.querySelectorAll('.reveal');
+  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}}),{threshold:0.06});
+  reveals.forEach(el=>obs.observe(el));
+  function openMobile(){document.getElementById('mobileMenu').classList.add('open');document.body.style.overflow='hidden';}
+  function closeMobile(){document.getElementById('mobileMenu').classList.remove('open');document.body.style.overflow='';}
+</script>
+</body>
+</html>

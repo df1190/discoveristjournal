@@ -1,3 +1,4 @@
+# System
 .DS_Store
 **/.DS_Store
 Thumbs.db
@@ -10,3 +11,12 @@ Thumbs.db
 *.MP4
 *.avi
 *.AVI
+
+# Sensitive / non-web files
+*.xlsx
+*.docx
+*.pdf
+memory_Discoverist_Marriot_Affiliate.md
+
+# Claude memory / drafts
+blog-drafts/

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Discoverist Journal — Hotels, Journeys & Places Worth Finding</title>
+  <meta name="description" content="A curated travel journal of remarkable hotels, moto journeys, and destinations with character. Real stays. Honest reviews. Affiliate links support the road.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0c0b09;
+      --deep:    #141210;
+      --charcoal:#1e1b17;
+      --stone:   #2a2520;
+      --warm:    #c8a97e;
+      --warm-lt: #e2c99f;
+      --cream:   #f2ece2;
+      --muted:   #7a7068;
+      --white:   #faf8f4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--warm); border-radius: 2px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 48px;
+      background: linear-gradient(to bottom, rgba(12,11,9,0.95) 0%, transparent 100%);
+      transition: background 0.4s;
+    }
+    nav.scrolled { background: rgba(12,11,9,0.97); border-bottom: 1px solid rgba(200,169,126,0.12); }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--warm-lt);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--muted); }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--warm-lt); }
+
+    .nav-cta {
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--warm);
+      border: 1px solid rgba(200,169,126,0.4);
+      padding: 9px 20px;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-cta:hover { background: var(--warm); color: var(--black); }
+
+    .nav-burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-burger span { width: 22px; height: 1px; background: var(--cream); display: block; transition: 0.3s; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; height: 100vh; min-height: 640px;
+      display: flex; align-items: flex-end;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://discoveristjournal.com/wp-content/uploads/2026/01/7-dji_fly_20230721_112538_90_1690062080451_photo-576x1024.jpg');
+      background-size: cover; background-position: center 30%;
+      transform: scale(1.04);
+      transition: transform 8s ease-out;
+    }
+    .hero-bg.loaded { transform: scale(1); }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(12,11,9,0.25) 0%,
+        rgba(12,11,9,0.1) 40%,
+        rgba(12,11,9,0.7) 75%,
+        rgba(12,11,9,0.96) 100%
+      );
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 48px 72px;
+      max-width: 820px;
+      opacity: 0; transform: translateY(24px);
+      animation: fadeUp 1.2s 0.4s forwards;
+    }
+    .hero-eyebrow {
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 18px;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(52px, 8vw, 96px);
+      font-weight: 800; line-height: 1.0;
+      color: var(--white); margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+    .hero-title em { font-style: italic; color: var(--warm-lt); }
+    .hero-sub {
+      font-size: 13px; font-weight: 300;
+      letter-spacing: 0.08em; color: rgba(242,236,226,0.65);
+      max-width: 460px; margin-bottom: 40px;
+    }
+    .hero-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .btn-primary {
+      font-size: 10px; font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase;
+      background: var(--warm); color: var(--black);
+      padding: 14px 32px; text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--warm-lt); transform: translateY(-1px); }
+    .btn-ghost {
+      font-size: 10px; font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--cream); border-bottom: 1px solid rgba(242,236,226,0.3);
+      padding-bottom: 2px; text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--warm-lt); border-color: var(--warm-lt); }
+
+    /* ── SECTIONS ── */
+    section { padding: 100px 48px; }
+    .section-label {
+      font-size: 10px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800; line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--white); margin-bottom: 16px;
+    }
+    .section-title em { font-style: italic; color: var(--warm-lt); }
+    .section-sub {
+      font-size: 13px; color: var(--muted);
+      max-width: 480px; margin-bottom: 56px;
+    }
+    .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; gap: 24px; flex-wrap: wrap; }
+    .section-header .section-title { margin-bottom: 0; }
+    .view-all {
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--warm); text-decoration: none; white-space: nowrap;
+      border-bottom: 1px solid rgba(200,169,126,0.3); padding-bottom: 2px;
+      transition: color 0.2s;
+    }
+    .view-all:hover { color: var(--warm-lt); }
+
+    /* ── INTRO ── */
+    .intro { background: var(--black); border-top: 1px solid rgba(200,169,126,0.1); }
+    .intro-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .intro-text p { font-size: 14px; color: rgba(242,236,226,0.7); line-height: 1.9; margin-bottom: 20px; }
+    .intro-text p:last-child { margin-bottom: 0; }
+    .intro-stats { display: flex; gap: 48px; margin-top: 40px; flex-wrap: wrap; }
+    .stat { }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 44px; font-weight: 800;
+      color: var(--warm-lt); line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-top: 6px;
+    }
+    .intro-quote {
+      border-left: 1px solid rgba(200,169,126,0.3);
+      padding-left: 40px;
+    }
+    .intro-quote blockquote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 700; font-style: italic;
+      color: var(--warm-lt); line-height: 1.35;
+      margin-bottom: 24px;
+    }
+    .intro-quote cite {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); font-style: normal;
+    }
+
+    /* ── HOTEL CARDS ── */
+    .hotels { background: var(--deep); }
+    .hotels-inner { max-width: 1200px; margin: 0 auto; }
+    .hotels-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .hotel-card {
+      position: relative; overflow: hidden;
+      aspect-ratio: 3/4; cursor: pointer;
+      text-decoration: none;
+    }
+    .hotel-card:first-child { grid-column: span 2; aspect-ratio: 16/9; }
+    .hotel-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      display: block;
+    }
+    .hotel-card:hover img { transform: scale(1.06); }
+    .hotel-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(12,11,9,0.92) 0%, rgba(12,11,9,0.2) 55%, transparent 100%);
+      transition: opacity 0.3s;
+    }
+    .hotel-card-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 28px 28px 24px;
+    }
+    .hotel-card-country {
+      font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 6px;
+    }
+    .hotel-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      color: var(--white); line-height: 1.2; margin-bottom: 8px;
+    }
+    .hotel-card:first-child .hotel-card-name { font-size: 30px; font-weight: 800; }
+    .hotel-card-desc {
+      font-size: 12px; color: rgba(242,236,226,0.55);
+      max-width: 280px; line-height: 1.6;
+    }
+    .hotel-card-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--warm); margin-top: 14px;
+      transition: gap 0.2s;
+    }
+    .hotel-card:hover .hotel-card-link { gap: 14px; }
+    .hotel-card-link::after { content: '→'; }
+
+    /* ── FEATURED DIVIDER ── */
+    .divider-band {
+      background: var(--stone);
+      padding: 28px 48px;
+      display: flex; align-items: center; justify-content: center; gap: 40px;
+      flex-wrap: wrap;
+    }
+    .divider-text {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .divider-badges { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+    .badge {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--warm-lt); border: 1px solid rgba(200,169,126,0.25);
+      padding: 7px 16px;
+    }
+
+    /* ── JOURNEYS ── */
+    .journeys { background: var(--black); }
+    .journeys-inner { max-width: 1200px; margin: 0 auto; }
+    .journeys-list { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .journey-item {
+      position: relative; overflow: hidden;
+      aspect-ratio: 4/3; text-decoration: none; display: block;
+    }
+    .journey-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .journey-item:hover img { transform: scale(1.06); }
+    .journey-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(12,11,9,0.88) 0%, transparent 60%);
+    }
+    .journey-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 24px 28px;
+    }
+    .journey-tag {
+      font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 8px;
+    }
+    .journey-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px; font-weight: 700;
+      color: var(--white); line-height: 1.2;
+    }
+    .journey-meta {
+      font-size: 11px; color: var(--muted); margin-top: 8px;
+    }
+
+    /* ── MOTO STRIP ── */
+    .moto-strip {
+      background: var(--charcoal);
+      padding: 80px 48px;
+      position: relative; overflow: hidden;
+    }
+    .moto-strip::before {
+      content: 'MOTO';
+      position: absolute; right: -20px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Playfair Display', serif;
+      font-size: 200px; font-weight: 300;
+      color: rgba(200,169,126,0.04);
+      pointer-events: none; line-height: 1;
+    }
+    .moto-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .moto-label {
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 16px;
+    }
+    .moto-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 800; color: var(--white);
+      line-height: 1.05; letter-spacing: -0.01em;
+      margin-bottom: 20px;
+    }
+    .moto-title em { font-style: italic; color: var(--warm-lt); }
+    .moto-desc { font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 32px; }
+    .moto-img {
+      position: relative; aspect-ratio: 4/3; overflow: hidden;
+    }
+    .moto-img img { width: 100%; height: 100%; object-fit: cover; }
+    .moto-img-caption {
+      position: absolute; bottom: 0; right: 0;
+      background: var(--black); padding: 10px 16px;
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--warm);
+    }
+
+    /* ── POD STORE ── */
+    .pod { background: var(--deep); }
+    .pod-inner { max-width: 1200px; margin: 0 auto; }
+    .pod-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+      margin-bottom: 48px;
+    }
+    .pod-item {
+      position: relative; overflow: hidden;
+      aspect-ratio: 1; background: var(--stone);
+      text-decoration: none;
+    }
+    .pod-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.6s ease, opacity 0.4s;
+    }
+    .pod-item:hover img { transform: scale(1.08); opacity: 0.7; }
+    .pod-item-info {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
+      padding: 16px; text-align: center;
+    }
+    .pod-item:hover .pod-item-info { opacity: 1; }
+    .pod-item-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; color: var(--white);
+      margin-bottom: 8px;
+    }
+    .pod-item-cta {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--warm); border-bottom: 1px solid var(--warm);
+      padding-bottom: 2px;
+    }
+    .pod-placeholder {
+      background: var(--stone);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; gap: 10px;
+    }
+    .pod-placeholder .pod-placeholder-icon {
+      font-size: 32px; color: var(--warm); opacity: 0.4;
+    }
+    .pod-placeholder span {
+      font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .pod-cta-row { text-align: center; }
+
+    /* ── BLOG ── */
+    .blog { background: var(--black); }
+    .blog-inner { max-width: 1200px; margin: 0 auto; }
+    .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+    .blog-card { text-decoration: none; display: block; }
+    .blog-card-img {
+      aspect-ratio: 3/2; overflow: hidden; margin-bottom: 20px;
+    }
+    .blog-card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.7s ease;
+    }
+    .blog-card:hover .blog-card-img img { transform: scale(1.05); }
+    .blog-card-tag {
+      font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 8px;
+    }
+    .blog-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      color: var(--white); line-height: 1.25; margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+    .blog-card:hover .blog-card-title { color: var(--warm-lt); }
+    .blog-card-excerpt { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .blog-card-meta { font-size: 11px; color: rgba(122,112,104,0.6); margin-top: 14px; }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      background: var(--charcoal);
+      padding: 80px 48px;
+      text-align: center;
+      border-top: 1px solid rgba(200,169,126,0.1);
+      border-bottom: 1px solid rgba(200,169,126,0.1);
+    }
+    .newsletter-inner { max-width: 540px; margin: 0 auto; }
+    .newsletter .section-label { justify-content: center; display: flex; }
+    .newsletter-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 4vw, 46px); font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--white); margin-bottom: 16px; line-height: 1.1;
+    }
+    .newsletter-sub { font-size: 13px; color: var(--muted); margin-bottom: 36px; }
+    .newsletter-form { display: flex; gap: 0; max-width: 420px; margin: 0 auto; }
+    .newsletter-form input {
+      flex: 1; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200,169,126,0.2); border-right: none;
+      padding: 14px 20px; color: var(--cream);
+      font-family: 'Barlow', sans-serif; font-size: 13px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .newsletter-form input::placeholder { color: var(--muted); }
+    .newsletter-form input:focus { border-color: var(--warm); }
+    .newsletter-form button {
+      background: var(--warm); color: var(--black);
+      border: none; padding: 14px 24px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .newsletter-form button:hover { background: var(--warm-lt); }
+    .newsletter-disclaimer { font-size: 11px; color: rgba(122,112,104,0.5); margin-top: 14px; }
+
+    /* ── DESTINATIONS ── */
+    .destinations { background: var(--deep); padding: 80px 48px; }
+    .destinations-inner { max-width: 1200px; margin: 0 auto; }
+    .dest-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px;
+    }
+    .dest-item {
+      position: relative; overflow: hidden;
+      aspect-ratio: 2/3; text-decoration: none;
+    }
+    .dest-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.7s ease, filter 0.4s;
+      filter: brightness(0.75) saturate(0.8);
+    }
+    .dest-item:hover img { transform: scale(1.08); filter: brightness(0.85) saturate(1); }
+    .dest-label {
+      position: absolute; bottom: 16px; left: 0; right: 0;
+      text-align: center;
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      padding: 64px 48px 36px;
+      border-top: 1px solid rgba(200,169,126,0.1);
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px; margin-bottom: 56px;
+    }
+    .footer-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--warm-lt); margin-bottom: 14px;
+    }
+    .footer-brand-tagline {
+      font-size: 12px; color: var(--muted); line-height: 1.8;
+      max-width: 260px; margin-bottom: 24px;
+    }
+    .footer-social { display: flex; gap: 16px; }
+    .footer-social a {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-social a:hover { color: var(--warm); }
+    .footer-col-title {
+      font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--warm); margin-bottom: 20px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a {
+      font-size: 13px; color: var(--muted); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--cream); }
+    .footer-bottom {
+      border-top: 1px solid rgba(200,169,126,0.08);
+      padding-top: 28px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 11px; color: rgba(122,112,104,0.5); }
+    .footer-affiliate {
+      font-size: 10px; color: rgba(122,112,104,0.4);
+      max-width: 500px; line-height: 1.5; text-align: right;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(12,11,9,0.98);
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 32px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px; font-weight: 700;
+      color: var(--cream); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--warm-lt); }
+    .mobile-close {
+      position: absolute; top: 24px; right: 48px;
+      font-size: 28px; color: var(--muted);
+      cursor: pointer; background: none; border: none;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      nav { padding: 20px 28px; }
+      section { padding: 80px 28px; }
+      .intro-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hotels-grid { grid-template-columns: 1fr 1fr; }
+      .hotel-card:first-child { grid-column: span 2; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .dest-grid { grid-template-columns: repeat(3, 1fr); }
+      .pod-grid { grid-template-columns: repeat(2, 1fr); }
+      .blog-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 18px 20px; }
+      .nav-links, .nav-cta { display: none; }
+      .nav-burger { display: flex; }
+      .hero-content { padding: 0 20px 56px; }
+      section { padding: 64px 20px; }
+      .hotels-grid { grid-template-columns: 1fr; }
+      .hotel-card:first-child { grid-column: span 1; aspect-ratio: 4/3; }
+      .journeys-list { grid-template-columns: 1fr; }
+      .moto-inner { grid-template-columns: 1fr; }
+      .moto-img { order: -1; }
+      .dest-grid { grid-template-columns: repeat(2, 1fr); }
+      .pod-grid { grid-template-columns: repeat(2, 1fr); }
+      .blog-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; gap: 32px; }
+      .footer-affiliate { text-align: left; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-form input { border-right: 1px solid rgba(200,169,126,0.2); }
+      .divider-band { flex-direction: column; gap: 20px; }
+      .moto-strip { padding: 64px 20px; }
+      .newsletter { padding: 64px 20px; }
+      .destinations { padding: 64px 20px; }
+      footer { padding: 48px 20px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="#hotels" onclick="closeMobile()">Hotels</a>
+  <a href="#journeys" onclick="closeMobile()">Journeys</a>
+  <a href="#moto" onclick="closeMobile()">Moto</a>
+  <a href="#store" onclick="closeMobile()">Store</a>
+  <a href="#about" onclick="closeMobile()">About</a>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="/" class="nav-logo">The Discoverist <span>Journal</span></a>
+  <ul class="nav-links">
+    <li><a href="#hotels">Hotel Reviews</a></li>
+    <li><a href="#journeys">Trips & Journeys</a></li>
+    <li><a href="#store">POD Store</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <a href="#newsletter" class="nav-cta">Subscribe</a>
+  <div class="nav-burger" onclick="openMobile()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="padding:0;">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Curated Travel — Hotels · Journeys · Places</p>
+    <h1 class="hero-title">The <em>Discoverist</em><br>Journal</h1>
+    <p class="hero-sub">Real stays. Honest reviews. Journeys that leave a mark. For travelers who choose with intention.</p>
+    <div class="hero-actions">
+      <a href="#hotels" class="btn-primary">Explore Hotels</a>
+      <a href="#journeys" class="btn-ghost">Read Journeys</a>
+    </div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="intro">
+  <div class="intro-inner">
+    <div class="intro-text reveal">
+      <p class="section-label">About the Journal</p>
+      <p>The Discoverist Journal is a curated travel and lifestyle journal built on real stays, real roads, and honest opinion. Marriott Bonvoy Ambassador. Star Alliance Gold. Every review is written from personal experience — no press trips, no PR kits.</p>
+      <p>From alpine resorts to coastal hideaways, from long-haul moto routes to city weekends, this is the journal of a life lived in transit — and the places worth remembering.</p>
+      <div class="intro-stats">
+        <div class="stat reveal reveal-delay-1">
+          <div class="stat-num">40+</div>
+          <div class="stat-label">Countries Visited</div>
+        </div>
+        <div class="stat reveal reveal-delay-2">
+          <div class="stat-num">200+</div>
+          <div class="stat-label">Hotels Reviewed</div>
+        </div>
+        <div class="stat reveal reveal-delay-3">
+          <div class="stat-num">★</div>
+          <div class="stat-label">Bonvoy Ambassador</div>
+        </div>
+      </div>
+    </div>
+    <div class="intro-quote reveal">
+      <blockquote>"Viajar es marcharse de casa… sentir que el tiempo es corto, viajar es regresar."</blockquote>
+      <cite>— Gabriel Gamar</cite>
+    </div>
+  </div>
+</section>
+
+<!-- HOTELS -->
+<section class="hotels" id="hotels">
+  <div class="hotels-inner">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">Hotel Reviews</p>
+        <h2 class="section-title">Stays Worth <em>Discovering</em></h2>
+      </div>
+      <a href="#hotels" class="view-all">All Reviews →</a>
+    </div>
+    <div class="hotels-grid">
+
+      <!-- Featured -->
+      <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-card reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="The Cambrian, Adelboden" loading="lazy">
+        <div class="hotel-card-overlay"></div>
+        <div class="hotel-card-info">
+          <p class="hotel-card-country">Switzerland · Adelboden</p>
+          <h3 class="hotel-card-name">The Cambrian</h3>
+          <p class="hotel-card-desc">A refined alpine retreat in the heart of the Swiss Alps. Understated luxury, mountain views, and impeccable calm.</p>
+          <span class="hotel-card-link">Book via Travelpayouts</span>
+        </div>
+      </a>
+
+      <!-- Card 2 -->
+      <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-card reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="Vigilius Mountain Resort" loading="lazy">
+        <div class="hotel-card-overlay"></div>
+        <div class="hotel-card-info">
+          <p class="hotel-card-country">Italy · South Tyrol</p>
+          <h3 class="hotel-card-name">Vigilius Mountain Resort</h3>
+          <p class="hotel-card-desc">Only accessible by cable car. Minimalist design perched above Lana, Northern Italy.</p>
+          <span class="hotel-card-link">Book Now</span>
+        </div>
+      </a>
+
+      <!-- Card 3 -->
+      <a href="https://prf.hn/l/3PGgpkE/" target="_blank" rel="noopener" class="hotel-card reveal reveal-delay-2">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_023-768x1024.jpg" alt="The Hotel Lucerne" loading="lazy">
+        <div class="hotel-card-overlay"></div>
+        <div class="hotel-card-info">
+          <p class="hotel-card-country">Switzerland · Lucerne</p>
+          <h3 class="hotel-card-name">The Hotel Lucerne</h3>
+          <p class="hotel-card-desc">Jean Nouvel's architectural statement on the shores of Lake Lucerne.</p>
+          <span class="hotel-card-link">Book Now</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- AFFILIATE DIVIDER -->
+<div class="divider-band reveal">
+  <span class="divider-text">Book through our curated partners</span>
+  <div class="divider-badges">
+    <span class="badge">Travelpayouts</span>
+    <span class="badge">Marriott Bonvoy</span>
+    <span class="badge">Amazon Travel</span>
+    <span class="badge">Booking.com</span>
+  </div>
+</div>
+
+<!-- JOURNEYS -->
+<section class="journeys" id="journeys">
+  <div class="journeys-inner">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">Trips & Journeys</p>
+        <h2 class="section-title">Stories from <em>the Road</em></h2>
+      </div>
+      <a href="#journeys" class="view-all">All Journeys →</a>
+    </div>
+    <div class="journeys-list">
+
+      <a href="https://discoveristjournal.com/weekend-in-the-middle-of-italian-alps" class="journey-item reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_4857-576x1024.jpg" alt="Italian Alps Journey" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Italy · Alps</p>
+          <h3 class="journey-title">Weekend in Northern Italy: Vigilius Mountain Resort</h3>
+          <p class="journey-meta">Cable cars, silence, and South Tyrolean design</p>
+        </div>
+      </a>
+
+      <a href="#journeys" class="journey-item reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="British Columbia Snowbiking" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Canada · British Columbia</p>
+          <h3 class="journey-title">Snowbiking in British Columbia</h3>
+          <p class="journey-meta">Deep powder, remote backcountry, and the best kind of cold</p>
+        </div>
+      </a>
+
+      <a href="#journeys" class="journey-item reveal reveal-delay-2">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Journey" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Europe · Multi-Country</p>
+          <h3 class="journey-title">Alpine Crossing: Switzerland to Austria</h3>
+          <p class="journey-meta">Passes, valleys, and villages that earn their stars</p>
+        </div>
+      </a>
+
+      <a href="#journeys" class="journey-item reveal reveal-delay-3">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="Aerial Journey" loading="lazy">
+        <div class="journey-overlay"></div>
+        <div class="journey-info">
+          <p class="journey-tag">Norway · Fjords</p>
+          <h3 class="journey-title">Norway: Fjords by Road</h3>
+          <p class="journey-meta">Drone dispatches and quiet roads above the water</p>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- MOTO STRIP -->
+<div class="moto-strip" id="moto">
+  <div class="moto-inner">
+    <div>
+      <p class="moto-label reveal">Motorcycle Trips · KTM Rally Series</p>
+      <h2 class="moto-title reveal">The <em>Long Way</em><br>Is the Right Way</h2>
+      <p class="moto-desc reveal">Five countries. One KTM. From the Balkans to the fjords — the rally trip reports are live, with on-board video and photography from every road.</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;" class="reveal">
+        <a href="moto-ktm-rally.html" class="btn-primary">KTM Rally Series</a>
+        <a href="journeys.html" class="btn-ghost">All Journeys</a>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:24px;" class="reveal">
+        <a href="moto-ktm-bosnia.html" style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(200,169,126,0.15);padding:6px 14px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--warm)';this.style.color='var(--warm-lt)'" onmouseout="this.style.borderColor='rgba(200,169,126,0.15)';this.style.color='var(--muted)'">Bosnia</a>
+        <a href="moto-ktm-france.html" style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(200,169,126,0.15);padding:6px 14px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--warm)';this.style.color='var(--warm-lt)'" onmouseout="this.style.borderColor='rgba(200,169,126,0.15)';this.style.color='var(--muted)'">France</a>
+        <a href="moto-ktm-norway.html" style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(200,169,126,0.15);padding:6px 14px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--warm)';this.style.color='var(--warm-lt)'" onmouseout="this.style.borderColor='rgba(200,169,126,0.15)';this.style.color='var(--muted)'">Norway</a>
+        <a href="moto-ktm-romania.html" style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(200,169,126,0.15);padding:6px 14px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--warm)';this.style.color='var(--warm-lt)'" onmouseout="this.style.borderColor='rgba(200,169,126,0.15)';this.style.color='var(--muted)'">Romania</a>
+        <a href="moto-ktm-italy.html" style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(200,169,126,0.15);padding:6px 14px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--warm)';this.style.color='var(--warm-lt)'" onmouseout="this.style.borderColor='rgba(200,169,126,0.15)';this.style.color='var(--muted)'">Italy</a>
+      </div>
+    </div>
+    <div class="moto-img reveal">
+      <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="KTM Rally Motorcycle Journey" loading="lazy">
+      <span class="moto-img-caption">KTM Rally Series →</span>
+    </div>
+  </div>
+</div>
+
+<!-- POD STORE -->
+<section class="pod" id="store">
+  <div class="pod-inner">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">The Shop</p>
+        <h2 class="section-title">Travel <em>Objects</em></h2>
+      </div>
+      <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="view-all">Visit Store →</a>
+    </div>
+    <div class="pod-grid">
+      <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/7-dji_fly_20230721_112538_90_1690062080451_photo-576x1024.jpg" alt="Travel Print" loading="lazy">
+        <div class="pod-item-info">
+          <span class="pod-item-name">Travel Prints</span>
+          <span class="pod-item-cta">Shop Now</span>
+        </div>
+      </a>
+      <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/8-dji_fly_20230721_112524_87_1690062076550_photo-576x1024.jpg" alt="Journal Gear" loading="lazy">
+        <div class="pod-item-info">
+          <span class="pod-item-name">Apparel</span>
+          <span class="pod-item-cta">Shop Now</span>
+        </div>
+      </a>
+      <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal reveal-delay-2">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Accessories" loading="lazy">
+        <div class="pod-item-info">
+          <span class="pod-item-name">Accessories</span>
+          <span class="pod-item-cta">Shop Now</span>
+        </div>
+      </a>
+      <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal reveal-delay-3">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="Notebooks" loading="lazy">
+        <div class="pod-item-info">
+          <span class="pod-item-name">Travel Notebooks</span>
+          <span class="pod-item-cta">Shop Now</span>
+        </div>
+      </a>
+    </div>
+    <div class="pod-cta-row reveal">
+      <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="btn-primary">Browse Full Collection</a>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<div class="newsletter" id="newsletter">
+  <div class="newsletter-inner">
+    <p class="section-label">Stay Connected</p>
+    <h2 class="newsletter-title">Join the Discoverist List</h2>
+    <p class="newsletter-sub">Curated stays, honest reviews, and new routes — delivered when there's something worth sending.</p>
+    <form class="newsletter-form" onsubmit="handleSubscribe(event)">
+      <input type="email" placeholder="Your email address" required>
+      <button type="submit">Subscribe</button>
+    </form>
+    <p class="newsletter-disclaimer">No spam. Unsubscribe anytime. Real travel, real opinions.</p>
+  </div>
+</div>
+
+<!-- DESTINATIONS -->
+<section class="destinations">
+  <div class="destinations-inner">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">Explore by Destination</p>
+        <h2 class="section-title">Where We've <em>Been</em></h2>
+      </div>
+    </div>
+    <div class="dest-grid">
+      <a href="#" class="dest-item reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="Switzerland" loading="lazy">
+        <span class="dest-label">Switzerland</span>
+      </a>
+      <a href="#" class="dest-item reveal reveal-delay-1">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="Italy" loading="lazy">
+        <span class="dest-label">Italy</span>
+      </a>
+      <a href="#" class="dest-item reveal reveal-delay-2">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="Canada" loading="lazy">
+        <span class="dest-label">Canada</span>
+      </a>
+      <a href="#" class="dest-item reveal reveal-delay-3">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Norway" loading="lazy">
+        <span class="dest-label">Norway</span>
+      </a>
+      <a href="#" class="dest-item reveal">
+        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="Destinations" loading="lazy">
+        <span class="dest-label">+ More →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG RECENT -->
+<section class="blog" id="blog">
+  <div class="blog-inner">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">From the Journal</p>
+        <h2 class="section-title">Recent <em>Writing</em></h2>
+      </div>
+      <a href="#blog" class="view-all">All Posts →</a>
+    </div>
+    <div class="blog-grid">
+
+      <a href="https://discoveristjournal.com/weekend-in-the-middle-of-italian-alps" class="blog-card reveal">
+        <div class="blog-card-img">
+          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_4857-576x1024.jpg" alt="Italian Alps" loading="lazy">
+        </div>
+        <p class="blog-card-tag">Hotel Review · Italy</p>
+        <h3 class="blog-card-title">Vigilius Mountain Resort: Above the World, Below the Sky</h3>
+        <p class="blog-card-excerpt">No road access. No noise. Just a cable car, a mountain, and one of the most considered hotels I've stayed in.</p>
+        <p class="blog-card-meta">South Tyrol, Italy</p>
+      </a>
+
+      <a href="#blog" class="blog-card reveal reveal-delay-1">
+        <div class="blog-card-img">
+          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="BC Snowbike" loading="lazy">
+        </div>
+        <p class="blog-card-tag">Journey · Canada</p>
+        <h3 class="blog-card-title">Snowbiking British Columbia: Cold, Remote, and Completely Worth It</h3>
+        <p class="blog-card-excerpt">The kind of trip that resets your sense of scale. Backcountry powder, no phone signal, and the best kind of exhaustion.</p>
+        <p class="blog-card-meta">British Columbia, Canada</p>
+      </a>
+
+      <a href="#blog" class="blog-card reveal reveal-delay-2">
+        <div class="blog-card-img">
+          <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_023-768x1024.jpg" alt="Lucerne" loading="lazy">
+        </div>
+        <p class="blog-card-tag">Hotel Review · Switzerland</p>
+        <h3 class="blog-card-title">The Hotel Lucerne: Jean Nouvel's Masterpiece on the Lake</h3>
+        <p class="blog-card-excerpt">Architecture, light, and water. One of those stays that changes how you think about what a hotel can be.</p>
+        <p class="blog-card-meta">Lucerne, Switzerland</p>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section style="background: var(--charcoal); padding: 100px 48px;" id="about">
+  <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+    <p class="section-label reveal" style="justify-content: center; display: flex;">The Author</p>
+    <h2 class="section-title reveal" style="text-align: center;">About the <em>Journal</em></h2>
+    <p class="reveal" style="font-size: 15px; color: var(--muted); line-height: 1.9; margin-bottom: 24px;">The Discoverist Journal is written by a frequent international traveler with Marriott Bonvoy Ambassador status and Star Alliance Gold. Every review comes from a real stay, every route from a real road. No press junkets. No staged photos. Just places that earned their place on the page.</p>
+    <p class="reveal" style="font-size: 15px; color: var(--muted); line-height: 1.9; margin-bottom: 40px;">Affiliate links help keep the lights on and the tank full. When you book through this journal, you're supporting independent travel writing — and getting a recommendation you can trust.</p>
+    <a href="https://discoveristjournal.com/about/" class="btn-primary reveal">Read More →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">The Discoverist Journal</div>
+        <p class="footer-brand-tagline">Hotels, adventures, and journeys worth discovering. Real trips. Honest reviews. Written from the road.</p>
+        <div class="footer-social">
+          <a href="#">Instagram</a>
+          <a href="#">Reddit</a>
+          <a href="#">Facebook</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-col-title">Navigate</p>
+        <ul class="footer-links">
+          <li><a href="#hotels">Hotel Reviews</a></li>
+          <li><a href="#journeys">Trips & Journeys</a></li>
+          <li><a href="#moto">Moto Routes</a></li>
+          <li><a href="#store">POD Store</a></li>
+          <li><a href="#blog">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Destinations</p>
+        <ul class="footer-links">
+          <li><a href="#">Switzerland</a></li>
+          <li><a href="#">Italy</a></li>
+          <li><a href="#">Norway</a></li>
+          <li><a href="#">Canada</a></li>
+          <li><a href="#">All Countries →</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Partners</p>
+        <ul class="footer-links">
+          <li><a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener">Travelpayouts Hotels</a></li>
+          <li><a href="#" target="_blank" rel="noopener">Marriott Bonvoy</a></li>
+          <li><a href="#" target="_blank" rel="noopener">Amazon Travel</a></li>
+          <li><a href="#" target="_blank" rel="noopener">Booking.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 The Discoverist Journal. All rights reserved.</p>
+      <p class="footer-affiliate">This site contains affiliate links. We may earn a commission when you book or buy through our links, at no extra cost to you. All recommendations are based on personal experience.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Hero parallax bg
+  const heroBg = document.getElementById('heroBg');
+  setTimeout(() => heroBg.classList.add('loaded'), 100);
+  window.addEventListener('scroll', () => {
+    heroBg.style.transform = `translateY(${window.scrollY * 0.3}px) scale(1.04)`;
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+
+  // Mobile menu
+  function openMobile() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
+
+  // Newsletter
+  function handleSubscribe(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.textContent = 'Subscribed ✓';
+    btn.style.background = 'var(--warm-lt)';
+    setTimeout(() => { btn.textContent = 'Subscribe'; btn.style.background = ''; e.target.reset(); }, 3000);
+  }
+</script>
+</body>
+</html>

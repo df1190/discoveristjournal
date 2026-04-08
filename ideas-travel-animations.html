@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Blog Animations</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --paper:#f5f0e8;
+  --ink:#1a1810;
+  --warm:#2c2618;
+  --terracotta:#c4603a;
+  --sage:#6b8c74;
+  --gold:#c8922a;
+  --dusk:#3a3060;
+  --mist:rgba(26,24,16,.06);
+}
+html { scroll-behavior:smooth; }
+body { background:var(--paper); color:var(--ink); font-family:'Jost',sans-serif; font-weight:300; overflow-x:hidden; }
+
+.label {
+  font-family:'Jost',sans-serif; font-size:.65rem; font-weight:500;
+  letter-spacing:.4em; text-transform:uppercase; color:var(--terracotta);
+  display:block; margin-bottom:1rem;
+}
+
+/* ══ 1. PASSPORT STAMP COLLECTION ══ */
+#passport {
+  min-height:100vh; background:var(--paper);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:6rem 2rem;
+  position:relative; overflow:hidden;
+}
+.passport-bg {
+  position:absolute; inset:0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(26,24,16,.04) 28px, rgba(26,24,16,.04) 29px),
+    repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(26,24,16,.04) 28px, rgba(26,24,16,.04) 29px);
+}
+.stamps-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:2.5rem;
+  max-width:800px; margin-top:3rem;
+}
+.stamp {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  aspect-ratio:1; border:3px dashed rgba(26,24,16,.15);
+  padding:1.2rem; text-align:center; position:relative;
+  opacity:0; transform:scale(0.6) rotate(-5deg);
+  transition:opacity .5s, transform .5s cubic-bezier(.34,1.56,.64,1);
+  cursor:pointer;
+}
+.stamp.stamped {
+  opacity:1; transform:scale(1) rotate(var(--rot));
+}
+.stamp::before {
+  content:''; position:absolute; inset:6px;
+  border:1px solid currentColor; opacity:.3;
+}
+.stamp-country {
+  font-family:'Cormorant Garamond',sans-serif; font-size:.7rem;
+  letter-spacing:.2em; text-transform:uppercase; font-weight:600;
+}
+.stamp-city {
+  font-family:'Cormorant Garamond',sans-serif; font-size:1.6rem;
+  font-weight:600; line-height:1.1; margin:.3rem 0;
+}
+.stamp-year { font-size:.6rem; letter-spacing:.15em; opacity:.5; font-weight:400; }
+.stamp-icon { font-size:1.5rem; margin-bottom:.3rem; }
+
+.s1 { color:var(--terracotta); --rot:-3deg; }
+.s2 { color:var(--sage); --rot:2deg; }
+.s3 { color:var(--dusk); --rot:-1deg; }
+.s4 { color:var(--gold); --rot:3deg; }
+.s5 { color:var(--terracotta); --rot:1deg; }
+.s6 { color:var(--dusk); --rot:-2deg; }
+.s7 { color:var(--sage); --rot:2.5deg; }
+.s8 { color:var(--gold); --rot:-1.5deg; }
+
+.stamp-ink {
+  position:absolute; inset:0;
+  background:currentColor; opacity:0;
+  mix-blend-mode:multiply;
+  clip-path:circle(0% at 50% 50%);
+  transition:clip-path .4s, opacity .4s;
+  pointer-events:none;
+}
+.stamp:hover .stamp-ink {
+  clip-path:circle(80% at 50% 50%); opacity:.08;
+}
+
+.stamp-btn {
+  margin-top:2.5rem;
+  font-family:'Jost',sans-serif; font-size:.75rem; letter-spacing:.3em; font-weight:400;
+  text-transform:uppercase; padding:.8rem 2.5rem;
+  background:var(--ink); color:var(--paper);
+  border:none; cursor:pointer; transition:all .3s;
+}
+.stamp-btn:hover { background:var(--terracotta); }
+
+/* ══ 2. POLAROID STACK EXPAND ══ */
+#polaroids {
+  min-height:100vh; background:var(--warm);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:6rem 2rem; gap:3rem;
+}
+.polaroid-stack {
+  position:relative; width:220px; height:260px; cursor:pointer;
+}
+.polaroid {
+  position:absolute; width:220px;
+  background:#fff; padding:14px 14px 48px;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+  transition:transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s;
+}
+.polaroid:nth-child(1) { transform:rotate(-6deg) translate(-10px, 5px); z-index:1; }
+.polaroid:nth-child(2) { transform:rotate(3deg) translate(5px,-5px); z-index:2; }
+.polaroid:nth-child(3) { transform:rotate(-2deg); z-index:3; }
+.polaroid:nth-child(4) { transform:rotate(5deg) translate(8px,3px); z-index:4; }
+.polaroid:nth-child(5) { transform:rotate(-1deg) translate(-3px,-2px); z-index:5; }
+
+.polaroid-stack.expanded .polaroid:nth-child(1) { transform:rotate(-20deg) translate(-180px, 40px); }
+.polaroid-stack.expanded .polaroid:nth-child(2) { transform:rotate(-10deg) translate(-100px, 20px); }
+.polaroid-stack.expanded .polaroid:nth-child(3) { transform:rotate(0deg) translate(0,0); }
+.polaroid-stack.expanded .polaroid:nth-child(4) { transform:rotate(10deg) translate(100px, 20px); }
+.polaroid-stack.expanded .polaroid:nth-child(5) { transform:rotate(20deg) translate(180px, 40px); }
+
+.pol-img {
+  width:100%; height:160px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem;
+}
+.pol-img-1 { background:linear-gradient(135deg,#f5c5a0,#e8804a); }
+.pol-img-2 { background:linear-gradient(135deg,#a0c5f5,#4a7ae8); }
+.pol-img-3 { background:linear-gradient(135deg,#a0f5c5,#2a9a6a); }
+.pol-img-4 { background:linear-gradient(135deg,#f5a0c5,#e84a7a); }
+.pol-img-5 { background:linear-gradient(135deg,#f5f0a0,#c8922a); }
+
+.pol-caption {
+  font-family:'Cormorant Garamond',sans-serif; font-size:.85rem; font-style:italic;
+  color:rgba(26,24,16,.6); text-align:center; padding-top:.8rem;
+  line-height:1.4;
+}
+
+.polaroid-hint {
+  font-family:'Jost',sans-serif; font-size:.72rem; letter-spacing:.25em;
+  text-transform:uppercase; color:rgba(245,240,232,.3); text-align:center;
+}
+
+/* ══ 3. WORLD MAP TOOLTIP PINS ══ */
+#worldmap {
+  min-height:100vh; background:var(--paper);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:6rem 2rem;
+}
+.map-wrap {
+  position:relative; width:100%; max-width:900px; margin-top:2rem;
+}
+.map-svg { width:100%; height:auto; opacity:.15; }
+.pin {
+  position:absolute; transform:translate(-50%,-100%);
+  cursor:pointer;
+}
+.pin-dot {
+  width:12px; height:12px; border-radius:50%;
+  background:var(--terracotta); border:2px solid var(--paper);
+  box-shadow:0 0 0 0 rgba(196,96,58,.4);
+  transition:transform .3s;
+  animation:pinPulse 2.5s ease-out infinite;
+}
+.pin:nth-child(2) .pin-dot { animation-delay:.4s; background:var(--sage); }
+.pin:nth-child(3) .pin-dot { animation-delay:.8s; background:var(--dusk); }
+.pin:nth-child(4) .pin-dot { animation-delay:1.2s; background:var(--gold); }
+.pin:nth-child(5) .pin-dot { animation-delay:1.6s; background:var(--terracotta); }
+.pin:nth-child(6) .pin-dot { animation-delay:.2s; background:var(--sage); }
+
+@keyframes pinPulse {
+  0%   { box-shadow:0 0 0 0 rgba(196,96,58,.5); }
+  70%  { box-shadow:0 0 0 14px rgba(196,96,58,0); }
+  100% { box-shadow:0 0 0 0 rgba(196,96,58,0); }
+}
+
+.pin-tip {
+  position:absolute; bottom:calc(100% + 10px); left:50%;
+  transform:translateX(-50%) scale(.8) translateY(5px);
+  background:var(--ink); color:var(--paper);
+  padding:.6rem 1rem; white-space:nowrap;
+  pointer-events:none; opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  font-size:.75rem; letter-spacing:.1em;
+}
+.pin-tip::after {
+  content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+  border:5px solid transparent; border-top-color:var(--ink);
+}
+.pin:hover .pin-tip {
+  opacity:1; transform:translateX(-50%) scale(1) translateY(0);
+}
+.pin:hover .pin-dot { transform:scale(1.4); }
+
+/* simple SVG world map paths */
+
+/* ══ 4. TYPEWRITER JOURNAL ENTRY ══ */
+#journal {
+  min-height:100vh; background:#f0ead6;
+  background-image: repeating-linear-gradient(transparent, transparent 31px, #c8b89a 31px, #c8b89a 32px);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:6rem 2rem; position:relative;
+}
+.journal-paper {
+  background:#faf6ee; max-width:680px; width:100%;
+  box-shadow:0 4px 40px rgba(0,0,0,.15), 2px 2px 0 #e8dcc8, 4px 4px 0 #d8ccb8;
+  padding:4rem 5rem; position:relative;
+  background-image: repeating-linear-gradient(transparent, transparent 31px, #e0d8c8 31px, #e0d8c8 32px);
+  background-position:0 3.5rem;
+}
+.journal-paper::before {
+  content:''; position:absolute; left:80px; top:0; bottom:0; width:1px;
+  background:rgba(196,96,58,.3);
+}
+.journal-date {
+  font-family:'Cormorant Garamond',sans-serif; font-size:.85rem; font-style:italic;
+  color:var(--terracotta); margin-bottom:2rem; display:block;
+}
+.journal-heading {
+  font-family:'Cormorant Garamond',sans-serif; font-size:2rem; font-weight:600;
+  margin-bottom:1.5rem; line-height:1.2;
+}
+.typewriter {
+  font-family:'Cormorant Garamond',sans-serif; font-size:1.1rem;
+  line-height:2; color:var(--warm); min-height:200px;
+}
+.cursor-blink {
+  display:inline-block; width:2px; height:1.1rem;
+  background:var(--terracotta); margin-left:1px;
+  animation:blink .7s step-end infinite;
+  vertical-align:text-bottom;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.journal-margin-note {
+  position:absolute; left:1.5rem; top:8rem;
+  font-family:'Cormorant Garamond',sans-serif; font-size:.75rem; font-style:italic;
+  color:var(--terracotta); writing-mode:vertical-rl; text-orientation:mixed;
+  transform:rotate(180deg); opacity:.7;
+}
+
+/* ══ 5. HORIZON PARALLAX SCROLL ══ */
+#horizon {
+  height:400vh; position:relative;
+}
+.horizon-sticky {
+  position:sticky; top:0; height:100vh; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+.horizon-layer {
+  position:absolute; inset:0; background-size:cover; background-position:center;
+}
+.layer-sky {
+  background:linear-gradient(to bottom, #1a3a6a 0%, #4a7ab8 40%, #c8a870 70%, #e8c890 100%);
+  transform:translateY(0);
+}
+.layer-mountains {
+  background:linear-gradient(to bottom, transparent 50%, #2a3820 60%, #3a4828 80%, #1a2410 100%);
+}
+.layer-mtn-shapes {
+  bottom:35%; left:0; right:0; height:45%;
+  position:absolute;
+}
+.layer-road {
+  bottom:0; left:0; right:0; height:40%;
+  background:linear-gradient(to bottom, transparent, #1a2010 40%, #0f1808 100%);
+}
+.layer-text {
+  position:relative; z-index:10; text-align:center; color:var(--paper);
+  pointer-events:none;
+}
+.horizon-title {
+  font-family:'Cormorant Garamond',sans-serif;
+  font-size:clamp(3rem,10vw,8rem); font-style:italic; font-weight:300;
+  line-height:.95; text-shadow:0 2px 40px rgba(0,0,0,.5);
+}
+.horizon-progress {
+  position:fixed; right:2rem; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; gap:.5rem; z-index:20;
+}
+.prog-step {
+  width:2px; height:30px; background:rgba(245,240,232,.2);
+  position:relative; cursor:pointer; transition:background .3s;
+}
+.prog-step.active { background:var(--paper); }
+.prog-step.active::before {
+  content:''; position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  font-family:'Jost',sans-serif; font-size:.6rem; letter-spacing:.1em;
+  color:var(--paper); white-space:nowrap;
+}
+
+/* sun/moon travel */
+.sun {
+  position:absolute; width:80px; height:80px; border-radius:50%;
+  background:radial-gradient(circle, #fff8d0, #f0c040);
+  box-shadow:0 0 60px 20px rgba(240,192,64,.3);
+  transition:all .1s;
+  top:15%; left:60%;
+  transform:translate(-50%,-50%);
+}
+
+/* reveal */
+.fade-up { opacity:0; transform:translateY(30px); transition:opacity .9s,transform .9s cubic-bezier(.16,1,.3,1); }
+.fade-up.on { opacity:1; transform:none; }
+
+::-webkit-scrollbar { width:2px; }
+::-webkit-scrollbar-thumb { background:var(--terracotta); }
+
+/* ══ SECTION BREAKS ══ */
+.divider { height:1px; background:linear-gradient(to right,transparent,rgba(26,24,16,.15),transparent); }
+</style>
+</head>
+<body>
+
+<!-- ① PASSPORT STAMPS -->
+<section id="passport">
+  <div class="passport-bg"></div>
+  <span class="label fade-up">Animation 01 — Passport Stamp Collection</span>
+  <h2 style="font-family:'Cormorant Garamond',sans-serif;font-size:clamp(2.5rem,6vw,4.5rem);font-style:italic;text-align:center;" class="fade-up">
+    Places I've<br>Called Home
+  </h2>
+  <div class="stamps-grid" id="stampsGrid">
+    <div class="stamp s1"><div class="stamp-ink"></div><div class="stamp-icon">🌸</div><div class="stamp-country">Japan</div><div class="stamp-city">Kyoto</div><div class="stamp-year">Spring 2023</div></div>
+    <div class="stamp s2"><div class="stamp-ink"></div><div class="stamp-icon">🏔</div><div class="stamp-country">Nepal</div><div class="stamp-city">Pokhara</div><div class="stamp-year">Oct 2023</div></div>
+    <div class="stamp s3"><div class="stamp-ink"></div><div class="stamp-icon">🏛</div><div class="stamp-country">Greece</div><div class="stamp-city">Santorini</div><div class="stamp-year">Summer 2022</div></div>
+    <div class="stamp s4"><div class="stamp-ink"></div><div class="stamp-icon">🐪</div><div class="stamp-country">Morocco</div><div class="stamp-city">Marrakech</div><div class="stamp-year">Winter 2022</div></div>
+    <div class="stamp s5"><div class="stamp-ink"></div><div class="stamp-icon">🌊</div><div class="stamp-country">Portugal</div><div class="stamp-city">Lisbon</div><div class="stamp-year">Apr 2024</div></div>
+    <div class="stamp s6"><div class="stamp-ink"></div><div class="stamp-icon">🌿</div><div class="stamp-country">Colombia</div><div class="stamp-city">Cartagena</div><div class="stamp-year">Jan 2024</div></div>
+    <div class="stamp s7"><div class="stamp-ink"></div><div class="stamp-icon">🏜</div><div class="stamp-country">Jordan</div><div class="stamp-city">Wadi Rum</div><div class="stamp-year">Mar 2023</div></div>
+    <div class="stamp s8"><div class="stamp-ink"></div><div class="stamp-icon">🗼</div><div class="stamp-country">France</div><div class="stamp-city">Paris</div><div class="stamp-year">Dec 2021</div></div>
+  </div>
+  <button class="stamp-btn fade-up" onclick="stampAll()">Stamp All</button>
+  <p style="margin-top:1rem;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(26,24,16,.3);" class="fade-up">Click stamps or use button</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ② POLAROID STACK -->
+<section id="polaroids">
+  <span class="label" style="color:rgba(245,240,232,.4);">Animation 02 — Polaroid Stack Fan</span>
+  <h2 style="font-family:'Cormorant Garamond',sans-serif;font-size:clamp(2.5rem,6vw,4.5rem);color:var(--paper);font-style:italic;text-align:center;" class="fade-up">
+    Moments<br>Worth Keeping
+  </h2>
+  <div class="polaroid-stack fade-up" id="polStack" onclick="this.classList.toggle('expanded')">
+    <div class="polaroid"><div class="pol-img pol-img-1">🌄</div><p class="pol-caption">Sunrise over<br>the Himalayas</p></div>
+    <div class="polaroid"><div class="pol-img pol-img-2">🌊</div><p class="pol-caption">Blue hour,<br>Santorini</p></div>
+    <div class="polaroid"><div class="pol-img pol-img-3">🌿</div><p class="pol-caption">Lost in the<br>rice terraces</p></div>
+    <div class="polaroid"><div class="pol-img pol-img-4">🌸</div><p class="pol-caption">Cherry blossom<br>season, Kyoto</p></div>
+    <div class="polaroid"><div class="pol-img pol-img-5">🏜</div><p class="pol-caption">Stars over<br>Wadi Rum</p></div>
+  </div>
+  <p class="polaroid-hint fade-up">Click the stack to fan out</p>
+</section>
+
+<div class="divider" style="background:linear-gradient(to right,transparent,rgba(245,240,232,.15),transparent);"></div>
+
+<!-- ③ MAP PINS -->
+<section id="worldmap">
+  <span class="label fade-up">Animation 03 — Pulsing Map Pins with Tooltips</span>
+  <h2 style="font-family:'Cormorant Garamond',sans-serif;font-size:clamp(2.5rem,6vw,4rem);font-style:italic;text-align:center;" class="fade-up">
+    Where I've<br>Wandered
+  </h2>
+  <div class="map-wrap fade-up">
+    <!-- Simple minimal world SVG -->
+    <svg class="map-svg" viewBox="0 0 1000 500" fill="var(--ink)" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1000" height="500" fill="none"/>
+      <!-- Very simplified continents as shapes -->
+      <!-- North America -->
+      <path d="M120,80 L220,70 L260,100 L280,160 L260,220 L220,260 L180,280 L140,260 L100,220 L90,160 L100,120 Z" opacity=".5"/>
+      <!-- South America -->
+      <path d="M220,280 L280,270 L310,310 L320,380 L300,440 L260,460 L220,440 L200,380 L200,320 Z" opacity=".5"/>
+      <!-- Europe -->
+      <path d="M440,60 L520,55 L540,90 L520,130 L480,140 L440,130 L420,100 Z" opacity=".5"/>
+      <!-- Africa -->
+      <path d="M440,150 L520,140 L560,180 L570,280 L540,360 L490,400 L440,380 L400,300 L400,200 Z" opacity=".5"/>
+      <!-- Asia -->
+      <path d="M540,50 L800,40 L840,100 L820,200 L760,240 L680,220 L600,200 L560,160 L540,120 Z" opacity=".5"/>
+      <!-- Southeast Asia -->
+      <path d="M720,220 L800,210 L820,260 L780,280 L720,260 Z" opacity=".5"/>
+      <!-- Australia -->
+      <path d="M760,310 L880,300 L900,360 L860,410 L780,420 L740,380 L740,340 Z" opacity=".5"/>
+    </svg>
+
+    <!-- Pins overlaid on map -->
+    <div class="pin" style="left:48%;top:28%;">
+      <div class="pin-tip">Paris, France 🗼</div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="pin" style="left:72%;top:25%;">
+      <div class="pin-tip">Kyoto, Japan 🌸</div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="pin" style="left:43%;top:48%;">
+      <div class="pin-tip">Marrakech, Morocco 🐪</div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="pin" style="left:63%;top:38%;">
+      <div class="pin-tip">Wadi Rum, Jordan 🏜</div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="pin" style="left:24%;top:62%;">
+      <div class="pin-tip">Cartagena, Colombia 🌊</div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="pin" style="left:67%;top:42%;">
+      <div class="pin-tip">Pokhara, Nepal 🏔</div>
+      <div class="pin-dot"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ④ TYPEWRITER JOURNAL -->
+<section id="journal">
+  <span class="label fade-up">Animation 04 — Typewriter Journal Entry</span>
+  <div class="journal-paper fade-up">
+    <div class="journal-margin-note">Travel Journal · Vol. 3</div>
+    <span class="journal-date">Thursday, October 12th — Somewhere in Rajasthan</span>
+    <h2 class="journal-heading">The Desert Teaches<br>You to Be Still</h2>
+    <div class="typewriter" id="typewriter-text"><span class="cursor-blink"></span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ⑤ PARALLAX HORIZON -->
+<section id="horizon">
+  <div class="horizon-sticky">
+    <div class="horizon-layer layer-sky" id="layerSky"></div>
+    <div class="sun" id="sun"></div>
+    <div class="horizon-layer layer-mountains"></div>
+    <svg style="position:absolute;bottom:35%;left:0;right:0;width:100%;" viewBox="0 0 1000 200" preserveAspectRatio="none">
+      <path d="M0,200 L0,140 L80,80 L160,120 L260,40 L360,100 L440,60 L520,110 L620,30 L700,90 L800,50 L880,100 L1000,70 L1000,200 Z" fill="#2a3820" opacity=".9"/>
+      <path d="M0,200 L0,160 L100,110 L200,150 L300,90 L400,130 L500,80 L600,130 L700,110 L800,70 L900,120 L1000,90 L1000,200 Z" fill="#1a2410"/>
+    </svg>
+    <div class="horizon-layer layer-road"></div>
+    <div class="layer-text">
+      <div class="horizon-title" id="horizonTitle">
+        The<br>Journey<br><em>Begins</em>
+      </div>
+    </div>
+  </div>
+  <div style="position:sticky;top:0;height:0;z-index:20;">
+    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);text-align:center;">
+      <span id="horizonLabel" style="font-family:'Jost',sans-serif;font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(245,240,232,.4);">Animation 05 — Parallax Horizon · Scroll to travel</span>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ── STAMP ANIMATION ── */
+const stamps = document.querySelectorAll('.stamp');
+stamps.forEach((s,i) => {
+  s.addEventListener('click', () => {
+    if (s.classList.contains('stamped')) return;
+    s.classList.add('stamped');
+    // ink splat sound-like visual
+    s.style.transition = 'opacity .3s, transform .3s cubic-bezier(.34,1.8,.64,1)';
+    setTimeout(() => s.style.transition = '', 400);
+  });
+});
+
+function stampAll() {
+  stamps.forEach((s,i) => {
+    setTimeout(() => {
+      s.classList.add('stamped');
+    }, i * 120);
+  });
+}
+
+// stamp on scroll
+const stampIo = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    stamps.forEach((s,i) => setTimeout(() => s.classList.add('stamped'), i*100+300));
+    stampIo.disconnect();
+  }
+}, {threshold:.3});
+stampIo.observe(document.getElementById('passport'));
+
+/* ── TYPEWRITER ── */
+const text = `The camel driver woke me at 4am with a tin cup of chai. No alarm, no phone — just the soft padding of hooves on sand and the first grey light creeping over the dunes. I had come to the Thar Desert expecting silence. What I found instead was a kind of listening I had forgotten I was capable of. The wind speaks here. The sand shifts and whispers ancient things. By noon I was sunburned and lost and completely, inexplicably at peace.`;
+
+let ti = 0;
+const tw = document.getElementById('typewriter-text');
+const blink = tw.querySelector('.cursor-blink');
+
+function typeNext() {
+  if (ti >= text.length) return;
+  // insert char before cursor
+  const char = document.createTextNode(text[ti]);
+  tw.insertBefore(char, blink);
+  ti++;
+  const speed = text[ti-1] === '.' || text[ti-1] === ',' ? 200 : 40 + Math.random()*30;
+  setTimeout(typeNext, speed);
+}
+
+const journalIo = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && ti === 0) { setTimeout(typeNext, 600); journalIo.disconnect(); }
+}, {threshold:.3});
+journalIo.observe(document.getElementById('journal'));
+
+/* ── PARALLAX HORIZON ── */
+const horizonSection = document.getElementById('horizon');
+const layerSky = document.getElementById('layerSky');
+const sunEl = document.getElementById('sun');
+const horizonTitle = document.getElementById('horizonTitle');
+
+const titles = ['The<br>Journey<br><em>Begins</em>','Lost<br>in<br><em>Wonder</em>','Beyond<br>the<br><em>Horizon</em>','Home<br>is<br><em>Everywhere</em>'];
+
+window.addEventListener('scroll', () => {
+  const rect = horizonSection.getBoundingClientRect();
+  const total = horizonSection.offsetHeight - window.innerHeight;
+  const scrolled = -rect.top;
+  const pct = Math.max(0, Math.min(1, scrolled / total));
+
+  // sky color shift
+  const r1 = Math.round(26 + pct*20);
+  const g1 = Math.round(58 + pct*20);
+  const b1 = Math.round(106 + pct*20);
+  layerSky.style.background = `linear-gradient(to bottom, hsl(${210+pct*40},${60-pct*20}%,${(26+pct*10)}%) 0%, hsl(${200+pct*60},${50}%,${(35+pct*10)}%) 40%, hsl(${30-pct*10},${60}%,${(60-pct*20)}%) 70%, hsl(${40-pct*10},${60}%,${(70-pct*20)}%) 100%)`;
+
+  // sun moves left and rises/sets
+  const sunX = 60 - pct * 40;
+  const sunY = 15 + Math.sin(pct * Math.PI) * (-10) + pct*60;
+  sunEl.style.left = sunX + '%';
+  sunEl.style.top  = sunY + '%';
+  sunEl.style.opacity = pct < .85 ? 1 : 1-(pct-.85)/.15;
+
+  // title changes
+  const titleIndex = Math.floor(pct * 3.99);
+  const titleHTML = titles[Math.min(titleIndex, 3)];
+  if (horizonTitle.innerHTML !== titleHTML) {
+    horizonTitle.style.opacity = '0';
+    horizonTitle.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      horizonTitle.innerHTML = titleHTML;
+      horizonTitle.style.opacity = '1';
+      horizonTitle.style.transform = 'translateY(0)';
+    }, 250);
+    horizonTitle.style.transition = 'opacity .3s,transform .3s';
+  }
+});
+
+/* ── FADE-UP SCROLL REVEAL ── */
+const io = new IntersectionObserver(entries =>
+  entries.forEach(e => e.isIntersecting && e.target.classList.add('on')), {threshold:.15});
+document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
