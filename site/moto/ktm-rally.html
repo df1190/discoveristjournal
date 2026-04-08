@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KTM Adventure Rally — MOTO×TRAVEL</title>
+  <meta name="description" content="KTM Adventure rally trips across Europe — Bosnia, France, Norway, Romania, Italy. On-board video, photography and route notes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cream:#f5f0ea;--sand:#e8ddd0;--clay:#c9b49a;--charcoal:#1a1a18;--ktm-orange:#f96500;--sage:#8a9e8a;--ink:#2c2c2a;--white:#fdfcfb}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--charcoal);overflow-x:hidden}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.4rem 3rem;background:rgba(253,252,251,0.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,0.06);transition:padding 0.3s}
+    nav.shrink{padding:0.8rem 3rem}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.15em;color:var(--charcoal);text-decoration:none}
+    .nav-logo span{color:var(--ktm-orange)}
+    .nav-links{display:flex;gap:2.2rem;list-style:none}
+    .nav-links a{font-size:0.78rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);text-decoration:none;position:relative;padding-bottom:3px}
+    .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--ktm-orange);transition:width 0.3s}
+    .nav-links a:hover::after,.nav-links a.active::after{width:100%}
+    .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer}
+    .nav-burger span{width:22px;height:1px;background:var(--charcoal);display:block}
+    .mobile-menu{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,26,24,0.98);flex-direction:column;align-items:center;justify-content:center;gap:32px}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:0.08em;color:var(--white);text-decoration:none;transition:color 0.2s}
+    .mobile-menu a:hover{color:var(--ktm-orange)}
+    .mobile-close{position:absolute;top:24px;right:3rem;font-size:28px;color:var(--clay);cursor:pointer;background:none;border:none}
+
+    /* SCROLL HERO */
+    .hero-wrapper{position:relative;height:320vh}
+    .hero-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    .hero-media{position:absolute;inset:0;background:url('https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg') center/cover no-repeat;transform-origin:center center;transform:scale(0.42) translateY(8%);border-radius:24px;transition:transform 0.05s linear,border-radius 0.1s linear;will-change:transform,border-radius}
+    .hero-media::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.6) 100%);border-radius:inherit}
+    .hero-text{position:relative;z-index:2;text-align:center;pointer-events:none}
+    .hero-eyebrow{font-size:0.72rem;font-weight:500;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:1rem;opacity:0;animation:fadeUp 0.8s 0.6s forwards}
+    .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4.5rem,12vw,11rem);line-height:0.9;color:#fff;letter-spacing:0.04em;opacity:0;animation:fadeUp 0.8s 0.3s forwards}
+    .hero-title em{font-family:'Playfair Display',serif;font-style:italic;color:var(--clay);display:block;font-size:0.38em;letter-spacing:0.08em}
+    .hero-scroll-hint{position:absolute;bottom:2.4rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:rgba(255,255,255,0.6);font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;z-index:3;opacity:0;animation:fadeIn 1s 1.2s forwards}
+    .scroll-line{width:1px;height:40px;background:rgba(255,255,255,0.3);position:relative;overflow:hidden}
+    .scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);animation:scrollDrop 1.6s 1.4s ease-in-out infinite}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{to{opacity:1}}
+    @keyframes scrollDrop{0%{top:-100%}100%{top:100%}}
+
+    /* TICKER */
+    .ticker{overflow:hidden;background:var(--ktm-orange);padding:1rem 0;white-space:nowrap}
+    .ticker-track{display:inline-flex;gap:0;animation:ticker 20s linear infinite}
+    .ticker-item{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.16em;color:rgba(255,255,255,0.85);padding:0 2.5rem}
+    .ticker-item::before{content:'✦ '}
+    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+    /* ABOUT STRIP */
+    .about-strip{background:var(--charcoal);color:var(--cream);padding:5rem 3rem;display:flex;align-items:center;justify-content:space-between;gap:3rem}
+    .about-strip p{font-size:clamp(1.05rem,1.8vw,1.4rem);font-weight:300;max-width:660px;line-height:1.75;color:rgba(245,240,234,0.85)}
+    .about-strip p em{font-family:'Playfair Display',serif;font-style:italic;color:var(--clay)}
+    .about-stats{display:flex;gap:3rem;flex-shrink:0}
+    .stat-num{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--ktm-orange);line-height:1}
+    .stat-lbl{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-top:0.3rem}
+
+    /* SECTION LABELS */
+    .section-label{font-size:0.68rem;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:var(--ktm-orange);margin-bottom:0.8rem}
+    .section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5.5rem);line-height:1;letter-spacing:0.04em;color:var(--charcoal)}
+
+    /* TRIPS GRID */
+    .trips-section{padding:7rem 3rem;background:var(--white)}
+    .trips-header{margin-bottom:4rem}
+    .trips-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+    .trip-card{border-radius:16px;overflow:hidden;position:relative;cursor:pointer;opacity:0;transform:translateY(40px);transition:opacity 0.6s ease,transform 0.6s ease,box-shadow 0.3s;text-decoration:none;display:block}
+    .trip-card.visible{opacity:1;transform:translateY(0)}
+    .trip-card:hover{box-shadow:0 24px 64px rgba(0,0,0,0.15)}
+    .trip-card.featured{grid-column:span 2}
+    .trip-card img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;transition:transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94)}
+    .trip-card.featured img{aspect-ratio:16/9}
+    .trip-card:hover img{transform:scale(1.04)}
+    .trip-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,transparent 55%);transition:opacity 0.4s}
+    .trip-info{position:absolute;bottom:1.4rem;left:1.6rem;right:1.6rem;color:#fff}
+    .trip-country{font-size:0.65rem;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--clay);margin-bottom:0.4rem}
+    .trip-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.05em;line-height:1;margin-bottom:0.3rem}
+    .trip-card.featured .trip-name{font-size:2.6rem}
+    .trip-desc{font-size:0.75rem;color:rgba(255,255,255,0.65);font-weight:300}
+    .trip-tag{position:absolute;top:1rem;right:1rem;background:var(--ktm-orange);color:#fff;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;padding:0.3rem 0.7rem;border-radius:100px}
+
+    /* ROUTES BANNER */
+    .routes-banner{background:var(--charcoal);padding:6rem 3rem;display:flex;align-items:center;gap:6rem;overflow:hidden;position:relative}
+    .routes-banner::before{content:'KTM';position:absolute;right:-2rem;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',sans-serif;font-size:22vw;color:rgba(255,255,255,0.025);pointer-events:none;line-height:1;white-space:nowrap}
+    .routes-text{color:var(--cream);max-width:480px;position:relative;z-index:1}
+    .routes-text h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,6vw,6rem);line-height:0.95;letter-spacing:0.04em;margin-bottom:1.5rem}
+    .routes-text h2 span{color:var(--ktm-orange)}
+    .routes-text p{font-size:1rem;font-weight:300;line-height:1.7;color:rgba(245,240,234,0.7);margin-bottom:2rem}
+    .btn-outline{display:inline-block;border:1.5px solid var(--clay);color:var(--clay);font-size:0.72rem;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:0.85rem 2rem;border-radius:100px;text-decoration:none;transition:background 0.3s,color 0.3s,border-color 0.3s}
+    .btn-outline:hover{background:var(--ktm-orange);border-color:var(--ktm-orange);color:#fff}
+    .route-chips{display:flex;flex-wrap:wrap;gap:0.8rem;position:relative;z-index:1}
+    .chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--cream);font-size:0.75rem;letter-spacing:0.1em;padding:0.6rem 1.2rem;border-radius:100px;text-decoration:none;display:inline-block;opacity:0;transform:translateY(20px);transition:background 0.25s,border-color 0.25s,opacity 0.5s ease,transform 0.5s ease}
+    .chip.visible{opacity:1;transform:translateY(0)}
+    .chip:hover{background:rgba(214,66,48,0.2);border-color:var(--ktm-orange)}
+
+    /* FOOTER */
+    footer{background:var(--cream);padding:5rem 3rem 3rem;border-top:1px solid var(--sand)}
+    .footer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3rem;margin-bottom:4rem}
+    .footer-brand .nav-logo{font-size:2rem}
+    .footer-brand p{font-size:0.85rem;line-height:1.7;color:rgba(28,28,26,0.6);margin-top:1rem;max-width:260px}
+    .footer-col h5{font-size:0.68rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--charcoal);margin-bottom:1.2rem}
+    .footer-col ul{list-style:none}
+    .footer-col ul li{margin-bottom:0.6rem}
+    .footer-col ul li a{font-size:0.85rem;color:rgba(28,28,26,0.6);text-decoration:none;transition:color 0.2s}
+    .footer-col ul li a:hover{color:var(--ktm-orange)}
+    .footer-bottom{border-top:1px solid var(--sand);padding-top:2rem;display:flex;justify-content:space-between;align-items:center}
+    .footer-bottom p{font-size:0.75rem;color:rgba(28,28,26,0.45);letter-spacing:0.06em}
+
+    /* CURSOR */
+    .cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--ktm-orange);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s,width 0.25s,height 0.25s}
+    .cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(214,66,48,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s,height 0.3s}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      .nav-links{display:none}.nav-burger{display:flex}
+      nav{padding:1.1rem 1.4rem}
+      .hero-wrapper{height:280vh}.hero-media{transform:scale(0.55) translateY(6%)}
+      .about-strip{flex-direction:column;padding:3.5rem 1.4rem;align-items:flex-start}
+      .about-stats{gap:2rem}
+      .trips-section{padding:4rem 1.4rem}
+      .trips-grid{grid-template-columns:1fr;gap:1.2rem}
+      .trip-card.featured{grid-column:span 1}
+      .routes-banner{flex-direction:column;gap:3rem;padding:4rem 1.4rem}
+      footer{padding:3.5rem 1.4rem 2rem}
+      .footer-grid{grid-template-columns:1fr;gap:2rem}
+      .footer-bottom{flex-direction:column;gap:0.5rem;text-align:center}
+      .cursor-dot,.cursor-ring{display:none}
+    }
+    @media(min-width:769px) and (max-width:1024px){
+      nav{padding:1.2rem 2rem}
+      .trips-grid{grid-template-columns:1fr 1fr}
+      .trip-card.featured{grid-column:span 2}
+      .about-strip{padding:4rem 2rem}
+      .trips-section,.routes-banner{padding:5rem 2rem}
+      footer{padding:4rem 2rem 2.5rem}
+    }
+    /* === DARK MOTO THEME === */
+    :root{--cream:#161614;--sand:#252520;--ink:#c8c4be}
+    body{background:#0d0d0b}
+    nav{background:rgba(10,10,9,0.92)!important;border-bottom-color:rgba(255,255,255,0.07)!important}
+    .nav-logo{color:#f0ede8!important}
+    .nav-links a:hover,.nav-links a.active{color:#fff!important}
+    .nav-burger span{background:#c0bcb6!important}
+    .trips-section{background:#0d0d0b!important}
+    .section-title{color:#f0ede8!important}
+    .footer-col h5{color:#f0ede8!important}
+    .footer-col ul li a{color:rgba(200,196,190,0.6)!important}
+    .footer-brand p{color:rgba(200,196,190,0.6)!important}
+    .footer-bottom p{color:rgba(200,196,190,0.45)!important}
+    ::-webkit-scrollbar-track{background:#161614}
+  </style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">✕</button>
+  <a href="/">Home</a>
+  <a href="/moto/ktm-rally">KTM Rally</a>
+  <a href="/moto/alpine-passes">Passes</a>
+  <a href="/moto/tools">Tools</a>
+  <a href="/about">About</a>
+</div>
+
+<nav id="mainNav">
+  <a href="/" class="nav-logo">MOTO <span>×</span> TRAVEL</a>
+  <ul class="nav-links">
+    <li><a href="/moto/ktm-rally" class="active">KTM Rally</a></li>
+    <li><a href="/moto/alpine-passes">Passes</a></li>
+    <li><a href="/journeys">Journeys</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <div class="nav-burger" onclick="document.getElementById('mobileMenu').classList.add('open')"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<div class="hero-wrapper" id="heroWrapper">
+  <div class="hero-sticky">
+    <div class="hero-media" id="heroMedia"></div>
+    <div class="hero-text" id="heroText">
+      <p class="hero-eyebrow">KTM Adventure Rally · Europe</p>
+      <h1 class="hero-title">
+        Five<br/>Countries
+        <em>One Adventure</em>
+      </h1>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item">Bosnia</span>
+    <span class="ticker-item">France</span>
+    <span class="ticker-item">Norway</span>
+    <span class="ticker-item">Romania</span>
+    <span class="ticker-item">Italy</span>
+    <span class="ticker-item">KTM Adventure</span>
+    <span class="ticker-item">Rally Series</span>
+    <span class="ticker-item">On-Board Video</span>
+    <span class="ticker-item">Bosnia</span>
+    <span class="ticker-item">France</span>
+    <span class="ticker-item">Norway</span>
+    <span class="ticker-item">Romania</span>
+    <span class="ticker-item">Italy</span>
+    <span class="ticker-item">KTM Adventure</span>
+    <span class="ticker-item">Rally Series</span>
+    <span class="ticker-item">On-Board Video</span>
+  </div>
+</div>
+
+<!-- ABOUT STRIP -->
+<div class="about-strip">
+  <p>Five countries. One KTM. These are the <em>adventure rally trip reports</em> — real roads, real conditions, on-board video from every route. Bosnia, France, Norway, Romania, Italy. Written from the saddle.</p>
+  <div class="about-stats">
+    <div><div class="stat-num">5</div><div class="stat-lbl">Countries</div></div>
+    <div><div class="stat-num">5</div><div class="stat-lbl">Trips</div></div>
+    <div><div class="stat-num">KTM</div><div class="stat-lbl">The Bike</div></div>
+  </div>
+</div>
+
+<!-- TRIPS GRID -->
+<section class="trips-section">
+  <div class="trips-header">
+    <p class="section-label">KTM Adventure Rally Series</p>
+    <h2 class="section-title">The Trips</h2>
+  </div>
+  <div class="trips-grid">
+
+    <!-- BOSNIA — featured -->
+    <a href="ktm-bosnia.html" class="trip-card featured">
+      <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="KTM Rally Bosnia" loading="lazy">
+      <div class="trip-overlay"></div>
+      <div class="trip-info">
+        <p class="trip-country">Bosnia & Herzegovina</p>
+        <h2 class="trip-name">Bosnia</h2>
+        <p class="trip-desc">Balkan backroads, mountain passes and the unexpected</p>
+      </div>
+      <span class="trip-tag">Video + Photos</span>
+    </a>
+
+    <!-- FRANCE -->
+    <a href="ktm-france.html" class="trip-card">
+      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="KTM Rally France" loading="lazy">
+      <div class="trip-overlay"></div>
+      <div class="trip-info">
+        <p class="trip-country">France</p>
+        <h2 class="trip-name">France</h2>
+        <p class="trip-desc">Mountain roads and open horizon</p>
+      </div>
+      <span class="trip-tag">Video + Photos</span>
+    </a>
+
+    <!-- NORWAY -->
+    <a href="ktm-norway.html" class="trip-card">
+      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="KTM Rally Norway" loading="lazy">
+      <div class="trip-overlay"></div>
+      <div class="trip-info">
+        <p class="trip-country">Norway</p>
+        <h2 class="trip-name">Norway</h2>
+        <p class="trip-desc">Fjords, switchbacks and midnight sun</p>
+      </div>
+      <span class="trip-tag">Video + Photos</span>
+    </a>
+
+    <!-- ROMANIA -->
+    <a href="ktm-romania.html" class="trip-card">
+      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/8-dji_fly_20230721_112524_87_1690062076550_photo-576x1024.jpg" alt="KTM Rally Romania" loading="lazy">
+      <div class="trip-overlay"></div>
+      <div class="trip-info">
+        <p class="trip-country">Romania</p>
+        <h2 class="trip-name">Romania</h2>
+        <p class="trip-desc">Carpathians, switchbacks and raw roads</p>
+      </div>
+      <span class="trip-tag">Video + Photos</span>
+    </a>
+
+    <!-- ITALY -->
+    <a href="ktm-italy.html" class="trip-card">
+      <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="KTM Rally Italy" loading="lazy">
+      <div class="trip-overlay"></div>
+      <div class="trip-info">
+        <p class="trip-country">Italy</p>
+        <h2 class="trip-name">Italy</h2>
+        <p class="trip-desc">Dolomites, alpine passes and the long way south</p>
+      </div>
+      <span class="trip-tag">Video + Photos</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- ROUTES BANNER -->
+<div class="routes-banner">
+  <div class="routes-text">
+    <h2>Adventure<br/><span>Rally</span><br/>Series</h2>
+    <p>Every trip documented with on-board video, photography and honest route notes. No press trips. No sponsorship. Just the bike and the road.</p>
+    <a href="journeys.html" class="btn-outline">All Journeys</a>
+  </div>
+  <div class="route-chips">
+    <a href="ktm-bosnia.html" class="chip">Bosnia & Herzegovina</a>
+    <a href="ktm-france.html" class="chip">France</a>
+    <a href="ktm-norway.html" class="chip">Norway</a>
+    <a href="ktm-romania.html" class="chip">Romania</a>
+    <a href="ktm-italy.html" class="chip">Italy</a>
+    <a href="alpine-passes.html" class="chip">Alpine Passes</a>
+    <a href="tools.html" class="chip">Moto Tools</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo">MOTO<span>×</span>TRAVEL</a>
+      <p>KTM Adventure rally trips across Europe. On-board video, photography and route notes from every road.</p>
+    </div>
+    <div class="footer-col">
+      <h5>KTM Rally Trips</h5>
+      <ul>
+        <li><a href="ktm-bosnia.html">Bosnia</a></li>
+        <li><a href="ktm-france.html">France</a></li>
+        <li><a href="ktm-norway.html">Norway</a></li>
+        <li><a href="ktm-romania.html">Romania</a></li>
+        <li><a href="ktm-italy.html">Italy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Explore</h5>
+      <ul>
+        <li><a href="index.html">The Discoverist Journal</a></li>
+        <li><a href="journeys.html">All Journeys</a></li>
+        <li><a href="alpine-passes.html">Alpine Passes</a></li>
+        <li><a href="moto-trip-report.html">Trip Reports</a></li>
+        <li><a href="tools.html">Moto Tools</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 The Discoverist Journal</p>
+    <p>Part of the MOTO×TRAVEL series</p>
+  </div>
+</footer>
+
+<script>
+  /* Cursor */
+  const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+  (function loop(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop)})();
+
+  /* Scroll hero expand */
+  const hw=document.getElementById('heroWrapper'),hm=document.getElementById('heroMedia'),ht=document.getElementById('heroText');
+  window.addEventListener('scroll',()=>{
+    const p=Math.min(hw.scrollTop||window.scrollY,hw.offsetHeight-window.innerHeight);
+    const prog=p/((hw.offsetHeight||1)-window.innerHeight);
+    const sc=0.42+(1-0.42)*Math.min(prog*1.4,1);
+    const br=Math.max(0,24-24*Math.min(prog*1.6,1));
+    hm.style.transform=`scale(${sc}) translateY(${8*(1-Math.min(prog*2,1))}%)`;
+    hm.style.borderRadius=br+'px';
+    ht.style.opacity=Math.max(0,1-prog*3);
+    document.getElementById('mainNav').classList.toggle('shrink',window.scrollY>80);
+  });
+
+  /* Reveal on scroll */
+  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}}),{threshold:0.1});
+  document.querySelectorAll('.trip-card,.chip').forEach(el=>obs.observe(el));
+
+</script>
+</body>
+</html>
