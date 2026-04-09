@@ -512,7 +512,7 @@
       letter-spacing: 0;
     }
     .moto-desc { font-size: 0.9rem; color: rgba(253,252,251,0.6); line-height: 1.8; margin-bottom: 32px; }
-    .moto-img { position: relative; aspect-ratio: 4/3; overflow: hidden; }
+    .moto-img { position: relative; aspect-ratio: 4/3; overflow: hidden; border-radius: 16px; }
     .moto-img img { width: 100%; height: 100%; object-fit: cover; }
 
     /* ── POD STORE ── */
@@ -643,15 +643,46 @@
     /* ── ABOUT TEASER ── */
     .about-teaser {
       background: var(--charcoal);
-      padding: 100px 3rem;
+      padding: 120px 3rem;
+      overflow: hidden;
+      position: relative;
     }
-    .about-teaser-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+    .about-teaser::before {
+      content: 'DISCOVERIST';
+      position: absolute;
+      right: -20px; bottom: -40px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 180px;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.025);
+      pointer-events: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .about-teaser-inner { max-width: 680px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
     .about-teaser .section-label { justify-content: center; display: flex; }
     .about-teaser .section-title { color: var(--white); }
     .about-teaser p {
       font-size: 0.95rem; color: rgba(253,252,251,0.6);
       line-height: 1.9; margin-bottom: 24px;
     }
+    .at-line {
+      display: block;
+      overflow: hidden;
+    }
+    .at-line-inner {
+      display: block;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.75s ease;
+    }
+    .about-teaser.at-visible .at-line-inner { transform: translateY(0); opacity: 1; }
+    .about-teaser.at-visible .at-line:nth-child(1) .at-line-inner { transition-delay: 0s; }
+    .about-teaser.at-visible .at-line:nth-child(2) .at-line-inner { transition-delay: 0.12s; }
+    .about-teaser.at-visible .at-line:nth-child(3) .at-line-inner { transition-delay: 0.24s; }
+    .about-teaser.at-visible .at-line:nth-child(4) .at-line-inner { transition-delay: 0.36s; }
+    .about-teaser.at-visible .at-line:nth-child(5) .at-line-inner { transition-delay: 0.48s; }
+    .about-teaser.at-visible .at-line:nth-child(6) .at-line-inner { transition-delay: 0.60s; }
 
     /* ── FOOTER ── */
     footer {
@@ -817,35 +848,6 @@
   </div>
 </section>
 
-<!-- INTRO -->
-<section class="intro" id="about-teaser">
-  <div class="intro-inner">
-    <div class="intro-text reveal">
-      <p class="section-label">About the Journal</p>
-      <p>The Discoverist Journal is a curated travel and lifestyle journal built on real stays, real roads, and honest opinion. Marriott Bonvoy Ambassador. Star Alliance Gold. Every review is written from personal experience — no press trips, no PR kits.</p>
-      <p>From alpine resorts to coastal hideaways, from long-haul moto routes to city weekends, this is the journal of a life lived in transit — and the places worth remembering.</p>
-      <div class="intro-stats">
-        <div class="stat reveal reveal-delay-1">
-          <div class="stat-num">40+</div>
-          <div class="stat-label">Countries Visited</div>
-        </div>
-        <div class="stat reveal reveal-delay-2">
-          <div class="stat-num">200+</div>
-          <div class="stat-label">Hotels Reviewed</div>
-        </div>
-        <div class="stat reveal reveal-delay-3">
-          <div class="stat-num">★</div>
-          <div class="stat-label">Bonvoy Ambassador</div>
-        </div>
-      </div>
-    </div>
-    <div class="intro-quote reveal">
-      <blockquote>"Viajar es marcharse de casa… sentir que el tiempo es corto, viajar es regresar."</blockquote>
-      <cite>— Gabriel Gamar</cite>
-    </div>
-  </div>
-</section>
-
 <!-- HOTELS -->
 <section class="hotels" id="hotels">
   <div class="hotels-inner">
@@ -859,7 +861,7 @@
     <div class="hotels-grid">
 
       <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-card reveal" data-tilt>
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="The Cambrian hotel in Adelboden, Swiss Alps" loading="lazy">
+        <img src="Media/Hero/DSC09761.JPG" alt="The Cambrian hotel in Adelboden, Swiss Alps" loading="lazy">
         <div class="hotel-card-overlay"></div>
         <div class="hotel-card-info">
           <p class="hotel-card-country">Switzerland · Adelboden</p>
@@ -870,7 +872,7 @@
       </a>
 
       <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-card reveal reveal-delay-1" data-tilt>
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="Vigilius Mountain Resort, South Tyrol Italy" loading="lazy">
+        <img src="Media/Hero/IMG_5450.jpg" alt="Vigilius Mountain Resort, South Tyrol Italy" loading="lazy">
         <div class="hotel-card-overlay"></div>
         <div class="hotel-card-info">
           <p class="hotel-card-country">Italy · South Tyrol</p>
@@ -881,7 +883,7 @@
       </a>
 
       <a href="https://prf.hn/l/3PGgpkE/" target="_blank" rel="noopener" class="hotel-card reveal reveal-delay-2" data-tilt>
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_023-768x1024.jpg" alt="The Hotel Lucerne on Lake Lucerne, Switzerland" loading="lazy">
+        <img src="Media/Hero/DSC09740.jpg" alt="The Hotel Lucerne on Lake Lucerne, Switzerland" loading="lazy">
         <div class="hotel-card-overlay"></div>
         <div class="hotel-card-info">
           <p class="hotel-card-country">Switzerland · Lucerne</p>
@@ -918,7 +920,7 @@
   <div class="journeys-list">
 
     <a href="https://discoveristjournal.com/weekend-in-the-middle-of-italian-alps" class="journey-item reveal">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_4857-576x1024.jpg" alt="Weekend in the Italian Alps" loading="lazy">
+      <img src="Media/Hero/DSC09772.jpg" alt="Weekend in the Italian Alps" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">01</span>
       <div class="journey-info">
@@ -929,7 +931,7 @@
     </a>
 
     <a href="/journeys" class="journey-item reveal reveal-delay-1">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="Snowbiking in British Columbia, Canada" loading="lazy">
+      <img src="Media/Hero/IMG_0702.JPG" alt="Snowbiking in British Columbia, Canada" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">02</span>
       <div class="journey-info">
@@ -940,7 +942,7 @@
     </a>
 
     <a href="/journeys" class="journey-item reveal reveal-delay-2">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Alpine Crossing Switzerland to Austria" loading="lazy">
+      <img src="Media/Hero/IMG_5791.jpg" alt="Alpine Crossing Switzerland to Austria" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">03</span>
       <div class="journey-info">
@@ -951,7 +953,7 @@
     </a>
 
     <a href="/journeys" class="journey-item reveal reveal-delay-3">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="Norway Fjords by Road drone view" loading="lazy">
+      <img src="Media/Hero/dji_fly_20231218_101620_328_1702921336993_photo.JPG" alt="Norway Fjords by Road drone view" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">04</span>
       <div class="journey-info">
@@ -993,28 +995,28 @@
     </div>
     <div class="pod-grid">
       <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/7-dji_fly_20230721_112538_90_1690062080451_photo-576x1024.jpg" alt="Travel print artwork" loading="lazy">
+        <img src="Media/Moto/IMG_9945.jpg" alt="Travel print artwork" loading="lazy">
         <div class="pod-item-info">
           <span class="pod-item-name">Travel Prints</span>
           <span class="pod-item-cta">Shop Now</span>
         </div>
       </a>
       <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal reveal-delay-1">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/8-dji_fly_20230721_112524_87_1690062076550_photo-576x1024.jpg" alt="Discoverist apparel" loading="lazy">
+        <img src="Media/Moto/IMG_2260.jpg" alt="Discoverist apparel" loading="lazy">
         <div class="pod-item-info">
           <span class="pod-item-name">Apparel</span>
           <span class="pod-item-cta">Shop Now</span>
         </div>
       </a>
       <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal reveal-delay-2">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Travel accessories" loading="lazy">
+        <img src="Media/Moto/IMG_2291.jpg" alt="Travel accessories" loading="lazy">
         <div class="pod-item-info">
           <span class="pod-item-name">Accessories</span>
           <span class="pod-item-cta">Shop Now</span>
         </div>
       </a>
       <a href="https://thediscoveristjournal.printify.me/" target="_blank" rel="noopener" class="pod-item reveal reveal-delay-3">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="Travel notebooks" loading="lazy">
+        <img src="Media/Moto/IMG_20190617_235719_996.JPG" alt="Travel notebooks" loading="lazy">
         <div class="pod-item-info">
           <span class="pod-item-name">Travel Notebooks</span>
           <span class="pod-item-cta">Shop Now</span>
@@ -1053,23 +1055,23 @@
     </div>
     <div class="dest-grid">
       <a href="/journeys" class="dest-item reveal">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="Switzerland travel" loading="lazy">
+        <img src="Media/Hero/DSC08191.jpg" alt="Switzerland travel" loading="lazy">
         <span class="dest-label">Switzerland</span>
       </a>
       <a href="/journeys" class="dest-item reveal reveal-delay-1">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="Italy travel" loading="lazy">
+        <img src="Media/Hero/DSC09761.JPG" alt="Italy travel" loading="lazy">
         <span class="dest-label">Italy</span>
       </a>
       <a href="/journeys" class="dest-item reveal reveal-delay-2">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="Canada travel" loading="lazy">
+        <img src="Media/Hero/IMG_0702.JPG" alt="Canada travel" loading="lazy">
         <span class="dest-label">Canada</span>
       </a>
       <a href="/journeys" class="dest-item reveal reveal-delay-3">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Norway travel" loading="lazy">
+        <img src="Media/Hero/dji_fly_20231218_101620_328_1702921336993_photo.JPG" alt="Norway travel" loading="lazy">
         <span class="dest-label">Norway</span>
       </a>
       <a href="/tools/interactive-map" class="dest-item reveal">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="More destinations" loading="lazy">
+        <img src="Media/About/dehancer-1753728042314.JPG" alt="More destinations" loading="lazy">
         <span class="dest-label">+ More →</span>
       </a>
     </div>
@@ -1090,7 +1092,7 @@
 
       <a href="https://discoveristjournal.com/weekend-in-the-middle-of-italian-alps" class="blog-card reveal">
         <div class="blog-card-img">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_4857-576x1024.jpg" alt="Vigilius Mountain Resort South Tyrol" loading="lazy">
+          <img src="Media/Hero/IMG_5450.jpg" alt="Vigilius Mountain Resort South Tyrol" loading="lazy">
         </div>
         <p class="blog-card-tag">Hotel Review · Italy</p>
         <h3 class="blog-card-title">Vigilius Mountain Resort: Above the World, Below the Sky</h3>
@@ -1100,7 +1102,7 @@
 
       <a href="/blog" class="blog-card reveal reveal-delay-1">
         <div class="blog-card-img">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="Snowbiking British Columbia Canada" loading="lazy">
+          <img src="Media/Moto/IMG_9945.jpg" alt="Snowbiking British Columbia Canada" loading="lazy">
         </div>
         <p class="blog-card-tag">Journey · Canada</p>
         <h3 class="blog-card-title">Snowbiking British Columbia: Cold, Remote, Completely Worth It</h3>
@@ -1110,7 +1112,7 @@
 
       <a href="/blog" class="blog-card reveal reveal-delay-2">
         <div class="blog-card-img">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_023-768x1024.jpg" alt="The Hotel Lucerne Jean Nouvel" loading="lazy">
+          <img src="Media/Hero/DSC09740.jpg" alt="The Hotel Lucerne Jean Nouvel" loading="lazy">
         </div>
         <p class="blog-card-tag">Hotel Review · Switzerland</p>
         <h3 class="blog-card-title">The Hotel Lucerne: Jean Nouvel's Masterpiece on the Lake</h3>
@@ -1127,9 +1129,14 @@
   <div class="about-teaser-inner">
     <p class="section-label reveal">The Author</p>
     <h2 class="section-title reveal">About the <em>Journal</em></h2>
-    <p class="reveal">The Discoverist Journal is written by a frequent international traveler with Marriott Bonvoy Ambassador status and Star Alliance Gold. Every review comes from a real stay, every route from a real road. No press junkets. No staged photos. Just places that earned their place on the page.</p>
-    <p class="reveal">Affiliate links help keep the lights on and the tank full. When you book through this journal, you're supporting independent travel writing — and getting a recommendation you can trust.</p>
-    <a href="/about" class="btn-primary reveal">Read More →</a>
+    <p>
+      <span class="at-line"><span class="at-line-inner">This journal started as personal notes from the road —</span></span>
+      <span class="at-line"><span class="at-line-inner">hotels that surprised, passes that humbled, and places that refused to leave.</span></span>
+      <span class="at-line"><span class="at-line-inner">It's written by a motorcycle traveler and adventure junkie who moves through the world</span></span>
+      <span class="at-line"><span class="at-line-inner">on two wheels as much as by plane. KTM rider. Alpine pass collector.</span></span>
+      <span class="at-line"><span class="at-line-inner">No press trips. No gifted stays. Just an honest record of the roads and rooms worth remembering.</span></span>
+    </p>
+    <a href="/about" class="btn-primary reveal" style="margin-top: 36px; display: inline-block;">Read More →</a>
   </div>
 </section>
 
@@ -1203,6 +1210,15 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
   }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
   reveals.forEach(el => observer.observe(el));
+
+  // About teaser line wipe
+  const aboutTeaser = document.querySelector('.about-teaser');
+  if (aboutTeaser) {
+    const atObs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { aboutTeaser.classList.add('at-visible'); atObs.disconnect(); }
+    }, { threshold: 0.2 });
+    atObs.observe(aboutTeaser);
+  }
 
   // Mobile menu
   function openMobile() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
