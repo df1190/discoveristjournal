@@ -164,6 +164,7 @@
       transform: scale(1.04);
       transition: transform 8s ease-out;
     }
+    .hero-bg.loaded { transform: scale(1); }
 
     /* ── HERO PHOTO CREDIT ── */
     .hero-credit {
@@ -173,7 +174,6 @@
       color: rgba(253,252,251,0.38);
       font-family: 'DM Sans', sans-serif; font-weight: 300;
     }
-    .hero-bg.loaded { transform: scale(1); }
     .hero-overlay {
       position: absolute; inset: 0;
       background: linear-gradient(
@@ -1197,12 +1197,9 @@
     nav.classList.toggle('scrolled', window.scrollY > 60);
   });
 
-  // Hero parallax bg
+  // Hero zoom-in on load
   const heroBg = document.getElementById('heroBg');
   setTimeout(() => heroBg.classList.add('loaded'), 100);
-  window.addEventListener('scroll', () => {
-    heroBg.style.transform = `translateY(${window.scrollY * 0.28}px) scale(1.04)`;
-  });
 
   // Reveal on scroll
   const reveals = document.querySelectorAll('.reveal');
