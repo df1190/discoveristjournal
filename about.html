@@ -116,17 +116,53 @@
     .quote-break cite { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,180,154,0.6); }
 
     /* PHILOSOPHY */
-    .philosophy { padding: 100px 3rem; background: var(--white); }
-    .philosophy-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-    .philosophy-text h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 3.5vw, 48px); letter-spacing: 0.04em; color: var(--charcoal); line-height: 1.0; margin-bottom: 24px; }
+    .philosophy { padding: 100px 3rem; background: var(--charcoal); }
+    .philosophy-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .philosophy-text h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 3.5vw, 48px); letter-spacing: 0.04em; color: var(--white); line-height: 1.0; margin-bottom: 24px; }
     .philosophy-text h2 em { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.9em; color: var(--moto-red); letter-spacing: 0; }
-    .philosophy-text p { font-size: 0.92rem; color: var(--ink); line-height: 1.9; margin-bottom: 18px; }
+    .philosophy-text p { font-size: 0.92rem; color: rgba(253,252,251,0.55); line-height: 1.9; margin-bottom: 18px; }
+    /* LIST ROW WIPE (MA-04) */
+    .value-row {
+      display: flex; align-items: stretch;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 1.6rem 0; gap: 1.5rem;
+      cursor: default; position: relative; overflow: hidden;
+    }
+    .value-row:last-child { border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .value-row::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 0; background: rgba(214,66,48,0.07);
+      transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .value-row:hover::before { width: 100%; }
+    .value-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem;
+      color: rgba(201,180,154,0.2); width: 3rem; flex-shrink: 0;
+      align-self: center; line-height: 1;
+    }
+    .value-content { flex: 1; }
+    .value-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+      color: var(--white); line-height: 1;
+      transition: color 0.3s, transform 0.4s cubic-bezier(0.16,1,0.3,1);
+      margin-bottom: 6px;
+    }
+    .value-row:hover .value-title { color: var(--moto-red); transform: translateX(10px); }
+    .value-desc {
+      font-size: 0.82rem; color: rgba(201,180,154,0.45); line-height: 1.7;
+      transition: color 0.3s;
+      letter-spacing: 0.02em;
+    }
+    .value-row:hover .value-desc { color: rgba(214,66,48,0.6); }
+    .value-arrow {
+      align-self: center; font-size: 1.2rem;
+      color: rgba(201,180,154,0.2);
+      transform: translateX(-8px);
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), color 0.3s;
+      flex-shrink: 0;
+    }
+    .value-row:hover .value-arrow { transform: translateX(0); color: var(--moto-red); }
     .philosophy-values { display: flex; flex-direction: column; }
-    .value-row { display: flex; gap: 24px; align-items: flex-start; padding: 24px 0; border-bottom: 1px solid var(--sand); }
-    .value-row:first-child { border-top: 1px solid var(--sand); }
-    .value-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 0.04em; color: var(--sand); line-height: 1; min-width: 52px; }
-    .value-title { font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--charcoal); margin-bottom: 6px; }
-    .value-desc { font-size: 0.85rem; color: var(--clay); line-height: 1.7; }
 
     /* STATS BAND */
     .stats-band { padding: 70px 3rem; background: var(--cream); border-top: 1px solid var(--sand); border-bottom: 1px solid var(--sand); }
@@ -230,15 +266,14 @@
 <section class="intro-split">
   <div class="intro-split-inner">
     <div class="intro-split-img reveal">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="The Discoverist in the Swiss Alps near Adelboden">
-      <p class="img-caption">Swiss Alps — The Cambrian, Adelboden</p>
+      <img src="Media/About/dehancer-1753728042314.JPG" alt="The Discoverist">
     </div>
     <div class="intro-split-text reveal reveal-delay-1">
       <p class="section-label">Who I Am</p>
       <h2>Not a travel blogger.<br>A <em>traveler</em> who writes.</h2>
-      <p>The Discoverist Journal started as a personal record — a way to document hotels, roads, and places that deserved more than a five-star rating and a one-liner. Over years of traveling through Europe, Asia, the Americas, and beyond, it became something more structured: a reference for people who travel the way I do.</p>
-      <p>I'm not a professional influencer. I pay for my own stays, or earn them through loyalty programs I've built over years of real travel. Marriott Bonvoy Ambassador. Star Alliance Gold. These aren't brand deals — they're the result of a life spent on the road.</p>
-      <p>Every review, every route recommendation, every gear note comes from personal experience. If I haven't been there, I won't write about it.</p>
+      <p>The Discoverist Journal is a personal record of a life spent moving — across mountain passes, through border crossings, and down the kind of roads that don't appear on recommended itineraries. It started as notes for myself and became something other people kept asking to read.</p>
+      <p>I travel by motorcycle as much as by plane. Some of the best places I've ever found were discovered at 80km/h on a back road through the Alps, or on a ferry crossing I almost missed. The motorcycle isn't just transport — it's the lens. It forces you to pay attention to the road, the weather, the towns you'd otherwise drive past without stopping.</p>
+      <p>Every review, every route, every gear note on this site comes from being there. If I haven't ridden it or slept in it, I won't write about it.</p>
       <a href="/journeys" class="btn-primary">Read the Journeys</a>
     </div>
   </div>
@@ -253,29 +288,23 @@
     </div>
     <div class="cred-grid">
       <div class="cred-card reveal">
-        <div class="cred-icon">★</div>
-        <h3 class="cred-title">Marriott Bonvoy Ambassador</h3>
-        <p class="cred-desc">Ambassador Elite status — the top tier of Marriott's loyalty programme. Earned through real nights, not comped stays. Over 100 nights per year across Marriott properties worldwide.</p>
+        <div class="cred-icon">◈</div>
+        <h3 class="cred-title">Motorcycle Traveler</h3>
+        <p class="cred-desc">KTM rider. Alpine passes, Scandinavian fjords, Balkan back roads. The motorcycle is the filter — it changes what you see, where you stop, and what stays with you after the trip is over.</p>
       </div>
       <div class="cred-card reveal reveal-delay-1">
-        <div class="cred-icon">✈</div>
-        <h3 class="cred-title">Star Alliance Gold</h3>
-        <p class="cred-desc">Frequent flyer status across multiple Star Alliance carriers. Lounge access, priority boarding, and a deep familiarity with the airport experience at both ends of every journey.</p>
+        <div class="cred-icon">◎</div>
+        <h3 class="cred-title">40+ Countries, Real Trips</h3>
+        <p class="cred-desc">Europe, Asia, the Americas, and beyond. Not as a tourist following a highlights reel — as someone trying to understand a place by actually spending time in it.</p>
       </div>
       <div class="cred-card reveal reveal-delay-2">
-        <div class="cred-icon">◎</div>
-        <h3 class="cred-title">40+ Countries, Real Reviews</h3>
-        <p class="cred-desc">No press trips. No gifted stays (unless clearly disclosed). Every recommendation is based on a stay I paid for — or earned — with my own loyalty points and real money.</p>
+        <div class="cred-icon">✦</div>
+        <h3 class="cred-title">No Press Trips. No Fluff.</h3>
+        <p class="cred-desc">Every hotel, route, and recommendation on this site is based on a trip I took myself. No gifted stays, no sponsored itineraries. Just honest notes from the road.</p>
       </div>
     </div>
   </div>
 </section>
-
-<!-- QUOTE BREAK -->
-<div class="quote-break reveal">
-  <blockquote>"Viajar es marcharse de casa… sentir que el tiempo es corto, viajar es regresar."</blockquote>
-  <cite>— Gabriel Gamar</cite>
-</div>
 
 <!-- PHILOSOPHY -->
 <section class="philosophy">
@@ -289,53 +318,39 @@
     <div class="philosophy-values reveal reveal-delay-1">
       <div class="value-row">
         <span class="value-num">01</span>
-        <div>
-          <p class="value-title">Real Experience Only</p>
-          <p class="value-desc">Every hotel review, route guide, and destination post is based on a stay or journey I completed myself.</p>
+        <div class="value-content">
+          <p class="value-title">Real Roads Only</p>
+          <p class="value-desc">Every route, pass, and destination covered here has been ridden or driven in person. No desk research.</p>
         </div>
+        <span class="value-arrow">→</span>
       </div>
       <div class="value-row">
         <span class="value-num">02</span>
-        <div>
-          <p class="value-title">No Sponsored Fluff</p>
-          <p class="value-desc">Affiliate links help keep the journal running. But they never dictate what gets written or recommended.</p>
+        <div class="value-content">
+          <p class="value-title">Two Wheels First</p>
+          <p class="value-desc">The motorcycle changes what you notice. The side roads, the weather, the stops that don't appear in any guide.</p>
         </div>
+        <span class="value-arrow">→</span>
       </div>
       <div class="value-row">
         <span class="value-num">03</span>
-        <div>
-          <p class="value-title">Intention Over Volume</p>
-          <p class="value-desc">Fewer posts, written properly. This isn't a content farm. It's a journal.</p>
+        <div class="value-content">
+          <p class="value-title">Slow Over Fast</p>
+          <p class="value-desc">Fewer posts, written with care. This isn't a content machine — it's a journal with a point of view.</p>
         </div>
+        <span class="value-arrow">→</span>
       </div>
       <div class="value-row">
         <span class="value-num">04</span>
-        <div>
-          <p class="value-title">Honest Affiliate Disclosure</p>
-          <p class="value-desc">When a link earns a commission, it's disclosed. Always. You deserve to know.</p>
+        <div class="value-content">
+          <p class="value-title">No Sponsored Noise</p>
+          <p class="value-desc">Affiliate links keep the lights on, but they never influence what gets recommended. The road does.</p>
         </div>
+        <span class="value-arrow">→</span>
       </div>
     </div>
   </div>
 </section>
-
-<!-- STATS BAND -->
-<div class="stats-band">
-  <div class="stats-band-inner">
-    <div class="reveal"><div class="stat-num">40+</div><p class="stat-label">Countries Visited</p></div>
-    <div class="reveal reveal-delay-1"><div class="stat-num">200+</div><p class="stat-label">Hotels Reviewed</p></div>
-    <div class="reveal reveal-delay-2"><div class="stat-num">★</div><p class="stat-label">Bonvoy Ambassador</p></div>
-    <div class="reveal reveal-delay-3"><div class="stat-num">∞</div><p class="stat-label">Miles Ridden</p></div>
-  </div>
-</div>
-
-<!-- AFFILIATE DISCLOSURE -->
-<div class="disclosure reveal">
-  <div class="disclosure-inner">
-    <h3>A Note on Affiliate Links</h3>
-    <p>This journal uses affiliate links from partners including Travelpayouts, Marriott Bonvoy, Booking.com, and Amazon. When you book or buy through a link on this site, I may earn a small commission — at no extra cost to you. It's how independent travel writing stays independent. Every recommendation is based on personal experience, regardless of whether a link is present.</p>
-  </div>
-</div>
 
 <!-- CTA -->
 <section class="about-cta">
