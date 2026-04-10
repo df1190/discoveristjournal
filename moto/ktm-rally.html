@@ -17,11 +17,12 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.4rem 3rem;background:rgba(253,252,251,0.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,0.06);transition:padding 0.3s}
     nav.shrink{padding:0.8rem 3rem}
     .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.15em;color:var(--charcoal);text-decoration:none}
-    .nav-logo span{color:var(--ktm-orange)}
     .nav-links{display:flex;gap:2.2rem;list-style:none}
     .nav-links a{font-size:0.78rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);text-decoration:none;position:relative;padding-bottom:3px}
     .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--ktm-orange);transition:width 0.3s}
     .nav-links a:hover::after,.nav-links a.active::after{width:100%}
+    .nav-cta{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ktm-orange);border:1px solid var(--ktm-orange);padding:9px 20px;text-decoration:none;transition:background 0.2s,color 0.2s}
+    .nav-cta:hover{background:var(--ktm-orange);color:var(--white)}
     .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer}
     .nav-burger span{width:22px;height:1px;background:var(--charcoal);display:block}
     .mobile-menu{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,26,24,0.98);flex-direction:column;align-items:center;justify-content:center;gap:32px}
@@ -118,7 +119,7 @@
 
     /* RESPONSIVE */
     @media(max-width:768px){
-      .nav-links{display:none}.nav-burger{display:flex}
+      .nav-links,.nav-cta{display:none}.nav-burger{display:flex}
       nav{padding:1.1rem 1.4rem}
       .hero-wrapper{height:280vh}.hero-media{transform:scale(0.55) translateY(6%)}
       .about-strip{flex-direction:column;padding:3.5rem 1.4rem;align-items:flex-start}
@@ -163,23 +164,26 @@
 
 <!-- NAV -->
 <div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">✕</button>
-  <a href="/">Home</a>
-  <a href="/moto/ktm-rally">KTM Rally</a>
-  <a href="/moto/alpine-passes">Passes</a>
-  <a href="/moto/tools">Tools</a>
-  <a href="/about">About</a>
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="/" onclick="closeMobile()">Home</a>
+  <a href="/hotels" onclick="closeMobile()">Hotels</a>
+  <a href="/journeys" onclick="closeMobile()">Journeys</a>
+  <a href="/moto/ktm-rally" onclick="closeMobile()">Moto</a>
+  <a href="/blog" onclick="closeMobile()">Journal</a>
+  <a href="/about" onclick="closeMobile()">About</a>
 </div>
 
 <nav id="mainNav">
-  <a href="/" class="nav-logo">MOTO <span>×</span> TRAVEL</a>
+  <a href="/" class="nav-logo">The Discoverist</a>
   <ul class="nav-links">
-    <li><a href="/moto/ktm-rally" class="active">KTM Rally</a></li>
-    <li><a href="/moto/alpine-passes">Passes</a></li>
-    <li><a href="/journeys">Journeys</a></li>
+    <li><a href="/hotels">Hotel Reviews</a></li>
+    <li><a href="/journeys">Trips &amp; Journeys</a></li>
+    <li><a href="/moto/ktm-rally" class="active">Moto</a></li>
+    <li><a href="/blog">Journal</a></li>
     <li><a href="/about">About</a></li>
   </ul>
-  <div class="nav-burger" onclick="document.getElementById('mobileMenu').classList.add('open')"><span></span><span></span><span></span></div>
+  <a href="/#newsletter" class="nav-cta">Subscribe</a>
+  <div class="nav-burger" onclick="openMobile()"><span></span><span></span><span></span></div>
 </nav>
 
 <!-- HERO -->
@@ -378,7 +382,8 @@
   /* Reveal on scroll */
   const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}}),{threshold:0.1});
   document.querySelectorAll('.trip-card,.chip').forEach(el=>obs.observe(el));
-
+  function openMobile() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
 </script>
 </body>
 </html>

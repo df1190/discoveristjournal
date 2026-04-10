@@ -55,12 +55,13 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3rem;background:rgba(253,252,251,0.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,0.06);transition:padding 0.3s}
     nav.scrolled{padding:0.8rem 3rem}
     .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.15em;color:var(--charcoal);text-decoration:none}
-    .nav-logo span{color:var(--ktm-orange)}
     .nav-links{display:flex;gap:36px;list-style:none}
     .nav-links a{font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink);text-decoration:none;opacity:0.7;transition:opacity 0.2s,color 0.2s;position:relative}
     .nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--ktm-orange);transition:width 0.2s}
     .nav-links a:hover,.nav-links a.active{opacity:1;color:var(--charcoal)}
     .nav-links a:hover::after,.nav-links a.active::after{width:100%}
+    .nav-cta{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ktm-orange);border:1px solid var(--ktm-orange);padding:9px 20px;text-decoration:none;transition:background 0.2s,color 0.2s}
+    .nav-cta:hover{background:var(--ktm-orange);color:var(--white)}
     .nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer}
     .nav-burger span{width:22px;height:1px;background:var(--charcoal);display:block}
     .progress-bar{position:fixed;top:65px;left:0;right:0;height:2px;background:var(--sand);z-index:99}
@@ -167,7 +168,7 @@
     .reveal{opacity:0;transform:translateY(22px);transition:opacity 0.8s ease,transform 0.8s ease}
     .reveal.visible{opacity:1;transform:translateY(0)}
     @media(max-width:1024px){.post-layout{grid-template-columns:1fr}.sidebar{display:none}.verdict-scores{grid-template-columns:repeat(2,1fr)}.route-band{grid-template-columns:repeat(3,1fr)}.gear-grid{grid-template-columns:1fr 1fr}}
-    @media(max-width:768px){nav{padding:1rem 1.25rem}.nav-links{display:none}.nav-burger{display:flex}.hero-content,.post-body,.post-nav{padding-left:1.25rem;padding-right:1.25rem}.route-band{grid-template-columns:repeat(2,1fr);padding:0 1.25rem}.photo-row{grid-template-columns:1fr}.gear-grid{grid-template-columns:1fr}.post-nav-inner{grid-template-columns:1fr}.footer-bottom{flex-direction:column;text-align:center}.footer-aff{text-align:center}}
+    @media(max-width:768px){nav{padding:1rem 1.25rem}.nav-links,.nav-cta{display:none}.nav-burger{display:flex}.hero-content,.post-body,.post-nav{padding-left:1.25rem;padding-right:1.25rem}.route-band{grid-template-columns:repeat(2,1fr);padding:0 1.25rem}.photo-row{grid-template-columns:1fr}.gear-grid{grid-template-columns:1fr}.post-nav-inner{grid-template-columns:1fr}.footer-bottom{flex-direction:column;text-align:center}.footer-aff{text-align:center}}
     /* === DARK MOTO THEME === */
     :root{--cream:#161614;--sand:#252520;--ink:#c8c4be}
     body{background:#0d0d0b}
@@ -187,23 +188,26 @@
 <body>
 
 <div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">✕</button>
-  <a href="/">Home</a>
-  <a href="/moto/ktm-rally">KTM Rally</a>
-  <a href="/moto/alpine-passes">Passes</a>
-  <a href="/moto/tools">Tools</a>
-  <a href="/about">About</a>
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="/" onclick="closeMobile()">Home</a>
+  <a href="/hotels" onclick="closeMobile()">Hotels</a>
+  <a href="/journeys" onclick="closeMobile()">Journeys</a>
+  <a href="/moto/ktm-rally" onclick="closeMobile()">Moto</a>
+  <a href="/blog" onclick="closeMobile()">Journal</a>
+  <a href="/about" onclick="closeMobile()">About</a>
 </div>
 
 <nav id="mainNav">
-  <a href="/" class="nav-logo">MOTO <span>×</span> TRAVEL</a>
+  <a href="/" class="nav-logo">The Discoverist</a>
   <ul class="nav-links">
-    <li><a href="/moto/ktm-rally" class="active">KTM Rally</a></li>
-    <li><a href="/moto/alpine-passes">Passes</a></li>
-    <li><a href="/journeys">Journeys</a></li>
+    <li><a href="/hotels">Hotel Reviews</a></li>
+    <li><a href="/journeys">Trips &amp; Journeys</a></li>
+    <li><a href="/moto/ktm-rally" class="active">Moto</a></li>
+    <li><a href="/blog">Journal</a></li>
     <li><a href="/about">About</a></li>
   </ul>
-  <div class="nav-burger" onclick="document.getElementById('mobileMenu').classList.add('open')"><span></span><span></span><span></span></div>
+  <a href="/#newsletter" class="nav-cta">Subscribe</a>
+  <div class="nav-burger" onclick="openMobile()"><span></span><span></span><span></span></div>
 </nav>
 
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -472,6 +476,8 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
   }, { threshold: 0.12 });
   reveals.forEach(r => observer.observe(r));
+  function openMobile() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
 </script>
 </body>
 </html>

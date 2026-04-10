@@ -51,11 +51,13 @@
 
     /* FEATURED HOTEL */
     .featured{max-width:1200px;margin:72px auto 0;padding:0 3rem}
-    .featured-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--sand);overflow:hidden}
-    .featured-img{overflow:hidden;aspect-ratio:4/3}
+    .featured-picks-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+    .featured-pick{border:1px solid var(--sand);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow 0.3s,transform 0.2s}
+    .featured-pick:hover{box-shadow:0 12px 48px rgba(44,44,42,0.14);transform:translateY(-2px)}
+    .featured-img{overflow:hidden;aspect-ratio:16/9}
     .featured-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.8s ease}
-    .featured-inner:hover .featured-img img{transform:scale(1.04)}
-    .featured-body{padding:48px;background:var(--cream);display:flex;flex-direction:column;justify-content:center}
+    .featured-pick:hover .featured-img img{transform:scale(1.04)}
+    .featured-body{padding:36px 40px;background:var(--cream);display:flex;flex-direction:column;flex:1}
     .featured-badge{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:4px 12px;display:inline-block;margin-bottom:20px;align-self:flex-start}
     .featured-country{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:10px}
     .featured-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4vw,52px);letter-spacing:0.04em;color:var(--charcoal);line-height:0.95;margin-bottom:16px}
@@ -208,8 +210,11 @@
       .hm-thumb,.hm-thumb-wrap{height:66px}
     }
     @media(max-width:1024px){
-      .featured-inner{grid-template-columns:1fr}.featured-img{aspect-ratio:16/9}
+      .featured-picks-grid{grid-template-columns:1fr}
       .hotels-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:768px){
+      .featured-picks-grid{grid-template-columns:1fr}
     }
     @media(max-width:768px){
       nav{padding:1rem 1.25rem}.nav-links,.nav-cta{display:none}.nav-burger{display:flex}
@@ -226,15 +231,20 @@
 
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-close" onclick="closeMobile()">✕</button>
-  <a href="/">Home</a><a href="/hotels">Hotels</a>
-  <a href="/journeys">Journeys</a><a href="/blog">Journal</a><a href="/about">About</a>
+  <a href="/" onclick="closeMobile()">Home</a>
+  <a href="/hotels" onclick="closeMobile()">Hotels</a>
+  <a href="/journeys" onclick="closeMobile()">Journeys</a>
+  <a href="/moto/ktm-rally" onclick="closeMobile()">Moto</a>
+  <a href="/blog" onclick="closeMobile()">Journal</a>
+  <a href="/about" onclick="closeMobile()">About</a>
 </div>
 
 <nav id="mainNav">
-  <a href="/" class="nav-logo">THE DISCOVERIST</a>
+  <a href="/" class="nav-logo">The Discoverist</a>
   <ul class="nav-links">
     <li><a href="/hotels" class="active">Hotel Reviews</a></li>
     <li><a href="/journeys">Trips &amp; Journeys</a></li>
+    <li><a href="/moto/ktm-rally">Moto</a></li>
     <li><a href="/blog">Journal</a></li>
     <li><a href="/about">About</a></li>
   </ul>
@@ -251,29 +261,60 @@
 
 <!-- FEATURED HOTEL -->
 <div class="featured">
-  <div class="featured-inner reveal">
-    <div class="featured-img">
-      <img src="Media/Hero/IMG_5450.jpg" alt="Vigilius Mountain Resort South Tyrol Italy" loading="lazy">
-    </div>
-    <div class="featured-body">
-      <span class="featured-badge">Discoverist Pick</span>
-      <p class="featured-country">🇮🇹 Lana, South Tyrol, Italy</p>
-      <h2 class="featured-name">Vigilius Mountain <em>Resort</em></h2>
-      <div class="featured-tags">
-        <span class="feat-tag">Spa</span>
-        <span class="feat-tag">Cable Car Access</span>
-        <span class="feat-tag">Moto Friendly</span>
-        <span class="feat-tag">Pass Proximity</span>
+  <div class="featured-picks-grid reveal">
+
+    <!-- Pick 1: Vigilius -->
+    <div class="featured-pick">
+      <div class="featured-img">
+        <img src="Media/Hero/IMG_5450.jpg" alt="Vigilius Mountain Resort South Tyrol Italy" loading="lazy">
       </div>
-      <p class="featured-desc">Accessible only by cable car from Lana village, Vigilius sits at 1,500m with views across the Merano basin. The spa is the best in South Tyrol. Parking for bikes is in the valley — secure, covered, and 20 minutes from the Stelvio base. It's the right hotel after a day on the passes: quiet, considered, and slightly removed from the world below.</p>
-      <div class="featured-score-row">
-        <div class="f-score"><div class="f-score-num">9.4</div><p class="f-score-lbl">Overall</p></div>
-        <div class="f-score"><div class="f-score-num">9.8</div><p class="f-score-lbl">Spa</p></div>
-        <div class="f-score"><div class="f-score-num">9.2</div><p class="f-score-lbl">Location</p></div>
-        <div class="f-score"><div class="f-score-num">8.8</div><p class="f-score-lbl">Value</p></div>
+      <div class="featured-body">
+        <span class="featured-badge">Discoverist Pick</span>
+        <p class="featured-country">🇮🇹 Lana, South Tyrol, Italy</p>
+        <h2 class="featured-name">Vigilius Mountain <em>Resort</em></h2>
+        <div class="featured-tags">
+          <span class="feat-tag">Spa</span>
+          <span class="feat-tag">Cable Car Access</span>
+          <span class="feat-tag">Moto Friendly</span>
+          <span class="feat-tag">Pass Proximity</span>
+        </div>
+        <p class="featured-desc">Accessible only by cable car from Lana village, Vigilius sits at 1,500m with views across the Merano basin. The spa is the best in South Tyrol. Quiet, considered, and slightly removed from the world below.</p>
+        <div class="featured-score-row">
+          <div class="f-score"><div class="f-score-num">9.4</div><p class="f-score-lbl">Overall</p></div>
+          <div class="f-score"><div class="f-score-num">9.8</div><p class="f-score-lbl">Spa</p></div>
+          <div class="f-score"><div class="f-score-num">9.2</div><p class="f-score-lbl">Location</p></div>
+          <div class="f-score"><div class="f-score-num">8.8</div><p class="f-score-lbl">Value</p></div>
+        </div>
+        <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
       </div>
-      <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
     </div>
+
+    <!-- Pick 2: The Cambrian -->
+    <div class="featured-pick">
+      <div class="featured-img">
+        <img src="Media/Hero/DSC09761.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
+      </div>
+      <div class="featured-body">
+        <span class="featured-badge">Discoverist Pick</span>
+        <p class="featured-country">🇨🇭 Adelboden, Switzerland</p>
+        <h2 class="featured-name">The <em>Cambrian</em></h2>
+        <div class="featured-tags">
+          <span class="feat-tag">Covered Parking</span>
+          <span class="feat-tag">Spa</span>
+          <span class="feat-tag">Early Breakfast</span>
+          <span class="feat-tag">Design Hotel</span>
+        </div>
+        <p class="featured-desc">Underground parking keeps bikes dry in any weather. 7am breakfast puts you on the Susten before the crowds. The outdoor spa pool earns a dedicated rest day — one of the best design hotels in the Swiss Alps.</p>
+        <div class="featured-score-row">
+          <div class="f-score"><div class="f-score-num">9.1</div><p class="f-score-lbl">Overall</p></div>
+          <div class="f-score"><div class="f-score-num">9.3</div><p class="f-score-lbl">Design</p></div>
+          <div class="f-score"><div class="f-score-num">9.0</div><p class="f-score-lbl">Location</p></div>
+          <div class="f-score"><div class="f-score-num">8.5</div><p class="f-score-lbl">Value</p></div>
+        </div>
+        <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
+      </div>
+    </div>
+
   </div>
 </div>
 
