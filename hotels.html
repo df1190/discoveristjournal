@@ -51,19 +51,19 @@
 
     /* FEATURED HOTEL */
     .featured{max-width:1200px;margin:72px auto 0;padding:0 3rem}
-    .featured-picks-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+    .featured-picks-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
     .featured-pick{border:1px solid var(--sand);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow 0.3s,transform 0.2s}
     .featured-pick:hover{box-shadow:0 12px 48px rgba(44,44,42,0.14);transform:translateY(-2px)}
-    .featured-img{overflow:hidden;aspect-ratio:16/9}
+    .featured-img{overflow:hidden;height:320px}
     .featured-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.8s ease}
     .featured-pick:hover .featured-img img{transform:scale(1.04)}
     .featured-body{padding:36px 40px;background:var(--cream);display:flex;flex-direction:column;flex:1}
-    .featured-badge{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:4px 12px;display:inline-block;margin-bottom:20px;align-self:flex-start}
+    .featured-badge{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:3px 10px;display:inline-block;margin-bottom:20px;align-self:flex-start}
     .featured-country{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:10px}
     .featured-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4vw,52px);letter-spacing:0.04em;color:var(--charcoal);line-height:0.95;margin-bottom:16px}
     .featured-name em{font-family:'Playfair Display',serif;font-style:italic;color:var(--clay);font-size:0.65em;letter-spacing:0.01em}
     .featured-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-    .feat-tag{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;background:var(--sand);color:var(--clay)}
+    .feat-tag{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 13px;background:var(--charcoal);color:var(--white);font-weight:500}
     .featured-desc{font-size:14px;font-weight:300;color:var(--ink);line-height:1.8;margin-bottom:28px}
     .featured-score-row{display:flex;gap:24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--sand)}
     .f-score{text-align:center}
@@ -80,17 +80,17 @@
     .filter-row-1.has-chips{border-bottom-color:var(--sand)}
     .filter-lbl{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink);opacity:0.5;margin-right:16px;white-space:nowrap;font-weight:500}
     .continent-tabs{display:flex;gap:4px;flex:1}
-    .c-tab{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:9px 22px;border:1px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.55;transition:opacity 0.2s,color 0.2s,border-color 0.2s,background 0.2s,box-shadow 0.2s;white-space:nowrap;position:relative}
-    .c-tab:hover{color:var(--charcoal);opacity:1;border-color:var(--sand);box-shadow:inset 0 -2px 0 rgba(214,66,48,0.4)}
-    .c-tab.active{border-color:var(--moto-red);color:var(--charcoal);background:rgba(214,66,48,0.07);opacity:1;font-weight:600;box-shadow:inset 0 -3px 0 var(--moto-red)}
+    .c-tab{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:9px 22px;border:1px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.72;transition:opacity 0.25s,color 0.25s,border-color 0.25s,background 0.25s,box-shadow 0.25s,transform 0.25s;white-space:nowrap;position:relative}
+    .c-tab:hover{color:var(--charcoal);opacity:1;border-color:var(--sand);box-shadow:inset 0 -2px 0 rgba(214,66,48,0.4);transform:translateY(-1px)}
+    .c-tab.active{border-color:var(--moto-red);color:var(--charcoal);background:rgba(214,66,48,0.1);opacity:1;font-weight:600;box-shadow:inset 0 -3px 0 var(--moto-red);transform:translateY(-1px)}
     .filter-count{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;color:var(--moto-red);white-space:nowrap;line-height:1}
     .filter-count span{font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink);opacity:0.45;margin-left:6px;vertical-align:middle;font-weight:500}
     .country-chips{display:none;gap:6px;padding:12px 0;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
     .country-chips::-webkit-scrollbar{display:none}
     .country-chips.active{display:flex}
-    .c-chip{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 16px;border:1px solid var(--sand);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.6;white-space:nowrap;transition:opacity 0.2s,color 0.2s,border-color 0.2s,background 0.2s,transform 0.2s;flex-shrink:0}
-    .c-chip:hover{border-color:var(--clay);color:var(--ink);opacity:1;transform:translateY(-2px)}
-    .c-chip.active{border-color:var(--moto-red);color:var(--charcoal);background:rgba(214,66,48,0.08);opacity:1;font-weight:600}
+    .c-chip{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 16px;border:1.5px solid var(--clay);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--charcoal);opacity:0.78;white-space:nowrap;transition:opacity 0.25s,color 0.25s,border-color 0.25s,background 0.25s,transform 0.25s,box-shadow 0.25s;flex-shrink:0}
+    .c-chip:hover{border-color:var(--moto-red);color:var(--charcoal);opacity:1;transform:translateY(-2px);box-shadow:0 4px 12px rgba(214,66,48,0.15)}
+    .c-chip.active{border-color:var(--moto-red);color:var(--white);background:var(--moto-red);opacity:1;font-weight:600;box-shadow:0 4px 14px rgba(214,66,48,0.28)}
 
     /* HOTELS GRID */
     .hotels-main{max-width:1200px;margin:0 auto;padding:56px 3rem 100px}
@@ -219,11 +219,17 @@
     @media(max-width:768px){
       nav{padding:1rem 1.25rem}.nav-links,.nav-cta{display:none}.nav-burger{display:flex}
       .page-header,.featured,.hotels-main{padding-left:1.25rem;padding-right:1.25rem}
-      .filter-bar{padding-left:1.25rem;padding-right:1.25rem}
+      .filter-bar{padding-left:0;padding-right:0;top:57px}
+      .filter-row-1{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:10px 1.25rem;gap:6px;flex-wrap:nowrap}
+      .filter-row-1::-webkit-scrollbar{display:none}
+      .filter-lbl{display:none}
+      .filter-count{display:none}
+      .continent-tabs{gap:6px;flex-shrink:0}
+      .c-tab{padding:8px 16px;font-size:10px}
       .hotels-grid{grid-template-columns:1fr}
       .featured-body{padding:28px}
       .footer-aff{text-align:left}
-      .filter-bar{top:57px}
+      .country-chips{padding:6px 1.25rem 10px}
     }
   </style>
 </head>
@@ -266,7 +272,7 @@
     <!-- Pick 1: Vigilius -->
     <div class="featured-pick">
       <div class="featured-img">
-        <img src="Media/Hero/IMG_5450.jpg" alt="Vigilius Mountain Resort South Tyrol Italy" loading="lazy">
+        <img src="Media/Hotels/Vigilius/for-hotel-review/cover.jpg" alt="Vigilius Mountain Resort South Tyrol Italy" loading="lazy" style="object-position: center 65%">
       </div>
       <div class="featured-body">
         <span class="featured-badge">Discoverist Pick</span>
@@ -275,16 +281,9 @@
         <div class="featured-tags">
           <span class="feat-tag">Spa</span>
           <span class="feat-tag">Cable Car Access</span>
-          <span class="feat-tag">Moto Friendly</span>
           <span class="feat-tag">Pass Proximity</span>
         </div>
-        <p class="featured-desc">Accessible only by cable car from Lana village, Vigilius sits at 1,500m with views across the Merano basin. The spa is the best in South Tyrol. Quiet, considered, and slightly removed from the world below.</p>
-        <div class="featured-score-row">
-          <div class="f-score"><div class="f-score-num">9.4</div><p class="f-score-lbl">Overall</p></div>
-          <div class="f-score"><div class="f-score-num">9.8</div><p class="f-score-lbl">Spa</p></div>
-          <div class="f-score"><div class="f-score-num">9.2</div><p class="f-score-lbl">Location</p></div>
-          <div class="f-score"><div class="f-score-num">8.8</div><p class="f-score-lbl">Value</p></div>
-        </div>
+        <p class="featured-desc">Cable car only — no road access. At 1,500m above Lana, the noise of the day simply doesn't follow you up. Best spa in South Tyrol, hiking trails from the hotel, complimentary mountain bikes, and a staff that feels effortlessly good.</p>
         <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
       </div>
     </div>
@@ -292,7 +291,7 @@
     <!-- Pick 2: The Cambrian -->
     <div class="featured-pick">
       <div class="featured-img">
-        <img src="Media/Hero/DSC09761.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
+        <img src="Media/Hotels/The-cambrian/cover.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
       </div>
       <div class="featured-body">
         <span class="featured-badge">Discoverist Pick</span>
@@ -304,14 +303,28 @@
           <span class="feat-tag">Early Breakfast</span>
           <span class="feat-tag">Design Hotel</span>
         </div>
-        <p class="featured-desc">Underground parking keeps bikes dry in any weather. 7am breakfast puts you on the Susten before the crowds. The outdoor spa pool earns a dedicated rest day — one of the best design hotels in the Swiss Alps.</p>
-        <div class="featured-score-row">
-          <div class="f-score"><div class="f-score-num">9.1</div><p class="f-score-lbl">Overall</p></div>
-          <div class="f-score"><div class="f-score-num">9.3</div><p class="f-score-lbl">Design</p></div>
-          <div class="f-score"><div class="f-score-num">9.0</div><p class="f-score-lbl">Location</p></div>
-          <div class="f-score"><div class="f-score-num">8.5</div><p class="f-score-lbl">Value</p></div>
-        </div>
+        <p class="featured-desc">Heated pool with alpine views, Michelin-starred restaurant next door, and MINI Cooper access for Ambassador Elite guests. Breakfast, gym, and staff all exceptional. The Bernese Oberland done properly.</p>
         <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
+      </div>
+    </div>
+
+    <!-- Pick 3: The Brown Guatapé -->
+    <div class="featured-pick">
+      <div class="featured-img">
+        <img src="Media/Hotels/guatape-the-brown/cover.jpg" alt="The Brown Guatapé Autograph Collection, Colombia" loading="lazy">
+      </div>
+      <div class="featured-body">
+        <span class="featured-badge">Discoverist Pick</span>
+        <p class="featured-country">🇨🇴 Guatapé, Colombia</p>
+        <h2 class="featured-name">The Brown <em>Guatapé</em></h2>
+        <div class="featured-tags">
+          <span class="feat-tag">Reservoir Views</span>
+          <span class="feat-tag">Infinity Pool</span>
+          <span class="feat-tag">Jet Ski & Helicopter</span>
+          <span class="feat-tag">Nature Immersive</span>
+        </div>
+        <p class="featured-desc">Perched above the Embalse de Guatapé with an infinity pool, suite terrace jacuzzi, and views that change by the hour. Breakfast is a 10. One of the best nature-integrated luxury hotels in Colombia.</p>
+        <a href="#" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
       </div>
     </div>
 
@@ -339,33 +352,16 @@
     <!-- ── EUROPE / ITALY ── -->
     <div class="hotel-card reveal" data-continent="europe" data-country="italy">
       <div class="hotel-img">
-        <img src="Media/Hero/IMG_5450.jpg" alt="Vigilius Mountain Resort" loading="lazy">
+        <img src="Media/Hotels/Vigilius/for-hotel-review/cover.jpg" alt="Vigilius Mountain Resort" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇮🇹 Lana, South Tyrol, Italy</p>
         <h3 class="hotel-name">Vigilius Mountain Resort</h3>
-        <div class="hotel-tags"><span class="h-tag">Spa</span><span class="h-tag">Cable Car</span><span class="h-tag">Moto Friendly</span></div>
-        <p class="hotel-desc">Only accessible by cable car. The best spa in South Tyrol at 1,500m. Secure valley parking for bikes, 20 minutes from Stelvio base.</p>
+        <div class="hotel-tags"><span class="h-tag">Spa</span><span class="h-tag">Cable Car</span></div>
+        <p class="hotel-desc">Cable car only from Lana. 1,500m, complete road-noise isolation, best spa in South Tyrol. Complimentary mountain bikes and hiking trails from the hotel.</p>
         <div class="hotel-footer">
           <div class="hotel-score"><span class="score-num">9.4</span><span class="score-max">/10</span></div>
-          <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="hotel-card reveal" data-continent="europe" data-country="italy">
-      <div class="hotel-img">
-        <img src="Media/Hero/DSC09772.jpg" alt="Bormio Italy Stelvio base" loading="lazy">
-        <span class="hotel-badge badge-new">Base Camp</span>
-      </div>
-      <div class="hotel-body">
-        <p class="hotel-country">🇮🇹 Bormio, Italy</p>
-        <h3 class="hotel-name">Bormio — Pass Base</h3>
-        <div class="hotel-tags"><span class="h-tag">Courtyard Parking</span><span class="h-tag">Early Breakfast</span><span class="h-tag">Stelvio 20min</span></div>
-        <p class="hotel-desc">The operational base for Stelvio and Gavia. 6:30am breakfast means you're on the pass before 8am. Secure courtyard bike parking included.</p>
-        <div class="hotel-footer">
-          <div class="hotel-score"><span class="score-num">8.6</span><span class="score-max">/10</span></div>
           <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
         </div>
       </div>
@@ -374,14 +370,14 @@
     <!-- ── EUROPE / SWITZERLAND ── -->
     <div class="hotel-card reveal" data-continent="europe" data-country="switzerland">
       <div class="hotel-img">
-        <img src="Media/Hero/DSC09761.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
+        <img src="Media/Hotels/The-cambrian/cover.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇨🇭 Adelboden, Switzerland</p>
         <h3 class="hotel-name">The Cambrian</h3>
         <div class="hotel-tags"><span class="h-tag">Covered Parking</span><span class="h-tag">Spa</span><span class="h-tag">Early Breakfast</span></div>
-        <p class="hotel-desc">Covered underground parking keeps bikes dry regardless of weather. 7am breakfast gets you on the Susten before the crowds. The outdoor spa pool earns a dedicated rest day.</p>
+        <p class="hotel-desc">Heated pool with alpine views, Michelin star next door, MINI Cooper use for Ambassador Elite. Ski lifts steps away, breakfast exceptional, staff genuinely warm.</p>
         <div class="hotel-footer">
           <div class="hotel-score"><span class="score-num">9.1</span><span class="score-max">/10</span></div>
           <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
@@ -391,13 +387,13 @@
 
     <div class="hotel-card reveal" data-continent="europe" data-country="switzerland">
       <div class="hotel-img">
-        <img src="Media/Hero/DSC09740.jpg" alt="The Hotel Lucerne Switzerland" loading="lazy">
+        <img src="Media/Hotels/Hotel-lucerne/hotel-lucern-for-index.jpg" alt="The Hotel Lucerne room with Lucerne city view, Switzerland" loading="lazy">
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇨🇭 Lucerne, Switzerland</p>
         <h3 class="hotel-name">The Hotel Lucerne</h3>
         <div class="hotel-tags"><span class="h-tag">Secure Garage</span><span class="h-tag">City Centre</span><span class="h-tag">Rest Day Base</span></div>
-        <p class="hotel-desc">Best Swiss city for a rest day mid-tour. Secure underground garage, excellent restaurant. Susten and Furka are 90 minutes out — stay two nights, ride one day.</p>
+        <p class="hotel-desc">Chapel Bridge minutes on foot, exceptional staff, and the best dog-friendly setup in Lucerne. Spacious rooms, distinctive art, and a team that reaches out before you even arrive.</p>
         <div class="hotel-footer">
           <div class="hotel-score"><span class="score-num">8.8</span><span class="score-max">/10</span></div>
           <a href="https://prf.hn/l/3PGgpkE/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
@@ -405,53 +401,20 @@
       </div>
     </div>
 
-    <div class="hotel-card reveal" data-continent="europe" data-country="switzerland">
-      <div class="hotel-img">
-        <img src="Media/Hero/DSC08191.jpg" alt="Andermatt Switzerland pass hub" loading="lazy">
-      </div>
-      <div class="hotel-body">
-        <p class="hotel-country">🇨🇭 Andermatt, Switzerland</p>
-        <h3 class="hotel-name">Andermatt — Pass Hub</h3>
-        <div class="hotel-tags"><span class="h-tag">Underground Parking</span><span class="h-tag">Furka 15min</span><span class="h-tag">Gotthard 10min</span></div>
-        <p class="hotel-desc">Best single base for Swiss pass riding. Furka in 15 minutes, Susten in 25, Gotthard in 10. Multiple hotels with heated underground parking at most properties.</p>
-        <div class="hotel-footer">
-          <div class="hotel-score"><span class="score-num">9.0</span><span class="score-max">/10</span></div>
-          <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── EUROPE / NORWAY ── -->
-    <div class="hotel-card reveal" data-continent="europe" data-country="norway">
-      <div class="hotel-img">
-        <img src="Media/Hero/dji_fly_20231218_101620_328_1702921336993_photo.JPG" alt="Flam fjord Norway" loading="lazy">
-        <span class="hotel-badge badge-eco">Fjord View</span>
-      </div>
-      <div class="hotel-body">
-        <p class="hotel-country">🇳🇴 Flåm, Norway</p>
-        <h3 class="hotel-name">Flåm — Fjord Base</h3>
-        <div class="hotel-tags"><span class="h-tag">Secure Parking</span><span class="h-tag">Fjord Access</span><span class="h-tag">Ferry Connections</span></div>
-        <p class="hotel-desc">Starting point for the Atlantic Road and Sognefjord loop. Secure parking, fjord views, ferry access for loop routing. Book 6–8 weeks ahead for July.</p>
-        <div class="hotel-footer">
-          <div class="hotel-score"><span class="score-num">8.9</span><span class="score-max">/10</span></div>
-          <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
-        </div>
-      </div>
-    </div>
-
     <!-- ── EUROPE / AUSTRIA ── -->
     <div class="hotel-card reveal" data-continent="europe" data-country="austria">
       <div class="hotel-img">
-        <img src="Media/Hero/IMG_0702.JPG" alt="Zell am See Austria" loading="lazy">
+        <img src="Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-panorama-alps-winter.jpg" alt="AC Hotel Innsbruck city panorama with snow-capped Alps" loading="lazy">
+        <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
-        <p class="hotel-country">🇦🇹 Zell am See, Austria</p>
-        <h3 class="hotel-name">Zell am See — Alpine Hub</h3>
-        <div class="hotel-tags"><span class="h-tag">Grossglockner 45min</span><span class="h-tag">Lakeside</span><span class="h-tag">Secure Parking</span></div>
-        <p class="hotel-desc">Natural base for the Grossglockner Hochalpenstrasse. Lakeside location: ride in the morning, swim in the afternoon. Several properties with covered bike parking.</p>
+        <p class="hotel-country">🇦🇹 Innsbruck, Austria</p>
+        <h3 class="hotel-name">AC Hotel Innsbruck</h3>
+        <div class="hotel-tags"><span class="h-tag">Train Station 5min</span><span class="h-tag">Mountain Views</span><span class="h-tag">Walkable</span></div>
+        <p class="hotel-desc">Five minutes from the main station, snow-capped Alps from every room, and a staff that handles the small things without being asked. Breakfast done properly.</p>
         <div class="hotel-footer">
-          <div class="hotel-score"><span class="score-num">8.7</span><span class="score-max">/10</span></div>
-          <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+          <div class="hotel-score"><span class="score-num">8.9</span><span class="score-max">/10</span></div>
+          <a href="#" target="_blank" rel="noopener" class="hotel-book">Book →</a>
         </div>
       </div>
     </div>
@@ -558,6 +521,37 @@
         <p class="hotel-desc">Transit hotel — no frills. Clean, efficiently run, minutes from El Dorado. Take the complimentary shuttle and don't stress about early flights.</p>
         <div class="hotel-footer">
           <div class="hotel-score"><span class="score-num">8.4</span><span class="score-max">/10</span></div>
+          <a href="#" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-card reveal" data-continent="americas" data-country="colombia">
+      <div class="hotel-img">
+        <img src="Media/Hotels/guatape-the-brown/cover.jpg" alt="The Brown Guatapé Autograph Collection hotel exterior, Colombia" loading="lazy">
+        <span class="hotel-badge badge-pick">Discoverist Pick</span>
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇨🇴 Guatapé, Colombia</p>
+        <h3 class="hotel-name">The Brown Guatapé, Autograph Collection</h3>
+        <div class="hotel-tags"><span class="h-tag">Reservoir Views</span><span class="h-tag">Infinity Pool</span><span class="h-tag">Jet Ski & Helicopter</span></div>
+        <p class="hotel-desc">Perched above the Embalse de Guatapé with an infinity pool, suite terrace jacuzzi, and views that change by the hour. One of the best nature-integrated luxury hotels in Colombia.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">9.3</span><span class="score-max">/10</span></div>
+          <a href="#" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-card reveal" data-continent="americas" data-country="colombia">
+      <div class="hotel-img placeholder"></div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇨🇴 Santa Marta, Colombia</p>
+        <h3 class="hotel-name">Santa Marta Marriott Resort Playa Dormida</h3>
+        <div class="hotel-tags"><span class="h-tag">Beachfront</span><span class="h-tag">Resort Pool</span><span class="h-tag">Caribbean</span></div>
+        <p class="hotel-desc">Review coming soon.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">—</span><span class="score-max">/10</span></div>
           <a href="#" class="hotel-book">Book →</a>
         </div>
       </div>
@@ -837,10 +831,32 @@
   const HOTEL_DATA = {
     'vigilius': {
       scores:[{n:'9.4',l:'Overall'},{n:'9.8',l:'Spa'},{n:'9.2',l:'Location'},{n:'8.8',l:'Value'}],
-      media:[{type:'image',src:'Media/Hero/IMG_5450.jpg'}],
-      review:'Accessible only by cable car from Lana village, Vigilius sits at 1,500m with uninterrupted views across the Merano basin. The architecture is considered — timber, stone, and glass — and the spa is widely regarded as the best in South Tyrol. If you\'re riding the Stelvio, the cable car means your bike stays in the valley (secure, covered parking in Lana) while you decompress at altitude. A deliberate separation from the road that ends up feeling exactly right after a full day on the passes.',
-      highlights:['Best spa in South Tyrol — book treatments on arrival','Cable car means zero road noise, total altitude isolation','Secure covered valley parking 20 minutes from Stelvio base','Food quality genuinely above the price point','Architecture and materials considered — not just expensive'],
-      considerations:['Bike must stay in valley (not necessarily a negative)','Premium price point — plan as a reward night','Check cable car last departure time before riding back down'],
+      media:[
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/cover.jpg',alt:'Vigilius Mountain Resort aerial view South Tyrol Italy'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-hotel-exterior-dusk.jpg',alt:'Vigilius Mountain Resort hotel exterior at dusk'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-hotel-exterior-sunset.jpg',alt:'Vigilius Mountain Resort hotel exterior at sunset'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-deluxe-room-interior.jpg',alt:'Vigilius Mountain Resort deluxe room interior'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-bathroom-wooden-vanity.jpg',alt:'Vigilius Mountain Resort bathroom wooden vanity'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-lobby-lounge-south-tyrol.jpg',alt:'Vigilius Mountain Resort lobby lounge South Tyrol'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-lounge-dusk-mountain-view.jpg',alt:'Vigilius Mountain Resort lounge at dusk with mountain view'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-interior-staircase-skylight.jpg',alt:'Vigilius Mountain Resort interior staircase with skylight'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-room-entry-orange-accent.jpg',alt:'Vigilius Mountain Resort room entry with orange accent light'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-dolomites-sunset-pink-sky.jpg',alt:'Vigilius Mountain Resort Dolomites sunset pink sky view'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-dolomites-panorama.jpg',alt:'Vigilius Mountain Resort Dolomites panorama view'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigiljoch-panoramic-valley-view-south-tyrol.jpg',alt:'Vigiljoch panoramic valley view South Tyrol'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-espresso-terrace-view.jpg',alt:'Vigilius Mountain Resort espresso on terrace with mountain view'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-cable-car-artwork-triptych.jpg',alt:'Vigilius Mountain Resort cable car artwork triptych'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-vigiljoch-1912-poster-lana.jpg',alt:'Vigiljoch 1912 Lana vintage poster'},
+        {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigiljoch-cable-car-station-sign-lana.jpg',alt:'Vigiljoch cable car station sign Lana'},
+        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-01.mov'},
+        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-02.mov'},
+        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-03.mov'},
+        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-04.mov'},
+        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-05.mov'}
+      ],
+      review:'One of the most distinctive mountain hotels I\'ve stayed at. The cable car from Lana isn\'t just a quirk — it\'s the feature. The moment you step off at 1,500m, road noise, traffic, and the general friction of travel disappear. It\'s a hard reset that most hotels claim and very few actually deliver. Breakfast is exceptional — fresh, local, well-stocked — the kind of morning meal that makes you want to linger. The heated pool and spa are the real draw for a rest day, and the spa is the best in South Tyrol by some margin. Hiking trails leave directly from the hotel. Take one of the complimentary full-suspension mountain bikes or rent an E-bike and get into the trails properly. The staff — check-in, restaurant, pool area — have a warmth that feels genuine, not rehearsed. One restaurant on site; take the cable car down to Lana if you want more options.',
+      highlights:['Cable car access — complete separation from road noise and traffic','Best spa in South Tyrol — book treatments on arrival','Complimentary full-suspension mountain bikes + E-bike rental','Hiking trails start at the hotel — no drive needed','Breakfast: fresh, local, genuinely well done','Staff across the board: warm, consistent, easy to be around'],
+      considerations:['Vehicle stays in the valley (secure covered parking in Lana)','One restaurant on-site — take the cable car down to Lana for variety','Check last cable car departure time before heading into the valley'],
       book:'https://prf.hn/l/DLkmPaZ/'
     },
     'bormio': {
@@ -853,18 +869,41 @@
     },
     'cambrian': {
       scores:[{n:'9.1',l:'Overall'},{n:'9.5',l:'Parking'},{n:'9.0',l:'Breakfast'},{n:'8.8',l:'Spa'}],
-      media:[{type:'image',src:'Media/Hero/DSC09761.JPG'}],
-      review:'The Cambrian is the best designed hotel in the Bernese Oberland. The underground garage is covered and secure — bikes stay dry regardless of mountain weather, which in the Alps means regardless of any weather. Breakfast at 7am is a serious operation. The route to Susten and beyond is 20 minutes from the front door, and the outdoor spa pool with its Alps backdrop makes a rest day feel justified rather than lazy.',
-      highlights:['Covered underground garage — weather irrelevant','7am breakfast, full Swiss spread','Susten Pass 20min, Grimsel 30min from the front door','Outdoor spa pool with Bernese Alps backdrop','Interior design and material quality above price point'],
-      considerations:['Adelboden is a valley-end town — requires commitment to get in and out','Small village; limited evening options outside the hotel'],
+      media:[
+        {type:'image',src:'Media/Hotels/The-cambrian/cover.JPG'},
+        {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-valley-sunset-aerial-winter.jpg'},
+        {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-village-aerial-winter-swiss-alps.jpg'},
+        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-video-01.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-adelboden-village-aerial-winter-swiss-alps.jpg'},
+        {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-hotel-entrance-parking-adelboden-winter.jpg'},
+        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-video-03.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-hotel-entrance-parking-adelboden-winter.jpg'},
+        {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-hotel-balcony-mountain-view-blue-hour-adelboden.jpg'},
+        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-hotel-exterior-evening-video.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-hotel-balcony-mountain-view-blue-hour-adelboden.jpg'},
+        {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-alpine-peak-sunset-bernese-oberland.jpg'},
+        {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-mountain-christmas-lights-night.jpg'},
+        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-winter-night-video-01.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-adelboden-mountain-christmas-lights-night.jpg'},
+        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-winter-night-video-02.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-adelboden-mountain-christmas-lights-night.jpg'}
+      ],
+      review:'The Cambrian sits steps from multiple ski lifts, easy to reach by train or bus — and the journey through the valley is genuinely charming and relaxing. As Ambassador Elite, the hotel offered use of a MINI Cooper to explore the surrounding area. That kind of gesture is rare and it changes the stay entirely — the freedom to drive out into the Bernese Oberland on your own terms is something you don\'t forget. Got upgraded to a junior suite: the space, the finish, and the views are all exceptional. The heated pool is outstanding, with a full alpine backdrop that earns time in it even after a full day on the mountain. Breakfast is a serious operation — well stocked, well done. The gym covers everything you need. The staff throughout carry it all with genuine warmth. And the Michelin-starred restaurant directly next to the hotel is not optional. Book it.',
+      highlights:['MINI Cooper loan for Ambassador Elite — rare, memorable, and genuinely useful','Junior suite upgrade — space, finish, and views all excellent','Heated pool with full Bernese Alps backdrop','Multiple ski lifts within easy reach of the hotel','Michelin-starred restaurant next door — book it without hesitation','Breakfast and gym both well above standard','Staff warmth consistent from check-in to pool to restaurant','Easy train and bus access — the valley ride in is charming'],
+      considerations:['Adelboden is a valley-end village — commitment to get in and out','Book well ahead for ski season — fills fast'],
       book:'https://prf.hn/l/kVGw1Zv/'
     },
     'hotel-lucerne': {
-      scores:[{n:'8.8',l:'Overall'},{n:'9.2',l:'Location'},{n:'8.5',l:'Dining'},{n:'8.3',l:'Value'}],
-      media:[{type:'image',src:'Media/Hero/DSC09740.jpg'}],
-      review:'Lucerne makes the best Swiss city rest day. Secure underground garage, excellent on-site restaurant, lake and old town within walking distance. Susten and Furka are 90 minutes east. The strategy: arrive on day six of a pass circuit, leave the bikes for 24 hours, eat well, walk slowly, gone by 8am the next morning. The hotel delivers exactly that — no friction, good beds, a garage that doesn\'t require planning.',
-      highlights:['Underground secure garage with direct hotel access','Best Swiss city base for a mid-tour rest day','Old town and lake waterfront walkable in 10 minutes','Restaurant quality worth staying in for dinner','Susten, Furka, Brünig all within 90 minute range'],
-      considerations:['City parking logic applies — don\'t ride in during peak summer afternoons','Premium city pricing; book two weeks out minimum'],
+      scores:[{n:'8.8',l:'Overall'},{n:'9.2',l:'Location'},{n:'9.4',l:'Service'},{n:'8.3',l:'Value'}],
+      media:[
+        {type:'image',src:'Media/Hotels/Hotel-lucerne/cover.jpg'},
+        {type:'image',src:'Media/Hotels/Hotel-lucerne/hotel-lucern-for-index.jpg'},
+        {type:'image',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-rooftops-copper-domes-swiss-flag.jpg'},
+        {type:'image',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-skyline-sunrise-view.jpg'},
+        {type:'image',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-aerial-night-drone.jpg'},
+        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-01.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-aerial-night-drone.jpg'},
+        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-02.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-rooftops-copper-domes-swiss-flag.jpg'},
+        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-03.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-rooftops-copper-domes-swiss-flag.jpg'},
+        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-04.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-skyline-sunrise-view.jpg'}
+      ],
+      review:'The Hotel Lucerne gets the fundamentals right and then adds genuine care on top. The team reached out before arrival to coordinate parking — proactive communication that is rarer than it should be. Rooms are spacious, clean, and comfortable, with floor-to-ceiling artwork that is genuinely unusual — quirky on day one, it grows on you. The location is hard to fault: Chapel Bridge, the old town, and a strong selection of restaurants are all within a few minutes on foot. For anyone travelling with a dog, this is the standout choice in Lucerne. The team went out of their way to have a treat, a toy, and a doggy bed waiting in the room on arrival. That kind of warmth runs through the entire staff — every interaction, every department. One of the more welcoming hotels we\'ve stayed at, anywhere.',
+      highlights:['Staff coordinated parking and arrival proactively before check-in','Best dog-friendly hotel in Lucerne — treat, toy, and bed waiting in the room','Spacious rooms with distinctive floor-to-ceiling artwork','Chapel Bridge and old town within minutes on foot','Great restaurant selection within easy walking distance','Entire staff consistently warm — every department, every interaction'],
+      considerations:['Floor-to-ceiling room art is unconventional — takes a day to adjust','Central location; request a quiet-facing room if noise is a concern'],
       book:'https://prf.hn/l/3PGgpkE/'
     },
     'andermatt': {
@@ -883,13 +922,37 @@
       considerations:['Book 6–8 weeks ahead for July — fills completely','Tourist-heavy in peak season; arrive and depart early'],
       book:'https://prf.hn/l/kVGw1Zv/'
     },
-    'zell-am-see': {
-      scores:[{n:'8.7',l:'Overall'},{n:'9.3',l:'Location'},{n:'8.5',l:'Facilities'}],
-      media:[{type:'image',src:'Media/Hero/IMG_0702.JPG'}],
-      review:'Zell am See sits on a lake with the Grossglockner 45 minutes to the south — one of the best two-activity bases in Austria: ride in the morning, swim in the afternoon. The lake is clean, the town is walkable, and the Hochalpenstrasse is worth multiple ascents over two days. Several properties offer covered bike storage; lakeside hotels fill fast.',
-      highlights:['Grossglockner Hochalpenstrasse 45min — multiple ascents possible','Lakeside swimming in the afternoon after riding','Several properties with covered bike parking','Walkable town with good restaurant options','Close to Kitzbühel and Felber Tauern for extended routing'],
-      considerations:['Very busy in high season — book lakeside rooms weeks ahead','Grossglockner road toll applies; buy online in advance'],
-      book:'https://prf.hn/l/kVGw1Zv/'
+    'ac-innsbruck': {
+      scores:[{n:'8.9',l:'Overall'},{n:'9.5',l:'Location'},{n:'9.2',l:'Service'},{n:'9.0',l:'Breakfast'}],
+      media:[
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-panorama-alps-winter.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-triple-window-alpine-panorama.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-window-city-mountain-view.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-view-innsbruck-sunset-alps.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-dusk-warm-glow-alps.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-dawn-alpine-panorama.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-night-snowy-mountains.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-night-orange-horizon-alps.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-birthday-surprise-towel-cake-roses.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-breakfast-plate-eggs-pretzel-sausages.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-breakfast-buffet-restaurant-interior.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-restaurant-seating-backlit-wall.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-lobby-reception-wooden-accents.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-king-bed-warm-lighting.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-bathroom-modern-glass-shower.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-nespresso-coffee-machine.jpg'},
+        {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-hotel-bar-lounge-innsbruck.jpg'},
+        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-01.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-panorama-alps-winter.jpg'},
+        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-02.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-night-snowy-mountains.jpg'},
+        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-03.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-dawn-alpine-panorama.jpg'},
+        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-04.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-view-innsbruck-sunset-alps.jpg'},
+        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-05.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-dusk-warm-glow-alps.jpg'},
+        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-06.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-night-orange-horizon-alps.jpg'}
+      ],
+      review:'AC Hotel Innsbruck earns its location. Five minutes from the main train station on foot — the entire city is walkable, and the snow-capped Tyrolean Alps wrapping around Innsbruck are visible from your room at every hour. The view doesn\'t get old. The staff are a genuine strength: attentive without being overbearing, fast to handle anything without making it a production. Celebrating a birthday? They had a surprise waiting on arrival — the kind of thoughtful detail that sets the tone for a whole stay. Small requests are handled the same way: a forgotten toothbrush became a dental kit at the door within minutes. Breakfast is a proper spread — real variety, warm service, well executed. The gym is well-equipped with enough weights and space to actually train. A strong base for Innsbruck and the Tyrol.',
+      highlights:['Snow-capped Alps visible from rooms at every hour of the day','5-minute walk to the main train station — everything else walkable','Birthday surprise prepared on arrival — personal and well done','Small requests handled fast and without fuss','Breakfast: excellent variety, warm service, properly done','Gym well-equipped with real weights and usable space','Staff attentive and genuinely helpful throughout'],
+      considerations:['Central city location — request a mountain-facing room for best views','Popular in ski season — book ahead for mountain-view rooms'],
+      book:'#'
     },
     'sheraton-ba': {
       scores:[{n:'8.6',l:'Overall'},{n:'8.8',l:'Facilities'},{n:'8.5',l:'Location'}],
@@ -905,6 +968,49 @@
       review:'The Sheraton Pilar offers a resort-style experience outside Buenos Aires proper — lush gardens, a modern convention center, spa, indoor and outdoor pools, and multiple dining options. Friendly and professional staff. Better suited for extended stays or off-site events than single-night transits. The commute into Buenos Aires adds friction, but the grounds make it worth it for the right type of trip.',
       highlights:['Lush gardens and resort-style atmosphere','Spa, indoor and outdoor pools','Multiple dining options on property','Friendly, professional staff','Well suited for extended business stays or events'],
       considerations:['Distance from central Buenos Aires adds commute time for short stays','Better for multi-day stays than quick transits'],
+      book:'#'
+    },
+    'the-brown-guatape': {
+      scores:[{n:'9.3',l:'Overall'},{n:'9.9',l:'Views'},{n:'9.2',l:'Service'},{n:'10',l:'Breakfast'}],
+      media:[
+        {type:'image',src:'Media/Hotels/guatape-the-brown/cover.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-infinity-pool-embalse-guatape-panorama.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-pool-terrace-reservoir-view-glass-railing.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-suite-terrace-jacuzzi-reservoir-sailboats.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-reservoir-panorama-blue-sky.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-rainbow-storm-dramatic.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-islands-tropical-panorama-colombia.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-wide-reservoir-view.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-hotel-circular-rooftop-terrace-pool-dusk.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-pool-thatched-pavilion-jacuzzi-dusk.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-thatched-pavilion-firepit-night-guatape.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-hotel-entrance-walkway-night-living-walls.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-hotel-entrance-dusk-koi-pond-wide.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-hotel-grounds-koi-pond-tropical-gardens.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-colombian-breakfast-arepa-rice-chorizo-mango.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-breakfast-buffet-le-creuset-woven-wall-art.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-breakfast-fresh-tropical-fruit-station.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-suite-bathroom-double-vanity-stone-basins.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-bathroom-acacia-amenities-wooden-tray.jpg'},
+        {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-welcome-amenity-coffee-bread-arrival-card.jpg'},
+        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-01.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-infinity-pool-embalse-guatape-panorama.jpg'},
+        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-02.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-reservoir-panorama-blue-sky.jpg'},
+        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-03.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-pool-thatched-pavilion-jacuzzi-dusk.jpg'},
+        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-04.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-hotel-circular-rooftop-terrace-pool-dusk.jpg'},
+        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-05.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-thatched-pavilion-firepit-night-guatape.jpg'},
+        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-06.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-rainbow-storm-dramatic.jpg'}
+      ],
+      review:'The Brown earns its Autograph Collection status in a way that most Marriott properties don\'t. The setting does the heavy lifting — perched above the Embalse de Guatapé, the reservoir views from the pool, the rooms, and the jacuzzi are genuinely spectacular, with a quality of light that shifts completely by the hour. As Ambassador Elite, the suite upgrade was immediate. The room delivered: spacious and well-appointed, with dual waterfall showers and a private terrace jacuzzi positioned directly above the water. Designed for a couple and it shows. Breakfast is serious — local Colombian dishes, fresh tropical fruit, real variety, and a dress code that keeps the atmosphere right. The gym is well-equipped with full range: rowing machines, weights, and space to actually use them. The staff — particularly at reception and poolside — are warm, attentive, and never rushed. On-site experiences include jet ski rentals and helicopter rides over the reservoir; both worth asking about at check-in. One honest note: some experiences listed (coffee tasting, gin & tonic session) were unavailable during our stay with no clear explanation — confirm in advance. Outside that, one of the best nature-integrated luxury hotels in Colombia.',
+      highlights:['Suite terrace jacuzzi positioned directly above the Embalse de Guatapé','Spectacular reservoir views from pool, rooms, and jacuzzi — changes by the hour','Breakfast: local Colombian dishes, fresh tropical fruit, dress code maintained','Dual waterfall showers — bathroom well above standard','Jet ski rentals and helicopter rides available — ask at reception','Gym: rowing machines, weights, genuinely well-equipped and spacious','Staff at reception and pool: warm, attentive, unhurried throughout','Ambassador Elite suite upgrade was immediate'],
+      considerations:['Some listed experiences (coffee tasting, gin & tonic) unavailable — confirm in advance','Premium pricing for the region — justified, but budget accordingly'],
+      book:'#'
+    },
+    'santa-marta-marriott': {
+      scores:[],
+      media:[],
+      review:'',
+      highlights:[],
+      considerations:[],
       book:'#'
     },
     'marriott-santa-cruz': {
@@ -1037,9 +1143,11 @@
     'The Hotel Lucerne':'hotel-lucerne',
     'Andermatt — Pass Hub':'andermatt',
     'Flåm — Fjord Base':'flam',
-    'Zell am See — Alpine Hub':'zell-am-see',
+    'AC Hotel Innsbruck':'ac-innsbruck',
     'Sheraton Buenos Aires':'sheraton-ba',
     'Sheraton Pilar':'sheraton-pilar',
+    'The Brown Guatapé, Autograph Collection':'the-brown-guatape',
+    'Santa Marta Marriott Resort Playa Dormida':'santa-marta-marriott',
     'Marriott Santa Cruz':'marriott-santa-cruz',
     'Delta Hotels Whistler Village Suites':'delta-whistler',
     'AC Hotel Santiago Costanera':'ac-santiago',
