@@ -381,22 +381,20 @@
 
     /* ── AFFILIATE DIVIDER ── */
     .divider-band {
-      background: var(--cream);
-      padding: 24px 3rem;
-      display: flex; align-items: center; justify-content: center; gap: 40px;
+      background: var(--charcoal);
+      padding: 28px 3rem;
+      display: flex; align-items: center; justify-content: center; gap: 48px;
       flex-wrap: wrap;
-      border-top: 1px solid var(--sand);
-      border-bottom: 1px solid var(--sand);
     }
     .divider-text {
-      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase;
       color: var(--clay);
     }
-    .divider-badges { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+    .divider-badges { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
     .badge {
-      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--ink); border: 1px solid var(--sand);
-      padding: 6px 14px;
+      font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--cream); border: 1px solid rgba(255,255,255,0.18);
+      padding: 7px 16px;
     }
 
     /* ── JOURNEYS ── */
@@ -569,22 +567,30 @@
       color: var(--charcoal); margin-bottom: 16px; line-height: 1;
     }
     .newsletter-sub { font-size: 0.88rem; color: var(--clay); margin-bottom: 36px; }
-    .newsletter-form { display: flex; gap: 0; max-width: 420px; margin: 0 auto; }
+    .newsletter-form {
+      display: flex; flex-direction: column; gap: 10px;
+      max-width: 420px; margin: 0 auto;
+    }
+    .newsletter-form .form-row {
+      display: flex; gap: 0;
+    }
     .newsletter-form input {
       flex: 1; background: var(--white);
-      border: 1px solid var(--sand); border-right: none;
+      border: 1px solid var(--sand);
       padding: 14px 20px; color: var(--ink);
       font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
       outline: none; transition: border-color 0.2s;
+      width: 100%;
     }
     .newsletter-form input::placeholder { color: var(--clay); }
-    .newsletter-form input:focus { border-color: var(--moto-red); }
+    .newsletter-form input:focus { border-color: var(--moto-red); outline: none; }
+    .newsletter-form .form-row input { border-right: none; }
     .newsletter-form button {
       background: var(--moto-red); color: var(--white);
       border: none; padding: 14px 24px;
       font-family: 'DM Sans', sans-serif;
       font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
-      cursor: pointer; transition: background 0.2s;
+      cursor: pointer; transition: background 0.2s; white-space: nowrap;
     }
     .newsletter-form button:hover { background: #c03520; }
     .newsletter-disclaimer { font-size: 0.72rem; color: var(--clay); margin-top: 14px; opacity: 0.7; }
@@ -593,23 +599,48 @@
     .destinations { background: var(--white); padding: 80px 3rem; }
     .destinations-inner { max-width: 1200px; margin: 0 auto; }
     .dest-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px;
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
     }
+    .dest-more {
+      margin-top: 28px; text-align: center;
+      font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--clay);
+    }
+    .dest-more a {
+      color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--sand);
+      padding-bottom: 2px; transition: color 0.2s, border-color 0.2s;
+    }
+    .dest-more a:hover { color: var(--charcoal); border-color: var(--clay); }
     .dest-item {
       position: relative; overflow: hidden;
       aspect-ratio: 2/3; text-decoration: none;
+      border-radius: 16px;
+      transform: translateY(0) scale(1);
+      transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  box-shadow 0.45s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .dest-item:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.22);
     }
     .dest-item img {
       width: 100%; height: 100%; object-fit: cover;
-      transition: transform 0.7s ease, filter 0.4s;
-      filter: brightness(0.78) saturate(0.9);
+      transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  filter 0.5s ease;
+      filter: brightness(0.75) saturate(0.88);
     }
-    .dest-item:hover img { transform: scale(1.08); filter: brightness(0.9) saturate(1.1); }
+    .dest-item:hover img { transform: scale(1.1); filter: brightness(0.88) saturate(1.15); }
     .dest-label {
       position: absolute; bottom: 16px; left: 0; right: 0;
       text-align: center;
       font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase;
       color: var(--white);
+      transition: transform 0.4s ease, letter-spacing 0.4s ease;
+    }
+    .dest-item:hover .dest-label {
+      transform: translateY(-4px);
+      letter-spacing: 0.3em;
     }
 
     /* ── BLOG ── */
@@ -861,18 +892,18 @@
     <div class="hotels-grid">
 
       <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="hotel-card reveal" data-tilt>
-        <img src="Media/Hero/DSC09761.JPG" alt="The Cambrian hotel in Adelboden, Swiss Alps" loading="lazy">
+        <img src="Media/Hotels/The-cambrian/Cambrian_for_index.JPG" alt="The Cambrian hotel in Adelboden, Swiss Alps" loading="lazy">
         <div class="hotel-card-overlay"></div>
         <div class="hotel-card-info">
           <p class="hotel-card-country">Switzerland · Adelboden</p>
           <h3 class="hotel-card-name">The Cambrian</h3>
           <p class="hotel-card-desc">A refined alpine retreat in the heart of the Swiss Alps. Understated luxury, mountain views, and impeccable calm.</p>
-          <span class="hotel-card-link">Book via Travelpayouts</span>
+          <span class="hotel-card-link">Book Now</span>
         </div>
       </a>
 
       <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="hotel-card reveal reveal-delay-1" data-tilt>
-        <img src="Media/Hero/IMG_5450.jpg" alt="Vigilius Mountain Resort, South Tyrol Italy" loading="lazy">
+        <img src="Media/Hotels/Vigilius/Vigilius-for-index.jpg" alt="Vigilius Mountain Resort, South Tyrol Italy" loading="lazy">
         <div class="hotel-card-overlay"></div>
         <div class="hotel-card-info">
           <p class="hotel-card-country">Italy · South Tyrol</p>
@@ -883,7 +914,7 @@
       </a>
 
       <a href="https://prf.hn/l/3PGgpkE/" target="_blank" rel="noopener" class="hotel-card reveal reveal-delay-2" data-tilt>
-        <img src="Media/Hero/DSC09740.jpg" alt="The Hotel Lucerne on Lake Lucerne, Switzerland" loading="lazy">
+        <img src="Media/Hotels/Hotel-lucerne/hotel-lucern-for-index.jpg" alt="The Hotel Lucerne on Lake Lucerne, Switzerland" loading="lazy">
         <div class="hotel-card-overlay"></div>
         <div class="hotel-card-info">
           <p class="hotel-card-country">Switzerland · Lucerne</p>
@@ -901,7 +932,6 @@
 <div class="divider-band reveal">
   <span class="divider-text">Book through our curated partners</span>
   <div class="divider-badges">
-    <span class="badge">Travelpayouts</span>
     <span class="badge">Marriott Bonvoy</span>
     <span class="badge">Amazon Travel</span>
     <span class="badge">Booking.com</span>
@@ -920,7 +950,7 @@
   <div class="journeys-list">
 
     <a href="https://discoveristjournal.com/weekend-in-the-middle-of-italian-alps" class="journey-item reveal">
-      <img src="Media/Hero/DSC09772.jpg" alt="Weekend in the Italian Alps" loading="lazy">
+      <img src="Media/Weekend-northern-italy.jpg" alt="Weekend in the Italian Alps" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">01</span>
       <div class="journey-info">
@@ -931,7 +961,7 @@
     </a>
 
     <a href="/journeys" class="journey-item reveal reveal-delay-1">
-      <img src="Media/Hero/IMG_0702.JPG" alt="Snowbiking in British Columbia, Canada" loading="lazy">
+      <img src="Media/Moto/Snowbiking-bc.JPG" alt="Snowbiking in British Columbia, Canada" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">02</span>
       <div class="journey-info">
@@ -942,24 +972,24 @@
     </a>
 
     <a href="/journeys" class="journey-item reveal reveal-delay-2">
-      <img src="Media/Hero/IMG_5791.jpg" alt="Alpine Crossing Switzerland to Austria" loading="lazy">
+      <img src="Media/Journeys/weekend-trip-Innsbruck.jpg" alt="Winter weekend in Innsbruck, Austria" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">03</span>
       <div class="journey-info">
-        <p class="journey-tag">Europe · Multi-Country</p>
-        <h3 class="journey-title">Alpine Crossing: Switzerland to Austria</h3>
-        <p class="journey-meta">Passes, valleys, and villages that earn their stars</p>
+        <p class="journey-tag">Austria · Innsbruck</p>
+        <h3 class="journey-title">Winter Weekend in Innsbruck</h3>
+        <p class="journey-meta">Old town charm, mountain air, and alpine stillness in December</p>
       </div>
     </a>
 
-    <a href="/journeys" class="journey-item reveal reveal-delay-3">
-      <img src="Media/Hero/dji_fly_20231218_101620_328_1702921336993_photo.JPG" alt="Norway Fjords by Road drone view" loading="lazy">
+    <a href="https://www.marriott.com/en-us/hotels/mdelg-the-brown-guatape-autograph-collection/overview/" target="_blank" rel="noopener" class="journey-item reveal reveal-delay-3">
+      <img src="Media/Journeys/guatape-weekend.jpg" alt="The Brown Guatapé, Colombia" loading="lazy">
       <div class="journey-overlay"></div>
       <span class="journey-num">04</span>
       <div class="journey-info">
-        <p class="journey-tag">Norway · Fjords</p>
-        <h3 class="journey-title">Norway: Fjords by Road</h3>
-        <p class="journey-meta">Drone dispatches and quiet roads above the water</p>
+        <p class="journey-tag">Colombia · Guatapé</p>
+        <h3 class="journey-title">Four Days at The Brown, Guatapé</h3>
+        <p class="journey-meta">A design hotel above the reservoir — slow mornings and views that hold</p>
       </div>
     </a>
 
@@ -1036,8 +1066,11 @@
     <h2 class="newsletter-title">Join the Discoverist List</h2>
     <p class="newsletter-sub">Curated stays, honest reviews, and new routes — delivered when there's something worth sending.</p>
     <form class="newsletter-form" onsubmit="handleSubscribe(event)">
-      <input type="email" placeholder="Your email address" required>
-      <button type="submit">Subscribe</button>
+      <input type="text" placeholder="Full name" required>
+      <div class="form-row">
+        <input type="email" placeholder="Email address" required>
+        <button type="submit">Subscribe</button>
+      </div>
     </form>
     <p class="newsletter-disclaimer">No spam. Unsubscribe anytime. Real travel, real opinions.</p>
   </div>
@@ -1055,26 +1088,31 @@
     </div>
     <div class="dest-grid">
       <a href="/journeys" class="dest-item reveal">
-        <img src="Media/Hero/DSC08191.jpg" alt="Switzerland travel" loading="lazy">
-        <span class="dest-label">Switzerland</span>
+        <img src="Media/europe.JPG" alt="Europe travel" loading="lazy">
+        <span class="dest-label">Europe</span>
       </a>
       <a href="/journeys" class="dest-item reveal reveal-delay-1">
-        <img src="Media/Hero/DSC09761.JPG" alt="Italy travel" loading="lazy">
-        <span class="dest-label">Italy</span>
-      </a>
-      <a href="/journeys" class="dest-item reveal reveal-delay-2">
-        <img src="Media/Hero/IMG_0702.JPG" alt="Canada travel" loading="lazy">
-        <span class="dest-label">Canada</span>
+        <img src="Media/USA.jpg" alt="North America travel" loading="lazy">
+        <span class="dest-label">North America</span>
       </a>
       <a href="/journeys" class="dest-item reveal reveal-delay-3">
-        <img src="Media/Hero/dji_fly_20231218_101620_328_1702921336993_photo.JPG" alt="Norway travel" loading="lazy">
-        <span class="dest-label">Norway</span>
+        <img src="Media/Asia.jpg" alt="Asia travel" loading="lazy">
+        <span class="dest-label">Asia</span>
       </a>
-      <a href="/tools/interactive-map" class="dest-item reveal">
-        <img src="Media/About/dehancer-1753728042314.JPG" alt="More destinations" loading="lazy">
-        <span class="dest-label">+ More →</span>
+      <a href="/journeys" class="dest-item reveal">
+        <img src="Media/Southamerica.JPG" alt="South America travel" loading="lazy">
+        <span class="dest-label">South America</span>
+      </a>
+      <a href="/journeys" class="dest-item reveal reveal-delay-1">
+        <img src="Media/caribbean.JPG" alt="Caribbean travel" loading="lazy">
+        <span class="dest-label">Caribbean</span>
+      </a>
+      <a href="/journeys" class="dest-item reveal reveal-delay-2">
+        <img src="Media/fin-del-mundo.JPG" alt="Patagonia Fin del Mundo travel" loading="lazy">
+        <span class="dest-label">Patagonia</span>
       </a>
     </div>
+    <p class="dest-more reveal">And many more places — <a href="/tools/interactive-map">explore the full interactive map →</a></p>
   </div>
 </section>
 
