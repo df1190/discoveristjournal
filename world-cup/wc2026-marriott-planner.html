@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup 2026 Marriott Planner | Discoverist Journal</title>
+<meta name="description" content="Find the perfect Marriott hotel for World Cup 2026. Hotel finder, Bonvoy points calculator, and match planner — all in one tool.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Base ─────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:       #0D0D0D;
+    --paper:     #F7F4EF;
+    --gold:      #C9A84C;
+    --gold-lt:   #E8D5A3;
+    --pitch:     #111827;
+    --grass:     #1A6B3C;
+    --grass-lt:  #D1FAE5;
+    --sky:       #1E4D8C;
+    --sky-lt:    #DBEAFE;
+    --red:       #C0392B;
+    --red-lt:    #FEE2E2;
+    --border:    rgba(0,0,0,0.10);
+    --shadow:    0 4px 24px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.14);
+    --radius:    12px;
+    --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── Hero Header ──────────────────────────────────────────────────────── */
+  .hero {
+    background: var(--pitch);
+    color: white;
+    padding: 56px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(201,168,76,0.18) 0%, transparent 70%),
+      repeating-linear-gradient(
+        45deg,
+        transparent, transparent 40px,
+        rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px
+      );
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--pitch);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 60px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p {
+    font-size: 16px;
+    font-weight: 300;
+    opacity: 0.75;
+    max-width: 480px;
+    margin: 0 auto 8px;
+  }
+  .ambassador-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+
+  /* ── Tab Navigation ───────────────────────────────────────────────────── */
+  .tab-nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .tab-nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-nav-inner::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex: 1;
+    min-width: 160px;
+    padding: 18px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--ink); background: var(--paper); }
+  .tab-btn.active {
+    color: var(--ink);
+    border-bottom-color: var(--gold);
+    font-weight: 600;
+  }
+  .tab-icon { font-size: 18px; }
+
+  /* ── Main Content ─────────────────────────────────────────────────────── */
+  .main { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .tab-panel { display: none; animation: fadeUp 0.35s ease; }
+  .tab-panel.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section Titles ───────────────────────────────────────────────────── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    color: #6B7280;
+    font-size: 15px;
+    margin-bottom: 32px;
+  }
+
+  /* ── Cards ────────────────────────────────────────────────────────────── */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── Form Elements ────────────────────────────────────────────────────── */
+  .form-group { margin-bottom: 20px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+  select, input[type="number"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: white;
+    appearance: none;
+    transition: var(--transition);
+    outline: none;
+  }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+  select:focus, input[type="number"]:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
+
+  /* ── Option Pills ─────────────────────────────────────────────────────── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    padding: 8px 16px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    background: white;
+    color: #374151;
+    user-select: none;
+  }
+  .pill:hover { border-color: var(--gold); color: var(--ink); }
+  .pill.selected {
+    background: var(--pitch);
+    border-color: var(--pitch);
+    color: white;
+  }
+
+  /* ── CTA Button ───────────────────────────────────────────────────────── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--pitch);
+    color: white;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 8px;
+    width: 100%;
+    justify-content: center;
+  }
+  .btn-primary:hover { background: #1F2937; transform: translateY(-1px); box-shadow: var(--shadow); }
+
+  .btn-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold);
+    color: var(--pitch);
+    padding: 14px 28px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    justify-content: center;
+  }
+  .btn-gold:hover { background: #b8963d; transform: translateY(-1px); box-shadow: var(--shadow); }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: var(--ink);
+    padding: 10px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+  .btn-outline:hover { border-color: var(--ink); background: var(--paper); }
+
+  /* ── Result Box ───────────────────────────────────────────────────────── */
+  .result-box {
+    display: none;
+    background: var(--pitch);
+    color: white;
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-top: 24px;
+    animation: fadeUp 0.4s ease;
+  }
+  .result-box.visible { display: block; }
+  .result-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  .result-box .match-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--pitch);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .result-detail {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .result-detail strong { opacity: 1; color: var(--gold-lt); }
+  .result-divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin: 20px 0;
+  }
+  .result-cta-label {
+    font-size: 12px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+
+  /* ── Points Calculator ────────────────────────────────────────────────── */
+  .points-display {
+    background: linear-gradient(135deg, var(--pitch) 0%, #1F3A5F 100%);
+    color: white;
+    border-radius: var(--radius);
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .points-display.visible { display: block; animation: fadeUp 0.4s ease; }
+  .points-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin: 12px 0 4px;
+  }
+  .points-label { font-size: 13px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.1em; }
+  .points-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .points-stat {
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: left;
+  }
+  .points-stat-val { font-size: 20px; font-weight: 700; color: var(--gold-lt); }
+  .points-stat-label { font-size: 11px; opacity: 0.6; margin-top: 2px; }
+
+  /* ── Match Planner ────────────────────────────────────────────────────── */
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .city-card {
+    border: 1.5px solid #E5E7EB;
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    background: white;
+    position: relative;
+  }
+  .city-card:hover { border-color: var(--gold); box-shadow: var(--shadow); }
+  .city-card.selected {
+    border-color: var(--pitch);
+    background: var(--pitch);
+    color: white;
+  }
+  .city-card.selected .city-flag { filter: none; }
+  .city-flag { font-size: 22px; margin-bottom: 6px; display: block; }
+  .city-name { font-weight: 600; font-size: 14px; }
+  .city-matches { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+  .city-card.selected .city-matches { opacity: 0.7; }
+  .city-final-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--gold);
+    color: var(--pitch);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .city-card.selected .city-final-badge { background: var(--gold); }
+
+  .itinerary {
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+  .itinerary.visible { display: block; }
+  .itinerary-stop {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: var(--shadow);
+  }
+  .stop-number {
+    background: var(--pitch);
+    color: var(--gold);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .stop-content { flex: 1; }
+  .stop-city { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .stop-hotel { font-size: 14px; color: #4B5563; margin-bottom: 12px; }
+  .stop-connector {
+    text-align: center;
+    color: #9CA3AF;
+    font-size: 12px;
+    margin: 4px 0 4px 23px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stop-connector::before,
+  .stop-connector::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E5E7EB;
+  }
+
+  /* ── Disclaimer ───────────────────────────────────────────────────────── */
+  .disclaimer {
+    background: #FEF3C7;
+    border: 1px solid #FDE68A;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #92400E;
+    margin-top: 32px;
+    line-height: 1.5;
+  }
+
+  /* ── Affiliate Note ───────────────────────────────────────────────────── */
+  .affiliate-note {
+    font-size: 11px;
+    color: #9CA3AF;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  /* ── Progress Bar ─────────────────────────────────────────────────────── */
+  .progress-track {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .progress-step {
+    flex: 1;
+    height: 3px;
+    background: #E5E7EB;
+    border-radius: 100px;
+    transition: var(--transition);
+  }
+  .progress-step.done { background: var(--gold); }
+
+  /* ── Responsive ───────────────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    .hero { padding: 40px 20px 36px; }
+    .main { padding: 24px 16px 60px; }
+    .card { padding: 20px; }
+    .points-grid { grid-template-columns: 1fr; }
+    .city-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<header class="hero">
+  <div class="hero-badge">⚽ FIFA World Cup 2026 Tool</div>
+  <h1>Your <span>Marriott</span> World Cup<br>Planner</h1>
+  <p>Find your hotel, calculate your points, plan your matches — all in one place.</p>
+  <div class="ambassador-tag">
+    ✦ Built by a Marriott Bonvoy Ambassador &nbsp;·&nbsp; Discoverist Journal
+  </div>
+</header>
+
+<!-- ── Tab Nav ────────────────────────────────────────────────────────────── -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" onclick="switchTab('finder')">
+      <span class="tab-icon">🏨</span> Hotel Finder
+    </button>
+    <button class="tab-btn" onclick="switchTab('points')">
+      <span class="tab-icon">💎</span> Points Calculator
+    </button>
+    <button class="tab-btn" onclick="switchTab('planner')">
+      <span class="tab-icon">🗺️</span> Match Planner
+    </button>
+  </div>
+</nav>
+
+<!-- ── Main ───────────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 1 — HOTEL FINDER                                                -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-finder" class="tab-panel active">
+    <h2 class="section-title">Find Your Perfect Hotel</h2>
+    <p class="section-sub">Answer 4 quick questions — get a personalized Marriott recommendation.</p>
+
+    <div class="progress-track">
+      <div class="progress-step done" id="ps1"></div>
+      <div class="progress-step" id="ps2"></div>
+      <div class="progress-step" id="ps3"></div>
+      <div class="progress-step" id="ps4"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📍 Which city are you visiting?</div>
+      <div class="form-group">
+        <select id="finder-city" onchange="updateProgress()">
+          <option value="">— Select a host city —</option>
+          <optgroup label="🇺🇸 United States">
+            <option value="nyc">New York / New Jersey ⭐ (Final)</option>
+            <option value="la">Los Angeles</option>
+            <option value="dal">Dallas</option>
+            <option value="atl">Atlanta</option>
+            <option value="hou">Houston</option>
+            <option value="mia">Miami</option>
+            <option value="phi">Philadelphia</option>
+            <option value="bos">Boston</option>
+            <option value="sea">Seattle</option>
+            <option value="kc">Kansas City</option>
+            <option value="sf">San Francisco Bay Area</option>
+          </optgroup>
+          <optgroup label="🇨🇦 Canada">
+            <option value="tor">Toronto</option>
+            <option value="van">Vancouver</option>
+          </optgroup>
+          <optgroup label="🇲🇽 Mexico">
+            <option value="mex">Mexico City (Opening Match)</option>
+            <option value="gdl">Guadalajara</option>
+            <option value="mty">Monterrey</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎯 What matters most to you?</div>
+      <div class="pill-group" id="priority-pills">
+        <div class="pill" onclick="selectPill(this,'priority','stadium')">🏟️ Stadium Proximity</div>
+        <div class="pill" onclick="selectPill(this,'priority','city')">🌆 City Experience</div>
+        <div class="pill" onclick="selectPill(this,'priority','points')">💎 Best Points Value</div>
+        <div class="pill" onclick="selectPill(this,'priority','luxury')">👑 Luxury & Upgrades</div>
+        <div class="pill" onclick="selectPill(this,'priority','lifestyle')">🌊 Lifestyle / Beach</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📅 How many nights?</div>
+      <div class="form-group">
+        <input type="number" id="finder-nights" min="1" max="30" value="4"
+               placeholder="e.g. 4" onchange="updateProgress()">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏅 What's your Bonvoy status?</div>
+      <div class="pill-group" id="status-pills">
+        <div class="pill" onclick="selectPill(this,'status','none')">No status</div>
+        <div class="pill" onclick="selectPill(this,'status','silver')">Silver</div>
+        <div class="pill" onclick="selectPill(this,'status','gold')">Gold</div>
+        <div class="pill" onclick="selectPill(this,'status','plat')">Platinum</div>
+        <div class="pill" onclick="selectPill(this,'status','titan')">Titanium</div>
+        <div class="pill" onclick="selectPill(this,'status','amb')">Ambassador ✦</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="runFinder()">
+      ✦ Find My Hotel →
+    </button>
+
+    <!-- Result -->
+    <div class="result-box" id="finder-result">
+      <div class="match-badge" id="res-badge">Top Pick</div>
+      <h3 id="res-hotel">—</h3>
+      <div class="result-detail">📍 <span id="res-location">—</span></div>
+      <div class="result-detail">💎 <span><strong id="res-points">—</strong> Bonvoy points/night (est.)</span></div>
+      <div class="result-detail">🏟️ <span id="res-stadium">—</span></div>
+      <div class="result-detail">👑 <span id="res-status">—</span></div>
+      <hr class="result-divider">
+      <div id="res-why" style="font-size:14px;opacity:0.85;line-height:1.7;margin-bottom:20px;"></div>
+      <div class="result-cta-label">Book directly through Marriott Bonvoy</div>
+      <a id="res-link" href="#" target="_blank" class="btn-gold">
+        Check Availability &amp; Rates →
+      </a>
+      <p class="affiliate-note" style="color:rgba(255,255,255,0.4);margin-top:10px;">
+        Affiliate link — I earn a small commission if you book, at no extra cost to you.
+      </p>
+      <hr class="result-divider">
+      <div id="res-runner" style="font-size:13px;opacity:0.7;"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 2 — POINTS CALCULATOR                                           -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-points" class="tab-panel">
+    <h2 class="section-title">Bonvoy Points Calculator</h2>
+    <p class="section-sub">Find out exactly how many points you need — and whether cash or points wins for World Cup.</p>
+
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Host City</label>
+        <select id="pts-city">
+          <option value="">— Select city —</option>
+          <option value="nyc">New York / New Jersey ⭐ Final</option>
+          <option value="la">Los Angeles</option>
+          <option value="mex">Mexico City</option>
+          <option value="dal">Dallas</option>
+          <option value="atl">Atlanta</option>
+          <option value="hou">Houston</option>
+          <option value="mia">Miami</option>
+          <option value="phi">Philadelphia</option>
+          <option value="bos">Boston</option>
+          <option value="sea">Seattle</option>
+          <option value="kc">Kansas City</option>
+          <option value="sf">San Francisco Bay Area</option>
+          <option value="tor">Toronto</option>
+          <option value="van">Vancouver</option>
+          <option value="gdl">Guadalajara</option>
+          <option value="mty">Monterrey</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hotel Tier</label>
+        <div class="pill-group" id="tier-pills">
+          <div class="pill" onclick="selectPill(this,'tier','budget')">Courtyard / Aloft</div>
+          <div class="pill" onclick="selectPill(this,'tier','mid')">Sheraton / Westin</div>
+          <div class="pill" onclick="selectPill(this,'tier','upper')">Marriott / W Hotel</div>
+          <div class="pill" onclick="selectPill(this,'tier','luxury')">JW / Ritz-Carlton</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Number of Nights</label>
+        <input type="number" id="pts-nights" min="1" max="30" value="5" placeholder="5">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Current Bonvoy Points Balance</label>
+        <input type="number" id="pts-balance" min="0" value="0" placeholder="e.g. 80000">
+      </div>
+      <button class="btn-primary" onclick="calcPoints()">Calculate Points Needed →</button>
+    </div>
+
+    <!-- Points Result -->
+    <div class="points-display" id="pts-result">
+      <div class="points-label">ESTIMATED POINTS NEEDED</div>
+      <div class="points-number" id="pts-total">—</div>
+      <div class="points-label" style="margin-bottom:0">for your stay</div>
+
+      <div class="points-grid">
+        <div class="points-stat">
+          <div class="points-stat-val" id="pts-per-night">—</div>
+          <div class="points-stat-label">Points per night (est.)</div>
+        </div>
+        <div class="points-stat">
+          <div class="points-stat-val" id="pts-cash">—</div>
+          <div class="points-stat-label">Est. cash rate / night</div>
+        </div>
+        <div class="points-stat">
+          <div class="points-stat-val" id="pts-gap">—</div>
+          <div class="points-stat-label">Points you still need</div>
+        </div>
+        <div class="points-stat">
+          <div class="points-stat-val" id="pts-verdict">—</div>
+          <div class="points-stat-label">Verdict</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="pts-advice" style="display:none;">
+      <div class="card-title">💡 Ambassador Tip</div>
+      <p id="pts-advice-text" style="font-size:14px;line-height:1.7;color:#374151;"></p>
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="YOUR-MARRIOTT-AFFILIATE-LINK-BONVOY-SEARCH" target="_blank" class="btn-gold" style="flex:1;min-width:200px;">
+          Search Award Availability →
+        </a>
+      </div>
+      <p class="affiliate-note">Affiliate link — I earn a small commission if you book, at no extra cost.</p>
+    </div>
+
+    <div class="disclaimer">
+      ⚠️ Points values are estimates based on typical Bonvoy category ranges. Actual rates vary by
+      property, date, and availability. Always verify current award rates on Marriott.com before booking.
+      World Cup dates will see reduced award availability — book early.
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB 3 — MATCH PLANNER                                               -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-planner" class="tab-panel">
+    <h2 class="section-title">Build Your Match Itinerary</h2>
+    <p class="section-sub">Select the cities you're visiting — get a hotel plan for every stop.</p>
+
+    <div class="card">
+      <div class="card-title">🗺️ Which cities are you attending? <span style="font-weight:400;color:#9CA3AF;font-size:12px;">(select all that apply)</span></div>
+      <div class="city-grid" id="city-grid">
+        <!-- Injected by JS -->
+      </div>
+      <button class="btn-primary" onclick="buildItinerary()">Build My Itinerary →</button>
+    </div>
+
+    <div class="itinerary" id="itinerary-result">
+      <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:6px;">Your World Cup Journey</h3>
+      <p style="color:#6B7280;font-size:14px;margin-bottom:24px;">Recommended Marriott for each stop. Book directly to earn Bonvoy points.</p>
+      <div id="itinerary-stops"></div>
+      <div class="disclaimer" style="margin-top:20px;">
+        All links are affiliate links. If you book through them I earn a small commission at no extra cost to you. As a Marriott Bonvoy Ambassador I only recommend properties I'd genuinely consider myself.
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Scripts ────────────────────────────────────────────────────────────── -->
+<script>
+// ── Data ───────────────────────────────────────────────────────────────────
+const AFFILIATE_BASE = "YOUR-MARRIOTT-PARTNERIZE-BASE-LINK";
+
+const CITIES = {
+  nyc: {
+    name: "New York / New Jersey",
+    flag: "🇺🇸",
+    matches: "Hosts the Final — July 19",
+    isFinal: true,
+    stadium: "MetLife Stadium (25 min from Penn Station via NJ Transit)",
+    hotels: {
+      stadium:   { name: "Sheraton Lincoln Harbor, Weehawken NJ",      pts: 40000, cash: 350, pubref: "wc26-nyc-lincoln",    why: "Closest Marriott to MetLife. Cross-river from Manhattan with ferry access. Cheaper than Manhattan during match weeks — the strategic sleeper pick most fans miss." },
+      city:      { name: "W New York — Union Square",                   pts: 60000, cash: 500, pubref: "wc26-nyc-w",          why: "Best atmosphere for the international crowd. Union Square location means subway access in every direction." },
+      points:    { name: "Courtyard Manhattan/Midtown East",            pts: 35000, cash: 280, pubref: "wc26-nyc-courtyard",  why: "Best points-to-location ratio in Manhattan. Category 5 — reliable choice when you want to stretch your points balance." },
+      luxury:    { name: "New York Marriott Marquis",                   pts: 70000, cash: 650, pubref: "wc26-nyc-marquis",    why: "I stayed here during a conference — 43rd floor views, Broadway Lounge at midnight with Times Square below. Consistent elite recognition. 10 min walk to Penn Station." },
+      lifestyle: { name: "New York Marriott Marquis",                   pts: 70000, cash: 650, pubref: "wc26-nyc-marquis",    why: "For the full NYC experience, the Marquis puts you in the centre of everything. The Broadway Lounge view at midnight is genuinely memorable." },
+    },
+    search_pubref: "wc26-nyc-search",
+    runner: "Also worth considering: Residence Inn East Rutherford Meadowlands (closest property to MetLife Stadium itself)."
+  },
+  la: {
+    name: "Los Angeles",
+    flag: "🇺🇸",
+    matches: "Multiple group stage & knockout matches",
+    isFinal: false,
+    stadium: "SoFi Stadium, Inglewood",
+    hotels: {
+      stadium:   { name: "JW Marriott Los Angeles L.A. LIVE",          pts: 60000, cash: 520, pubref: "wc26-la-jwlalive",      why: "Walking distance to SoFi Stadium. Shares the LA Live complex with the Ritz-Carlton. The strategic pick for fans who want zero match-day logistics stress." },
+      city:      { name: "W Hollywood",                                 pts: 55000, cash: 450, pubref: "wc26-la-whollywood",    why: "Hollywood base with full city access. Younger, international crowd — will have incredible World Cup energy." },
+      points:    { name: "Residence Inn Los Angeles LAX/Century Blvd",  pts: 30000, cash: 220, pubref: "wc26-la-residenceinn",  why: "Best points value near LAX and SoFi access corridor. Category 4 — solid pick when points conservation matters." },
+      luxury:    { name: "The Ritz-Carlton Los Angeles",                pts: 85000, cash: 800, pubref: "wc26-la-ritzcarlton",   why: "Shares the LA Live complex with the JW Marriott. Premium service, walking distance to SoFi. The top-tier World Cup base in LA." },
+      lifestyle: { name: "Marina del Rey Marriott",                     pts: 40000, cash: 320, pubref: "wc26-la-marinadelrey",  why: "I stayed here — walking distance to Venice Beach. Best M Lounge menu I've had across all my Bonvoy stays. Friendly staff throughout. The LA experience beyond the stadium." },
+    },
+    search_pubref: "wc26-la-search",
+    runner: "Also consider: Marina del Rey Marriott for the Venice Beach / lifestyle experience with great M Lounge."
+  },
+  dal: {
+    name: "Dallas",
+    flag: "🇺🇸",
+    matches: "Multiple matches including knockout rounds",
+    isFinal: false,
+    stadium: "AT&T Stadium, Arlington",
+    hotels: {
+      stadium:   { name: "Marriott Dallas Las Colinas",                 pts: 35000, cash: 260, pubref: "wc26-dal-citycenter",   why: "Closest Marriott to AT&T Stadium in Arlington. Easier stadium access on match days than downtown options." },
+      city:      { name: "Aloft Dallas Downtown",                       pts: 30000, cash: 230, pubref: "wc26-dal-aloft",         why: "Vibrant downtown location with easy access to the Dallas Arts District, bars, and restaurants. Great World Cup atmosphere base." },
+      points:    { name: "Marriott Dallas City Center",                  pts: 32000, cash: 240, pubref: "wc26-dal-citycenter",   why: "Solid mid-tier pick in downtown Dallas. Good points value, central location, reliable elite recognition." },
+      luxury:    { name: "Renaissance Dallas at Plano Legacy West",     pts: 45000, cash: 360, pubref: "wc26-dal-renaissance",   why: "Upscale option in the Legacy West district — dining, shopping, easy highway access to AT&T Stadium." },
+      lifestyle: { name: "Aloft Dallas Downtown",                       pts: 30000, cash: 230, pubref: "wc26-dal-aloft",         why: "Downtown energy, walkable district, younger crowd. Good lifestyle pick for fans who want the city experience between matches." },
+    },
+    search_pubref: "wc26-dal-search",
+    runner: "Dallas is a car city — factor in stadium transport. Rideshare from downtown to AT&T Stadium is ~25 min on non-match days; plan for longer on game days."
+  },
+  atl: {
+    name: "Atlanta",
+    flag: "🇺🇸",
+    matches: "8 matches including a Semi-Final",
+    isFinal: false,
+    stadium: "Mercedes-Benz Stadium",
+    hotels: {
+      stadium:   { name: "Atlanta Marriott Marquis",                    pts: 45000, cash: 350, pubref: "wc26-atl-marquis",      why: "Downtown Atlanta, walkable to Mercedes-Benz Stadium and the Fan Festival at Centennial Olympic Park. Best stadium-access Marriott in the city." },
+      city:      { name: "W Atlanta Midtown",                           pts: 42000, cash: 330, pubref: "wc26-atl-w",            why: "Midtown location with easy MARTA transit access downtown. Good city atmosphere and walkable dining district." },
+      points:    { name: "Marriott Atlanta Century Center",              pts: 30000, cash: 220, pubref: "wc26-atl-search",       why: "More affordable points redemption outside the immediate downtown core. Good transit connections via MARTA." },
+      luxury:    { name: "Renaissance Atlanta Waverly",                  pts: 48000, cash: 380, pubref: "wc26-atl-renaissance",  why: "Upscale option in the Galleria area. Excellent amenities and consistent elite recognition." },
+      lifestyle: { name: "W Atlanta Midtown",                           pts: 42000, cash: 330, pubref: "wc26-atl-w",            why: "Midtown is Atlanta's most walkable, most social neighbourhood. Great for the in-between-matches experience." },
+    },
+    search_pubref: "wc26-atl-search",
+    runner: "Atlanta hosts a Semi-Final — one of the most sought-after knockout fixtures. Book now if attending."
+  },
+  hou: {
+    name: "Houston",
+    flag: "🇺🇸",
+    matches: "Multiple group stage matches",
+    isFinal: false,
+    stadium: "NRG Stadium",
+    hotels: {
+      stadium:   { name: "Marriott Marquis Houston",                    pts: 50000, cash: 380, pubref: "wc26-hou-marquis",      why: "Downtown Houston flagship. Connected to the George R. Brown Convention Center and well-positioned for NRG Stadium access." },
+      city:      { name: "JW Marriott Houston Downtown",                pts: 58000, cash: 440, pubref: "wc26-hou-jw",           why: "Downtown Houston's premium Marriott. Excellent elite recognition, great lounge, walkable to bars and restaurants." },
+      points:    { name: "Marriott Marquis Houston",                    pts: 50000, cash: 380, pubref: "wc26-hou-marquis",      why: "Best balance of location and points value in Houston for this tournament." },
+      luxury:    { name: "JW Marriott Houston Downtown",                pts: 58000, cash: 440, pubref: "wc26-hou-jw",           why: "Top-tier Houston experience. Consistent Ambassador recognition, premium amenities." },
+      lifestyle: { name: "Marriott Marquis Houston",                    pts: 50000, cash: 380, pubref: "wc26-hou-marquis",      why: "Rooftop pool shaped like Texas. Downtown Houston energy. The lifestyle pick for this city." },
+    },
+    search_pubref: "wc26-hou-search",
+    runner: "Houston summers are hot and humid — build in downtime. The NRG area is a car/rideshare city; plan match-day transport in advance."
+  },
+  mia: {
+    name: "Miami",
+    flag: "🇺🇸",
+    matches: "Multiple matches",
+    isFinal: false,
+    stadium: "Hard Rock Stadium, Miami Gardens",
+    hotels: {
+      stadium:   { name: "JW Marriott Miami Turnberry Resort & Spa",   pts: 65000, cash: 550, pubref: "wc26-mia-jwturnberry",  why: "Aventura location puts you closest to Hard Rock Stadium. Resort amenities, spa, and a full luxury experience away from the downtown crowds." },
+      city:      { name: "W Miami",                                     pts: 60000, cash: 480, pubref: "wc26-mia-w",            why: "Brickell location for Biscayne Bay views and downtown Miami energy. Great nightlife access between matches." },
+      points:    { name: "Miami Marriott Biscayne Bay",                 pts: 40000, cash: 310, pubref: "wc26-mia-biscayne",     why: "Best points value in a central Miami location. Bayside views, good transit connections." },
+      luxury:    { name: "JW Marriott Miami Turnberry Resort & Spa",   pts: 65000, cash: 550, pubref: "wc26-mia-jwturnberry",  why: "The luxury pick. Resort-style experience, closest to Hard Rock Stadium, consistent top-tier elite recognition." },
+      lifestyle: { name: "W Miami",                                     pts: 60000, cash: 480, pubref: "wc26-mia-w",            why: "Miami lifestyle — Brickell energy, Biscayne Bay views, rooftop scene. The experience-first pick for Miami." },
+    },
+    search_pubref: "wc26-mia-search",
+    runner: "Hard Rock Stadium requires rideshare or shuttle from downtown — plan ahead. Brightline high-speed rail connects from Fort Lauderdale and beyond."
+  },
+  phi: {
+    name: "Philadelphia",
+    flag: "🇺🇸",
+    matches: "Multiple group stage matches",
+    isFinal: false,
+    stadium: "Lincoln Financial Field",
+    hotels: {
+      stadium:   { name: "Philadelphia Marriott Downtown",              pts: 45000, cash: 340, pubref: "wc26-phi-downtown",     why: "Centre City location with SEPTA access to Lincoln Financial Field. Walkable to Independence Hall and the main fan areas." },
+      city:      { name: "W Philadelphia",                              pts: 55000, cash: 420, pubref: "wc26-phi-w",            why: "Rittenhouse Square area. Philadelphia's most vibrant neighbourhood with great walkability to bars, restaurants, and the Rocky Steps." },
+      points:    { name: "Courtyard Philadelphia Downtown",             pts: 35000, cash: 260, pubref: "wc26-phi-search",       why: "Best points value in central Philadelphia. Reliable and well-located for transit to the stadium." },
+      luxury:    { name: "W Philadelphia",                              pts: 55000, cash: 420, pubref: "wc26-phi-w",            why: "Top Philadelphia Marriott experience. Consistent luxury service and central location." },
+      lifestyle: { name: "W Philadelphia",                              pts: 55000, cash: 420, pubref: "wc26-phi-w",            why: "Rittenhouse Square is one of the most walkable, livable neighbourhoods on the East Coast. Great World Cup base." },
+    },
+    search_pubref: "wc26-phi-search",
+    runner: "Philadelphia is one of the easiest World Cup cities for sightseeing — Liberty Bell, Rocky Steps, and the Art Museum are all walkable from Centre City."
+  },
+  bos: {
+    name: "Boston",
+    flag: "🇺🇸",
+    matches: "Multiple group stage matches",
+    isFinal: false,
+    stadium: "Gillette Stadium, Foxborough",
+    hotels: {
+      stadium:   { name: "Sheraton Boston Hotel",                       pts: 40000, cash: 310, pubref: "wc26-bos-sheraton",     why: "Back Bay location with easy Commuter Rail access to Foxborough / Gillette Stadium. One of the most connected Marriott properties in Boston." },
+      city:      { name: "Boston Marriott Copley Place",                pts: 50000, cash: 390, pubref: "wc26-bos-copley",       why: "Copley Square flagship — Back Bay's best address. Attached to the Copley Place mall and connected to the MBTA Green Line." },
+      points:    { name: "Courtyard Boston Downtown",                   pts: 35000, cash: 270, pubref: "wc26-bos-courtyard",    why: "Best points value in central Boston. Reliable choice near the Financial District with T access." },
+      luxury:    { name: "Boston Marriott Copley Place",                pts: 50000, cash: 390, pubref: "wc26-bos-copley",       why: "Boston's premier Marriott. Excellent location, consistent Ambassador recognition, full amenities." },
+      lifestyle: { name: "Boston Marriott Copley Place",                pts: 50000, cash: 390, pubref: "wc26-bos-copley",       why: "Back Bay is Boston's most walkable, most social neighbourhood. Newbury Street, the Esplanade, Fenway Park — all accessible on foot." },
+    },
+    search_pubref: "wc26-bos-search",
+    runner: "Gillette Stadium is 30 miles south of Boston in Foxborough — use the MBTA Commuter Rail (Providence Line) from South Station on match days."
+  },
+  sea: {
+    name: "Seattle",
+    flag: "🇺🇸",
+    matches: "Multiple group stage matches",
+    isFinal: false,
+    stadium: "Lumen Field",
+    hotels: {
+      stadium:   { name: "Seattle Marriott Waterfront",                 pts: 50000, cash: 390, pubref: "wc26-sea-waterfront",   why: "Waterfront location with a short walk to Lumen Field. Pike Place Market next door. Best stadium proximity of any Seattle Marriott." },
+      city:      { name: "W Seattle",                                   pts: 55000, cash: 430, pubref: "wc26-sea-w",            why: "Downtown energy at the W with city views and easy access to Capitol Hill, Pike Place, and the waterfront." },
+      points:    { name: "Courtyard Seattle Downtown/Pioneer Square",   pts: 38000, cash: 290, pubref: "wc26-sea-search",       why: "Pioneer Square location is walkable to Lumen Field. Best points value in the downtown corridor." },
+      luxury:    { name: "Sheraton Grand Seattle",                      pts: 52000, cash: 410, pubref: "wc26-sea-sheraton",     why: "Downtown flagship. Consistent elite recognition, full amenities, central location." },
+      lifestyle: { name: "Seattle Marriott Waterfront",                 pts: 50000, cash: 390, pubref: "wc26-sea-waterfront",   why: "Puget Sound views, Pike Place Market steps away, walkable waterfront. The Seattle experience in one location." },
+    },
+    search_pubref: "wc26-sea-search",
+    runner: "Seattle summers are the city at its best — mild, sunny, and beautiful. Lumen Field is walkable from most downtown hotels."
+  },
+  kc: {
+    name: "Kansas City",
+    flag: "🇺🇸",
+    matches: "6 matches including a Quarter-Final",
+    isFinal: false,
+    stadium: "Arrowhead Stadium",
+    hotels: {
+      stadium:   { name: "Ambassador Hotel Kansas City, Autograph Collection", pts: 35000, cash: 260, pubref: "wc26-kc-ambassador", why: "The official Bonvoy property closest to Arrowhead Stadium and the fan zones. Historic 1925 building, boutique character, Bonvoy points. The best-positioned Marriott for match days in KC." },
+      city:      { name: "Marriott Kansas City Country Club Plaza",     pts: 40000, cash: 300, pubref: "wc26-kc-plaza",          why: "Country Club Plaza is KC's most upscale district — Spanish architecture, high-end dining, and a walkable neighbourhood feel." },
+      points:    { name: "Ambassador Hotel Kansas City, Autograph Collection", pts: 35000, cash: 260, pubref: "wc26-kc-ambassador", why: "Best combination of points value, character, and stadium access in Kansas City." },
+      luxury:    { name: "Marriott Kansas City Country Club Plaza",     pts: 40000, cash: 300, pubref: "wc26-kc-plaza",          why: "Plaza district luxury experience. Great dining and KC's most refined neighbourhood." },
+      lifestyle: { name: "Ambassador Hotel Kansas City, Autograph Collection", pts: 35000, cash: 260, pubref: "wc26-kc-ambassador", why: "Boutique character in a historic building. The lifestyle pick in a city better known for BBQ than boutique hotels." },
+    },
+    search_pubref: "wc26-kc-search",
+    runner: "Kansas City hosts Argentina's opening match June 16 with Messi — one of the most anticipated games of the tournament. Book immediately."
+  },
+  sf: {
+    name: "San Francisco Bay Area",
+    flag: "🇺🇸",
+    matches: "Multiple group stage matches",
+    isFinal: false,
+    stadium: "Levi's Stadium, Santa Clara",
+    hotels: {
+      stadium:   { name: "Hotel Citrine Palo Alto (Tribute Portfolio)",  pts: 32000, cash: 280, pubref: "wc26-sf-citrine",       why: "Marriott Tribute Portfolio property nearest to Levi's Stadium. Eco-conscious, California-cool aesthetic. Best stadium proximity in the Bonvoy portfolio for this venue." },
+      city:      { name: "W San Francisco",                             pts: 65000, cash: 520, pubref: "wc26-sf-w",              why: "SoMa location for the full SF experience — walkable to the Ferry Building, Mission Bay, and the best restaurants in the city." },
+      points:    { name: "AC Hotel Sunnyvale Moffett Park",             pts: 30000, cash: 240, pubref: "wc26-sf-acmoffett",      why: "Silicon Valley location close to Levi's Stadium. Best points value for fans prioritising stadium access over city experience." },
+      luxury:    { name: "San Francisco Marriott Marquis",              pts: 68000, cash: 540, pubref: "wc26-sf-marquis",        why: "Downtown SF flagship with views of the Bay. Top-tier Ambassador experience and central Union Square location." },
+      lifestyle: { name: "W San Francisco",                             pts: 65000, cash: 520, pubref: "wc26-sf-w",              why: "The lifestyle pick. San Francisco's most vibrant urban hotel — design-forward, social, and walkable to the city's best." },
+    },
+    search_pubref: "wc26-sf-search",
+    runner: "Note: Levi's Stadium is in Santa Clara, 45 min from downtown SF. Factor in Bay Area traffic on match days and consider staying closer to the stadium."
+  },
+  tor: {
+    name: "Toronto",
+    flag: "🇨🇦",
+    matches: "6 matches",
+    isFinal: false,
+    stadium: "BMO Field",
+    hotels: {
+      stadium:   { name: "Delta Hotels Toronto",                        pts: 38000, cash: 290, pubref: "wc26-tor-delta",         why: "Central downtown with GO Transit and TTC access to BMO Field. Solid Bonvoy option in the core." },
+      city:      { name: "Sheraton Centre Toronto Hotel",               pts: 45000, cash: 360, pubref: "wc26-tor-sheraton",      why: "Connected to the PATH underground network. Prime downtown Toronto location steps from City Hall and Nathan Phillips Square." },
+      points:    { name: "Delta Hotels Toronto",                        pts: 38000, cash: 290, pubref: "wc26-tor-delta",         why: "Best points value among central Toronto Bonvoy properties." },
+      luxury:    { name: "Le Méridien King Edward Toronto",             pts: 52000, cash: 420, pubref: "wc26-tor-kingedward",    why: "Historic 1903 property in the Financial District. One of Toronto's most characterful luxury hotels." },
+      lifestyle: { name: "Sheraton Centre Toronto Hotel",               pts: 45000, cash: 360, pubref: "wc26-tor-sheraton",      why: "PATH access means rain or shine you're connected. Kensington Market and Chinatown are a short walk." },
+    },
+    search_pubref: "wc26-tor-search",
+    runner: "Canada tip: Toronto and Vancouver are the only World Cup venues accessible without a US visa — important for many international fans."
+  },
+  van: {
+    name: "Vancouver",
+    flag: "🇨🇦",
+    matches: "7 matches including a Round of 16",
+    isFinal: false,
+    stadium: "BC Place",
+    hotels: {
+      stadium:   { name: "JW Marriott Parq Vancouver",                 pts: 55000, cash: 440, pubref: "wc26-van-jwparq",        why: "Adjacent to BC Place Stadium. Walk to the match, walk back. The most strategic Bonvoy pick in Vancouver." },
+      city:      { name: "The Douglas, Autograph Collection",          pts: 48000, cash: 380, pubref: "wc26-van-douglas",       why: "Boutique Autograph Collection property next to BC Place. Design-forward character and excellent location." },
+      points:    { name: "Sheraton Vancouver Wall Centre",             pts: 40000, cash: 310, pubref: "wc26-van-sheraton",      why: "Central Vancouver with great transit connections. Best points value among established Bonvoy properties in the city." },
+      luxury:    { name: "JW Marriott Parq Vancouver",                 pts: 55000, cash: 440, pubref: "wc26-van-jwparq",        why: "Top-tier Vancouver experience. Adjacent to BC Place, full JW amenities, consistent Ambassador recognition." },
+      lifestyle: { name: "Sheraton Vancouver Wall Centre",             pts: 40000, cash: 310, pubref: "wc26-van-sheraton",      why: "Central location makes exploring Vancouver — Gastown, Stanley Park, Granville Island — all easy. One of North America's most beautiful cities." },
+    },
+    search_pubref: "wc26-van-search",
+    runner: "Vancouver is surrounded by mountains and ocean — budget time for Stanley Park, Granville Island, and the Seawall between matches."
+  },
+  mex: {
+    name: "Mexico City",
+    flag: "🇲🇽",
+    matches: "Opening Match June 11 + multiple group stage",
+    isFinal: false,
+    stadium: "Estadio Azteca",
+    hotels: {
+      stadium:   { name: "JW Marriott Mexico City",                    pts: 35000, cash: 280, pubref: "wc26-mex-jw",            why: "Polanco location — Mexico City's most upscale district. Well-positioned for Azteca access and the best dining in the city." },
+      city:      { name: "W Mexico City",                              pts: 38000, cash: 300, pubref: "wc26-mex-w",             why: "Polanco energy at the W — rooftop bar, design-forward rooms, walking distance to Presidente Masaryk." },
+      points:    { name: "Marriott Mexico City Reforma",               pts: 28000, cash: 220, pubref: "wc26-mex-reforma",       why: "Paseo de la Reforma address at the best points value. Central, walkable to Chapultepec Park and the Museo Nacional de Antropología." },
+      luxury:    { name: "St. Regis Mexico City",                      pts: 55000, cash: 450, pubref: "wc26-mex-stregis",       why: "The finest Marriott address in Mexico City. Reforma boulevard, butler service, spectacular views. For the Final Week experience." },
+      lifestyle: { name: "W Mexico City",                              pts: 38000, cash: 300, pubref: "wc26-mex-w",             why: "Polanco is Mexico City's most walkable, most exciting neighbourhood. The lifestyle pick for experiencing the city at its best." },
+    },
+    search_pubref: "wc26-mex-search",
+    runner: "Mexico City opens the tournament June 11 at the Azteca — one of the most iconic stadiums in football history. Book immediately."
+  },
+  gdl: {
+    name: "Guadalajara",
+    flag: "🇲🇽",
+    matches: "Multiple group stage matches",
+    isFinal: false,
+    stadium: "Estadio Akron",
+    hotels: {
+      stadium:   { name: "Marriott Guadalajara",                       pts: 25000, cash: 200, pubref: "wc26-gdl-marriott",      why: "The primary Bonvoy property in Guadalajara. Well-positioned for Estadio Akron access and the Zapopan area." },
+      city:      { name: "W Guadalajara",                              pts: 30000, cash: 240, pubref: "wc26-gdl-w",             why: "Design-forward W in Mexico's second city. Good access to the historic centre and the tequila region day trips." },
+      points:    { name: "Marriott Guadalajara",                       pts: 25000, cash: 200, pubref: "wc26-gdl-marriott",      why: "Excellent points value — one of the most affordable Bonvoy redemptions among all 16 host cities." },
+      luxury:    { name: "W Guadalajara",                              pts: 30000, cash: 240, pubref: "wc26-gdl-w",             why: "Top luxury option in Guadalajara. W service and design in a city with serious culture and food credentials." },
+      lifestyle: { name: "W Guadalajara",                              pts: 30000, cash: 240, pubref: "wc26-gdl-w",             why: "Guadalajara is the home of mariachi and tequila. The W puts you at the centre of it." },
+    },
+    search_pubref: "wc26-gdl-search",
+    runner: "Guadalajara day trip: Tequila town is 90 minutes by car. A world-class side trip between matches."
+  },
+  mty: {
+    name: "Monterrey",
+    flag: "🇲🇽",
+    matches: "Multiple group stage matches",
+    isFinal: false,
+    stadium: "Estadio BBVA",
+    hotels: {
+      stadium:   { name: "Marriott Monterrey Airport",                  pts: 22000, cash: 180, pubref: "wc26-mty-airport",      why: "Convenient airport location with easy stadium access. The practical choice for fans focused purely on match-day logistics." },
+      city:      { name: "Sheraton Ambassador Monterrey",              pts: 28000, cash: 220, pubref: "wc26-mty-sheraton",      why: "The established Bonvoy property in Monterrey's urban core. Near the Macroplaza and Barrio Antiguo." },
+      points:    { name: "Marriott Monterrey Airport",                  pts: 22000, cash: 180, pubref: "wc26-mty-airport",      why: "Best points value in Monterrey — one of the lowest redemption costs across all 16 host cities." },
+      luxury:    { name: "Sheraton Ambassador Monterrey",              pts: 28000, cash: 220, pubref: "wc26-mty-sheraton",      why: "Top Bonvoy experience in Monterrey with city views and central location." },
+      lifestyle: { name: "Sheraton Ambassador Monterrey",              pts: 28000, cash: 220, pubref: "wc26-mty-sheraton",      why: "Monterrey is surrounded by dramatic Sierra Madre mountains. Stay central and explore — Parque Fundidora is worth an afternoon." },
+    },
+    search_pubref: "wc26-mty-search",
+    runner: "Estadio BBVA is one of the most visually striking World Cup venues — surrounded by mountains. Arrive early for the views."
+  },
+};
+
+const POINTS_DATA = {
+  budget: { label: "Courtyard / Aloft",    base: { nyc:35000,la:28000,mex:22000,dal:28000,atl:28000,hou:30000,mia:32000,phi:30000,bos:32000,sea:35000,kc:25000,sf:32000,tor:30000,van:35000,gdl:20000,mty:18000 }, cashBase: { nyc:260,la:200,mex:160,dal:200,atl:190,hou:210,mia:230,phi:210,bos:230,sea:250,kc:180,sf:230,tor:210,van:240,gdl:140,mty:130 } },
+  mid:    { label: "Sheraton / Westin",    base: { nyc:50000,la:42000,mex:30000,dal:36000,atl:36000,hou:42000,mia:45000,phi:40000,bos:44000,sea:48000,kc:32000,sf:44000,tor:40000,van:46000,gdl:26000,mty:24000 }, cashBase: { nyc:380,la:310,mex:240,dal:270,atl:270,hou:310,mia:340,phi:300,bos:340,sea:370,kc:250,sf:340,tor:300,van:350,gdl:190,mty:180 } },
+  upper:  { label: "Marriott / W Hotel",   base: { nyc:65000,la:55000,mex:36000,dal:44000,atl:42000,hou:50000,mia:55000,phi:50000,bos:52000,sea:54000,kc:38000,sf:56000,tor:48000,van:52000,gdl:30000,mty:28000 }, cashBase: { nyc:520,la:420,mex:290,dal:340,atl:330,hou:390,mia:430,phi:390,bos:410,sea:430,kc:300,sf:440,tor:370,van:410,gdl:230,mty:220 } },
+  luxury: { label: "JW / Ritz-Carlton",   base: { nyc:85000,la:80000,mex:55000,dal:60000,atl:60000,hou:65000,mia:70000,phi:65000,bos:68000,sea:70000,kc:55000,sf:75000,tor:65000,van:65000,gdl:40000,mty:36000 }, cashBase: { nyc:750,la:700,mex:440,dal:490,atl:490,hou:530,mia:580,phi:530,bos:560,sea:580,kc:450,sf:620,tor:530,van:540,gdl:320,mty:290 } },
+};
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+const selections = {};
+
+function selectPill(el, group, value) {
+  document.querySelectorAll(`#${group}-pills .pill`).forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selections[group] = value;
+  updateProgress();
+}
+
+function updateProgress() {
+  const city    = document.getElementById('finder-city')?.value;
+  const nights  = document.getElementById('finder-nights')?.value;
+  ['ps1','ps2','ps3','ps4'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const filled = [!!city, !!selections.priority, !!nights, !!selections.status][i];
+    el.classList.toggle('done', filled);
+  });
+}
+
+function buildAffiliateLink(pubref) {
+  return `${AFFILIATE_BASE}?pubref=${pubref}`;
+}
+
+function fmtNum(n) {
+  return n.toLocaleString();
+}
+
+// ── Tab Switching ────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── Tab 1: Hotel Finder ──────────────────────────────────────────────────────
+function runFinder() {
+  const cityKey  = document.getElementById('finder-city').value;
+  const priority = selections.priority;
+  const nights   = parseInt(document.getElementById('finder-nights').value) || 4;
+  const status   = selections.status || 'none';
+
+  if (!cityKey) { alert('Please select a host city.'); return; }
+  if (!priority) { alert('Please choose what matters most to you.'); return; }
+
+  const city  = CITIES[cityKey];
+  const hotel = city.hotels[priority];
+
+  document.getElementById('res-badge').textContent    = city.isFinal ? '⭐ Final Host City — Top Pick' : '🏆 Top Pick for You';
+  document.getElementById('res-hotel').textContent    = hotel.name;
+  document.getElementById('res-location').textContent = city.name;
+  document.getElementById('res-points').textContent   = fmtNum(hotel.pts);
+  document.getElementById('res-stadium').textContent  = city.stadium;
+  document.getElementById('res-status').textContent   = getStatusNote(status, priority);
+  document.getElementById('res-why').textContent      = hotel.why;
+  document.getElementById('res-runner').textContent   = city.runner;
+
+  const link = document.getElementById('res-link');
+  link.href  = buildAffiliateLink(hotel.pubref);
+
+  document.getElementById('finder-result').classList.add('visible');
+  document.getElementById('finder-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function getStatusNote(status, priority) {
+  if (status === 'amb') return 'As Ambassador: request your Personal Ambassador for this stay, and attach Suite Night Awards now for Final-week bookings.';
+  if (status === 'titan') return 'Titanium: strong upgrade priority. Lounge access guaranteed. Request early check-in at booking.';
+  if (status === 'plat') return 'Platinum: lounge access included, breakfast benefit applies at most properties.';
+  if (status === 'gold') return 'Gold: room upgrade when available, late checkout. Lounges at select properties.';
+  if (status === 'silver') return 'Silver: late checkout benefit. Limited upgrades.';
+  return 'No status: consider joining Bonvoy before booking — it\'s free and you\'ll earn points from day one.';
+}
+
+// ── Tab 2: Points Calculator ─────────────────────────────────────────────────
+function calcPoints() {
+  const cityKey = document.getElementById('pts-city').value;
+  const tier    = selections.tier;
+  const nights  = parseInt(document.getElementById('pts-nights').value) || 5;
+  const balance = parseInt(document.getElementById('pts-balance').value) || 0;
+
+  if (!cityKey) { alert('Please select a city.'); return; }
+  if (!tier)    { alert('Please select a hotel tier.'); return; }
+
+  const tierData   = POINTS_DATA[tier];
+  const ptsNight   = tierData.base[cityKey] || 40000;
+  const cashNight  = tierData.cashBase[cityKey] || 350;
+  const totalPts   = ptsNight * nights;
+  const totalCash  = cashNight * nights;
+  const gap        = Math.max(0, totalPts - balance);
+  const ptsValue   = (totalCash / totalPts * 100).toFixed(2); // cents per point
+
+  document.getElementById('pts-total').textContent     = fmtNum(totalPts);
+  document.getElementById('pts-per-night').textContent = fmtNum(ptsNight);
+  document.getElementById('pts-cash').textContent      = '$' + fmtNum(cashNight);
+  document.getElementById('pts-gap').textContent       = gap > 0 ? fmtNum(gap) + ' short' : '✓ You have enough!';
+  document.getElementById('pts-verdict').textContent   = parseFloat(ptsValue) > 0.7 ? '✅ Use points' : '💵 Consider cash';
+
+  document.getElementById('pts-result').classList.add('visible');
+  document.getElementById('pts-advice').style.display = 'block';
+
+  let advice = '';
+  if (gap > 0) {
+    advice = `You need ${fmtNum(gap)} more points. The fastest ways to close the gap: (1) a Bonvoy credit card sign-up bonus typically delivers 75,000–100,000 points; (2) check for Bonvoy points purchase promotions (they run 25–30% bonus offers a few times a year); (3) earn at rate of 6–17x per stay at Marriott properties between now and June. `;
+  } else {
+    advice = `Good news — you have enough points for this stay. Book a refundable award rate now to lock in availability, then cancel only if something better comes up. `;
+  }
+
+  if (parseFloat(ptsValue) > 0.7) {
+    advice += `At ~${ptsValue}¢ per point, this redemption is above average. Use your points — cash rates during World Cup will be extreme.`;
+  } else {
+    advice += `At ~${ptsValue}¢ per point, cash rates are relatively reasonable for this city and tier. Consider saving points for higher-value redemptions.`;
+  }
+
+  document.getElementById('pts-advice-text').textContent = advice;
+  document.getElementById('pts-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Tab 3: Match Planner ─────────────────────────────────────────────────────
+function buildCityGrid() {
+  const grid = document.getElementById('city-grid');
+  Object.entries(CITIES).forEach(([key, city]) => {
+    const card = document.createElement('div');
+    card.className = 'city-card';
+    card.dataset.key = key;
+    card.onclick = () => card.classList.toggle('selected');
+    card.innerHTML = `
+      ${city.isFinal ? '<div class="city-final-badge">⭐ Final</div>' : ''}
+      <span class="city-flag">${city.flag}</span>
+      <div class="city-name">${city.name}</div>
+      <div class="city-matches">${city.matches}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function buildItinerary() {
+  const selected = [...document.querySelectorAll('.city-card.selected')]
+    .map(c => c.dataset.key);
+
+  if (selected.length === 0) {
+    alert('Please select at least one city.');
+    return;
+  }
+
+  const container = document.getElementById('itinerary-stops');
+  container.innerHTML = '';
+
+  selected.forEach((key, i) => {
+    const city  = CITIES[key];
+    // Default to 'luxury' for itinerary — most aspirational
+    const hotel = city.hotels.luxury;
+
+    // Connector
+    if (i > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'stop-connector';
+      conn.textContent = '✈ next stop';
+      container.appendChild(conn);
+    }
+
+    const stop = document.createElement('div');
+    stop.className = 'itinerary-stop';
+    stop.innerHTML = `
+      <div class="stop-number">${i + 1}</div>
+      <div class="stop-content">
+        <div class="stop-city">${city.flag} ${city.name}</div>
+        <div class="stop-hotel">🏨 ${hotel.name}</div>
+        <div style="font-size:13px;color:#6B7280;margin-bottom:12px;">${hotel.why}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:12px;background:#F3F4F6;padding:4px 10px;border-radius:100px;">
+            💎 ~${fmtNum(hotel.pts)} pts/night
+          </span>
+          <span style="font-size:12px;background:#F3F4F6;padding:4px 10px;border-radius:100px;">
+            💵 ~$${fmtNum(hotel.cash)}/night cash
+          </span>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="${buildAffiliateLink(hotel.pubref)}" target="_blank" class="btn-gold" style="font-size:13px;padding:9px 18px;">
+            Book This Hotel →
+          </a>
+          <a href="${buildAffiliateLink(city.search_pubref)}" target="_blank" class="btn-outline" style="font-size:13px;">
+            All ${city.name} Options
+          </a>
+        </div>
+        <p class="affiliate-note" style="text-align:left;margin-top:8px;">Affiliate link · I earn a small commission if you book</p>
+      </div>
+    `;
+    container.appendChild(stop);
+  });
+
+  // Summary
+  if (selected.length > 1) {
+    const summary = document.createElement('div');
+    summary.className = 'card';
+    summary.style.marginTop = '20px';
+    summary.innerHTML = `
+      <div class="card-title">📊 Your Trip at a Glance</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
+        <div>
+          <div style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">${selected.length}</div>
+          <div style="font-size:12px;color:#6B7280;">Host Cities</div>
+        </div>
+        <div>
+          <div style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">${selected.length * 3}+</div>
+          <div style="font-size:12px;color:#6B7280;">Nights Est.</div>
+        </div>
+        <div>
+          <div style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">${selected.filter(k => CITIES[k].isFinal).length > 0 ? '🏆' : '⚽'}</div>
+          <div style="font-size:12px;color:#6B7280;">${selected.filter(k => CITIES[k].isFinal).length > 0 ? 'Includes the Final' : 'Group Stage'}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(summary);
+  }
+
+  document.getElementById('itinerary-result').classList.add('visible');
+  document.getElementById('itinerary-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+buildCityGrid();
+</script>
+</body>
+</html>
