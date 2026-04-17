@@ -34,8 +34,12 @@
     /* SCROLL HERO */
     .hero-wrapper{position:relative;height:320vh}
     .hero-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
-    .hero-media{position:absolute;inset:0;background:url('https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg') center/cover no-repeat;transform-origin:center center;transform:scale(0.42) translateY(8%);border-radius:24px;transition:transform 0.05s linear,border-radius 0.1s linear;will-change:transform,border-radius}
-    .hero-media::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.6) 100%);border-radius:inherit}
+    .hero-media{position:absolute;inset:0;transform-origin:center center;transform:scale(0.42) translateY(8%);border-radius:24px;transition:transform 0.05s linear,border-radius 0.1s linear;will-change:transform,border-radius;overflow:hidden}
+    .hero-img{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat}
+    .hero-img-1{background-image:url('../Media/Moto/KTM-France/ktm-adventure-rally-france-2022-dirt-trail-forest-solo-rider.jpg');animation:heroFade 9s ease-in-out infinite}
+    .hero-img-2{background-image:url('../Media/Moto/KTM-France/ktm-adventure-rally-france-2022-rider-helmet-portrait-number-107.jpg');animation:heroFade 9s ease-in-out infinite reverse}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.6) 100%);z-index:1}
+    @keyframes heroFade{0%,40%{opacity:1}50%,90%{opacity:0}100%{opacity:1}}
     .hero-text{position:relative;z-index:2;text-align:center;pointer-events:none}
     .hero-eyebrow{font-size:0.72rem;font-weight:500;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:1rem;opacity:0;animation:fadeUp 0.8s 0.6s forwards}
     .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4.5rem,12vw,11rem);line-height:0.9;color:#fff;letter-spacing:0.04em;opacity:0;animation:fadeUp 0.8s 0.3s forwards}
@@ -87,18 +91,33 @@
     .trip-tag{position:absolute;top:1rem;right:1rem;background:var(--ktm-orange);color:#fff;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;padding:0.3rem 0.7rem;border-radius:100px}
 
     /* ROUTES BANNER */
-    .routes-banner{background:var(--charcoal);padding:6rem 3rem;display:flex;align-items:center;gap:6rem;overflow:hidden;position:relative}
+    .routes-banner{background:var(--charcoal);padding:6rem 3rem;display:flex;align-items:center;justify-content:center;gap:6rem;overflow:hidden;position:relative}
     .routes-banner::before{content:'KTM';position:absolute;right:-2rem;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',sans-serif;font-size:22vw;color:rgba(255,255,255,0.025);pointer-events:none;line-height:1;white-space:nowrap}
     .routes-text{color:var(--cream);max-width:480px;position:relative;z-index:1}
-    .routes-text h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,6vw,6rem);line-height:0.95;letter-spacing:0.04em;margin-bottom:1.5rem}
+    .routes-text h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,6vw,6rem);line-height:0.95;letter-spacing:0.04em;margin-bottom:1.5rem;color:#fff}
     .routes-text h2 span{color:var(--ktm-orange)}
     .routes-text p{font-size:1rem;font-weight:300;line-height:1.7;color:rgba(245,240,234,0.7);margin-bottom:2rem}
     .btn-outline{display:inline-block;border:1.5px solid var(--clay);color:var(--clay);font-size:0.72rem;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:0.85rem 2rem;border-radius:100px;text-decoration:none;transition:background 0.3s,color 0.3s,border-color 0.3s}
     .btn-outline:hover{background:var(--ktm-orange);border-color:var(--ktm-orange);color:#fff}
-    .route-chips{display:flex;flex-wrap:wrap;gap:0.8rem;position:relative;z-index:1}
-    .chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--cream);font-size:0.75rem;letter-spacing:0.1em;padding:0.6rem 1.2rem;border-radius:100px;text-decoration:none;display:inline-block;opacity:0;transform:translateY(20px);transition:background 0.25s,border-color 0.25s,opacity 0.5s ease,transform 0.5s ease}
-    .chip.visible{opacity:1;transform:translateY(0)}
-    .chip:hover{background:rgba(214,66,48,0.2);border-color:var(--ktm-orange)}
+    .yt-card{position:relative;z-index:1;width:480px;border-radius:18px;overflow:hidden;background:#fff;flex-shrink:0;box-shadow:0 4px 24px rgba(0,0,0,0.3),0 1px 3px rgba(0,0,0,0.2);transition:box-shadow 0.3s,transform 0.3s;text-decoration:none;display:block}
+    .yt-card:hover{box-shadow:0 8px 40px rgba(0,0,0,0.45),0 2px 6px rgba(0,0,0,0.25);transform:translateY(-3px)}
+    .yt-thumb{position:relative;aspect-ratio:16/9;overflow:hidden}
+    .yt-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.5s ease}
+    .yt-card:hover .yt-thumb img{transform:scale(1.04)}
+    .yt-thumb-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.22);display:flex;align-items:center;justify-content:center}
+    .yt-play-btn{width:56px;height:56px;background:rgba(255,255,255,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,background 0.2s;backdrop-filter:blur(8px)}
+    .yt-card:hover .yt-play-btn{transform:scale(1.1);background:#fff}
+    .yt-play-btn svg{width:20px;height:20px;fill:var(--ktm-orange);margin-left:3px}
+    .yt-thumb-tag{position:absolute;top:1rem;left:1rem;background:rgba(0,0,0,0.55);color:#fff;font-size:0.58rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;padding:0.28rem 0.65rem;border-radius:100px;backdrop-filter:blur(8px)}
+    .yt-bottom{padding:1.2rem 1.4rem 1.4rem}
+    .yt-channel-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem}
+    .yt-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ktm-orange),#ff8533);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff;flex-shrink:0;font-family:system-ui,sans-serif}
+    .yt-meta{flex:1}
+    .yt-channel-name{font-size:0.88rem;font-weight:600;color:#1d1d1f;letter-spacing:-0.01em;line-height:1}
+    .yt-handle{font-size:0.68rem;color:rgba(29,29,31,0.45);margin-top:0.1rem;display:block}
+    .yt-sub-btn{display:flex;align-items:center;justify-content:center;gap:0.5rem;background:var(--ktm-orange);color:#fff;padding:0.7rem;border-radius:10px;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;transition:opacity 0.2s}
+    .yt-card:hover .yt-sub-btn{opacity:0.9}
+    .yt-sub-btn svg{width:14px;height:14px;fill:#fff;flex-shrink:0}
 
     /* FOOTER */
     footer{background:var(--cream);padding:5rem 3rem 3rem;border-top:1px solid var(--sand)}
@@ -189,7 +208,11 @@
 <!-- HERO -->
 <div class="hero-wrapper" id="heroWrapper">
   <div class="hero-sticky">
-    <div class="hero-media" id="heroMedia"></div>
+    <div class="hero-media" id="heroMedia">
+      <div class="hero-img hero-img-1"></div>
+      <div class="hero-img hero-img-2"></div>
+      <div class="hero-overlay"></div>
+    </div>
     <div class="hero-text" id="heroText">
       <p class="hero-eyebrow">KTM Adventure Rally · Europe</p>
       <h1 class="hero-title">
@@ -244,9 +267,9 @@
   </div>
   <div class="trips-grid">
 
-    <!-- BOSNIA — featured -->
-    <a href="/moto/ktm-bosnia" class="trip-card featured">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="KTM Rally Bosnia" loading="lazy">
+    <!-- BOSNIA -->
+    <a href="/moto/ktm-bosnia" class="trip-card">
+      <img src="../Media/Moto/KTM-Bosnia/ktm-adventure-rally-bosnia-2019-bikes-mountain-plateau-clouds.jpg" alt="KTM Adventure Rally Bosnia 2019 — bikes on mountain plateau with clouds" loading="lazy">
       <div class="trip-overlay"></div>
       <div class="trip-info">
         <p class="trip-country">Bosnia & Herzegovina</p>
@@ -258,7 +281,7 @@
 
     <!-- FRANCE -->
     <a href="/moto/ktm-france" class="trip-card">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="KTM Rally France" loading="lazy">
+      <img src="../Media/Moto/KTM-France/ktm-adventure-rally-france-2022-start-line-redbull-arch-departure.jpg" alt="KTM Adventure Rally France 2022 — start line Red Bull arch departure" loading="lazy" style="object-position:top">
       <div class="trip-overlay"></div>
       <div class="trip-info">
         <p class="trip-country">France</p>
@@ -270,7 +293,7 @@
 
     <!-- NORWAY -->
     <a href="/moto/ktm-norway" class="trip-card">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="KTM Rally Norway" loading="lazy">
+      <img src="../Media/Moto/KTM-Norway/ktm-adventure-rally-norway-2023-ktm-fjord-mountain-roadside.jpg" alt="KTM Adventure Rally Norway 2023 — KTM roadside fjord mountain view" loading="lazy" style="object-position:50% 70%">
       <div class="trip-overlay"></div>
       <div class="trip-info">
         <p class="trip-country">Norway</p>
@@ -282,7 +305,7 @@
 
     <!-- ROMANIA -->
     <a href="/moto/ktm-romania" class="trip-card">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/8-dji_fly_20230721_112524_87_1690062076550_photo-576x1024.jpg" alt="KTM Rally Romania" loading="lazy">
+      <img src="../Media/Moto/KTM-Romania/ktm-adventure-rally-romania-2025-forest-water-crossing-hero.jpg" alt="KTM Adventure Rally Romania 2025 — forest water crossing" loading="lazy">
       <div class="trip-overlay"></div>
       <div class="trip-info">
         <p class="trip-country">Romania</p>
@@ -294,7 +317,7 @@
 
     <!-- ITALY -->
     <a href="/moto/ktm-italy" class="trip-card">
-      <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="KTM Rally Italy" loading="lazy">
+      <img src="../Media/Moto/KTM-adventure-rally-europe-italy-2026.png" alt="KTM Adventure Rally Italy 2026" loading="lazy" style="object-fit:contain;background:#0d0d0b;padding:1.5rem">
       <div class="trip-overlay"></div>
       <div class="trip-info">
         <p class="trip-country">Italy</p>
@@ -310,19 +333,35 @@
 <!-- ROUTES BANNER -->
 <div class="routes-banner">
   <div class="routes-text">
-    <h2>Adventure<br/><span>Rally</span><br/>Series</h2>
-    <p>Every trip documented with on-board video, photography and honest route notes. No press trips. No sponsorship. Just the bike and the road.</p>
-    <a href="/journeys" class="btn-outline">All Journeys</a>
+    <p class="section-label">YouTube</p>
+    <h2>Watch every<br/>route on <span>video.</span></h2>
+    <p>Adventure motorcycle videos, POV rides, rally footage and travel. Real roads across Europe and the world — on-board from every route.</p>
+    <a href="https://www.youtube.com/channel/UCRwFYUuj3kVynycDuCxcb4Q?sub_confirmation=1" class="btn-outline" target="_blank" rel="noopener" style="margin-top:0.5rem;display:inline-block">Subscribe on YouTube</a>
   </div>
-  <div class="route-chips">
-    <a href="/moto/ktm-bosnia" class="chip">Bosnia & Herzegovina</a>
-    <a href="/moto/ktm-france" class="chip">France</a>
-    <a href="/moto/ktm-norway" class="chip">Norway</a>
-    <a href="/moto/ktm-romania" class="chip">Romania</a>
-    <a href="/moto/ktm-italy" class="chip">Italy</a>
-    <a href="/moto/alpine-passes" class="chip">Alpine Passes</a>
-    <a href="/moto/tools" class="chip">Moto Tools</a>
-  </div>
+  <a href="https://www.youtube.com/channel/UCRwFYUuj3kVynycDuCxcb4Q?sub_confirmation=1" class="yt-card" target="_blank" rel="noopener">
+    <div class="yt-thumb">
+      <img src="../Media/Moto/KTM-Romania/ktm-adventure-rally-romania-2025-forest-water-crossing-hero.jpg" alt="KTM Adventure Rally on-board video">
+      <div class="yt-thumb-overlay">
+        <div class="yt-play-btn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+      <span class="yt-thumb-tag">On-Board Video</span>
+    </div>
+    <div class="yt-bottom">
+      <div class="yt-channel-row">
+        <div class="yt-avatar">D</div>
+        <div class="yt-meta">
+          <div class="yt-channel-name">David Mancilla</div>
+          <span class="yt-handle">@df1190</span>
+        </div>
+      </div>
+      <div class="yt-sub-btn">
+        <svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.2-1.6-1-2.3c-1-.9-2.1-.9-2.6-.9C16.8 2.8 12 2.8 12 2.8s-4.8 0-7.9.2c-.5.1-1.6.1-2.6.9C.7 4.6.5 6.2.5 6.2S.3 8 .3 9.9v1.8c0 1.8.2 3.7.2 3.7s.2 1.6 1 2.3c1 .9 2.3.8 2.9.9C6.2 18.8 12 18.8 12 18.8s4.8 0 7.9-.3c.5-.1 1.6-.1 2.6-.9.8-.7 1-2.3 1-2.3s.2-1.8.2-3.7V9.9c0-1.9-.2-3.7-.2-3.7zM9.7 13.5V7.2l7 3.2-7 3.1z"/></svg>
+        Subscribe &amp; Watch
+      </div>
+    </div>
+  </a>
 </div>
 
 <!-- FOOTER -->
