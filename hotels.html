@@ -140,6 +140,7 @@
     .hm-viewer{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0;background:#0e0e0d}
     .hm-viewer img{max-width:100%;max-height:100%;object-fit:contain;display:block;transition:opacity 0.25s ease}
     .hm-viewer video{width:100%;height:100%;object-fit:contain;display:block}
+    .hm-viewer iframe{width:100%;height:100%;border:0;display:block}
     .hm-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:rgba(255,255,255,0.7);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:background 0.2s,color 0.2s;z-index:2}
     .hm-nav:hover{background:rgba(0,0,0,0.7);color:var(--white)}
     .hm-nav-prev{left:8px}.hm-nav-next{right:8px}
@@ -878,11 +879,9 @@
         {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-cable-car-artwork-triptych.jpg',alt:'Vigilius Mountain Resort cable car artwork triptych'},
         {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-vigiljoch-1912-poster-lana.jpg',alt:'Vigiljoch 1912 Lana vintage poster'},
         {type:'image',src:'Media/Hotels/Vigilius/for-hotel-review/vigiljoch-cable-car-station-sign-lana.jpg',alt:'Vigiljoch cable car station sign Lana'},
-        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-01.mov'},
-        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-02.mov'},
-        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-03.mov'},
-        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-04.mov'},
-        {type:'video',src:'Media/Hotels/Vigilius/for-hotel-review/vigilius-mountain-resort-video-05.mov'}
+        {type:'youtube',src:'tFuE2QlHhEM'},
+        {type:'vimeo',src:'1184424933'},
+        {type:'vimeo',src:'1184424966'}
       ],
       review:'One of the most distinctive mountain hotels I\'ve stayed at. The cable car from Lana isn\'t just a quirk — it\'s the feature. The moment you step off at 1,500m, road noise, traffic, and the general friction of travel disappear. It\'s a hard reset that most hotels claim and very few actually deliver. Breakfast is exceptional — fresh, local, well-stocked — the kind of morning meal that makes you want to linger. The heated pool and spa are the real draw for a rest day, and the spa is the best in South Tyrol by some margin. Hiking trails leave directly from the hotel. Take one of the complimentary full-suspension mountain bikes or rent an E-bike and get into the trails properly. The staff — check-in, restaurant, pool area — have a warmth that feels genuine, not rehearsed. One restaurant on site; take the cable car down to Lana if you want more options.',
       highlights:['Cable car access — complete separation from road noise and traffic','Best spa in South Tyrol — book treatments on arrival','Complimentary full-suspension mountain bikes + E-bike rental','Hiking trails start at the hotel — no drive needed','Breakfast: fresh, local, genuinely well done','Staff across the board: warm, consistent, easy to be around'],
@@ -903,15 +902,12 @@
         {type:'image',src:'Media/Hotels/The-cambrian/cover.JPG'},
         {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-valley-sunset-aerial-winter.jpg'},
         {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-village-aerial-winter-swiss-alps.jpg'},
-        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-video-01.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-adelboden-village-aerial-winter-swiss-alps.jpg'},
         {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-hotel-entrance-parking-adelboden-winter.jpg'},
-        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-video-03.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-hotel-entrance-parking-adelboden-winter.jpg'},
         {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-hotel-balcony-mountain-view-blue-hour-adelboden.jpg'},
-        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-hotel-exterior-evening-video.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-hotel-balcony-mountain-view-blue-hour-adelboden.jpg'},
         {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-alpine-peak-sunset-bernese-oberland.jpg'},
         {type:'image',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-mountain-christmas-lights-night.jpg'},
-        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-winter-night-video-01.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-adelboden-mountain-christmas-lights-night.jpg'},
-        {type:'video',src:'Media/Hotels/The-cambrian/the-cambrian-adelboden-winter-night-video-02.mov',poster:'Media/Hotels/The-cambrian/the-cambrian-adelboden-mountain-christmas-lights-night.jpg'}
+        {type:'vimeo',src:'1184428107'},
+        {type:'vimeo',src:'1184428342'}
       ],
       review:'The Cambrian sits steps from multiple ski lifts, easy to reach by train or bus — and the journey through the valley is genuinely charming and relaxing. As Ambassador Elite, the hotel offered use of a MINI Cooper to explore the surrounding area. That kind of gesture is rare and it changes the stay entirely — the freedom to drive out into the Bernese Oberland on your own terms is something you don\'t forget. Got upgraded to a junior suite: the space, the finish, and the views are all exceptional. The heated pool is outstanding, with a full alpine backdrop that earns time in it even after a full day on the mountain. Breakfast is a serious operation — well stocked, well done. The gym covers everything you need. The staff throughout carry it all with genuine warmth. And the Michelin-starred restaurant directly next to the hotel is not optional. Book it.',
       highlights:['MINI Cooper loan for Ambassador Elite — rare, memorable, and genuinely useful','Junior suite upgrade — space, finish, and views all excellent','Heated pool with full Bernese Alps backdrop','Multiple ski lifts within easy reach of the hotel','Michelin-starred restaurant next door — book it without hesitation','Breakfast and gym both well above standard','Staff warmth consistent from check-in to pool to restaurant','Easy train and bus access — the valley ride in is charming'],
@@ -926,10 +922,7 @@
         {type:'image',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-rooftops-copper-domes-swiss-flag.jpg'},
         {type:'image',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-skyline-sunrise-view.jpg'},
         {type:'image',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-aerial-night-drone.jpg'},
-        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-01.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-aerial-night-drone.jpg'},
-        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-02.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-rooftops-copper-domes-swiss-flag.jpg'},
-        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-03.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-rooftops-copper-domes-swiss-flag.jpg'},
-        {type:'video',src:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-video-04.mov',poster:'Media/Hotels/Hotel-lucerne/the-hotel-lucerne-lucerne-city-skyline-sunrise-view.jpg'}
+        {type:'vimeo',src:'1184424442'}
       ],
       review:'The Hotel Lucerne gets the fundamentals right and then adds genuine care on top. The team reached out before arrival to coordinate parking — proactive communication that is rarer than it should be. Rooms are spacious, clean, and comfortable, with floor-to-ceiling artwork that is genuinely unusual — quirky on day one, it grows on you. The location is hard to fault: Chapel Bridge, the old town, and a strong selection of restaurants are all within a few minutes on foot. For anyone travelling with a dog, this is the standout choice in Lucerne. The team went out of their way to have a treat, a toy, and a doggy bed waiting in the room on arrival. That kind of warmth runs through the entire staff — every interaction, every department. One of the more welcoming hotels we\'ve stayed at, anywhere.',
       highlights:['Staff coordinated parking and arrival proactively before check-in','Best dog-friendly hotel in Lucerne — treat, toy, and bed waiting in the room','Spacious rooms with distinctive floor-to-ceiling artwork','Chapel Bridge and old town within minutes on foot','Great restaurant selection within easy walking distance','Entire staff consistently warm — every department, every interaction'],
@@ -972,12 +965,8 @@
         {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-bathroom-modern-glass-shower.jpg'},
         {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-nespresso-coffee-machine.jpg'},
         {type:'image',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-hotel-bar-lounge-innsbruck.jpg'},
-        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-01.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-panorama-alps-winter.jpg'},
-        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-02.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-night-snowy-mountains.jpg'},
-        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-03.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-dawn-alpine-panorama.jpg'},
-        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-04.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-room-view-innsbruck-sunset-alps.jpg'},
-        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-05.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-dusk-warm-glow-alps.jpg'},
-        {type:'video',src:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-video-06.mov',poster:'Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-night-orange-horizon-alps.jpg'}
+        {type:'vimeo',src:'1184424017'},
+        {type:'vimeo',src:'1184424018'}
       ],
       review:'AC Hotel Innsbruck earns its location. Five minutes from the main train station on foot — the entire city is walkable, and the snow-capped Tyrolean Alps wrapping around Innsbruck are visible from your room at every hour. The view doesn\'t get old. The staff are a genuine strength: attentive without being overbearing, fast to handle anything without making it a production. Celebrating a birthday? They had a surprise waiting on arrival — the kind of thoughtful detail that sets the tone for a whole stay. Small requests are handled the same way: a forgotten toothbrush became a dental kit at the door within minutes. Breakfast is a proper spread — real variety, warm service, well executed. The gym is well-equipped with enough weights and space to actually train. A strong base for Innsbruck and the Tyrol.',
       highlights:['Snow-capped Alps visible from rooms at every hour of the day','5-minute walk to the main train station — everything else walkable','Birthday surprise prepared on arrival — personal and well done','Small requests handled fast and without fuss','Breakfast: excellent variety, warm service, properly done','Gym well-equipped with real weights and usable space','Staff attentive and genuinely helpful throughout'],
@@ -990,8 +979,7 @@
         {type:'image',src:'Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-for-index.jpg'},
         {type:'image',src:'Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-torre-inglesa-retiro-park-city-view.jpg'},
         {type:'image',src:'Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-torre-inglesa-aerial-retiro.jpg'},
-        {type:'video',src:'Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-video-01.mp4',poster:'Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-for-index.jpg'},
-        {type:'video',src:'Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-video-02.mp4',poster:'Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-torre-inglesa-retiro-park-city-view.jpg'}
+        {type:'vimeo',src:'1184424573'}
       ],
       review:'Situated in the bustling Retiro district, the Sheraton Buenos Aires is a large convention-scale hotel with clear strengths: outdoor and indoor pools, a state-of-the-art fitness center, several dining options, and attentive staff. Steps from Puerto Madero and close to Recoleta. Not intimate — this is a full-service convention hotel — but it delivers consistency across business and leisure stays.',
       highlights:['Outdoor and indoor pools — both well maintained','State-of-the-art fitness center','Close to Puerto Madero and Recoleta neighborhoods','Attentive staff committed to a smooth stay','Reliable choice for convention and business travel'],
@@ -1033,12 +1021,7 @@
         {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-suite-bathroom-double-vanity-stone-basins.jpg'},
         {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-bathroom-acacia-amenities-wooden-tray.jpg'},
         {type:'image',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-welcome-amenity-coffee-bread-arrival-card.jpg'},
-        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-01.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-infinity-pool-embalse-guatape-panorama.jpg'},
-        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-02.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-reservoir-panorama-blue-sky.jpg'},
-        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-03.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-pool-thatched-pavilion-jacuzzi-dusk.jpg'},
-        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-04.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-hotel-circular-rooftop-terrace-pool-dusk.jpg'},
-        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-05.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-thatched-pavilion-firepit-night-guatape.jpg'},
-        {type:'video',src:'Media/Hotels/guatape-the-brown/the-brown-guatape-video-06.mov',poster:'Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-rainbow-storm-dramatic.jpg'}
+        {type:'vimeo',src:'1184427953'}
       ],
       review:'The Brown earns its Autograph Collection status in a way that most Marriott properties don\'t. The setting does the heavy lifting — perched above the Embalse de Guatapé, the reservoir views from the pool, the rooms, and the jacuzzi are genuinely spectacular, with a quality of light that shifts completely by the hour. As Ambassador Elite, the suite upgrade was immediate. The room delivered: spacious and well-appointed, with dual waterfall showers and a private terrace jacuzzi positioned directly above the water. Designed for a couple and it shows. Breakfast is serious — local Colombian dishes, fresh tropical fruit, real variety, and a dress code that keeps the atmosphere right. The gym is well-equipped with full range: rowing machines, weights, and space to actually use them. The staff — particularly at reception and poolside — are warm, attentive, and never rushed. On-site experiences include jet ski rentals and helicopter rides over the reservoir; both worth asking about at check-in. One honest note: some experiences listed (coffee tasting, gin & tonic session) were unavailable during our stay with no clear explanation — confirm in advance. Outside that, one of the best nature-integrated luxury hotels in Colombia.',
       highlights:['Suite terrace jacuzzi positioned directly above the Embalse de Guatapé','Spectacular reservoir views from pool, rooms, and jacuzzi — changes by the hour','Breakfast: local Colombian dishes, fresh tropical fruit, dress code maintained','Dual waterfall showers — bathroom well above standard','Jet ski rentals and helicopter rides available — ask at reception','Gym: rowing machines, weights, genuinely well-equipped and spacious','Staff at reception and pool: warm, attentive, unhurried throughout','Ambassador Elite suite upgrade was immediate'],
@@ -1072,9 +1055,6 @@
         {type:'image',src:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-snowy-trees-village-exterior.jpg'},
         {type:'image',src:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-for-index.jpg'},
         {type:'image',src:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-foggy-snow-covered-pine-trees.jpg'},
-        {type:'video',src:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-video-01.mov',poster:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-snowy-trees-village-exterior.jpg'},
-        {type:'video',src:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-video-02.mp4',poster:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-foggy-snow-covered-pine-trees.jpg'},
-        {type:'video',src:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-video-03.mov',poster:'Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-snowy-trees-village-exterior.jpg'}
       ],
       review:'Right in Whistler Village — walking distance to shops, restaurants, and the slopes, no shuttles needed. The heated outdoor pool with mountain views is a genuine draw, usable year-round and spectacular in summer. Friendly staff. On-site dining is good. Best value Marriott-brand option in the village for the price. Kitchenette suites work well for longer ski or hiking stays. Note that parking is not included, and elite upgrades are not available here (the hotel offers some points to offset).',
       highlights:['Village location — walkable to shops, restaurants, and slopes','Heated outdoor pool with mountain views','Friendly staff with good on-site dining','Kitchenette suites useful for longer trips','Best value at this brand level in Whistler'],
@@ -1089,10 +1069,8 @@
         {type:'image',src:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-room-santiago-city-aerial-view.jpg'},
         {type:'image',src:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-room-view-sunrise-santiago-city.jpg'},
         {type:'image',src:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-gym-exercise-bike-andes-mountains.jpg'},
-        {type:'video',src:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-video-01.mp4',poster:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-sunset-cityscape-santiago-chile.jpg'},
-        {type:'video',src:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-video-02.mp4',poster:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-for-index.jpg'},
-        {type:'video',src:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-video-03.mov',poster:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-room-santiago-city-aerial-view.jpg'},
-        {type:'video',src:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-video-04.mov',poster:'Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-room-view-sunrise-santiago-city.jpg'}
+        {type:'vimeo',src:'1184423438'},
+        {type:'vimeo',src:'1184423436'}
       ],
       review:'One of the best hotels in Santiago and my consistent first choice in Chile. Located within the Costanera Center with direct mall access from the 5th floor — restaurants and shops without stepping outside. The rooftop delivers breathtaking Andes views and stunning sunsets. Breakfast is among the best I have had at any hotel in South America. Elite and Ambassador members receive excellent, genuine upgrades. Parking shared with the mall means no friction. Exceptional staff across the board.',
       highlights:['Direct mall access from the 5th floor — unmatched convenience','Rooftop Andes views and sunsets — exceptional','One of the best hotel breakfasts in South America','Excellent upgrades for Elite and Ambassador members','Convenient parking shared with Costanera Center','Exceptional staff — best in Chile'],
@@ -1138,10 +1116,7 @@
         {type:'image',src:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-breakfast-buffet-restaurant.jpg'},
         {type:'image',src:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-bathroom-bathtub-glass-enclosure.jpg'},
         {type:'image',src:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-welcome-amenity-charcuterie-board.jpg'},
-        {type:'video',src:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-video-01.mov',poster:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-room-king-bed-modern-interior.jpg'},
-        {type:'video',src:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-video-02.mov',poster:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-breakfast-buffet-restaurant.jpg'},
-        {type:'video',src:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-video-03.mov',poster:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-room-king-bed-modern-interior.jpg'},
-        {type:'video',src:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-video-04.mov',poster:'Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-welcome-amenity-charcuterie-board.jpg'}
+        {type:'vimeo',src:'1184426155'}
       ],
       review:'My top recommendation in the Dominican Republic — and I have stayed at other properties across the country. New construction means everything is in spectacular condition. The gym is the best I have found in any hotel in the DR: clean, ample weights, and proper stretching areas. The rooftop pool bar has gorgeous city views. Restaurants are excellent with a standout breakfast buffet. The lounge offers alcoholic drinks and a comfortable meeting setup. Connected to a neighboring Bonvoy hotel, so you can charge meals and drinks to your room across both properties. Ample parking.',
       highlights:['Best hotel gym in the Dominican Republic — clean, fully equipped','Rooftop pool bar with gorgeous city views','Excellent restaurant and breakfast buffet','Lounge with alcoholic drinks and meeting room','Connected to neighboring Bonvoy property — charge across both hotels','New property in spectacular condition','Ample parking on-site'],
@@ -1152,8 +1127,7 @@
       scores:[{n:'8.6',l:'Overall'},{n:'8.8',l:'Breakfast'},{n:'8.5',l:'Value'}],
       media:[
         {type:'image',src:'Media/Hotels/Courtyard-san-salvador/courtyard-san-salvador-welcome-local-art-bird-sculpture.jpg'},
-        {type:'video',src:'Media/Hotels/Courtyard-san-salvador/courtyard-san-salvador-video-01.mp4',poster:'Media/Hotels/Courtyard-san-salvador/courtyard-san-salvador-welcome-local-art-bird-sculpture.jpg'},
-        {type:'video',src:'Media/Hotels/Courtyard-san-salvador/courtyard-san-salvador-video-02.mov',poster:'Media/Hotels/Courtyard-san-salvador/courtyard-san-salvador-welcome-local-art-bird-sculpture.jpg'}
+        {type:'vimeo',src:'1184426271'}
       ],
       review:'A great hotel that fills fast for a reason. Very close to La Gran Via mall — easy access to shopping and dining. The breakfast is a standout: the pupusas are the best hotel breakfast item I have had in Central America. Friendly staff, comfortable atmosphere. Slightly higher pricing and often fully booked, so plan ahead or you will lose it.',
       highlights:['Very close to La Gran Via mall — prime access to shopping and dining','Best hotel breakfast in Central America — the pupusas are exceptional','Consistently friendly staff','Comfortable, welcoming atmosphere'],
@@ -1198,7 +1172,7 @@
       media:[
         {type:'image',src:'Media/Hotels/Westin-lima/limwi-exterior-7624-hor-clsc.jpg.webp'},
         {type:'image',src:'Media/Hotels/Westin-lima/westin-lima-for-index.jpg'},
-        {type:'video',src:'Media/Hotels/Westin-lima/westin-lima-video-01.mp4',poster:'Media/Hotels/Westin-lima/limwi-exterior-7624-hor-clsc.jpg.webp'}
+        {type:'vimeo',src:'1184425011'}
       ],
       review:'My top pick in Lima — and the best hotel I have stayed at in South America. Three restaurants, all operating at a high standard. Elegant and inviting bars. A spectacular lounge on the top floor with breathtaking Pacific views. The service is the best I have encountered anywhere in the region — attentive, consistent, genuinely helpful. Rooms are frequently upgraded for elite members, and the views from upper floors are remarkable. Comprehensive fully-equipped gym. Miraflores location means Larcomar and the Pacific waterfront are walkable. Has never disappointed across multiple stays.',
       highlights:['Best service in South America — exceptional and consistent','Spectacular top-floor lounge with Pacific Ocean views','Three restaurants, all high standard','Rooms frequently upgraded for elite members','Comprehensive, fully-equipped gym','Miraflores — walking distance to Larcomar and the Pacific cliffside'],
@@ -1213,9 +1187,8 @@
         {type:'image',src:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-espresso-pacific-view-miraflores.jpg'},
         {type:'image',src:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-aerial-miraflores-coastline-lima.jpg'},
         {type:'image',src:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-miraflores-cliffs-pacific-coast-lima.jpg'},
-        {type:'video',src:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-video-01.mov',poster:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-for-index.jpg'},
-        {type:'video',src:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-video-02.mp4',poster:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-aerial-miraflores-coastline-lima.jpg'},
-        {type:'video',src:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-video-03.mov',poster:'Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-pacific-ocean-view-room-window.jpg'}
+        {type:'vimeo',src:'1184423263'},
+        {type:'vimeo',src:'1184423305'}
       ],
       review:'Sensational views and spectacular sunsets over the Pacific — do not miss them. Super comfortable beds, modern rooms, and an in-room espresso machine with perfect foam. The rooftop has excellent food and great vibes for drinks. A convenient mini market on the first floor. Prime Miraflores location close to the mall with many nearby restaurants, bars, and places for a good evening walk. Completely recommended.',
       highlights:['Sensational Pacific Ocean views — do not miss the sunsets','Super comfortable beds and modern rooms','In-room espresso machine — perfect foam','Amazing rooftop for food and drinks','Convenient mini market on the first floor','Prime Miraflores location — walkable to mall, restaurants, and waterfront'],
@@ -1293,13 +1266,19 @@
     _mediaIdx = idx;
     const m = _media[idx];
     const viewer = document.getElementById('hmViewer');
-    // stop any existing video
+    // stop any existing video or vimeo
     const prevVid = viewer.querySelector('video');
     if (prevVid) prevVid.pause();
+    const prevFrame = viewer.querySelector('iframe');
+    if (prevFrame) prevFrame.src = '';
 
     if (!m) return;
     if (m.type === 'video') {
       viewer.innerHTML = `<video src="${m.src}"${m.poster?' poster="'+m.poster+'"':''} controls muted playsinline></video>`;
+    } else if (m.type === 'vimeo') {
+      viewer.innerHTML = `<iframe src="https://player.vimeo.com/video/${m.src}?autoplay=1&loop=1&muted=1&color=d64230&title=0&byline=0&portrait=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+    } else if (m.type === 'youtube') {
+      viewer.innerHTML = `<iframe src="https://www.youtube.com/embed/${m.src}?autoplay=1&loop=1&playlist=${m.src}&rel=0&modestbranding=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
     } else {
       viewer.innerHTML = `<img src="${m.src}" alt="" loading="eager">`;
     }
@@ -1355,6 +1334,17 @@
           <div class="hm-thumb-play">▶</div>
         </div>`;
       }
+      if (m.type === 'vimeo') {
+        return `<div class="hm-thumb-wrap${i===0?' active':''}" onclick="setViewerMedia(${i})" style="background:#1a1a18">
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"><span style="color:rgba(255,255,255,0.6);font-size:1.4rem">▶</span></div>
+        </div>`;
+      }
+      if (m.type === 'youtube') {
+        return `<div class="hm-thumb-wrap${i===0?' active':''}" onclick="setViewerMedia(${i})">
+          <img src="https://img.youtube.com/vi/${m.src}/hqdefault.jpg" alt="">
+          <div class="hm-thumb-play">▶</div>
+        </div>`;
+      }
       return `<img class="hm-thumb${i===0?' active':''}" src="${m.src}" alt="" onclick="setViewerMedia(${i})" loading="lazy">`;
     }).join('');
 
@@ -1402,6 +1392,8 @@
   function closeHotelModal() {
     const vid = document.querySelector('#hmViewer video');
     if (vid) vid.pause();
+    const frames = document.querySelectorAll('#hmViewer iframe');
+    frames.forEach(f => f.src = '');
     document.getElementById('hmOverlay').classList.remove('open');
     document.getElementById('hmPanel').classList.remove('open');
     document.body.style.overflow = '';
