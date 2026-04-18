@@ -71,7 +71,7 @@
 
     /* HERO */
     .post-hero { position:relative; height:92vh; min-height:600px; display:flex; align-items:flex-end; overflow:hidden; }
-    .post-hero-bg { position:absolute; inset:0; background:var(--charcoal); background-image:url('images/vigiljoch-cable-car-lana-night-valley-lights-south-tyrol.jpg'); background-size:cover; background-position:center 40%; }
+    .post-hero-bg { position:absolute; inset:0; background:var(--charcoal); background-image:url('images/lana-south-tyrol-valley-aerial-autumn-larches-alps-v2.jpg'); background-size:cover; background-position:center 40%; }
     .post-hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,rgba(26,26,24,0.1) 0%,rgba(26,26,24,0.75) 100%); }
     .post-hero-content { position:relative; z-index:2; padding:0 3rem 5rem; max-width:960px; opacity:0; transform:translateY(20px); animation:fadeUp 1s 0.3s forwards; }
     @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
@@ -183,8 +183,34 @@
 
     /* TAGS */
     .post-tags { display:flex; gap:8px; flex-wrap:wrap; margin:56px 0 0; padding-top:32px; border-top:1px solid var(--sand); }
-    .post-tag { font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; padding:7px 13px; border:1px solid var(--sand); color:var(--clay); text-decoration:none; transition:all 0.2s; }
-    .post-tag:hover { border-color:var(--moto-red); color:var(--moto-red); }
+    .post-tag { font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; padding:8px 16px; border:1.5px solid var(--ink); color:var(--ink); text-decoration:none; transition:all 0.2s; font-weight:500; background:var(--cream); }
+    .post-tag:hover { border-color:var(--moto-red); color:var(--white); background:var(--moto-red); }
+
+    /* HOTEL GALLERY */
+    .hotel-gallery { position:relative; margin:40px 0; background:var(--charcoal); overflow:hidden; }
+    .hotel-gallery-track { display:flex; transition:transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94); }
+    .hotel-gallery-slide { min-width:100%; position:relative; display:flex; align-items:center; justify-content:center; background:var(--charcoal); height:520px; cursor:zoom-in; }
+    .hotel-gallery-slide img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; display:block; }
+    .hotel-gallery-caption { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent,rgba(26,26,24,0.8)); padding:40px 28px 16px; font-size:0.72rem; color:rgba(253,252,251,0.85); letter-spacing:0.08em; font-style:italic; pointer-events:none; }
+    .hotel-gallery-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(26,26,24,0.6); border:1px solid rgba(255,255,255,0.2); color:var(--white); width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.2s; z-index:5; font-size:20px; line-height:1; backdrop-filter:blur(6px); }
+    .hotel-gallery-btn:hover { background:rgba(214,66,48,0.85); }
+    .hotel-gallery-prev { left:14px; }
+    .hotel-gallery-next { right:14px; }
+    .hotel-gallery-dots { display:flex; gap:7px; justify-content:center; padding:12px 0 0; }
+    .hotel-gallery-dot { width:6px; height:6px; border-radius:50%; background:var(--sand); transition:background 0.2s,transform 0.2s; cursor:pointer; }
+    .hotel-gallery-dot.active { background:var(--moto-red); transform:scale(1.3); }
+
+    /* LIGHTBOX */
+    .lightbox { display:none; position:fixed; inset:0; z-index:1000; background:rgba(10,10,8,0.95); align-items:center; justify-content:center; cursor:zoom-out; }
+    .lightbox.open { display:flex; }
+    .lightbox img { max-width:92vw; max-height:92vh; object-fit:contain; display:block; box-shadow:0 0 60px rgba(0,0,0,0.6); }
+    .lightbox-close { position:absolute; top:20px; right:28px; color:rgba(255,255,255,0.6); font-size:32px; cursor:pointer; background:none; border:none; line-height:1; transition:color 0.2s; }
+    .lightbox-close:hover { color:var(--white); }
+    .lightbox-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:var(--white); width:50px; height:50px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:22px; transition:background 0.2s; backdrop-filter:blur(4px); }
+    .lightbox-btn:hover { background:rgba(214,66,48,0.7); }
+    .lightbox-prev { left:20px; }
+    .lightbox-next { right:20px; }
+    .lightbox-counter { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); font-size:0.7rem; letter-spacing:0.2em; color:rgba(255,255,255,0.45); }
 
     /* SIDEBAR */
     .post-sidebar { position:sticky; top:100px; }
@@ -265,6 +291,15 @@
   </style>
 </head>
 <body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="lbClose()">
+  <button class="lightbox-close" onclick="lbClose()">&#215;</button>
+  <button class="lightbox-btn lightbox-prev" onclick="event.stopPropagation();lbMove(-1)">&#8592;</button>
+  <img id="lbImg" src="" alt="">
+  <button class="lightbox-btn lightbox-next" onclick="event.stopPropagation();lbMove(1)">&#8594;</button>
+  <span class="lightbox-counter" id="lbCounter"></span>
+</div>
 
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-close" onclick="closeMobile()">✕</button>
@@ -363,21 +398,39 @@
       <p class="post-p reveal">Vigilius was designed by <strong>Matteo Thun</strong>, and it shows — but not in a showy way. The building sits low against the hillside in local larch wood and glass, the spa terrace steps up toward the tree line in weathered timber, and the entrance corridor leads you in through stone-flagged floors with minimal signage and maximum quiet. It reads like somewhere that has been here a long time, even though every material choice is considered.</p>
       <p class="post-p reveal">The lobby sets the tone: warm oak joinery, a copy of the Neue Südtiroler Tageszeitung on the table, dried flowers in a ceramic pot, luggage with cow-print tags already waiting by a red chair. The colour palette throughout leans on ochre, forest green, rust red, and natural stone — the Alps distilled into interior design.</p>
 
-      <div class="post-img-full reveal">
-        <img src="images/vigilius-mountain-resort-entrance-dusk-south-tyrol.jpg" alt="Vigilius Mountain Resort entrance at dusk, Lana South Tyrol Italy" loading="lazy">
-        <p class="post-img-caption">The entrance sits at the top of the Vigiljoch plateau — low, quiet, and easy to miss until you're already inside.</p>
+      <div class="hotel-gallery reveal" id="hotelGallery">
+        <div class="hotel-gallery-track" id="hotelTrack">
+          <div class="hotel-gallery-slide" onclick="lbOpen(0)">
+            <img src="images/vigilius-mountain-resort-entrance-dusk-south-tyrol.jpg" alt="Vigilius Mountain Resort entrance at dusk, Lana South Tyrol" loading="lazy">
+            <p class="hotel-gallery-caption">The entrance — low against the hillside, easy to miss until you're already inside.</p>
+          </div>
+          <div class="hotel-gallery-slide" onclick="lbOpen(1)">
+            <img src="images/vigilius-mountain-resort-exterior-night-entrance-sign.jpg" alt="Vigilius Mountain Resort exterior at night with entrance sign, Vigiljoch" loading="lazy">
+            <p class="hotel-gallery-caption">The exterior at night — larch wood, glass, and the plateau lit only by the hotel.</p>
+          </div>
+          <div class="hotel-gallery-slide" onclick="lbOpen(2)">
+            <img src="images/vigilius-mountain-resort-lobby-warm-interior-vigiljoch.jpg" alt="Vigilius Mountain Resort lobby warm interior with oak joinery and dried flowers" loading="lazy">
+            <p class="hotel-gallery-caption">The lobby: oak joinery, a local newspaper, and a pace that slows you down from the moment you arrive.</p>
+          </div>
+          <div class="hotel-gallery-slide" onclick="lbOpen(3)">
+            <img src="images/vigiljoch-1912-lana-vintage-mountain-poster-art.jpg" alt="Vigiljoch 1912 Lana vintage mountain poster artwork inside the resort" loading="lazy">
+            <p class="hotel-gallery-caption">The resort's visual identity — Matteo Thun's design sensibility extends to the artwork and signage throughout.</p>
+          </div>
+          <div class="hotel-gallery-slide" onclick="lbOpen(4)">
+            <img src="images/vigiljoch-1912-lana-shield-badge-cable-station.jpg" alt="Vigiljoch 1912 Lana shield badge at the cable car station" loading="lazy">
+            <p class="hotel-gallery-caption">The Vigiljoch 1912 Lana shield — the resort's mark on the cable car and throughout the property.</p>
+          </div>
+        </div>
+        <button class="hotel-gallery-btn hotel-gallery-prev" onclick="event.stopPropagation();hotelGalleryMove(-1)" aria-label="Previous">&#8592;</button>
+        <button class="hotel-gallery-btn hotel-gallery-next" onclick="event.stopPropagation();hotelGalleryMove(1)" aria-label="Next">&#8594;</button>
       </div>
-
-      <div class="post-img-full reveal">
-        <img src="images/vigilius-mountain-resort-lobby-warm-interior-vigiljoch.jpg" alt="Vigilius Mountain Resort lobby warm interior with dried flowers and newspaper, Vigiljoch" loading="lazy">
-        <p class="post-img-caption">The lobby: oak joinery, a local newspaper, and a pace that slows you down from the moment you arrive.</p>
+      <div class="hotel-gallery-dots" id="hotelDots">
+        <span class="hotel-gallery-dot active" onclick="hotelGalleryGo(0)"></span>
+        <span class="hotel-gallery-dot" onclick="hotelGalleryGo(1)"></span>
+        <span class="hotel-gallery-dot" onclick="hotelGalleryGo(2)"></span>
+        <span class="hotel-gallery-dot" onclick="hotelGalleryGo(3)"></span>
+        <span class="hotel-gallery-dot" onclick="hotelGalleryGo(4)"></span>
       </div>
-
-      <div class="post-img-grid reveal">
-        <img src="images/vigiljoch-1912-lana-vintage-poster-mountain-resort.jpg" alt="Vigiljoch 1912 Lana vintage poster illustration mountain resort" loading="lazy">
-        <img src="images/vigilius-mountain-resort-cable-car-art-triptych.jpg" alt="Vigilius Mountain Resort cable car artwork triptych on concrete wall" loading="lazy">
-      </div>
-      <p class="post-img-caption" style="text-align:center;margin-top:-30px;margin-bottom:40px">The resort's visual identity — Matteo Thun's design sensibility extends to the artwork and signage throughout.</p>
 
       <!-- THE ROOM -->
       <h2 class="post-h2 reveal" id="room">The <em>Room</em></h2>
@@ -392,9 +445,9 @@
 
       <div class="post-img-grid reveal">
         <img src="images/vigilius-mountain-resort-bathroom-wooden-vanity-stone-sink.jpg" alt="Vigilius Mountain Resort bathroom wooden vanity with stone sink and backlit mirror" loading="lazy">
-        <img src="images/vigilius-mountain-resort-room-desk-nook-orange-backlit.jpg" alt="Vigilius Mountain Resort room desk nook with orange backlit panel and hiking brochures" loading="lazy">
+        <img src="images/vigilius-mountain-resort-room-desk-nook-orange-backlit.jpg" alt="Vigilius Mountain Resort toilet room with orange backlit panel and wood paneling" loading="lazy">
       </div>
-      <p class="post-img-caption" style="text-align:center;margin-top:-30px;margin-bottom:40px">Left: the full-width wooden vanity — stone sink, backlit mirror, every detail deliberate. Right: the desk nook, orange-lit and set into the wall.</p>
+      <p class="post-img-caption" style="text-align:center;margin-top:-30px;margin-bottom:40px">Left: the full-width wooden vanity — stone sink, backlit mirror, every detail deliberate. Right: the toilet room, with the signature orange backlit panel set into the wall.</p>
 
       <!-- SPA -->
       <h2 class="post-h2 reveal" id="spa">Spa &amp; <em>Wellness</em></h2>
@@ -696,6 +749,60 @@
   reveals.forEach(el => obs.observe(el));
   function openMobile() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
   function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
+
+  // Hotel gallery
+  let hotelIdx = 0;
+  const hotelSlides = document.querySelectorAll('#hotelGallery .hotel-gallery-slide');
+  const hotelDots = document.querySelectorAll('#hotelDots .hotel-gallery-dot');
+  function hotelGalleryUpdate() {
+    document.getElementById('hotelTrack').style.transform = `translateX(-${hotelIdx * 100}%)`;
+    hotelDots.forEach((d, i) => d.classList.toggle('active', i === hotelIdx));
+  }
+  function hotelGalleryMove(dir) {
+    hotelIdx = (hotelIdx + dir + hotelSlides.length) % hotelSlides.length;
+    hotelGalleryUpdate();
+  }
+  function hotelGalleryGo(i) { hotelIdx = i; hotelGalleryUpdate(); }
+
+  // Keyboard nav for gallery
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('lightbox').classList.contains('open')) {
+      if (e.key === 'ArrowLeft') lbMove(-1);
+      if (e.key === 'ArrowRight') lbMove(1);
+      if (e.key === 'Escape') lbClose();
+    }
+  });
+
+  // Lightbox
+  const lbImages = [
+    {src:'images/vigilius-mountain-resort-entrance-dusk-south-tyrol.jpg', alt:'Vigilius Mountain Resort entrance at dusk'},
+    {src:'images/vigilius-mountain-resort-exterior-night-entrance-sign.jpg', alt:'Vigilius Mountain Resort exterior at night'},
+    {src:'images/vigilius-mountain-resort-lobby-warm-interior-vigiljoch.jpg', alt:'Vigilius Mountain Resort lobby interior'},
+    {src:'images/vigiljoch-1912-lana-vintage-mountain-poster-art.jpg', alt:'Vigiljoch 1912 Lana vintage mountain poster'},
+    {src:'images/vigiljoch-1912-lana-shield-badge-cable-station.jpg', alt:'Vigiljoch 1912 Lana shield badge'},
+  ];
+  let lbIdx = 0;
+  function lbOpen(i) {
+    lbIdx = i;
+    const lb = document.getElementById('lightbox');
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    lbRender();
+  }
+  function lbClose() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function lbMove(dir) {
+    lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length;
+    lbRender();
+  }
+  function lbRender() {
+    const img = document.getElementById('lbImg');
+    img.src = lbImages[lbIdx].src;
+    img.alt = lbImages[lbIdx].alt;
+    document.getElementById('lbCounter').textContent = `${lbIdx + 1} / ${lbImages.length}`;
+  }
 </script>
 </body>
 </html>
