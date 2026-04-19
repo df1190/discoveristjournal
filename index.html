@@ -510,8 +510,8 @@
       letter-spacing: 0;
     }
     .moto-desc { font-size: 0.9rem; color: rgba(253,252,251,0.6); line-height: 1.8; margin-bottom: 32px; }
-    .moto-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .moto-photos img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; display: block; }
+    .moto-photos { position: relative; aspect-ratio: 3/4; overflow: hidden; border-radius: 16px; }
+    .moto-photos img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* ── POD STORE ── */
     .pod { background: var(--white); }
@@ -1009,7 +1009,6 @@
 
     <div class="moto-photos reveal">
       <img src="Media/Moto/KTM-Romania/ktm-adventure-rally-romania-2025-forest-water-crossing-hero.jpg" alt="KTM motorcycle water crossing forest trail Romania adventure rally 2025" loading="lazy">
-      <img src="Media/Hero/colombian-mountains.jpg" alt="Colombian mountain landscape aerial view" loading="lazy">
     </div>
   </div>
 </div>
