@@ -18,6 +18,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([^\.]+)$ $1.html [NC,L]
 
 # Redirect /page.html → /page (301 permanent, avoids duplicate content)
+# But NOT index.html files — those serve as directory indexes (e.g. /blog/ not /blog/index)
+RewriteCond %{THE_REQUEST} !/index\.html [NC]
 RewriteCond %{THE_REQUEST} /([^.]+)\.html [NC]
 RewriteRule ^ /%1 [NC,L,R=301]
 
