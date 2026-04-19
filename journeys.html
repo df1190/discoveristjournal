@@ -70,7 +70,7 @@
 
     /* HERO */
     .page-header { position: relative; height: 72vh; min-height: 500px; display: flex; align-items: flex-end; overflow: hidden; }
-    .page-header-bg { position: absolute; inset: 0; background-image: url('Media/Hero/alps-valley-aerial-drone-green-summer-snow-peaks.jpg'); background-size: cover; background-position: center 60%; }
+    .page-header-bg { position: absolute; inset: 0; background-image: url('Media/Hero/alps-valley-aerial-drone-green-summer-snow-peaks.jpg'); background-size: cover; background-position: center 25%; }
     .page-header-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,26,24,0.25) 0%, rgba(26,26,24,0.88) 100%); }
     .page-header-content { position: relative; z-index: 2; padding: 0 3rem 4.5rem; max-width: 1200px; opacity: 0; transform: translateY(20px); animation: fadeUp 1s 0.3s forwards; }
     .page-eyebrow { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--clay); margin-bottom: 16px; }
@@ -111,16 +111,14 @@
     .section-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--moto-red); margin-bottom: 12px; }
     .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 4vw, 52px); letter-spacing: 0.04em; color: var(--charcoal); margin-bottom: 48px; line-height: 1.0; }
     .section-title em { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.9em; color: var(--moto-red); letter-spacing: 0; }
-    .journey-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-    .journey-card { position: relative; overflow: hidden; aspect-ratio: 3/4; text-decoration: none; display: block; }
-    .journey-card.wide { grid-column: span 2; aspect-ratio: 16/9; }
+    .journey-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+    .journey-card { position: relative; overflow: hidden; aspect-ratio: 4/3; text-decoration: none; display: block; }
     .journey-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94); display: block; }
     .journey-card:hover img { transform: scale(1.06); }
-    .journey-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(26,26,24,0.9) 0%, rgba(26,26,24,0.1) 55%, transparent 100%); }
-    .journey-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 28px; }
+    .journey-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(26,26,24,0.92) 0%, rgba(26,26,24,0.15) 55%, transparent 100%); }
+    .journey-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 32px; }
     .journey-tag { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--clay); margin-bottom: 8px; }
-    .journey-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em; color: var(--white); line-height: 1.1; margin-bottom: 8px; }
-    .journey-card.wide .journey-title { font-size: 30px; }
+    .journey-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 0.05em; color: var(--white); line-height: 1.1; margin-bottom: 8px; }
     .journey-meta-sm { font-size: 0.72rem; color: rgba(253,252,251,0.6); }
     .journey-link { display: inline-flex; align-items: center; gap: 8px; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clay); margin-top: 10px; transition: gap 0.2s, color 0.2s; }
     .journey-card:hover .journey-link { gap: 14px; color: var(--white); }
@@ -184,8 +182,6 @@
       nav { padding: 1.2rem 1.75rem; } nav.scrolled { padding: 0.75rem 1.75rem; }
       .featured-card { grid-template-columns: 1fr; }
       .featured-info { border-left: 1px solid var(--sand); border-top: none; }
-      .journey-grid { grid-template-columns: 1fr 1fr; }
-      .journey-card.wide { grid-column: span 2; }
       .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
     }
     @media (max-width: 768px) {
@@ -193,7 +189,6 @@
       .page-header-content { padding: 0 1.25rem 3.5rem; }
       .filters, .featured-journey, .journey-grid-section, .moto-section, .load-more { padding-left: 1.25rem; padding-right: 1.25rem; }
       .journey-grid { grid-template-columns: 1fr; }
-      .journey-card.wide { grid-column: span 1; aspect-ratio: 4/3; }
       .moto-grid { grid-template-columns: 1fr 1fr; }
       .footer-top { grid-template-columns: 1fr; gap: 32px; } .footer-affiliate { text-align: left; }
     }
@@ -279,7 +274,7 @@
     <h2 class="section-title reveal">From the <em>Archive</em></h2>
     <div class="journey-grid">
 
-      <a href="/blog/" class="journey-card wide reveal">
+      <a href="/blog/" class="journey-card reveal">
         <img src="Media/Moto/Snowbiking-bc.JPG" alt="Snowbiking British Columbia backcountry Canada" loading="lazy">
         <div class="journey-overlay"></div>
         <div class="journey-info">
@@ -336,53 +331,33 @@
     </div>
     <div class="moto-grid">
 
-      <a href="/moto/ktm-bosnia" class="moto-card reveal">
-        <img src="Media/Moto/KTM-Bosnia/ktm-adventure-rally-bosnia-2019-bikes-mountain-plateau-clouds.jpg" alt="KTM Adventure Rally Bosnia 2019 — bikes on mountain plateau with clouds" loading="lazy">
-        <div class="moto-overlay"></div>
-        <div class="moto-card-info">
-          <span class="moto-badge">2019</span>
-          <p class="moto-card-tag">Bosnia · Rally</p>
-          <h3 class="moto-card-title">KTM Adventure Rally — Bosnia</h3>
-        </div>
-      </a>
-
-      <a href="/moto/ktm-france" class="moto-card reveal reveal-delay-1">
+      <a href="/moto/ktm-france" class="moto-card reveal">
         <img src="Media/Moto/KTM-France/ktm-adventure-rally-france-2022-rider-helmet-portrait-number-107.jpg" alt="KTM Adventure Rally France 2022 — rider with helmet, number 107" loading="lazy">
         <div class="moto-overlay"></div>
         <div class="moto-card-info">
           <span class="moto-badge">2022</span>
-          <p class="moto-card-tag">France · Rally</p>
+          <p class="moto-card-tag">France · Alps · Rally</p>
           <h3 class="moto-card-title">KTM Adventure Rally — France</h3>
         </div>
       </a>
 
-      <a href="/moto/ktm-norway" class="moto-card reveal reveal-delay-2">
+      <a href="/moto/ktm-norway" class="moto-card reveal reveal-delay-1">
         <img src="Media/Moto/KTM-Norway/ktm-adventure-rally-norway-2023-ktm-fjord-mountain-roadside.jpg" alt="KTM Adventure Rally Norway 2023 — KTM bikes by fjord and mountain road" loading="lazy">
         <div class="moto-overlay"></div>
         <div class="moto-card-info">
           <span class="moto-badge">2023</span>
-          <p class="moto-card-tag">Norway · Rally</p>
+          <p class="moto-card-tag">Norway · Fjords · Rally</p>
           <h3 class="moto-card-title">KTM Adventure Rally — Norway</h3>
         </div>
       </a>
 
-      <a href="/moto/ktm-romania" class="moto-card reveal">
+      <a href="/moto/ktm-romania" class="moto-card reveal reveal-delay-2">
         <img src="Media/Moto/KTM-Romania/ktm-adventure-rally-romania-2025-alpine-ridge-cornering.jpg" alt="KTM Adventure Rally Romania 2025 — cornering on alpine ridge" loading="lazy">
         <div class="moto-overlay"></div>
         <div class="moto-card-info">
           <span class="moto-badge">2025</span>
-          <p class="moto-card-tag">Romania · Rally</p>
+          <p class="moto-card-tag">Romania · Carpathians · Rally</p>
           <h3 class="moto-card-title">KTM Adventure Rally — Romania</h3>
-        </div>
-      </a>
-
-      <a href="/moto/ktm-italy" class="moto-card reveal reveal-delay-1">
-        <img src="Media/Moto/KTM-adventure-rally-europe-italy-2026.png" alt="KTM Adventure Rally Italy 2026 — South Tyrol and Dolomites" loading="lazy">
-        <div class="moto-overlay"></div>
-        <div class="moto-card-info">
-          <span class="moto-badge upcoming">Sep 2026</span>
-          <p class="moto-card-tag">Italy · South Tyrol</p>
-          <h3 class="moto-card-title">KTM Adventure Rally — Italy</h3>
         </div>
       </a>
 
