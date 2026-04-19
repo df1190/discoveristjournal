@@ -70,7 +70,7 @@
 
     /* HERO */
     .page-header { position: relative; height: 72vh; min-height: 500px; display: flex; align-items: flex-end; overflow: hidden; }
-    .page-header-bg { position: absolute; inset: 0; background-image: url('https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg'); background-size: cover; background-position: center; }
+    .page-header-bg { position: absolute; inset: 0; background-image: url('Media/Hero/alps-valley-aerial-drone-green-summer-snow-peaks.jpg'); background-size: cover; background-position: center 60%; }
     .page-header-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,26,24,0.25) 0%, rgba(26,26,24,0.88) 100%); }
     .page-header-content { position: relative; z-index: 2; padding: 0 3rem 4.5rem; max-width: 1200px; opacity: 0; transform: translateY(20px); animation: fadeUp 1s 0.3s forwards; }
     .page-eyebrow { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--clay); margin-bottom: 16px; }
@@ -134,6 +134,8 @@
     .moto-section .section-title { color: var(--white); }
     .moto-section .section-title em { color: var(--clay); }
     .moto-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 56px; }
+    .moto-badge { display: inline-block; font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; background: var(--moto-red); color: var(--white); padding: 3px 9px; margin-bottom: 6px; }
+    .moto-badge.upcoming { background: rgba(201,180,154,0.3); color: var(--clay); border: 1px solid rgba(201,180,154,0.4); }
     .moto-card { position: relative; overflow: hidden; aspect-ratio: 4/3; text-decoration: none; display: block; }
     .moto-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
     .moto-card:hover img { transform: scale(1.06); }
@@ -288,8 +290,8 @@
         </div>
       </a>
 
-      <a href="/blog/" class="journey-card reveal">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="The Cambrian hotel Adelboden Switzerland" loading="lazy">
+      <a href="/hotels" class="journey-card reveal">
+        <img src="Media/Hotels/The-cambrian/Cambrian_for_index.JPG" alt="The Cambrian hotel Adelboden, Bernese Oberland Switzerland" loading="lazy">
         <div class="journey-overlay"></div>
         <div class="journey-info">
           <p class="journey-tag">Switzerland · Alpine</p>
@@ -333,30 +335,57 @@
       <h2 class="section-title">The <em>Long Road</em></h2>
     </div>
     <div class="moto-grid">
-      <a href="/moto/alpine-passes" class="moto-card reveal">
-        <img src="Media/Moto/alpine-crossing.JPG" alt="Alpine crossing motorcycle route Switzerland to Austria" loading="lazy">
+
+      <a href="/moto/ktm-bosnia" class="moto-card reveal">
+        <img src="Media/Moto/KTM-Bosnia/ktm-adventure-rally-bosnia-2019-bikes-mountain-plateau-clouds.jpg" alt="KTM Adventure Rally Bosnia 2019 — bikes on mountain plateau with clouds" loading="lazy">
         <div class="moto-overlay"></div>
         <div class="moto-card-info">
-          <p class="moto-card-tag">Europe · Moto Route</p>
-          <h3 class="moto-card-title">Alpine Passes: The Essential Route</h3>
+          <span class="moto-badge">2019</span>
+          <p class="moto-card-tag">Bosnia · Rally</p>
+          <h3 class="moto-card-title">KTM Adventure Rally — Bosnia</h3>
         </div>
       </a>
-      <a href="/moto/stelvio-gavia" class="moto-card reveal reveal-delay-1">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/8-dji_fly_20230721_112524_87_1690062076550_photo-576x1024.jpg" alt="Norway Atlantic Road motorcycle journey" loading="lazy">
+
+      <a href="/moto/ktm-france" class="moto-card reveal reveal-delay-1">
+        <img src="Media/Moto/KTM-France/ktm-adventure-rally-france-2022-rider-helmet-portrait-number-107.jpg" alt="KTM Adventure Rally France 2022 — rider with helmet, number 107" loading="lazy">
         <div class="moto-overlay"></div>
         <div class="moto-card-info">
-          <p class="moto-card-tag">Italy · Alpine Route</p>
-          <h3 class="moto-card-title">Stelvio & Gavia: Two-Day Moto Loop</h3>
+          <span class="moto-badge">2022</span>
+          <p class="moto-card-tag">France · Rally</p>
+          <h3 class="moto-card-title">KTM Adventure Rally — France</h3>
         </div>
       </a>
-      <a href="/moto/ktm-rally" class="moto-card reveal reveal-delay-2">
-        <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="KTM Adventure Rally Europe series" loading="lazy">
+
+      <a href="/moto/ktm-norway" class="moto-card reveal reveal-delay-2">
+        <img src="Media/Moto/KTM-Norway/ktm-adventure-rally-norway-2023-ktm-fjord-mountain-roadside.jpg" alt="KTM Adventure Rally Norway 2023 — KTM bikes by fjord and mountain road" loading="lazy">
         <div class="moto-overlay"></div>
         <div class="moto-card-info">
-          <p class="moto-card-tag">Europe · Rally Series</p>
-          <h3 class="moto-card-title">KTM Adventure Rally: 5 Countries</h3>
+          <span class="moto-badge">2023</span>
+          <p class="moto-card-tag">Norway · Rally</p>
+          <h3 class="moto-card-title">KTM Adventure Rally — Norway</h3>
         </div>
       </a>
+
+      <a href="/moto/ktm-romania" class="moto-card reveal">
+        <img src="Media/Moto/KTM-Romania/ktm-adventure-rally-romania-2025-alpine-ridge-cornering.jpg" alt="KTM Adventure Rally Romania 2025 — cornering on alpine ridge" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <span class="moto-badge">2025</span>
+          <p class="moto-card-tag">Romania · Rally</p>
+          <h3 class="moto-card-title">KTM Adventure Rally — Romania</h3>
+        </div>
+      </a>
+
+      <a href="/moto/ktm-italy" class="moto-card reveal reveal-delay-1">
+        <img src="Media/Moto/KTM-adventure-rally-europe-italy-2026.png" alt="KTM Adventure Rally Italy 2026 — South Tyrol and Dolomites" loading="lazy">
+        <div class="moto-overlay"></div>
+        <div class="moto-card-info">
+          <span class="moto-badge upcoming">Sep 2026</span>
+          <p class="moto-card-tag">Italy · South Tyrol</p>
+          <h3 class="moto-card-title">KTM Adventure Rally — Italy</h3>
+        </div>
+      </a>
+
     </div>
   </div>
 </section>
