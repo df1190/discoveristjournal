@@ -42,7 +42,11 @@
     .nav-burger span{width:22px;height:1.5px;background:var(--charcoal);display:block}
 
     /* PAGE HEADER */
-    .page-header{padding:140px 3rem 72px;background:var(--charcoal);position:relative;overflow:hidden}
+    .page-header{padding:140px 3rem 72px;position:relative;overflow:hidden}
+    .page-header-bg{position:absolute;inset:0;background-image:url('Media/Hero/swiss-alps-mountain-hotels-hero.jpg');background-size:cover;background-position:center 40%;z-index:0}
+    .page-header-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(26,26,24,0.55) 0%,rgba(26,26,24,0.75) 100%)}
+    .page-header::after{content:'HOTELS';font-family:'Bebas Neue',sans-serif;font-size:clamp(140px,20vw,280px);letter-spacing:0.04em;color:rgba(255,255,255,0.04);position:absolute;right:-20px;bottom:-20px;line-height:0.8;pointer-events:none;z-index:1}
+    .header-eyebrow,.header-title,.header-sub{position:relative;z-index:2}
     .page-header::after{content:'HOTELS';font-family:'Bebas Neue',sans-serif;font-size:clamp(140px,20vw,280px);letter-spacing:0.04em;color:rgba(255,255,255,0.03);position:absolute;right:-20px;bottom:-20px;line-height:0.8;pointer-events:none}
     .header-eyebrow{font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:var(--moto-red);margin-bottom:12px}
     .header-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,8vw,100px);letter-spacing:0.04em;color:var(--white);line-height:0.9;margin-bottom:16px}
@@ -261,6 +265,7 @@
 
 <!-- PAGE HEADER -->
 <div class="page-header">
+  <div class="page-header-bg"></div>
   <p class="header-eyebrow">Personal Reviews · Real Nights · Honest Assessments</p>
   <h1 class="header-title">Hotels<br><em>Worth the Rate</em></h1>
   <p class="header-sub">Every property personally stayed in. No press trips, no comped nights. Europe, the Americas, and growing.</p>
@@ -890,7 +895,7 @@
     },
     'bormio': {
       scores:[{n:'8.6',l:'Overall'},{n:'9.4',l:'Location'},{n:'8.2',l:'Value'}],
-      media:[{type:'image',src:'Media/Hero/DSC09772.jpg'}],
+      media:[{type:'image',src:'Media/Hero/bormio-stelvio-italian-alps-mountain.jpg'}],
       review:'Bormio is purely operational — you\'re here because Stelvio and Gavia are within reach, not because the town demands attention. The critical detail is the 6:30am breakfast: loaded, fueled, and on the pass road before 8am — well ahead of tour buses that arrive around 9:30. Secure courtyard parking for motorcycles included. The hotels themselves are modest but functional; the value of the stay is entirely in timing and logistics.',
       highlights:['6:30am breakfast — on Stelvio before the morning traffic','Courtyard parking for motorcycles, included','Gavia accessible in the same morning loop as Stelvio','20 minutes to Stelvio base — clean riding with no urban sprawl'],
       considerations:['Town is utilitarian — not a destination in itself','Book ahead for peak season July–August'],
@@ -931,7 +936,7 @@
     },
     'andermatt': {
       scores:[{n:'9.0',l:'Overall'},{n:'9.8',l:'Pass Access'},{n:'8.7',l:'Facilities'}],
-      media:[{type:'image',src:'Media/Hero/DSC08191.jpg'}],
+      media:[{type:'image',src:'Media/Hero/andermatt-swiss-alps-mountain-village.jpg'}],
       review:'Andermatt is the single best base for Swiss pass riding. No other location comes close for route density: Furka in 15 minutes, Susten in 25, Gotthard in 10, Oberalp in 20. The village has developed thoughtfully — multiple hotel options at various price points, most with heated underground parking. If you\'re doing Switzerland in 5–7 days, at least two nights here is non-negotiable.',
       highlights:['Furka 15min, Susten 25min, Gotthard 10min, Oberalp 20min','Multiple hotels with heated underground parking','Zero commute time — passes start outside the village','Village restaurant options have improved significantly'],
       considerations:['Very popular July–August — book well in advance','Cold at altitude even in summer — pack accordingly'],
@@ -939,7 +944,7 @@
     },
     'flam': {
       scores:[{n:'8.9',l:'Overall'},{n:'9.5',l:'Setting'},{n:'8.4',l:'Value'}],
-      media:[{type:'image',src:'Media/Hero/dji_fly_20231218_101620_328_1702921336993_photo.JPG'}],
+      media:[{type:'image',src:'Media/Hero/Images_Discoverist/norway-fjord-drone-portrait-winter.jpg'}],
       review:'Flåm sits at the head of Aurlandsfjord — one of the narrowest and most dramatic arms of Sognefjord — and works as the starting point for the Atlantic Road loop and the Sognefjord circuit. Secure parking, ferry access for route flexibility, and fjord views from most rooms. Key planning note: book 6–8 weeks ahead for July. The village fills completely in peak season and alternatives mean significantly longer drives to fjord access.',
       highlights:['Fjord views from rooms — genuinely one of Norway\'s best settings','Ferry connections for loop routing flexibility','Starting point for Atlantic Road and Sognefjord circuit','Secure parking included at most properties'],
       considerations:['Book 6–8 weeks ahead for July — fills completely','Tourist-heavy in peak season; arrive and depart early'],
