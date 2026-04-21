@@ -83,8 +83,27 @@
     .filter-chip { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; padding:6px 14px; border:1px solid var(--sand); color:var(--clay); background:none; cursor:pointer; transition:all 0.2s; }
     .filter-chip:hover,.filter-chip.active { border-color:var(--moto-red); color:var(--moto-red); background:rgba(214,66,48,0.04); }
 
-    /* MAP CONTAINER */
-    #mapContainer { width:100%; height:520px; border:1px solid var(--sand); }
+    /* MAP LAYOUT */
+    .map-layout { display:flex; gap:16px; align-items:flex-start; }
+    .map-layout #mapContainer { flex:1; min-width:0; height:520px; border:1px solid var(--sand); }
+
+    /* HOTEL LIST SIDEBAR */
+    #hotelList { width:260px; flex-shrink:0; height:520px; overflow-y:auto; border:1px solid var(--sand); background:var(--white); }
+    #hotelList::-webkit-scrollbar { width:3px; }
+    #hotelList::-webkit-scrollbar-thumb { background:var(--clay); border-radius:2px; }
+    .hl-header { padding:12px 14px 10px; border-bottom:1px solid var(--sand); position:sticky; top:0; background:var(--white); z-index:1; }
+    .hl-title { font-size:9px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--clay); }
+    .hl-count { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.05em; color:var(--moto-red); line-height:1; margin-top:2px; }
+    .hl-item { display:flex; align-items:flex-start; justify-content:space-between; padding:10px 14px; border-bottom:1px solid rgba(232,221,208,0.5); text-decoration:none; transition:background 0.15s; gap:8px; }
+    .hl-item:hover { background:var(--cream); }
+    .hl-item:last-child { border-bottom:none; }
+    .hl-name { font-size:12px; font-weight:400; color:var(--ink); line-height:1.35; }
+    .hl-city { font-size:10px; font-weight:300; color:var(--clay); margin-top:2px; }
+    .hl-arrow { font-size:10px; color:var(--clay); flex-shrink:0; margin-top:3px; transition:color 0.15s; }
+    .hl-item:hover .hl-arrow { color:var(--moto-red); }
+
+    @media(max-width:1024px) { #hotelList { width:220px; } }
+    @media(max-width:900px) { .map-layout { flex-direction:column; } .map-layout #mapContainer { height:420px; width:100%; } #hotelList { width:100%; height:300px; } }
 
     /* Leaflet overrides for brand */
     .leaflet-popup-content-wrapper { border-radius:0; border:1px solid rgba(44,44,42,0.12); box-shadow:0 4px 24px rgba(0,0,0,0.08); padding:0; }
@@ -233,7 +252,16 @@
       </div>
     </div>
 
-    <div id="mapContainer"></div>
+    <div class="map-layout">
+      <div id="mapContainer"></div>
+      <div id="hotelList">
+        <div class="hl-header">
+          <p class="hl-title">Showing</p>
+          <p class="hl-count" id="hlCount">257 Hotels</p>
+        </div>
+        <div id="hlItems"></div>
+      </div>
+    </div>
     <p style="font-size:11px;color:var(--clay);margin-top:12px;text-align:center;">257 curated Marriott Bonvoy hotels. Click any pin or cluster to browse affiliate rates.</p>
   </div>
 </section>
@@ -676,6 +704,22 @@ window.addEventListener('load', function() {
     return '<div class="popup-inner"><p class="popup-country">' + city + ' &middot; ' + country + '</p><p class="popup-name">' + name + '</p><a class="popup-cta" href="' + h.link + '" target="_blank" rel="noopener">Book via Marriott Bonvoy &rarr;</a></div>';
   }
 
+  let currentSubset = HOTELS;
+
+  function updateList() {
+    const bounds = map.getBounds();
+    const visible = currentSubset.filter(h => bounds.contains([h.lat, h.lng]));
+    const sorted = [...visible].sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
+    document.getElementById('hlCount').textContent = sorted.length + ' Hotel' + (sorted.length !== 1 ? 's' : '');
+    document.getElementById('hlItems').innerHTML = sorted.map(h =>
+      '<a class="hl-item" href="' + h.link + '" target="_blank" rel="noopener">' +
+        '<div><p class="hl-name">' + h.name.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</p>' +
+        '<p class="hl-city">' + h.city.replace(/&/g,'&amp;') + ', ' + h.country.replace(/&/g,'&amp;') + '</p></div>' +
+        '<span class="hl-arrow">&rarr;</span>' +
+      '</a>'
+    ).join('');
+  }
+
   window.renderMarkers = function(filter) {
     if (clusterGroup) { map.removeLayer(clusterGroup); }
     clusterGroup = L.markerClusterGroup({
@@ -684,14 +728,18 @@ window.addEventListener('load', function() {
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true
     });
-    const subset = filter ? HOTELS.filter(h => filter.has(h.country)) : HOTELS;
-    subset.forEach(h => {
+    currentSubset = filter ? HOTELS.filter(h => filter.has(h.country)) : HOTELS;
+    currentSubset.forEach(h => {
       const marker = L.marker([h.lat, h.lng], { icon: pinIcon });
       marker.bindPopup(buildPopup(h), { maxWidth: 300, minWidth: 220 });
       clusterGroup.addLayer(marker);
     });
     map.addLayer(clusterGroup);
+    document.getElementById('hotelList').scrollTop = 0;
+    updateList();
   };
+
+  map.on('moveend zoomend', updateList);
 
   renderMarkers(null);
 });
