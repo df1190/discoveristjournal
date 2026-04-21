@@ -22,12 +22,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
 
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+  <!-- Leaflet MarkerCluster -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Interactive Travel Map",
-    "description": "Explore every country visited, reviewed, and ridden by The Discoverist Journal. Hotels, routes, and journal entries mapped by destination.",
+    "description": "Explore every country visited, reviewed, and ridden by The Discoverist Journal.",
     "url": "https://discoveristjournal.com/tools/interactive-map",
     "applicationCategory": "TravelApplication",
     "operatingSystem": "Web",
@@ -75,29 +83,28 @@
     .filter-chip { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; padding:6px 14px; border:1px solid var(--sand); color:var(--clay); background:none; cursor:pointer; transition:all 0.2s; }
     .filter-chip:hover,.filter-chip.active { border-color:var(--moto-red); color:var(--moto-red); background:rgba(214,66,48,0.04); }
 
-    /* SVG MAP */
-    .map-svg-wrap { width:100%; background:var(--cream); border:1px solid var(--sand); overflow:hidden; position:relative; }
-    #worldMap { width:100%; height:auto; display:block; }
-    .country-path { fill:#e8ddd0; stroke:rgba(201,180,154,0.3); stroke-width:0.5; cursor:default; transition:fill 0.2s; }
-    .country-path.visited { fill:#ddd3c5; stroke:rgba(201,180,154,0.5); cursor:pointer; }
-    .country-path.visited:hover { fill:rgba(214,66,48,0.15); stroke:var(--moto-red); stroke-width:1; }
-    .country-path.featured { fill:rgba(214,66,48,0.12); stroke:rgba(214,66,48,0.3); }
-    .country-path.featured:hover { fill:rgba(214,66,48,0.28); stroke:var(--moto-red); }
-    .country-path.moto { fill:rgba(138,158,138,0.2); stroke:rgba(138,158,138,0.4); }
-    .country-path.moto:hover { fill:rgba(138,158,138,0.4); }
+    /* MAP CONTAINER */
+    #mapContainer { width:100%; height:520px; border:1px solid var(--sand); }
 
-    /* TOOLTIP */
-    .map-tooltip {
-      position:absolute; pointer-events:none; z-index:50;
-      background:var(--charcoal); border:1px solid rgba(255,255,255,0.1);
-      padding:14px 18px; min-width:180px; opacity:0; transition:opacity 0.15s;
-      transform:translateX(-50%);
-    }
-    .map-tooltip.visible { opacity:1; }
-    .tt-country { font-size:10px; font-weight:500; letter-spacing:0.22em; text-transform:uppercase; color:var(--moto-red); margin-bottom:4px; }
-    .tt-title { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.05em; color:var(--white); margin-bottom:6px; }
-    .tt-meta { font-size:11px; font-weight:300; color:var(--clay); }
-    .tt-tag { font-size:9px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; padding:2px 8px; background:rgba(214,66,48,0.2); color:var(--moto-red); display:inline-block; margin-top:6px; }
+    /* Leaflet overrides for brand */
+    .leaflet-popup-content-wrapper { border-radius:0; border:1px solid rgba(44,44,42,0.12); box-shadow:0 4px 24px rgba(0,0,0,0.08); padding:0; }
+    .leaflet-popup-content { margin:0; }
+    .leaflet-popup-tip { background:var(--white); }
+    .leaflet-popup-close-button { color:var(--clay) !important; font-size:16px !important; top:10px !important; right:12px !important; }
+    .leaflet-popup-close-button:hover { color:var(--moto-red) !important; }
+    /* Cluster styles */
+    .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large { background:rgba(214,66,48,0.15) !important; }
+    .marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div { background:rgba(214,66,48,0.85) !important; color:#fff !important; font-family:'DM Sans',sans-serif !important; font-size:11px !important; font-weight:500 !important; }
+
+    /* Custom pin marker */
+    .hotel-pin { width:12px; height:12px; background:var(--moto-red); border:2px solid #fff; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,0.35); cursor:pointer; }
+
+    /* Popup inner */
+    .popup-inner { padding:18px 20px 16px; min-width:220px; max-width:280px; background:var(--white); }
+    .popup-country { font-size:9px; font-weight:500; letter-spacing:0.22em; text-transform:uppercase; color:var(--moto-red); margin-bottom:5px; }
+    .popup-name { font-size:14px; font-weight:500; color:var(--ink); line-height:1.35; margin-bottom:12px; }
+    .popup-cta { display:inline-block; font-size:9px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:var(--moto-red); border:1px solid var(--moto-red); padding:6px 14px; text-decoration:none; transition:all 0.2s; }
+    .popup-cta:hover { background:var(--moto-red); color:#fff; }
 
     /* COUNTRIES SECTION */
     .countries-section { padding:60px 48px 80px; background:var(--cream); }
@@ -137,21 +144,74 @@
     .vt-btn.active { border-color:var(--moto-red); color:var(--moto-red); }
 
     @media(max-width:900px) { .country-grid{grid-template-columns:repeat(2,1fr)} .country-list{grid-template-columns:1fr 1fr} .stats-bar{gap:24px} }
-    @media(max-width:600px) { .tool-header,.map-section,.countries-section{padding-left:20px;padding-right:20px} .country-grid{grid-template-columns:1fr 1fr} .country-list{grid-template-columns:1fr} .stats-bar{padding:16px 20px} }
+    @media(max-width:600px) { .tool-header,.map-section,.countries-section{padding-left:20px;padding-right:20px} .country-grid{grid-template-columns:1fr 1fr} .country-list{grid-template-columns:1fr} .stats-bar{padding:16px 20px} #mapContainer{height:360px} }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: rgba(253,252,251,0.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: padding 0.3s;
+    }
+    nav.scrolled { padding: 0.8rem 3rem; }
+    .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:0.15em; color:var(--charcoal); text-decoration:none; }
+    .nav-links { display:flex; gap:2.2rem; list-style:none; }
+    .nav-links a { font-size:0.72rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink); text-decoration:none; position:relative; padding-bottom:3px; }
+    .nav-links a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1.5px; background:var(--moto-red); transition:width 0.3s ease; }
+    .nav-links a:hover::after { width:100%; }
+    .nav-links a:hover { color:var(--charcoal); }
+    .nav-cta { font-size:0.68rem; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:var(--moto-red); border:1.5px solid var(--moto-red); padding:8px 20px; text-decoration:none; transition:background 0.2s,color 0.2s; }
+    .nav-cta:hover { background:var(--moto-red); color:var(--white); }
+    .nav-burger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+    .nav-burger span { width:22px; height:1.5px; background:var(--charcoal); display:block; transition:0.3s; }
+    .mobile-menu { display:none; position:fixed; inset:0; z-index:200; background:rgba(253,252,251,0.97); flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-family:'Bebas Neue',sans-serif; font-size:40px; letter-spacing:0.08em; color:var(--charcoal); text-decoration:none; transition:color 0.2s; }
+    .mobile-menu a:hover { color:var(--moto-red); }
+    .mobile-close { position:absolute; top:24px; right:3rem; font-size:24px; color:var(--clay); cursor:pointer; background:none; border:none; }
+    @media(max-width:768px) { nav{padding:1rem 1.25rem} .nav-links,.nav-cta{display:none} .nav-burger{display:flex} }
   </style>
 </head>
 <body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="/" onclick="closeMobile()">Home</a>
+  <a href="/hotels" onclick="closeMobile()">Hotels</a>
+  <a href="/journeys" onclick="closeMobile()">Journeys</a>
+  <a href="/moto/ktm-rally" onclick="closeMobile()">Moto</a>
+  <a href="/blog/" onclick="closeMobile()">Journal</a>
+  <a href="/about" onclick="closeMobile()">About</a>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="/" class="nav-logo">The Discoverist</a>
+  <ul class="nav-links">
+    <li><a href="/hotels">Hotel Reviews</a></li>
+    <li><a href="/journeys">Trips &amp; Journeys</a></li>
+    <li><a href="/moto/ktm-rally">Moto</a></li>
+    <li><a href="/blog/">Journal</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <a href="/#newsletter" class="nav-cta">Subscribe</a>
+  <div class="nav-burger" onclick="openMobile()"><span></span><span></span><span></span></div>
+</nav>
 
 <div class="tool-header">
   <a href="/" class="back-link">← The Discoverist Journal</a>
   <p class="tool-eyebrow">The Journey So Far</p>
   <h1 class="tool-title">Explore the <em>Map</em></h1>
-  <p class="tool-sub">Every country visited, reviewed, and ridden. Click a destination to find hotels, routes, and journal entries.</p>
+  <p class="tool-sub">Every country visited, reviewed, and ridden. Click any hotel pin to find affiliate rates.</p>
 </div>
 
 <div class="stats-bar">
   <div class="stat-item"><div class="stat-num">40+</div><p class="stat-lbl">Countries Visited</p></div>
-  <div class="stat-item"><div class="stat-num">200+</div><p class="stat-lbl">Hotels Reviewed</p></div>
+  <div class="stat-item"><div class="stat-num">257</div><p class="stat-lbl">Hotels Curated</p></div>
   <div class="stat-item"><div class="stat-num">12</div><p class="stat-lbl">Moto Routes</p></div>
   <div class="stat-item"><div class="stat-num">★</div><p class="stat-lbl">Bonvoy Ambassador</p></div>
 </div>
@@ -162,67 +222,19 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
       <div class="map-filter">
         <span class="map-filter-label">Show</span>
-        <button class="filter-chip active" onclick="filterMap('all',this)">All Visited</button>
-        <button class="filter-chip" onclick="filterMap('reviewed',this)">Hotel Reviews</button>
-        <button class="filter-chip" onclick="filterMap('moto',this)">Moto Routes</button>
+        <button class="filter-chip active" onclick="setFilter('all',this)">All Hotels</button>
+        <button class="filter-chip" onclick="setFilter('europe',this)">Europe</button>
+        <button class="filter-chip" onclick="setFilter('americas',this)">Americas</button>
+        <button class="filter-chip" onclick="setFilter('asia',this)">Asia-Pacific</button>
       </div>
       <div style="display:flex;gap:16px;align-items:center;font-size:11px;color:var(--clay);">
-        <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:rgba(214,66,48,0.2);display:inline-block;border:1px solid var(--moto-red);"></span>Featured Reviews</span>
-        <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#ddd3c5;display:inline-block;border:1px solid var(--sand);"></span>Visited</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:var(--moto-red);display:inline-block;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);"></span>Hotel pin</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:20px;background:rgba(214,66,48,0.8);display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-size:9px;color:#fff;font-weight:600;">5</span>Cluster</span>
       </div>
     </div>
 
-    <div class="map-svg-wrap">
-      <svg id="worldMap" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1000" height="500" fill="#e0d8ce"/>
-
-        <!-- North America -->
-        <path class="country-path visited" id="canada" d="M 80 80 L 280 80 L 290 130 L 260 160 L 220 170 L 180 190 L 120 200 L 80 180 Z" onclick="showCountry('canada')" title="Canada"/>
-        <path class="country-path" id="usa" d="M 100 200 L 260 200 L 270 240 L 240 270 L 180 280 L 120 270 L 90 250 Z"/>
-        <path class="country-path visited" id="mexico" d="M 110 280 L 200 280 L 210 310 L 180 330 L 140 325 L 110 310 Z" onclick="showCountry('mexico')"/>
-        <path class="country-path visited" id="colombia" d="M 190 330 L 230 325 L 240 355 L 220 375 L 190 370 L 178 350 Z" onclick="showCountry('colombia')"/>
-
-        <!-- Europe -->
-        <path class="country-path featured" id="switzerland" d="M 472 148 L 488 148 L 490 158 L 480 162 L 470 158 Z" onclick="showCountry('switzerland')"/>
-        <path class="country-path featured" id="italy" d="M 478 158 L 496 155 L 500 175 L 492 200 L 484 210 L 476 195 L 474 175 Z" onclick="showCountry('italy')"/>
-        <path class="country-path visited" id="norway" d="M 468 80 L 490 75 L 496 108 L 480 120 L 462 115 Z" onclick="showCountry('norway')"/>
-        <path class="country-path visited" id="germany" d="M 470 135 L 492 132 L 496 150 L 484 154 L 468 152 Z" onclick="showCountry('germany')"/>
-        <path class="country-path visited" id="austria" d="M 488 150 L 506 148 L 508 158 L 496 160 L 486 158 Z" onclick="showCountry('austria')"/>
-        <path class="country-path visited" id="spain" d="M 444 175 L 472 172 L 474 198 L 456 204 L 440 200 Z" onclick="showCountry('spain')"/>
-        <path class="country-path visited" id="croatia" d="M 502 162 L 514 160 L 516 172 L 506 174 Z" onclick="showCountry('croatia')"/>
-        <path class="country-path visited" id="france" d="M 454 152 L 474 150 L 476 170 L 462 175 L 450 170 Z" onclick="showCountry('france')"/>
-
-        <!-- Africa -->
-        <path class="country-path" d="M 460 240 L 540 230 L 560 300 L 540 370 L 500 395 L 460 370 L 440 310 Z"/>
-
-        <!-- Asia -->
-        <path class="country-path visited" id="thailand" d="M 700 260 L 716 258 L 720 290 L 710 310 L 700 300 L 698 280 Z" onclick="showCountry('thailand')"/>
-        <path class="country-path" d="M 600 120 L 800 120 L 820 220 L 780 260 L 720 270 L 650 240 L 590 190 Z"/>
-
-        <!-- Australia -->
-        <path class="country-path" d="M 720 350 L 820 340 L 840 400 L 800 430 L 740 420 L 710 390 Z"/>
-
-        <!-- South America -->
-        <path class="country-path" d="M 200 330 L 290 320 L 310 420 L 280 470 L 240 475 L 200 450 L 175 390 Z"/>
-
-        <!-- Country labels -->
-        <text x="474" y="156" font-size="5" fill="rgba(44,44,42,0.6)" font-family="sans-serif" text-anchor="middle">CH</text>
-        <text x="487" y="180" font-size="5" fill="rgba(44,44,42,0.6)" font-family="sans-serif" text-anchor="middle">IT</text>
-        <text x="479" y="100" font-size="5" fill="rgba(44,44,42,0.6)" font-family="sans-serif" text-anchor="middle">NO</text>
-        <text x="175" y="110" font-size="5" fill="rgba(44,44,42,0.6)" font-family="sans-serif" text-anchor="middle">CA</text>
-        <text x="708" y="285" font-size="5" fill="rgba(44,44,42,0.6)" font-family="sans-serif" text-anchor="middle">TH</text>
-        <text x="210" y="350" font-size="5" fill="rgba(44,44,42,0.6)" font-family="sans-serif" text-anchor="middle">CO</text>
-      </svg>
-
-      <div class="map-tooltip" id="mapTooltip">
-        <p class="tt-country" id="ttCountry">Switzerland</p>
-        <p class="tt-title" id="ttTitle">The Cambrian, Adelboden</p>
-        <p class="tt-meta" id="ttMeta">1 hotel review · 2 journeys</p>
-        <span class="tt-tag" id="ttTag">Featured</span>
-      </div>
-    </div>
-
-    <p style="font-size:11px;color:var(--clay);margin-top:12px;text-align:center;">Click any highlighted country to see reviews and journeys. Map simplified for display — detailed routes in the journeys section.</p>
+    <div id="mapContainer"></div>
+    <p style="font-size:11px;color:var(--clay);margin-top:12px;text-align:center;">257 curated Marriott Bonvoy hotels. Click any pin or cluster to browse affiliate rates.</p>
   </div>
 </section>
 
@@ -244,77 +256,77 @@
     <div id="gridView">
       <div class="country-grid">
         <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg" alt="Switzerland" loading="lazy">
+          <img src="../Media/Hero/Images_Discoverist/swiss-alps-mountain-panorama-pass.jpg" alt="Swiss Alps mountain panorama" loading="lazy">
           <div class="country-overlay"></div>
           <span class="country-badge">Featured</span>
           <div class="country-info">
-            <p class="country-label">🇨🇭 Europe</p>
+            <p class="country-label">&#127481;&#127469; Asia</p>
+            <h3 class="country-name">Thailand</h3>
+            <p class="country-count">1 journey</p>
+          </div>
+        </a>
+        <a href="/journeys" class="country-card">
+          <img src="../Media/Hero/Images_Discoverist/south-tyrol-mountain-landscape-2.jpg" alt="South Tyrol mountain landscape" loading="lazy">
+          <div class="country-overlay"></div>
+          <span class="country-badge">Featured</span>
+          <div class="country-info">
+            <p class="country-label">&#127462;&#127481; Europe</p>
+            <h3 class="country-name">Austria</h3>
+            <p class="country-count">2 hotels · 1 journey</p>
+          </div>
+        </a>
+        <a href="/journeys" class="country-card">
+          <img src="../Media/Hero/Images_Discoverist/norway-fjord-drone-portrait-winter.jpg" alt="Norway fjord drone view winter" loading="lazy">
+          <div class="country-overlay"></div>
+          <div class="country-info">
+            <p class="country-label">&#127464;&#127469; Europe</p>
             <h3 class="country-name">Switzerland</h3>
             <p class="country-count">3 hotels · 4 journeys</p>
           </div>
         </a>
         <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/02/IMG_4850-576x1024.jpg" alt="Italy" loading="lazy">
-          <div class="country-overlay"></div>
-          <span class="country-badge">Featured</span>
-          <div class="country-info">
-            <p class="country-label">🇮🇹 Europe</p>
-            <h3 class="country-name">Italy</h3>
-            <p class="country-count">2 hotels · 2 journeys</p>
-          </div>
-        </a>
-        <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/4-DJI_0101-576x1024.jpg" alt="Norway" loading="lazy">
+          <img src="../Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-snowy-trees-village-exterior.jpg" alt="Whistler BC snowy village exterior" loading="lazy">
           <div class="country-overlay"></div>
           <div class="country-info">
-            <p class="country-label">🇳🇴 Europe</p>
-            <h3 class="country-name">Norway</h3>
-            <p class="country-count">1 journey · Moto route</p>
-          </div>
-        </a>
-        <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/2-0-1024x576.jpg" alt="Canada" loading="lazy">
-          <div class="country-overlay"></div>
-          <div class="country-info">
-            <p class="country-label">🇨🇦 Americas</p>
+            <p class="country-label">&#127464;&#127462; Americas</p>
             <h3 class="country-name">Canada</h3>
             <p class="country-count">1 journey · BC Snowbike</p>
           </div>
         </a>
         <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/7-dji_fly_20230721_112538_90_1690062080451_photo-576x1024.jpg" alt="Spain" loading="lazy">
+          <img src="../Media/Hero/alps-valley-aerial-drone-green-summer-snow-peaks.jpg" alt="Alps valley aerial drone summer" loading="lazy">
           <div class="country-overlay"></div>
           <div class="country-info">
-            <p class="country-label">🇪🇸 Europe</p>
-            <h3 class="country-name">Spain</h3>
-            <p class="country-count">2 journeys</p>
+            <p class="country-label">&#127462;&#127481; Europe</p>
+            <h3 class="country-name">Austria</h3>
+            <p class="country-count">1 journey</p>
           </div>
         </a>
         <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/IMG_5791-scaled-e1769258060646-1024x954.jpg" alt="Germany" loading="lazy">
+          <img src="../Media/Hero/alps-valley-drone-aerial-autumn-forest.jpg" alt="Alps valley drone aerial autumn" loading="lazy">
           <div class="country-overlay"></div>
           <div class="country-info">
-            <p class="country-label">🇩🇪 Europe</p>
-            <h3 class="country-name">Germany</h3>
-            <p class="country-count">2 journeys · Moto</p>
-          </div>
-        </a>
-        <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2026/01/8-dji_fly_20230721_112524_87_1690062076550_photo-576x1024.jpg" alt="Colombia" loading="lazy">
-          <div class="country-overlay"></div>
-          <div class="country-info">
-            <p class="country-label">🇨🇴 Americas</p>
+            <p class="country-label">&#127464;&#127476; Americas</p>
             <h3 class="country-name">Colombia</h3>
             <p class="country-count">1 journey</p>
           </div>
         </a>
         <a href="/journeys" class="country-card">
-          <img src="https://discoveristjournal.com/wp-content/uploads/2023/01/IMG_4938-1024x576.jpg" alt="Thailand" loading="lazy">
+          <img src="../Media/Hotels/guatape-the-brown/the-brown-guatape-embalse-guatape-wide-reservoir-view.jpg" alt="Guatape reservoir wide view Colombia" loading="lazy">
           <div class="country-overlay"></div>
           <div class="country-info">
-            <p class="country-label">🇹🇭 Asia</p>
-            <h3 class="country-name">Thailand</h3>
+            <p class="country-label">&#127464;&#127476; Americas</p>
+            <h3 class="country-name">Colombia</h3>
             <p class="country-count">1 journey</p>
+          </div>
+        </a>
+        <a href="/journeys" class="country-card">
+          <img src="../Media/Hero/Images_Discoverist/alpine-aerial-portrait-mountain.jpg" alt="Alpine aerial portrait mountain" loading="lazy">
+          <div class="country-overlay"></div>
+          <div class="country-info">
+            <p class="country-label">&#127482;&#127480; Americas</p>
+            <h3 class="country-name">USA</h3>
+            <p class="country-count">2 journeys</p>
           </div>
         </a>
       </div>
@@ -325,27 +337,27 @@
       <div class="region-section">
         <h3 class="region-title">Europe</h3>
         <div class="country-list">
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇨🇭</span><span class="cli-name">Switzerland</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">3 Hotels</span><span class="cli-tag">Alps</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇮🇹</span><span class="cli-name">Italy / South Tyrol</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">2 Hotels</span><span class="cli-tag">Alpine</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇳🇴</span><span class="cli-name">Norway</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Fjords</span><span class="cli-tag">Moto</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇩🇪</span><span class="cli-name">Germany</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Moto</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇦🇹</span><span class="cli-name">Austria</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Alpine</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇪🇸</span><span class="cli-name">Spain</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇭🇷</span><span class="cli-name">Croatia</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Coast</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇫🇷</span><span class="cli-name">France</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127464;&#127469;</span><span class="cli-name">Switzerland</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">3 Hotels</span><span class="cli-tag">Alps</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127470;&#127481;</span><span class="cli-name">Italy / South Tyrol</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">2 Hotels</span><span class="cli-tag">Alpine</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127475;&#127476;</span><span class="cli-name">Norway</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Fjords</span><span class="cli-tag">Moto</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127465;&#127466;</span><span class="cli-name">Germany</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Moto</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127462;&#127481;</span><span class="cli-name">Austria</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Alpine</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127466;&#127480;</span><span class="cli-name">Spain</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127469;&#127479;</span><span class="cli-name">Croatia</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Coast</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127467;&#127479;</span><span class="cli-name">France</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
         </div>
       </div>
       <div class="region-section">
         <h3 class="region-title">Americas</h3>
         <div class="country-list">
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇨🇦</span><span class="cli-name">Canada</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">BC</span><span class="cli-tag">Winter</span></div><span class="cli-count">→</span></div></a>
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇨🇴</span><span class="cli-name">Colombia</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127464;&#127462;</span><span class="cli-name">Canada</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">BC</span><span class="cli-tag">Winter</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127464;&#127476;</span><span class="cli-name">Colombia</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
         </div>
       </div>
       <div class="region-section">
         <h3 class="region-title">Asia</h3>
         <div class="country-list">
-          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">🇹🇭</span><span class="cli-name">Thailand</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Beach</span><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
+          <a href="/journeys" class="country-list-item"><div class="cli-left"><span class="cli-flag">&#127481;&#127469;</span><span class="cli-name">Thailand</span></div><div style="display:flex;align-items:center;gap:16px;"><div class="cli-tags"><span class="cli-tag">Beach</span><span class="cli-tag">City</span></div><span class="cli-count">→</span></div></a>
         </div>
       </div>
     </div>
@@ -353,69 +365,342 @@
 </section>
 
 <script>
-  const countryData = {
-    switzerland: { name:'Switzerland', title:'The Cambrian, Adelboden', meta:'3 hotel reviews · 4 journeys', tag:'Featured', link:'/journeys' },
-    italy: { name:'Italy', title:'Vigilius Mountain Resort', meta:'2 hotel reviews · 2 journeys', tag:'Featured', link:'/journeys' },
-    norway: { name:'Norway', title:'Fjords by Road', meta:'1 journey · 1 moto route', tag:'Moto', link:'/journeys' },
-    germany: { name:'Germany', title:'Alpine Pass Moto Route', meta:'2 journeys · moto', tag:'Moto', link:'/journeys' },
-    austria: { name:'Austria', title:'Alpine Crossings', meta:'1 journey', tag:'Visited', link:'/journeys' },
-    spain: { name:'Spain', title:'City & Coast', meta:'2 journeys', tag:'Visited', link:'/journeys' },
-    croatia: { name:'Croatia', title:'Adriatic Coast', meta:'1 journey', tag:'Visited', link:'/journeys' },
-    france: { name:'France', title:'City Stays', meta:'1 journey', tag:'Visited', link:'/journeys' },
-    canada: { name:'Canada', title:'Snowbiking BC', meta:'1 backcountry journey', tag:'Featured', link:'/journeys' },
-    colombia: { name:'Colombia', title:'Medellín & Beyond', meta:'1 journey', tag:'Visited', link:'/journeys' },
-    thailand: { name:'Thailand', title:'Temples & Coastline', meta:'1 journey', tag:'Visited', link:'/journeys' },
-    mexico: { name:'Mexico', title:'Moto Route', meta:'1 journey', tag:'Moto', link:'/journeys' }
-  };
+const HOTELS = [
+  {"country": "French Polynesia", "city": "Bora Bora", "name": "The St. Regis Bora Bora Resort", "link": "https://prf.hn/l/eOBazp8/", "lat": -16.4858526, "lng": -151.6943083},
+  {"country": "French Polynesia", "city": "Bora Bora", "name": "The Westin Bora Bora Resort and Spa", "link": "https://prf.hn/l/ngdRov8/", "lat": -16.4971415, "lng": -151.7018508},
+  {"country": "Aruba", "city": "Aruba", "name": "The Ritz-Carlton Aruba", "link": "https://prf.hn/l/jXAW4gn/", "lat": 12.5831193, "lng": -70.043683},
+  {"country": "Cayman Islands", "city": "Grand Cayman", "name": "The Ritz-Carlton Grand Cayman", "link": "https://prf.hn/l/y8kP1nD/", "lat": 19.3359638, "lng": -81.379341},
+  {"country": "Cayman Islands", "city": "Grand Cayman", "name": "Grand Cayman Marriott Resort", "link": "https://prf.hn/l/bxl5oPG/", "lat": 19.3174601, "lng": -81.3835374},
+  {"country": "Barbados", "city": "Barbados", "name": "The House Barbados, an Autograph Collection All-Inclusive Resort (Adults Only)", "link": "https://prf.hn/l/eO9QbvY/", "lat": 13.218457, "lng": -59.6003606999999},
+  {"country": "Dominican Republic", "city": "Punta Cana", "name": "The Westin Puntacana Resort & Club", "link": "https://prf.hn/l/y8kLDQD/", "lat": 18.538957, "lng": -68.356967},
+  {"country": "Dominican Republic", "city": "Punta Cana", "name": "Sanctuary Cap Cana, A Luxury Collection Resort (Adults Only)", "link": "https://prf.hn/l/PlyPYv5/", "lat": 18.4728065, "lng": -68.3997176},
+  {"country": "Dominican Republic", "city": "Punta Cana", "name": "W Punta Cana, Adult All-Inclusive", "link": "https://prf.hn/l/BJ18mXD/", "lat": 18.8362224, "lng": -68.6068267},
+  {"country": "Dominican Republic", "city": "Punta Cana", "name": "The Ocean Club", "link": "https://prf.hn/l/DLXp8pw/", "lat": 18.6481207, "lng": -68.3537163},
+  {"country": "Dominican Republic", "city": "Punta Cana", "name": "Royalton Splash Punta Cana, An Autograph Collection All-Inclusive Resort & Casino", "link": "https://prf.hn/l/y8BpOAx/", "lat": 18.7262776, "lng": -68.4720148999999},
+  {"country": "USA", "city": "Tampa", "name": "JW Marriott Tampa Water Street", "link": "https://prf.hn/l/kVGAlvz/", "lat": 27.9415219, "lng": -82.4538882},
+  {"country": "USA", "city": "Clearwater", "name": "Clearwater Beach Marriott Resort on Sand Key", "link": "https://prf.hn/l/1e8kVmB/", "lat": 27.9534504, "lng": -82.8283239},
+  {"country": "USA", "city": "Clearwater", "name": "JW Marriott Clearwater Beach Resort and Spa", "link": "https://prf.hn/l/EJXNeyN/", "lat": 27.9659111, "lng": -82.8245716},
+  {"country": "Portugal", "city": "Lisbon", "name": "The Ivens, Autograph Collection", "link": "https://prf.hn/l/kVGOX9n/", "lat": 38.7096235, "lng": -9.14040949999999},
+  {"country": "Portugal", "city": "Algarve", "name": "Pine Cliffs Hotel, A Luxury Collection Resort", "link": "https://prf.hn/l/Jpy1Wkv/", "lat": 37.0966684, "lng": -8.17874419999999},
+  {"country": "Portugal", "city": "Algarve", "name": "Domes Lake Algarve, Autograph Collection", "link": "https://prf.hn/l/vwBkYVv/", "lat": 37.0786661, "lng": -8.126481},
+  {"country": "Portugal", "city": "Algarve", "name": "W Algarve", "link": "https://prf.hn/l/6WoVlYd/", "lat": 37.0796637, "lng": -8.301115},
+  {"country": "Croatia", "city": "Dubrovnik", "name": "Sheraton Dubrovnik Riviera Hotel", "link": "https://prf.hn/l/EJDQQwe/", "lat": 42.6233649, "lng": 18.1965015},
+  {"country": "Maldives", "city": "Maldives", "name": "JW Marriott Maldives Resort and Spa", "link": "https://prf.hn/l/YLppOg5/", "lat": 6.09028679999999, "lng": 73.2039159999999},
+  {"country": "Maldives", "city": "Maldives", "name": "The Ritz-Carlton Maldives, Fari Islands", "link": "https://prf.hn/l/w9gVEXe/", "lat": 4.6041761, "lng": 73.5803957999999},
+  {"country": "Maldives", "city": "Maldives", "name": "W Maldives", "link": "https://prf.hn/l/KmoBPev/", "lat": 4.007057, "lng": 72.8111931},
+  {"country": "Spain", "city": "Madrid", "name": "Santo Mauro, A Luxury Collection Hotel", "link": "https://prf.hn/l/mVBMqYm/", "lat": 40.4309697, "lng": -3.6931098},
+  {"country": "Spain", "city": "Madrid", "name": "The Madrid Edition", "link": "https://prf.hn/l/ZZByo9W/", "lat": 40.4175359, "lng": -3.7060301},
+  {"country": "Spain", "city": "Madrid", "name": "The Palace, A Luxury Collection Hotel", "link": "https://prf.hn/l/75BOYQj/", "lat": 40.4154461, "lng": -3.6958159},
+  {"country": "Spain", "city": "Madrid", "name": "Santo Mauro, A Luxury Collection Hotel (Photos link)", "link": "https://prf.hn/l/eO9pPdd/", "lat": 40.4309697, "lng": -3.6931098},
+  {"country": "Spain", "city": "Madrid", "name": "Madrid Marriott Auditorium Hotel and Conference Center", "link": "https://prf.hn/l/62GoDOG/", "lat": 40.448466, "lng": -3.5586235},
+  {"country": "Italy", "city": "Rome", "name": "The Rome Edition", "link": "https://prf.hn/l/Rly5Jn9/", "lat": 41.9053697, "lng": 12.4907813},
+  {"country": "Italy", "city": "Rome", "name": "Le Méridien Visconti Rome", "link": "https://prf.hn/l/p3QQNzW/", "lat": 41.907625, "lng": 12.4710274},
+  {"country": "Italy", "city": "Rome", "name": "The St. Regis Rome", "link": "https://prf.hn/l/mVkPW4q/", "lat": 41.9040717, "lng": 12.4948729},
+  {"country": "Italy", "city": "Rome", "name": "The Pantheon Iconic Rome Hotel, Autograph Collection", "link": "https://prf.hn/l/KmA0gBm/", "lat": 41.8980404, "lng": 12.4760059},
+  {"country": "Italy", "city": "Tuscany", "name": "Renaissance Tuscany Il Ciocco Resort & Spa", "link": "https://prf.hn/l/QLj9PRD/", "lat": 44.0903874, "lng": 10.4665872},
+  {"country": "Colombia", "city": "Santa Marta", "name": "Santa Marta Marriott Resort Playa Dormida", "link": "https://prf.hn/l/Plydqn5/", "lat": 11.1339646, "lng": -74.227862},
+  {"country": "Colombia", "city": "Bogotá", "name": "W Bogotá", "link": "https://prf.hn/l/8j5O2y8/", "lat": 4.693273, "lng": -74.034641},
+  {"country": "Colombia", "city": "Bogotá", "name": "Bogotá Marriott Hotel", "link": "https://prf.hn/l/W4pk1D2/", "lat": 4.65925669999999, "lng": -74.1086036},
+  {"country": "Colombia", "city": "Medellín", "name": "Medellín Marriott Hotel", "link": "https://prf.hn/l/Kj09DJR/", "lat": 6.202927, "lng": -75.5727095},
+  {"country": "Colombia", "city": "Guatapé", "name": "The Brown", "link": "https://prf.hn/l/3PpgyzR/", "lat": 6.2422454, "lng": -75.1845579},
+  {"country": "USA", "city": "Orlando", "name": "JW Marriott Orlando, Grande Lakes", "link": "https://prf.hn/l/NdybqwN/", "lat": 28.4014678, "lng": -81.4282207},
+  {"country": "USA", "city": "Orlando", "name": "The Ritz-Carlton Orlando, Grande Lakes", "link": "https://prf.hn/l/o3kBYVk/", "lat": 28.4052031, "lng": -81.4291638999999},
+  {"country": "Canada", "city": "Montreal", "name": "W Montréal", "link": "https://prf.hn/l/aWoyqGV/", "lat": 45.5020684, "lng": -73.5619478999999},
+  {"country": "Canada", "city": "Whistler, BC", "name": "Delta Hotels Whistler Village Suites", "link": "https://prf.hn/l/8jm8gz0/", "lat": 50.1169693, "lng": -122.9561797},
+  {"country": "Canada", "city": "Blue Mountain, ON", "name": "The Westin Trillium House, Blue Mountain", "link": "https://prf.hn/l/gxaYeYa/", "lat": 44.5016755, "lng": -80.3101564999999},
+  {"country": "Canada", "city": "Rossland, BC", "name": "The Josie Hotel, Autograph Collection", "link": "https://prf.hn/l/OqjyENm/", "lat": 49.1028938, "lng": -117.8201305},
+  {"country": "Spain", "city": "Mallorca (Son Vida)", "name": "Castillo Hotel Son Vida", "link": "https://prf.hn/l/gx8ePEe/", "lat": 39.5917983, "lng": 2.5959141},
+  {"country": "Canada", "city": "Regina, SK", "name": "The Hotel Saskatchewan, Autograph Collection", "link": "https://prf.hn/l/p3jWYDq/", "lat": 50.4469114, "lng": -104.6111212},
+  {"country": "Japan", "city": "Kyoto", "name": "Hotel The Mitsui Kyoto, A Luxury Collection Hotel & Spa", "link": "https://prf.hn/l/vwz2AzM/", "lat": 35.0134568, "lng": 135.7533513},
+  {"country": "Barbados", "city": "Barbados", "name": "Waves Hotel & Spa by Elegant Hotels, All-Inclusive", "link": "https://prf.hn/l/6ZpV557/", "lat": 13.1424694, "lng": -59.6372049},
+  {"country": "Mexico", "city": "Mexico City", "name": "The Ritz-Carlton Mexico City", "link": "https://prf.hn/l/64B11bw/", "lat": 19.4240425, "lng": -99.1757592},
+  {"country": "Mexico", "city": "Mexico City", "name": "JW Marriott Hotel Mexico City Polanco", "link": "https://prf.hn/l/bxYZMgq/", "lat": 19.4273539, "lng": -99.1947727},
+  {"country": "Mexico", "city": "Cancún", "name": "The Westin Resort & Spa, Cancún", "link": "https://prf.hn/l/o3BGAOd/", "lat": 21.0392024, "lng": -86.7821664},
+  {"country": "Mexico", "city": "Cancún", "name": "The Westin Lagunamar Ocean Resort Villas & Spa, Cancún", "link": "https://prf.hn/l/jXO4aYB/", "lat": 21.1092167, "lng": -86.7617479},
+  {"country": "Mexico", "city": "Isla Mujeres", "name": "Almare, A Luxury Collection Resort, Isla Mujeres (Adults Only)", "link": "https://prf.hn/l/9OXwB1Q/", "lat": 21.2183086, "lng": -86.7287101},
+  {"country": "Mexico", "city": "Riviera Maya", "name": "Paraiso de la Bonita, A Luxury Collection Resort (Adults Only)", "link": "https://prf.hn/l/8j508p8/", "lat": 20.9122464, "lng": -86.8468148},
+  {"country": "Mexico", "city": "Cancún", "name": "Marriott Cancún, An All-Inclusive Resort", "link": "https://prf.hn/l/deB0G5Y/", "lat": 21.0861891, "lng": -86.7713935},
+  {"country": "Mexico", "city": "Cancún", "name": "JW Marriott Cancún Resort & Spa", "link": "https://prf.hn/l/7AvX1An/", "lat": 21.088236, "lng": -86.7706319},
+  {"country": "Mexico", "city": "Riviera Maya", "name": "The Riviera Maya Edition", "link": "https://prf.hn/l/KjPp8WJ/", "lat": 20.7188643, "lng": -86.9887265},
+  {"country": "Scotland", "city": "Edinburgh", "name": "Sheraton Grand Hotel & Spa, Edinburgh", "link": "https://prf.hn/l/xE1wqej/", "lat": 55.9468163, "lng": -3.2076913},
+  {"country": "Scotland", "city": "Edinburgh", "name": "W Edinburgh", "link": "https://prf.hn/l/bxYGa2m/", "lat": 55.9549073, "lng": -3.1890496},
+  {"country": "Japan", "city": "Tokyo", "name": "The Ritz-Carlton Tokyo", "link": "https://prf.hn/l/8j5Z48p/", "lat": 35.6662932, "lng": 139.7312789},
+  {"country": "Japan", "city": "Tokyo", "name": "The Westin Tokyo", "link": "https://prf.hn/l/MbBBwga/", "lat": 35.6415837, "lng": 139.7154177},
+  {"country": "Japan", "city": "Kyoto", "name": "The Ritz-Carlton Kyoto", "link": "https://prf.hn/l/7RPmD8p/", "lat": 35.013917, "lng": 135.7708565},
+  {"country": "Japan", "city": "Osaka", "name": "The Osaka Station Hotel, Autograph Collection", "link": "https://prf.hn/l/RlAJLxJ/", "lat": 34.7005991, "lng": 135.4943196},
+  {"country": "Japan", "city": "Nara", "name": "Shisui, A Luxury Collection Hotel, Nara", "link": "https://prf.hn/l/7ooBnvE/", "lat": 34.6854251, "lng": 135.8353524},
+  {"country": "Romania", "city": "Bucharest", "name": "The Marmorosch Bucharest, Autograph Collection", "link": "https://prf.hn/l/W4Bvm4q/", "lat": 44.4338677, "lng": 26.0988686},
+  {"country": "Hungary", "city": "Budapest", "name": "Budapest Marriott Hotel", "link": "https://prf.hn/l/gxa8VXj/", "lat": 47.494823, "lng": 19.0497012},
+  {"country": "Romania", "city": "Bucharest", "name": "JW Marriott Bucharest Grand Hotel", "link": "https://prf.hn/l/q3klaqd/", "lat": 44.4256044, "lng": 26.0768937},
+  {"country": "Spain", "city": "Barcelona", "name": "Cotton House Hotel, Autograph Collection", "link": "https://prf.hn/l/NdXLlEL/", "lat": 41.3917358, "lng": 2.1718019},
+  {"country": "Spain", "city": "Barcelona", "name": "The Barcelona EDITION", "link": "https://prf.hn/l/MbX2OWB/", "lat": 41.3859439999999, "lng": 2.1778103},
+  {"country": "Spain", "city": "Barcelona", "name": "W Barcelona", "link": "https://prf.hn/l/YLplmyY/", "lat": 41.368437, "lng": 2.1901534},
+  {"country": "Spain", "city": "Barcelona", "name": "AC Hotel Diagonal L’Illa", "link": "https://prf.hn/l/q3lXRyL/", "lat": 41.389919, "lng": 2.1357886},
+  {"country": "Spain", "city": "Valencia", "name": "The Westin Valencia", "link": "https://prf.hn/l/ryzQx4L/", "lat": 39.4728743999999, "lng": -0.3614621},
+  {"country": "Iceland", "city": "Nesjavellir", "name": "ION Adventure Hotel, a Member of Design Hotels", "link": "https://prf.hn/l/MbWoXpb/", "lat": 64.1177651, "lng": -21.2532076},
+  {"country": "Iceland", "city": "Reykjavik", "name": "The Reykjavik EDITION", "link": "https://prf.hn/l/9Oxx9EO/", "lat": 64.1499243, "lng": -21.9353029},
+  {"country": "Iceland", "city": "Reykjavik", "name": "ION City Hotel", "link": "https://prf.hn/l/ngQ28Xb/", "lat": 64.1453607, "lng": -21.9280717},
+  {"country": "Switzerland", "city": "Verbier", "name": "W Verbier", "link": "https://prf.hn/l/mV0g2q1/", "lat": 46.0925877, "lng": 7.23339039999999},
+  {"country": "Switzerland", "city": "Geneva", "name": "The Ritz-Carlton Hotel de la Paix, Geneva", "link": "https://prf.hn/l/p3QVOwq/", "lat": 46.2078778, "lng": 6.1484203},
+  {"country": "Switzerland", "city": "Adelboden", "name": "The Cambrian", "link": "https://prf.hn/l/kVGw1Zv/", "lat": 46.4936111, "lng": 7.5611111},
+  {"country": "Switzerland", "city": "St. Moritz", "name": "Giardino Mountain Champfèr, a Member of Design Hotels", "link": "https://prf.hn/l/VxBwqxJ/", "lat": 46.4776534, "lng": 9.8110204},
+  {"country": "Canada", "city": "Quebec City", "name": "Hotel PUR Quebec, a Tribute Portfolio Hotel", "link": "https://prf.hn/l/gx1vY4a/", "lat": 46.8145979, "lng": -71.2242115},
+  {"country": "Canada", "city": "Quebec City", "name": "Quebec City Marriott Downtown", "link": "https://prf.hn/l/0e9EBvP/", "lat": 46.8119561, "lng": -71.214373},
+  {"country": "Switzerland", "city": "Zurich", "name": "Zurich Marriott Hotel", "link": "https://prf.hn/l/LABYlMw/", "lat": 47.3824972, "lng": 8.54032799999999},
+  {"country": "Switzerland", "city": "Zurich", "name": "Neues Schloss Privat Hotel Zurich, Autograph Collection", "link": "https://prf.hn/l/ZZBNeM9/", "lat": 47.3655023, "lng": 8.5359419},
+  {"country": "Switzerland", "city": "Zurich", "name": "Kameha Grand Zurich, Autograph Collection", "link": "https://prf.hn/l/2Mp9BbO/", "lat": 47.4229992, "lng": 8.55913859999999},
+  {"country": "Switzerland", "city": "Lucerne", "name": "The Hotel (Design Hotel Lucerne)", "link": "https://prf.hn/l/3PGgpkE/", "lat": 47.0479649, "lng": 8.3078197},
+  {"country": "Belgium", "city": "Brussels", "name": "Brussels Marriott Hotel Grand Place", "link": "https://prf.hn/l/EJDQbzO/", "lat": 50.8487526, "lng": 4.3488433},
+  {"country": "Thailand", "city": "Bangkok", "name": "Bangkok Marriott Hotel Sukhumvit", "link": "https://prf.hn/l/DLOm1Pz/", "lat": 13.7234261, "lng": 100.5805352},
+  {"country": "Thailand", "city": "Bangkok", "name": "W Bangkok", "link": "https://prf.hn/l/Vxjg0gk/", "lat": 13.7220776, "lng": 100.5286377},
+  {"country": "Thailand", "city": "Bangkok", "name": "The St. Regis Bangkok", "link": "https://prf.hn/l/G9XXWyZ/", "lat": 13.7399855, "lng": 100.5398763},
+  {"country": "Thailand", "city": "Bangkok", "name": "The Athenee Hotel, a Luxury Collection Hotel, Bangkok", "link": "https://prf.hn/l/AJaaqyd/", "lat": 13.7413541, "lng": 100.547775},
+  {"country": "Thailand", "city": "Bangkok", "name": "The Ritz-Carlton, Bangkok", "link": "https://prf.hn/l/W4x18zv/", "lat": 13.7281966, "lng": 100.5455828},
+  {"country": "Thailand", "city": "Koh Samui", "name": "The Ritz-Carlton, Koh Samui", "link": "https://prf.hn/l/3PqPgyV/", "lat": 9.5692642, "lng": 100.0625011},
+  {"country": "Thailand", "city": "Bangkok", "name": "Renaissance Bangkok Ratchaprasong Hotel", "link": "https://prf.hn/l/xEeaZEz/", "lat": 13.7430424, "lng": 100.5418879},
+  {"country": "France", "city": "Paris", "name": "Renaissance Paris Arc de Triomphe Hotel", "link": "https://prf.hn/l/y8bLENm/", "lat": 48.8770898, "lng": 2.2970606},
+  {"country": "France", "city": "Paris", "name": "Renaissance Paris Nobel Tour Eiffel Hotel", "link": "https://prf.hn/l/7ojmX0A/", "lat": 48.8672555, "lng": 2.2857141},
+  {"country": "Spain", "city": "Mallorca", "name": "The St. Regis Mardavall Mallorca Resort", "link": "https://prf.hn/l/rGEyNqQ/", "lat": 39.528159, "lng": 2.550929},
+  {"country": "Chile", "city": "Santiago", "name": "AC Hotel Santiago Costanera Center", "link": "https://prf.hn/l/lQA2Je0/", "lat": -33.4181112, "lng": -70.6056143},
+  {"country": "Chile", "city": "Santiago", "name": "The Ritz-Carlton, Santiago", "link": "https://prf.hn/l/1eXlJND/", "lat": -33.4159232, "lng": -70.5952035},
+  {"country": "Chile", "city": "Santiago", "name": "Santiago Marriott Hotel", "link": "https://prf.hn/l/9O5XWnQ/", "lat": -33.3999875, "lng": -70.5742745},
+  {"country": "Canada", "city": "Toronto", "name": "Delta Hotels Toronto", "link": "https://prf.hn/l/deB0vjZ/", "lat": 43.6430689, "lng": -79.383865},
+  {"country": "Canada", "city": "Toronto", "name": "Bisha, a Luxury Collection Hotel Toronto", "link": "https://prf.hn/l/ZZGLeaX/", "lat": 43.6452961, "lng": -79.3924474},
+  {"country": "Canada", "city": "Toronto", "name": "W Toronto", "link": "https://prf.hn/l/EJDQD5V/", "lat": 43.67087, "lng": -79.3845923},
+  {"country": "Canada", "city": "Toronto", "name": "Toronto Marriott Markham", "link": "https://prf.hn/l/MbBWnw9/", "lat": 43.8496625999999, "lng": -79.3241087999999},
+  {"country": "Costa Rica", "city": "Guanacaste", "name": "W Costa Rica Reserva Conchal", "link": "https://prf.hn/l/eOz5W9n/", "lat": 10.3977196, "lng": -85.8105313},
+  {"country": "Costa Rica", "city": "Guanacaste", "name": "The Westin Reserva Conchal, an All-Inclusive Golf Resort & Spa", "link": "https://prf.hn/l/aWL1p4q/", "lat": 10.3973462, "lng": -85.8013469999999},
+  {"country": "Costa Rica", "city": "Guanacaste", "name": "JW Marriott Guanacaste Resort & Spa", "link": "https://prf.hn/l/BJbbXaJ/", "lat": 10.2461403, "lng": -85.8457684999999},
+  {"country": "Costa Rica", "city": "Guanacaste", "name": "Nekajui, a Ritz-Carlton Reserve", "link": "https://prf.hn/l/BJ1mvn5/", "lat": 10.6300931, "lng": -85.6833293},
+  {"country": "Costa Rica", "city": "San José", "name": "Sheraton San José Hotel, Costa Rica", "link": "https://prf.hn/l/7Op8Ley/", "lat": 9.947514, "lng": -84.1559219999999},
+  {"country": "Costa Rica", "city": "Puntarenas", "name": "Punta Islita, Autograph Collection", "link": "https://prf.hn/l/xE19k2l/", "lat": 9.9778439, "lng": -84.8294210999999},
+  {"country": "Costa Rica", "city": "Puntarenas", "name": "Punta Islita, Autograph Collection (affiliate 2)", "link": "https://prf.hn/l/0eE9GPN/", "lat": 9.9778439, "lng": -84.8294210999999},
+  {"country": "Costa Rica", "city": "Los Sueños", "name": "Los Sueños Marriott Ocean & Golf Resort", "link": "https://prf.hn/l/q3klaJo/", "lat": 9.6529829, "lng": -84.6597647999999},
+  {"country": "Costa Rica", "city": "Guanacaste", "name": "Nekajui, a Ritz-Carlton Reserve (duplicate)", "link": "https://prf.hn/l/AJabJgX/", "lat": 10.6300931, "lng": -85.6833293},
+  {"country": "Costa Rica", "city": "Guanacaste", "name": "El Mangroove, Autograph Collection", "link": "https://prf.hn/l/4PAMb9P/", "lat": 10.5894761, "lng": -85.6497472},
+  {"country": "Costa Rica", "city": "San José", "name": "Costa Rica Marriott Hotel Hacienda Belen", "link": "https://prf.hn/l/7RLA4XA/", "lat": 9.9872377, "lng": -84.1735643999999},
+  {"country": "Brazil", "city": "Rio de Janeiro", "name": "JW Marriott Hotel Rio de Janeiro", "link": "https://prf.hn/l/eOz8W0m/", "lat": -22.9722307, "lng": -43.1858418},
+  {"country": "USA", "city": "Miami", "name": "W South Beach", "link": "https://prf.hn/l/aWL3VOV/", "lat": 25.7973813, "lng": -80.1271903},
+  {"country": "USA", "city": "Miami", "name": "Miami South Beach EDITION", "link": "https://prf.hn/l/bxZqwOG/", "lat": 25.7826123, "lng": -80.1340772},
+  {"country": "USA", "city": "Miami", "name": "St. Regis Bal Harbour", "link": "https://prf.hn/l/4PGXMDp/", "lat": 25.8890934, "lng": -80.1224107},
+  {"country": "USA", "city": "Austin", "name": "W Austin", "link": "https://prf.hn/l/eOBdpD0/", "lat": 29.9481673, "lng": -96.2653461},
+  {"country": "USA", "city": "Austin", "name": "JW Marriott Austin", "link": "https://prf.hn/l/QLjO3qz/", "lat": 30.2642084, "lng": -97.7434655},
+  {"country": "USA", "city": "Hoboken", "name": "W Hoboken", "link": "https://prf.hn/l/DLXZN1w/", "lat": 40.7393875, "lng": -74.0280172},
+  {"country": "USA", "city": "New York", "name": "The New York EDITION", "link": "https://prf.hn/l/y8k2ODn/", "lat": 40.741286, "lng": -73.9873576999999},
+  {"country": "Israel", "city": "Tel Aviv", "name": "Sheraton Grand Tel Aviv", "link": "https://prf.hn/l/EJn0bgQ/", "lat": 32.0813441, "lng": 34.7681592},
+  {"country": "Czech Republic", "city": "Prague", "name": "W Prague", "link": "https://prf.hn/l/JpDbZ4D/", "lat": 50.0821317, "lng": 14.4270135},
+  {"country": "USA", "city": "New York", "name": "New York Marriott Marquis (NYC Marquis)", "link": "https://prf.hn/l/NdBQXqZ/", "lat": 40.7585862, "lng": -73.9858201999999},
+  {"country": "USA", "city": "New York", "name": "The New York EDITION", "link": "https://prf.hn/l/RlDDweQ/", "lat": 40.7554316, "lng": -73.9900633},
+  {"country": "USA", "city": "New York", "name": "The New York Edition", "link": "https://prf.hn/l/2MpanO9/", "lat": 40.741286, "lng": -73.9873576999999},
+  {"country": "USA", "city": "New York", "name": "Ritz-Carlton Central Park", "link": "https://prf.hn/l/YLA02O5/", "lat": 40.7652719, "lng": -73.9759991999999},
+  {"country": "USA", "city": "New York", "name": "JW Marriott Essex House", "link": "https://prf.hn/l/YLBd0BV/", "lat": 40.7662802, "lng": -73.9785674},
+  {"country": "Greece", "city": "Costa Navarino", "name": "W Costa Navarino", "link": "https://prf.hn/l/deZJQ8w/", "lat": 36.9388198, "lng": 21.7124295},
+  {"country": "Greece", "city": "Athens", "name": "Hotel Grande Bretagne", "link": "https://prf.hn/l/7DBDl2B/", "lat": 37.976178, "lng": 23.7353123},
+  {"country": "Greece", "city": "Athens", "name": "Athens Marriott Hotel", "link": "https://prf.hn/l/w9kb8ve/", "lat": 37.9406265, "lng": 23.697044},
+  {"country": "Greece", "city": "Costa Navarino", "name": "The Romanos, a Luxury Collection Resort", "link": "https://prf.hn/l/6kdEV29/", "lat": 36.996582, "lng": 21.650282},
+  {"country": "Greece", "city": "Corfu", "name": "Domes Miramare, a Luxury Collection Resort", "link": "https://prf.hn/l/G9D90O5/", "lat": 39.4895147, "lng": 19.9274131},
+  {"country": "Greece", "city": "Santorini", "name": "Nous Santorini, a Member of Design Hotels", "link": "https://prf.hn/l/8jDjDjw/", "lat": 36.4017599, "lng": 25.4510191},
+  {"country": "Austria", "city": "Vienna", "name": "Hotel Imperial, a Luxury Collection Hotel", "link": "https://prf.hn/l/9O5pqM9/", "lat": 48.20111, "lng": 16.3728713},
+  {"country": "Austria", "city": "Vienna", "name": "Imperial Riding School Autograph Collection", "link": "https://prf.hn/l/2Mp32WO/", "lat": 48.1973445, "lng": 16.3864039},
+  {"country": "Austria", "city": "Vienna", "name": "Hotel Bristol, a Luxury Collection Hotel", "link": "https://prf.hn/l/KM01zGb/", "lat": 48.2026179, "lng": 16.3702543},
+  {"country": "Austria", "city": "Salzburg", "name": "Sheraton Grand Salzburg", "link": "https://prf.hn/l/7YElVM9/", "lat": 47.8069935, "lng": 13.0407158},
+  {"country": "UK", "city": "London", "name": "London Edition Hotel", "link": "https://prf.hn/l/gx1MdZy/", "lat": 51.5167678, "lng": -0.1362555},
+  {"country": "UK", "city": "London", "name": "JW Marriott Grosvenor House London", "link": "https://prf.hn/l/o3kxDyd/, https://prf.hn/l/OqBaXB0/", "lat": 51.509674, "lng": -0.1552706},
+  {"country": "UK", "city": "London", "name": "The Wellesley Knightsbridge, a Luxury Collection Hotel", "link": "https://prf.hn/l/AJDV0X5/", "lat": 51.5023924, "lng": -0.1536199},
+  {"country": "UK", "city": "London", "name": "The Ritz London", "link": "https://prf.hn/l/0egMp5Y/", "lat": 51.5070782, "lng": -0.1416273},
+  {"country": "UK", "city": "London", "name": "Sheraton Grand London Park Lane", "link": "https://prf.hn/l/VxBZEej/", "lat": 51.5050061, "lng": -0.1472411},
+  {"country": "UK", "city": "London", "name": "St Ermin’s Hotel, Autograph Collection", "link": "https://prf.hn/l/7BnPopw/", "lat": 51.4991371, "lng": -0.1344175},
+  {"country": "UK", "city": "London", "name": "W London", "link": "https://prf.hn/l/o3knmPk/", "lat": 51.5108429999999, "lng": -0.1314287},
+  {"country": "UK", "city": "London", "name": "Sheraton Heathrow Hotel", "link": "https://prf.hn/l/AJab518/", "lat": 51.4835963, "lng": -0.481204999999999},
+  {"country": "UK", "city": "London", "name": "Bankside Hotel, Autograph Collection", "link": "https://prf.hn/l/6ZPQbD5/", "lat": 51.5079055, "lng": -0.1052799},
+  {"country": "Ireland", "city": "Dublin", "name": "The Shelbourne, Autograph Collection", "link": "https://prf.hn/l/aWBpvEm/", "lat": 53.338949, "lng": -6.2561065},
+  {"country": "South Africa", "city": "Johannesburg", "name": "Johannesburg Marriott Hotel Melrose Arch", "link": "https://prf.hn/l/rGqdg3R/", "lat": -26.1314988, "lng": 28.0672341},
+  {"country": "Canada", "city": "Vancouver", "name": "JW Marriott Parq Vancouver", "link": "https://prf.hn/l/EJy8eBO/", "lat": 49.2755681, "lng": -123.1136457},
+  {"country": "Canada", "city": "Vancouver", "name": "Vancouver Marriott Pinnacle Downtown Hotel", "link": "https://prf.hn/l/W4EEzO2/", "lat": 49.2878477999999, "lng": -123.1205131},
+  {"country": "Canada", "city": "Vancouver", "name": "Vancouver Airport Marriott Hotel", "link": "https://prf.hn/l/QLB5loE/", "lat": 49.1705619, "lng": -123.1406285},
+  {"country": "Malaysia", "city": "Kuala Lumpur", "name": "The St. Regis Kuala Lumpur", "link": "https://prf.hn/l/QLj1E4D/", "lat": 3.1369937, "lng": 101.6891578},
+  {"country": "Malaysia", "city": "Kuala Lumpur", "name": "The Westin Kuala Lumpur", "link": "https://prf.hn/l/7AvyXVR/", "lat": 3.1478489, "lng": 101.7145371},
+  {"country": "Indonesia", "city": "Labuan Bajo", "name": "Ta’aktana, a Luxury Collection Resort & Spa, Labuan Bajo", "link": "https://prf.hn/l/BJDdaE3/", "lat": -8.4744534, "lng": 119.8819709},
+  {"country": "Malaysia", "city": "Kuala Lumpur", "name": "W Kuala Lumpur", "link": "https://prf.hn/l/o3mBmqv/", "lat": 3.158464, "lng": 101.7094092},
+  {"country": "Italy", "city": "Florence", "name": "The Westin Excelsior Florence", "link": "https://prf.hn/l/NdBQREX/", "lat": 43.7719285, "lng": 11.2458883},
+  {"country": "Italy", "city": "Costa Smeralda", "name": "Hotel Cala di Volpe, a Luxury Collection Hotel, Costa Smeralda", "link": "https://prf.hn/l/mVBZVE0/", "lat": 41.0902627, "lng": 9.5410506},
+  {"country": "Italy", "city": "Florence", "name": "W Florence", "link": "https://prf.hn/l/0eEEBD1/", "lat": 43.7750997, "lng": 11.2510951},
+  {"country": "United Arab Emirates", "city": "Abu Dhabi", "name": "W Abu Dhabi – Yas Island", "link": "https://prf.hn/l/eOa3An0/", "lat": 24.4673877, "lng": 54.6050141},
+  {"country": "Australia", "city": "Brisbane", "name": "W Brisbane", "link": "https://prf.hn/l/w9gEApE/", "lat": -27.4704265, "lng": 153.0215762},
+  {"country": "Australia", "city": "Sydney", "name": "Sydney Harbour Marriott Hotel at Circular Quay", "link": "https://prf.hn/l/gxa1yRl/", "lat": -33.8628027, "lng": 151.2094187},
+  {"country": "Australia", "city": "Sydney", "name": "W Sydney", "link": "https://prf.hn/l/mV0BGeL/", "lat": -33.8734584, "lng": 151.2016157},
+  {"country": "United States", "city": "Vail, Colorado", "name": "(not specified)", "link": "https://prf.hn/l/jXO4xVR/", "lat": 39.6433243, "lng": -106.3780801},
+  {"country": "Mexico", "city": "Los Cabos", "name": "Solaz, a Luxury Collection Resort, Los Cabos", "link": "https://prf.hn/l/p3j11Pv/", "lat": 22.974162, "lng": -109.7813192},
+  {"country": "Netherlands", "city": "Amsterdam", "name": "Amsterdam Marriott Hotel", "link": "https://prf.hn/l/mVkE88q/", "lat": 52.3625708, "lng": 4.8801082},
+  {"country": "Netherlands", "city": "Amsterdam", "name": "W Amsterdam", "link": "https://prf.hn/l/o3kpGGd/", "lat": 52.3727871, "lng": 4.89000589999999},
+  {"country": "Argentina", "city": "Buenos Aires", "name": "Buenos Aires Marriott", "link": "https://prf.hn/l/ngQ8pzl/", "lat": -34.6019041, "lng": -58.380725},
+  {"country": "Argentina", "city": "Buenos Aires (Recoleta)", "name": "Recoleta Grand Buenos Aires, a Tribute Portfolio Hotel", "link": "https://prf.hn/l/LABL3PL/", "lat": -34.5921693, "lng": -58.3910275999999},
+  {"country": "Argentina", "city": "Buenos Aires", "name": "Sheraton Buenos Aires Hotel & Convention Center", "link": "https://prf.hn/l/LABeL53/", "lat": -34.5930606, "lng": -58.3724309},
+  {"country": "United States", "city": "Rancho Mirage, California", "name": "The Ritz-Carlton, Rancho Mirage", "link": "https://prf.hn/l/w941jpj/", "lat": 33.767454, "lng": -116.4565417},
+  {"country": "Canada", "city": "Calgary", "name": "Calgary Marriott Downtown Hotel", "link": "https://prf.hn/l/XZjz4gD/", "lat": 51.0448375, "lng": -114.0626009},
+  {"country": "Turkey", "city": "Istanbul", "name": "Sheraton Istanbul City Center", "link": "https://prf.hn/l/4PAawRa/", "lat": 41.039266, "lng": 28.97456},
+  {"country": "Turkey", "city": "Bodrum", "name": "Caresse, a Luxury Collection Resort & Spa, Bodrum", "link": "https://prf.hn/l/p3Wa3GW/", "lat": 37.0236644, "lng": 27.3885264},
+  {"country": "Turkey", "city": "Istanbul", "name": "JW Marriott Istanbul Bosphorus", "link": "https://prf.hn/l/YLl1Xe5/", "lat": 41.0241112, "lng": 28.9792252},
+  {"country": "Turkey", "city": "Istanbul", "name": "Decamondo Galata, a Tribute Portfolio Hotel", "link": "https://prf.hn/l/NdX3EGN/", "lat": 41.0238287, "lng": 28.9741776},
+  {"country": "Germany", "city": "Frankfurt", "name": "Frankfurt Marriott Hotel", "link": "https://prf.hn/l/W4Bzbdw/", "lat": 50.1145889, "lng": 8.6503145},
+  {"country": "Germany", "city": "Frankfurt", "name": "The Westin Grand Frankfurt", "link": "https://prf.hn/l/o3xVkkB/", "lat": 50.1157832, "lng": 8.6872593},
+  {"country": "Germany", "city": "Frankfurt (Königstein im Taunus)", "name": "Falkenstein Grand, Autograph Collection", "link": "https://prf.hn/l/YLpDEQ9/", "lat": 50.1922007, "lng": 8.4798843},
+  {"country": "Puerto Rico", "city": "San Juan", "name": "San Juan Marriott Resort & Stellaris Casino", "link": "https://prf.hn/l/de4NV4N/", "lat": 18.4564858, "lng": -66.0702661999999},
+  {"country": "Puerto Rico", "city": "San Juan", "name": "Hotel Rumbao", "link": "https://prf.hn/l/DLO8xYe/", "lat": 18.4640982, "lng": -66.1120751999999},
+  {"country": "Italy", "city": "Rome", "name": "The Westin Excelsior Rome", "link": "https://prf.hn/l/55M1ZZR/", "lat": 41.9076864, "lng": 12.4900751},
+  {"country": "Italy", "city": "Venice", "name": "JW Marriott Venice Resort & Spa", "link": "https://prf.hn/l/lQOOy00/", "lat": 45.4052158, "lng": 12.3196096},
+  {"country": "Italy", "city": "Venice", "name": "The Gritti Palace, a Luxury Collection Hotel, Venice", "link": "https://prf.hn/l/DLXDmNe/", "lat": 45.4317807, "lng": 12.3333017},
+  {"country": "Italy", "city": "Venice", "name": "The St. Regis Venice", "link": "https://prf.hn/l/EJXDey0/", "lat": 45.431933, "lng": 12.33549},
+  {"country": "Italy", "city": "Lake Como", "name": "Sheraton Lake Como Hotel", "link": "https://prf.hn/l/deBjNjY/", "lat": 45.8339765, "lng": 9.07039},
+  {"country": "Netherlands", "city": "Rotterdam", "name": "Rotterdam Marriott Hotel", "link": "https://prf.hn/l/aWBp4YA/", "lat": 51.9224697999999, "lng": 4.4716068},
+  {"country": "Mexico", "city": "Puerto Vallarta", "name": "Marriott Puerto Vallarta Resort & Spa", "link": "https://prf.hn/l/gxaaaja/", "lat": 20.6621535, "lng": -105.2566996},
+  {"country": "Mexico", "city": "Puerto Vallarta", "name": "The Westin Resort & Spa, Puerto Vallarta", "link": "https://prf.hn/l/y8PEnBm/", "lat": 20.658612, "lng": -105.2496708},
+  {"country": "United States", "city": "Fort Lauderdale, Florida", "name": "The Ritz-Carlton, Fort Lauderdale", "link": "https://prf.hn/l/o3m1dbk/", "lat": 26.1230313, "lng": -80.1047991},
+  {"country": "Peru", "city": "Lima", "name": "AC Hotel Lima Miraflores", "link": "https://prf.hn/l/lQBEazv/", "lat": -12.1328531, "lng": -77.0293801},
+  {"country": "Peru", "city": "Lima", "name": "The Westin Lima Hotel & Convention Center", "link": "https://prf.hn/l/Vx89oQb/", "lat": -12.0917021, "lng": -77.0247784},
+  {"country": "Peru", "city": "Lima", "name": "JW Marriott Hotel Lima", "link": "https://prf.hn/l/9OxzmVa/", "lat": -12.1315143, "lng": -77.0293086},
+  {"country": "Philippines", "city": "Manila", "name": "Manila Marriott Hotel at Newport World Resorts", "link": "https://prf.hn/l/bxlllv3/", "lat": 14.5203917, "lng": 121.0187143},
+  {"country": "United States", "city": "New Orleans", "name": "JW Marriott New Orleans", "link": "https://prf.hn/l/p3j15Dk/", "lat": 29.952226, "lng": -90.0690035},
+  {"country": "South Korea", "city": "Seoul", "name": "Le Méridien Seoul Myeongdong", "link": "https://prf.hn/l/550bPex/", "lat": 37.5617228, "lng": 126.9827076},
+  {"country": "United States", "city": "Chicago", "name": "Renaissance Chicago Downtown Hotel", "link": "https://prf.hn/l/DLXXbjE/", "lat": 41.8862002, "lng": -87.6283129},
+  {"country": "United States", "city": "Chicago", "name": "Residence Inn Chicago Downtown/Magnificent Mile", "link": "https://prf.hn/l/7Qqa9mD/", "lat": 41.893894, "lng": -87.6251557},
+  {"country": "United States", "city": "Chicago", "name": "Marriott Marquis Chicago", "link": "https://prf.hn/l/AJbzdgO/", "lat": 41.8540186, "lng": -87.6205363},
+  {"country": "Panama", "city": "Panama City", "name": "JW Marriott Panama", "link": "https://prf.hn/l/PlpkzAp/", "lat": 8.97511849999999, "lng": -79.5069383},
+  {"country": "Italy", "city": "Milan", "name": "Excelsior Hotel Gallia, a Luxury Collection Hotel, Milan", "link": "https://prf.hn/l/bxZvP3A/", "lat": 45.4856769, "lng": 9.2014669},
+  {"country": "Italy", "city": "Milan", "name": "Sheraton Milan San Siro", "link": "https://prf.hn/l/8jmDXoX/", "lat": 45.4783232, "lng": 9.1030634},
+  {"country": "Italy", "city": "Milan", "name": "The Westin Palace, Milan", "link": "https://prf.hn/l/7x3WRZz/", "lat": 45.4786492, "lng": 9.1992341},
+  {"country": "Italy", "city": "Milan", "name": "Duo Milan Porta Nuova, a Tribute Portfolio Hotel", "link": "https://prf.hn/l/G9D9D9J/", "lat": 45.4849767, "lng": 9.1981703},
+  {"country": "Italy", "city": "Sicily", "name": "Mangias Brucoli, Sicily Autograph Collection", "link": "https://prf.hn/l/p3QoDXv/", "lat": 37.2864112, "lng": 15.182006},
+  {"country": "Greece", "city": "Mykonos", "name": "Myconian Kyma, A Member of Design Hotels", "link": "https://prf.hn/l/7R0YNNB/", "lat": 37.4373067, "lng": 25.3298367},
+  {"country": "USA", "city": "Arizona", "name": "The Ritz-Carlton, Dove Mountain", "link": "https://prf.hn/l/vwjjnA5/", "lat": 32.4789343, "lng": -111.0890351},
+  {"country": "Portugal", "city": "Lisbon", "name": "The Ivens Autograph Collection", "link": "https://prf.hn/l/eOzzAmo/", "lat": 38.7096235, "lng": -9.14040949999999},
+  {"country": "USA", "city": "Arizona", "name": "JW Marriott Tucson Starr Pass Resort and Spa", "link": "https://prf.hn/l/lQA44NW/", "lat": 32.2160138, "lng": -111.0502987},
+  {"country": "Portugal", "city": "Lisbon", "name": "Sheraton Lisboa Hotel and Spa", "link": "https://prf.hn/l/BJbDVPD/", "lat": 38.731753, "lng": -9.1469952},
+  {"country": "Mexico", "city": "W Punta Mita", "name": "W Punta de Mita", "link": "https://prf.hn/l/mV0BZeL/", "lat": 20.7486873, "lng": -105.4321982},
+  {"country": "Germany", "city": "Lieser", "name": "Schloss Lieser Autograph Collection", "link": "https://prf.hn/l/1eXoOXG/", "lat": 49.9172879, "lng": 7.0195801},
+  {"country": "Germany", "city": "Munich", "name": "Munich Marriott Hotel", "link": "https://prf.hn/l/AJyNmxn/", "lat": 48.1745710999999, "lng": 11.5926852},
+  {"country": "Germany", "city": "Munich", "name": "Königshof, A Luxury Collection Hotel Munich", "link": "https://prf.hn/l/8j5y2VQ/", "lat": 48.1396957, "lng": 11.5646127},
+  {"country": "Germany", "city": "Berlin", "name": "Berlin Marriott Hotel", "link": "https://prf.hn/l/1e8kmyz/", "lat": 52.510875, "lng": 13.3762494},
+  {"country": "Germany", "city": "Berlin", "name": "Courtyard Berlin City Center", "link": "https://prf.hn/l/KMdLaqp/", "lat": 52.5098492, "lng": 13.3998213},
+  {"country": "Germany", "city": "Berlin", "name": "JW Marriott Hotel Berlin", "link": "https://prf.hn/l/EJDJDJN/", "lat": 52.5075241, "lng": 13.3639006},
+  {"country": "Denmark", "city": "Copenhagen", "name": "Copenhagen Marriott Hotel", "link": "https://prf.hn/l/G9yQ8Yp/", "lat": 55.6686771, "lng": 12.5738779},
+  {"country": "France", "city": "Nice", "name": "Le Meridien Nice", "link": "https://prf.hn/l/NdX0dgM/", "lat": 43.6952412, "lng": 7.2657761},
+  {"country": "USA", "city": "Chicago", "name": "The Gwen, A Luxury Collection Hotel Michigan Avenue", "link": "https://prf.hn/l/w9gEagY/", "lat": 41.8912584, "lng": -87.6251238999999},
+  {"country": "Indonesia", "city": "Bali", "name": "Mandapa, A Ritz-Carlton Reserve", "link": "https://prf.hn/l/LAyVMmw/", "lat": -8.4859273, "lng": 115.2453955},
+  {"country": "Indonesia", "city": "Bali", "name": "The Laguna, A Luxury Collection Resort and Spa Nusa Dua", "link": "https://prf.hn/l/6WLxVYj/", "lat": -8.7973822, "lng": 115.2307704},
+  {"country": "Indonesia", "city": "Bali", "name": "W Bali Seminyak", "link": "https://prf.hn/l/XZBJm5q/", "lat": -8.6772946, "lng": 115.1491632},
+  {"country": "Singapore", "city": "Singapore", "name": "The Westin Singapore", "link": "https://prf.hn/l/4PXb2Jk/", "lat": 1.2782749, "lng": 103.8507719},
+  {"country": "Singapore", "city": "Singapore", "name": "JW Marriott Hotel Singapore South Beach", "link": "https://prf.hn/l/LAXyyeR/", "lat": 1.2944688, "lng": 103.8557929},
+  {"country": "Singapore", "city": "Singapore", "name": "The St. Regis Singapore", "link": "https://prf.hn/l/4PqPqDZ/", "lat": 1.306006, "lng": 103.8260475},
+  {"country": "USA", "city": "Hawaii", "name": "Waikiki Beach Marriott Resort and Spa", "link": "https://prf.hn/l/1eXlDGX/", "lat": 21.2733659, "lng": -157.8225003},
+  {"country": "USA", "city": "Hawaii", "name": "Sheraton Waikiki Beach Resort", "link": "https://prf.hn/l/G9yLMzz/", "lat": 21.2782408, "lng": -157.829903},
+  {"country": "USA", "city": "St Thomas", "name": "Buoy Haus Beach Resort, St. Thomas Autograph Collection", "link": "https://prf.hn/l/7gxYn1r/", "lat": 38.7945952, "lng": -106.5348379},
+  {"country": "Sri Lanka", "city": "Weligama", "name": "Weligama Bay Marriott Resort and Spa", "link": "https://prf.hn/l/mVmvoRV/", "lat": 5.9730503, "lng": 80.4394054999999},
+  {"country": "USA", "city": "Texas", "name": "JW Marriott San Antonio Hill Country Resort and Spa", "link": "https://prf.hn/l/aWoLpEl/", "lat": 29.6663753, "lng": -98.4008875},
+  {"country": "USA", "city": "Santa Cruz", "name": "Hotel Paradox, Autograph Collection", "link": "https://prf.hn/l/xEek4Ln/", "lat": 36.9768291, "lng": -122.0209158},
+  {"country": "USA", "city": "San Diego", "name": "Marriott Marquis San Diego Marina", "link": "https://prf.hn/l/mVBpq5v/", "lat": 32.7091144, "lng": -117.1662334},
+  {"country": "USA", "city": "San Diego", "name": "Sheraton San Diego Resort", "link": "https://prf.hn/l/75y30jx/", "lat": 32.7270687, "lng": -117.1978609},
+  {"country": "USA", "city": "Las Vegas", "name": "Bellagio, A Luxury Collection Resort and Casino", "link": "https://prf.hn/l/y8knqeL/", "lat": 36.1129455, "lng": -115.1765067},
+  {"country": "USA", "city": "Las Vegas", "name": "The Cosmopolitan of Las Vegas, Autograph Collection", "link": "https://prf.hn/l/zpJ1WGg/", "lat": 36.10996, "lng": -115.1754159},
+  {"country": "USA", "city": "San Francisco", "name": "San Francisco Marriott Marquis", "link": "https://prf.hn/l/Oqj8aO0/", "lat": 37.7853366, "lng": -122.4044068},
+  {"country": "USA", "city": "San Francisco", "name": "Palace Hotel, A Luxury Collection Hotel San Francisco", "link": "https://prf.hn/l/p3ome8W/", "lat": 37.7881241, "lng": -122.4019021},
+  {"country": "Puerto Rico", "city": "San Juan", "name": "San Juan Marriott Resort and Stellaris Casino", "link": "https://prf.hn/l/ry82ne7/", "lat": 18.4564858, "lng": -66.0702661999999},
+  {"country": "USA", "city": "Seattle", "name": "Seattle Marriott Waterfront", "link": "https://prf.hn/l/zp1BY9b/", "lat": 47.6107019, "lng": -122.3466414},
+  {"country": "Andorra", "city": "Incles", "name": "Hotel Euroski Mountain Resort & Spa", "link": "https://prf.hn/l/G954MyZ/", "lat": 42.5786094, "lng": 1.6578208},
+  {"country": "USA", "city": "Tampa", "name": "The Tampa EDITION", "link": "https://prf.hn/l/zpk0vBg/", "lat": 27.9467, "lng": -82.4581},
+  {"country": "Austria", "city": "Bad Gastein", "name": "The Comodo, A Member of Design Hotels", "link": "https://prf.hn/l/BJ1Zno5/", "lat": 47.1195, "lng": 13.1339},
+  {"country": "Austria", "city": "Innsbruck", "name": "AC Hotel Innsbruck", "link": "https://prf.hn/l/KjdXwpQ/", "lat": 47.2692, "lng": 11.4041},
+  {"country": "Italy", "city": "Lana", "name": "Vigilius Mountain Resort, A Member of Design Hotels", "link": "https://prf.hn/l/DLkmPaZ/", "lat": 46.6189, "lng": 11.1469},
+  {"country": "China", "city": "Shanghai", "name": "The St. Regis on the Bund, Shanghai", "link": "https://prf.hn/l/OqBXkxj/", "lat": 31.2395, "lng": 121.4917},
+  {"country": "China", "city": "Beijing", "name": "JW Marriott Hotel Beijing", "link": "https://prf.hn/l/8jkxEbQ/", "lat": 39.9042, "lng": 116.4074},
+  {"country": "Japan", "city": "Yokohama", "name": "The Westin Yokohama", "link": "https://prf.hn/l/6bOAbWm/", "lat": 35.4507, "lng": 139.6312},
+  {"country": "Macau", "city": "Macau", "name": "W Macau - Studio City", "link": "https://prf.hn/l/PlpmM0p/", "lat": 22.1315, "lng": 113.5477},
+  {"country": "Japan", "city": "Osaka", "name": "W Osaka", "link": "https://prf.hn/l/EJdRyDO/", "lat": 34.6957, "lng": 135.5002},
+  {"country": "South Korea", "city": "Seoul", "name": "L'Escape, A Luxury Collection Hotel, Seoul Myeongdong", "link": "https://prf.hn/l/9Okm0DD/", "lat": 37.5628, "lng": 126.9869},
+  {"country": "Japan", "city": "Kyoto", "name": "The Westin Miyako Kyoto", "link": "https://prf.hn/l/lQ0PGGA/", "lat": 35.0116, "lng": 135.7814},
+  {"country": "USA", "city": "Boston", "name": "W Boston", "link": "https://prf.hn/l/rwPW1y1/", "lat": 42.3536, "lng": -71.0622},
+  {"country": "Mexico", "city": "Mexico City", "name": "W Mexico City", "link": "https://prf.hn/l/o3xmXlB/", "lat": 19.4266, "lng": -99.1684},
+  {"country": "Dominican Republic", "city": "Cap Cana", "name": "The St. Regis Cap Cana Resort", "link": "https://prf.hn/l/EJ2RExL/", "lat": 18.5178, "lng": -68.3732},
+  {"country": "Malta", "city": "St. Julian's", "name": "Malta Marriott Hotel & Spa", "link": "https://prf.hn/l/Vx5BDBJ/", "lat": 35.9189, "lng": 14.4889},
+  {"country": "Portugal", "city": "Lisbon", "name": "Moxy Lisbon City", "link": "https://prf.hn/l/3188RZv/", "lat": 38.7169, "lng": -9.1399}
+];
 
-  const tooltip = document.getElementById('mapTooltip');
-  let tooltipTimeout;
+const EUROPE = new Set(['France','Germany','Austria','Switzerland','Italy','Norway','Spain','Croatia','Portugal','Scotland','UK','Ireland','Belgium','Netherlands','Denmark','Czech Republic','Hungary','Romania','Iceland','Greece','Malta','Andorra']);
+const AMERICAS = new Set(['USA','United States','Canada','Colombia','Mexico','Brazil','Argentina','Chile','Peru','Costa Rica','Panama','Dominican Republic','Barbados','Aruba','Cayman Islands','French Polynesia','Puerto Rico']);
+const ASIA_PAC = new Set(['Thailand','Japan','Indonesia','Malaysia','Singapore','Philippines','South Korea','China','Sri Lanka','Maldives','Australia','Macau','Israel','Turkey','United Arab Emirates','South Africa']);
 
-  function showCountry(id) {
-    const d = countryData[id];
-    if (!d) return;
-    document.getElementById('ttCountry').textContent = d.name;
-    document.getElementById('ttTitle').textContent = d.title;
-    document.getElementById('ttMeta').textContent = d.meta;
-    document.getElementById('ttTag').textContent = d.tag;
-    tooltip.classList.add('visible');
-    clearTimeout(tooltipTimeout);
-    tooltipTimeout = setTimeout(() => tooltip.classList.remove('visible'), 3000);
-  }
+const REGION_FILTER = { all: null, europe: EUROPE, americas: AMERICAS, asia: ASIA_PAC };
 
-  document.querySelectorAll('.country-path.visited, .country-path.featured, .country-path.moto').forEach(el => {
-    el.addEventListener('mouseenter', function(e) {
-      const id = this.id;
-      if (!id || !countryData[id]) return;
-      const d = countryData[id];
-      document.getElementById('ttCountry').textContent = d.name;
-      document.getElementById('ttTitle').textContent = d.title;
-      document.getElementById('ttMeta').textContent = d.meta;
-      document.getElementById('ttTag').textContent = d.tag;
-      const rect = this.getBoundingClientRect();
-      const mapRect = document.getElementById('worldMap').getBoundingClientRect();
-      tooltip.style.left = (rect.left - mapRect.left + rect.width/2) + 'px';
-      tooltip.style.top = (rect.top - mapRect.top - 10) + 'px';
-      tooltip.classList.add('visible');
-    });
-    el.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
-    el.addEventListener('click', function() {
-      const id = this.id;
-      if (countryData[id]) window.location.href = countryData[id].link;
-    });
+let map, clusterGroup;
+
+function setFilter(key, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderMarkers(REGION_FILTER[key]);
+}
+
+function setView(view, btn) {
+  document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('gridView').style.display = view === 'grid' ? 'block' : 'none';
+  document.getElementById('listView').style.display = view === 'list' ? 'block' : 'none';
+}
+
+window.addEventListener('load', function() {
+  map = L.map('mapContainer', {
+    center: [20, 10],
+    zoom: 2,
+    minZoom: 2,
+    maxZoom: 16,
+    zoomControl: true
   });
 
-  function filterMap(type, btn) {
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  const pinIcon = L.divIcon({
+    className: '',
+    html: '<div class="hotel-pin"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6],
+    popupAnchor: [0, -10]
+  });
+
+  function buildPopup(h) {
+    const city = h.city.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const country = h.country.replace(/&/g, '&amp;');
+    const name = h.name.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    return '<div class="popup-inner"><p class="popup-country">' + city + ' &middot; ' + country + '</p><p class="popup-name">' + name + '</p><a class="popup-cta" href="' + h.link + '" target="_blank" rel="noopener">Book via Marriott Bonvoy &rarr;</a></div>';
   }
 
-  function setView(view, btn) {
-    document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('gridView').style.display = view === 'grid' ? 'block' : 'none';
-    document.getElementById('listView').style.display = view === 'list' ? 'block' : 'none';
-  }
+  window.renderMarkers = function(filter) {
+    if (clusterGroup) { map.removeLayer(clusterGroup); }
+    clusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 50,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true
+    });
+    const subset = filter ? HOTELS.filter(h => filter.has(h.country)) : HOTELS;
+    subset.forEach(h => {
+      const marker = L.marker([h.lat, h.lng], { icon: pinIcon });
+      marker.bindPopup(buildPopup(h), { maxWidth: 300, minWidth: 220 });
+      clusterGroup.addLayer(marker);
+    });
+    map.addLayer(clusterGroup);
+  };
+
+  renderMarkers(null);
+});
+
+window.addEventListener('scroll', function() {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 40);
+});
+function openMobile()  { document.getElementById('mobileMenu').classList.add('open');    document.body.style.overflow='hidden'; }
+function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
 </script>
 </body>
 </html>
