@@ -107,22 +107,23 @@
     .post-nav-item:hover .post-nav-title { color:var(--moto-red); }
     .post-nav-item.next { text-align:right; }
 
-    footer { background:var(--white); padding:64px 3rem 36px; border-top:1px solid var(--sand); }
+    footer { background:var(--charcoal); padding:64px 3rem 36px; border-top:none; position:relative; }
+    footer::before { content:""; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(214,66,48,0.45),transparent); }
     .footer-inner { max-width:1200px; margin:0 auto; }
     .footer-top { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:60px; margin-bottom:56px; }
-    .footer-brand-name { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:0.15em; color:var(--charcoal); margin-bottom:14px; }
+    .footer-brand-name { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:0.15em; color:var(--white); margin-bottom:14px; }
     .footer-brand-tagline { font-size:0.88rem; color:var(--ink); opacity:0.6; line-height:1.8; max-width:260px; margin-bottom:24px; }
     .footer-social { display:flex; gap:20px; align-items:center; }
     .footer-social a { font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--clay); text-decoration:none; }
-    .footer-social a:hover { color:var(--moto-red); opacity:1; }
+    .footer-social a:hover { color:var(--white); }
     .footer-social svg { display:block; }
     .footer-col-title { font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--moto-red); margin-bottom:20px; }
     .footer-links { list-style:none; display:flex; flex-direction:column; gap:10px; }
     .footer-links a { font-size:0.85rem; color:var(--clay); text-decoration:none; }
-    .footer-links a:hover { color:var(--charcoal); }
-    .footer-bottom { border-top:1px solid var(--sand); padding-top:28px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
-    .footer-copy { font-size:0.72rem; color:var(--clay); opacity:0.7; }
-    .footer-affiliate { font-size:0.68rem; color:var(--clay); opacity:0.6; max-width:500px; line-height:1.5; text-align:right; }
+    .footer-links a:hover { color:var(--white); }
+    .footer-bottom { border-top:1px solid rgba(201,180,154,0.12); padding-top:28px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+    .footer-copy { font-size:0.72rem; color:rgba(201,180,154,0.45); }
+    .footer-affiliate { font-size:0.68rem; color:rgba(201,180,154,0.32); max-width:500px; line-height:1.5; text-align:right; }
 
     .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.7s ease,transform 0.7s ease; }
     .reveal.visible { opacity:1; transform:translateY(0); }
@@ -287,7 +288,7 @@
       <div><p class="footer-col-title">Navigate</p><ul class="footer-links"><li><a href="/hotels">Hotel Reviews</a></li><li><a href="/journeys">Trips &amp; Journeys</a></li><li><a href="/moto/ktm-rally">Moto</a></li>
     <li><a href="/blog/" class="active">Journal</a></li><li><a href="/blog/">Blog</a></li></ul></div>
       <div><p class="footer-col-title">Film &amp; Gear</p><ul class="footer-links"><li><a href="/blog/gopro-timelapse">GoPro Awards</a></li><li><a href="/drone-shots">Drone Shots</a></li><li><a href="/moto/tools">Moto Tools</a></li></ul></div>
-      <div><p class="footer-col-title">Partners</p><ul class="footer-links"><li><a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener">Travelpayouts Hotels</a></li><li><a href="#" target="_blank" rel="noopener">Booking.com</a></li></ul></div>
+      <div><p class="footer-col-title">The Shop</p><ul class="footer-links"><li><a href="https://store.discoveristjournal.com/" target="_blank" rel="noopener">Discoverist Store</a></li><li><a href="https://moto.discoveristjournal.com/" target="_blank" rel="noopener">Moto Store</a></li><li><a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener">Amazon Storefront</a></li></ul></div>
     </div>
     <div class="footer-bottom">
       <p class="footer-copy">© 2026 The Discoverist Journal. All rights reserved.</p>
