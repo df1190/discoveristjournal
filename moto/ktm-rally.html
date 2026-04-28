@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KTM Adventure Rally — MOTO×TRAVEL</title>
   <meta name="description" content="KTM Adventure rally trips across Europe — Bosnia, France, Norway, Romania, Italy. On-board video, photography and route notes.">
+  <link rel="canonical" href="https://discoveristjournal.com/moto/ktm-rally"/>
+  <meta property="og:site_name" content="The Discoverist Journal">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="KTM Adventure Rally — MOTO×TRAVEL">
+  <meta property="og:description" content="KTM Adventure rally trips across Europe — Bosnia, France, Norway, Romania, Italy. On-board video, photography and route notes.">
+  <meta property="og:url" content="https://discoveristjournal.com/moto/ktm-rally">
+  <meta property="og:image" content="https://discoveristjournal.com/Media/Moto/ktm-adventure-alpine-summit-valley-panorama.jpg">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet"/>
   <style>
@@ -174,6 +184,18 @@
     .footer-brand p{color:rgba(200,196,190,0.6)!important}
     .footer-bottom p{color:rgba(200,196,190,0.45)!important}
     ::-webkit-scrollbar-track{background:#161614}
+    /* === FOLLOW BAR === */
+    .follow-bar{background:#f5f0ea;border-top:1px solid #e8ddd0;padding:48px 3rem}
+    .follow-inner{max-width:1200px;margin:0 auto;text-align:center}
+    .follow-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#7a5c3e;margin-bottom:20px}
+    .follow-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+    .follow-btn{display:flex;align-items:center;gap:12px;padding:16px 32px;border:1px solid #e8ddd0;background:#fdfcfb;text-decoration:none;transition:border-color 0.2s,box-shadow 0.2s}
+    .follow-btn-ig:hover{border-color:#E1306C;box-shadow:0 4px 16px rgba(225,48,108,0.15)}
+    .follow-btn-yt:hover{border-color:#FF0000;box-shadow:0 4px 16px rgba(255,0,0,0.15)}
+    .follow-btn svg{width:28px;height:28px;flex-shrink:0}
+    .follow-btn-text{display:flex;flex-direction:column;text-align:left}
+    .follow-handle{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;color:#1a1a18;line-height:1}
+    .follow-platform{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7a5c3e;margin-top:3px}
   </style>
 </head>
 <body>
@@ -362,6 +384,30 @@
       </div>
     </div>
   </a>
+</div>
+
+<div class="follow-bar">
+  <div class="follow-inner">
+    <p class="follow-eyebrow">Follow the Journey</p>
+    <div class="follow-links">
+      <a href="https://www.instagram.com/fmancillag/" target="_blank" rel="noopener" class="follow-btn follow-btn-ig">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+          <defs><linearGradient id="ig-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#f09433"/><stop offset="25%" stop-color="#e6683c"/><stop offset="50%" stop-color="#dc2743"/><stop offset="75%" stop-color="#cc2366"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs>
+          <rect x="1" y="1" width="22" height="22" rx="6" ry="6" fill="url(#ig-g)"/>
+          <circle cx="12" cy="12" r="4.5" stroke="white" stroke-width="1.8" fill="none"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="white"/>
+        </svg>
+        <div class="follow-btn-text"><span class="follow-handle">@fmancillag</span><span class="follow-platform">Instagram</span></div>
+      </a>
+      <a href="https://www.youtube.com/@df1190" target="_blank" rel="noopener" class="follow-btn follow-btn-yt">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+          <rect x="1" y="4" width="22" height="16" rx="4" fill="#FF0000"/>
+          <polygon points="9.5 15.5 16 12 9.5 8.5" fill="white"/>
+        </svg>
+        <div class="follow-btn-text"><span class="follow-handle">@df1190</span><span class="follow-platform">YouTube</span></div>
+      </a>
+    </div>
+  </div>
 </div>
 
 <!-- FOOTER -->

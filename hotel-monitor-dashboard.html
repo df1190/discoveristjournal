@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Discoverist — Hotel Opportunity Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181b24;
+    --surface2: #1f2230;
+    --border: #2a2d3a;
+    --text: #e8e9ed;
+    --text-dim: #8b8fa3;
+    --accent: #c9a55c;
+    --accent-glow: rgba(201,165,92,0.15);
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --orange: #fb923c;
+    --reddit: #ff4500;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(201,165,92,0.04) 0%, transparent 100%);
+  }
+  .header-left { display:flex; align-items:center; gap:16px; }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--text-dim); font-weight:400; font-size:14px; font-family:'DM Sans',sans-serif; margin-left:12px; }
+  .header-right { display:flex; align-items:center; gap:12px; }
+
+  .status-dot {
+    width:8px; height:8px; border-radius:50%; background:var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; }
+    50% { opacity:0.4; }
+  }
+  .status-text { font-size:13px; color:var(--text-dim); }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr 380px;
+    height: calc(100vh - 73px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--surface);
+  }
+  .sidebar h3 {
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--text-dim);
+    margin-bottom:16px;
+  }
+
+  .subreddit-list { list-style:none; margin-bottom:28px; }
+  .subreddit-list li {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.15s;
+    margin-bottom:2px;
+  }
+  .subreddit-list li:hover { background: var(--surface2); }
+  .subreddit-list li.active { background: var(--accent-glow); color: var(--accent); }
+  .subreddit-list li .count {
+    font-size:11px;
+    background: var(--surface2);
+    padding:2px 8px;
+    border-radius:10px;
+    color:var(--text-dim);
+  }
+  .subreddit-list li.active .count { background:rgba(201,165,92,0.2); color:var(--accent); }
+
+  .add-sub {
+    width:100%;
+    padding:10px 12px;
+    background:var(--surface2);
+    border:1px dashed var(--border);
+    border-radius:8px;
+    color:var(--text-dim);
+    font-size:13px;
+    cursor:pointer;
+    transition:all 0.15s;
+    font-family:'DM Sans',sans-serif;
+    margin-bottom:28px;
+  }
+  .add-sub:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* KEYWORD CONFIG */
+  .keyword-section { margin-bottom:20px; }
+  .keyword-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .tag {
+    padding:4px 10px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:12px;
+    color:var(--text-dim);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .tag .remove { cursor:pointer; opacity:0.5; }
+  .tag .remove:hover { opacity:1; color:var(--red); }
+  .tag.hotel { border-color:rgba(201,165,92,0.3); color:var(--accent); }
+  .tag.destination { border-color:rgba(96,165,250,0.3); color:var(--blue); }
+  .tag.intent { border-color:rgba(74,222,128,0.3); color:var(--green); }
+
+  /* MAIN FEED */
+  .main-feed {
+    padding: 20px 24px;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  .feed-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:20px;
+  }
+  .feed-title {
+    font-family:'Playfair Display',serif;
+    font-size:20px;
+    font-weight:600;
+  }
+  .feed-filters {
+    display:flex;
+    gap:8px;
+  }
+  .filter-btn {
+    padding:6px 14px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text-dim);
+    font-size:12px;
+    font-family:'DM Sans',sans-serif;
+    cursor:pointer;
+    transition:all 0.15s;
+  }
+  .filter-btn:hover { border-color:var(--accent); color:var(--text); }
+  .filter-btn.active { background:var(--accent-glow); border-color:var(--accent); color:var(--accent); }
+
+  /* POST CARDS */
+  .post-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position:relative;
+  }
+  .post-card:hover { border-color:var(--accent); transform:translateY(-1px); }
+  .post-card.selected { border-color:var(--accent); background:linear-gradient(135deg, var(--surface) 0%, var(--accent-glow) 100%); }
+
+  .post-meta {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+    font-size:12px;
+    color:var(--text-dim);
+  }
+  .post-source {
+    padding:2px 8px;
+    border-radius:4px;
+    font-weight:500;
+    font-size:11px;
+  }
+  .post-source.reddit { background:rgba(255,69,0,0.15); color:var(--reddit); }
+  .post-source.facebook { background:rgba(66,103,178,0.15); color:#6b8fd4; }
+
+  .post-title {
+    font-size:15px;
+    font-weight:500;
+    line-height:1.5;
+    margin-bottom:8px;
+  }
+  .post-title .highlight {
+    background:rgba(201,165,92,0.2);
+    color:var(--accent);
+    padding:0 3px;
+    border-radius:3px;
+  }
+
+  .post-snippet {
+    font-size:13px;
+    color:var(--text-dim);
+    line-height:1.6;
+    margin-bottom:12px;
+  }
+
+  .post-tags {
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .post-tag {
+    font-size:11px;
+    padding:3px 8px;
+    border-radius:4px;
+    background:var(--surface2);
+    color:var(--text-dim);
+  }
+  .post-tag.high { background:rgba(74,222,128,0.1); color:var(--green); }
+  .post-tag.medium { background:rgba(251,146,60,0.1); color:var(--orange); }
+  .post-tag.low { background:rgba(248,113,113,0.1); color:var(--red); }
+
+  .post-engagement {
+    position:absolute;
+    top:20px;
+    right:20px;
+    text-align:right;
+  }
+  .post-score {
+    font-size:20px;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .post-score-label {
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--text-dim);
+  }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    display:flex;
+    flex-direction:column;
+  }
+
+  .panel-section {
+    padding:20px;
+    border-bottom:1px solid var(--border);
+  }
+  .panel-section h4 {
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--text-dim);
+    margin-bottom:14px;
+  }
+
+  /* RESPONSE TEMPLATES */
+  .template-card {
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    margin-bottom:8px;
+    cursor:pointer;
+    transition:all 0.15s;
+  }
+  .template-card:hover { border-color:var(--accent); }
+  .template-card.active { border-color:var(--accent); background:var(--accent-glow); }
+  .template-name {
+    font-size:13px;
+    font-weight:500;
+    margin-bottom:4px;
+  }
+  .template-desc {
+    font-size:11px;
+    color:var(--text-dim);
+    line-height:1.4;
+  }
+
+  /* RESPONSE COMPOSER */
+  .composer {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+    overflow-y:auto;
+  }
+  .composer h4 {
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--text-dim);
+    margin-bottom:14px;
+  }
+  .composer-area {
+    flex:1;
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    color:var(--text);
+    font-family:'DM Sans',sans-serif;
+    font-size:13px;
+    line-height:1.7;
+    resize:none;
+    outline:none;
+    min-height:200px;
+  }
+  .composer-area:focus { border-color:var(--accent); }
+  .composer-area::placeholder { color:var(--text-dim); opacity:0.5; }
+
+  .composer-actions {
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+  }
+  .btn {
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:500;
+    font-family:'DM Sans',sans-serif;
+    cursor:pointer;
+    transition:all 0.15s;
+    border:none;
+  }
+  .btn-primary {
+    background:var(--accent);
+    color:var(--bg);
+  }
+  .btn-primary:hover { opacity:0.9; transform:translateY(-1px); }
+  .btn-secondary {
+    background:var(--surface2);
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color:var(--accent); }
+  .btn-ghost {
+    background:transparent;
+    color:var(--text-dim);
+  }
+  .btn-ghost:hover { color:var(--text); }
+
+  .affiliate-preview {
+    margin-top:12px;
+    padding:12px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+  }
+  .affiliate-preview .label {
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--text-dim);
+    margin-bottom:6px;
+  }
+  .affiliate-link {
+    font-size:12px;
+    color:var(--accent);
+    word-break:break-all;
+    font-family:monospace;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    padding:16px 20px;
+    border-top:1px solid var(--border);
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap:12px;
+    background:var(--surface2);
+  }
+  .stat {
+    text-align:center;
+  }
+  .stat-value {
+    font-size:18px;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .stat-label {
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--text-dim);
+    margin-top:2px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--text-dim); }
+
+  /* REFRESH BTN */
+  .refresh-btn {
+    padding:8px 16px;
+    border-radius:8px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    font-size:12px;
+    font-family:'DM Sans',sans-serif;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:all 0.15s;
+  }
+  .refresh-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .refresh-btn .spinner {
+    display:inline-block;
+    width:14px;height:14px;
+    border:2px solid var(--border);
+    border-top-color:var(--accent);
+    border-radius:50%;
+  }
+  .refresh-btn.loading .spinner { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .empty-state {
+    text-align:center;
+    padding:60px 20px;
+    color:var(--text-dim);
+  }
+  .empty-state .icon { font-size:48px; margin-bottom:16px; opacity:0.3; }
+  .empty-state p { font-size:14px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">Discoverist <span>Opportunity Monitor</span></div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span class="status-text">Monitoring 12 subreddits</span>
+    <button class="refresh-btn" id="refreshBtn" onclick="refreshFeed()">
+      <span class="spinner"></span>
+      Scan Now
+    </button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <h3>Reddit Subreddits</h3>
+    <ul class="subreddit-list" id="subredditList">
+      <li class="active" onclick="selectSub(this,'all')">
+        <span>All Subreddits</span>
+        <span class="count" id="totalCount">0</span>
+      </li>
+    </ul>
+    <button class="add-sub" onclick="addSubredditPrompt()">+ Add Subreddit</button>
+
+    <div class="keyword-section">
+      <h3>Tracked Keywords</h3>
+      <div class="keyword-tags" id="keywordTags"></div>
+    </div>
+
+    <div class="keyword-section">
+      <h3>Intent Signals</h3>
+      <div class="keyword-tags">
+        <span class="tag intent">hotel recommendation</span>
+        <span class="tag intent">where to stay</span>
+        <span class="tag intent">which hotel</span>
+        <span class="tag intent">best hotel</span>
+        <span class="tag intent">hotel near</span>
+        <span class="tag intent">looking for hotel</span>
+        <span class="tag intent">suggest a hotel</span>
+        <span class="tag intent">hotel advice</span>
+      </div>
+    </div>
+
+    <div class="stats-bar" style="border-radius:10px;margin-top:20px;">
+      <div class="stat">
+        <div class="stat-value" id="statPosts">0</div>
+        <div class="stat-label">Posts Found</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statHigh">0</div>
+        <div class="stat-label">High Value</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statResponded">0</div>
+        <div class="stat-label">Responded</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN FEED -->
+  <div class="main-feed" id="mainFeed">
+    <div class="feed-header">
+      <div class="feed-title">Opportunity Feed</div>
+      <div class="feed-filters">
+        <button class="filter-btn active" onclick="setFilter(this,'all')">All</button>
+        <button class="filter-btn" onclick="setFilter(this,'high')">High Value</button>
+        <button class="filter-btn" onclick="setFilter(this,'unanswered')">Unanswered</button>
+        <button class="filter-btn" onclick="setFilter(this,'recent')">Last 24h</button>
+      </div>
+    </div>
+    <div id="postList">
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>Click <strong>"Scan Now"</strong> to search Reddit for<br>hotel recommendation opportunities</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="panel-section">
+      <h4>Response Templates</h4>
+      <div class="template-card active" onclick="selectTemplate(0)">
+        <div class="template-name">🏨 Personal Experience</div>
+        <div class="template-desc">Share your stay experience + natural affiliate link</div>
+      </div>
+      <div class="template-card" onclick="selectTemplate(1)">
+        <div class="template-name">📊 Comparison Helper</div>
+        <div class="template-desc">Compare 2-3 hotels with pros/cons + links</div>
+      </div>
+      <div class="template-card" onclick="selectTemplate(2)">
+        <div class="template-name">💡 Budget Advisor</div>
+        <div class="template-desc">Help find best value + loyalty program tips</div>
+      </div>
+      <div class="template-card" onclick="selectTemplate(3)">
+        <div class="template-name">📍 Local Expert</div>
+        <div class="template-desc">Destination-specific hotel advice + area tips</div>
+      </div>
+    </div>
+
+    <div class="composer">
+      <h4>Compose Response</h4>
+      <textarea class="composer-area" id="composerText" placeholder="Select a post and template to generate a response...&#10;&#10;Your comment will include a natural affiliate link based on the hotel being discussed."></textarea>
+
+      <div class="affiliate-preview" id="affiliatePreview" style="display:none;">
+        <div class="label">Affiliate Link (auto-inserted)</div>
+        <div class="affiliate-link" id="affiliateLink"></div>
+      </div>
+
+      <div class="composer-actions">
+        <button class="btn btn-primary" onclick="copyResponse()">📋 Copy to Clipboard</button>
+        <button class="btn btn-secondary" onclick="openReddit()">↗ Open Thread</button>
+        <button class="btn btn-ghost" onclick="markResponded()">✓ Mark Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============================================
+  // CONFIG
+  // ============================================
+  const SUBREDDITS = [
+    'travel', 'hotels', 'marriott', 'hilton',
+    'solotravel', 'TravelHacks', 'Shoestring',
+    'digitalnomad', 'AwardTravel', 'churning',
+    'TravelNoPics', 'backpacking'
+  ];
+
+  const KEYWORDS = [
+    'hotel recommendation', 'where to stay', 'which hotel',
+    'best hotel', 'hotel near', 'looking for hotel',
+    'suggest a hotel', 'hotel advice', 'Marriott',
+    'Bonvoy', 'resort', 'accommodation'
+  ];
+
+  const TEMPLATES = [
+    {
+      name: 'Personal Experience',
+      generate: (post) => `I actually stayed at [HOTEL NAME] during my trip to ${post.destination || '[DESTINATION]'} and it was a great experience. The ${post.priceRange === 'budget' ? 'value for money was solid' : 'service and amenities were excellent'}.
+
+A few things I noticed:
+- ${post.destination ? 'Location was perfect for exploring ' + post.destination : 'Great central location'}
+- Staff was very helpful with local recommendations
+- ${post.priceRange === 'budget' ? 'Clean and modern rooms at a fair price' : 'Rooms were spacious and well-maintained'}
+
+${post.loyaltyMention ? 'If you\'re a Bonvoy member, you can earn points on this stay which is a nice bonus. ' : ''}Here's a link to check current rates and availability: [AFFILIATE LINK]
+
+Happy to answer any specific questions about the property!`
+    },
+    {
+      name: 'Comparison Helper',
+      generate: (post) => `I've stayed at a few places in ${post.destination || '[DESTINATION]'} so here's my honest comparison:
+
+**Option 1: [HOTEL A]**
+- Pros: Great location, modern rooms
+- Cons: Can be pricey during peak season
+- Check rates: [AFFILIATE LINK 1]
+
+**Option 2: [HOTEL B]**
+- Pros: Better value, good breakfast included
+- Cons: Slightly further from center
+- Check rates: [AFFILIATE LINK 2]
+
+For your situation, I'd lean toward [HOTEL A/B] because ${post.priceRange === 'budget' ? 'the value is hard to beat' : 'the quality really stands out'}. Let me know if you want more details on either!`
+    },
+    {
+      name: 'Budget Advisor',
+      generate: (post) => `Great question! For ${post.destination || '[DESTINATION]'} on a budget, here's what I'd recommend:
+
+The sweet spot is usually [HOTEL NAME] — I stayed there and got a solid room for around $[XX]/night. It's clean, well-located, and has everything you need without paying for extras you won't use.
+
+Pro tip: If you sign up for Marriott Bonvoy (free), you can sometimes get member-exclusive rates that are 10-15% lower than the public price. Plus you earn points toward free nights.
+
+Here's the direct booking link: [AFFILIATE LINK]
+
+Also worth checking the area around [NEIGHBORHOOD] for other deals. Happy to share more if you need specific tips!`
+    },
+    {
+      name: 'Local Expert',
+      generate: (post) => `I know ${post.destination || '[DESTINATION]'} pretty well from multiple visits. The area you're looking at is a great choice.
+
+For hotels in that zone, my top pick is [HOTEL NAME]. It's right in the heart of [AREA], walking distance to [ATTRACTIONS]. I've stayed there during both high and low season.
+
+What makes it stand out:
+- ${post.destination ? 'Perfect base for exploring ' + post.destination : 'Unbeatable location'}
+- Rooms are consistently clean and comfortable
+- The staff knows the area well and gives great local tips
+
+You can check availability here: [AFFILIATE LINK]
+
+One more tip for ${post.destination || 'the area'}: [LOCAL TIP]. Let me know if you need restaurant or activity recommendations too!`
+    }
+  ];
+
+  let posts = [];
+  let selectedPost = null;
+  let selectedTemplate = 0;
+  let currentFilter = 'all';
+  let currentSub = 'all';
+  let respondedPosts = new Set();
+
+  // ============================================
+  // INIT
+  // ============================================
+  function init() {
+    renderSubreddits();
+    renderKeywords();
+  }
+
+  function renderSubreddits() {
+    const list = document.getElementById('subredditList');
+    // keep the "All" item
+    SUBREDDITS.forEach(sub => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span>r/${sub}</span><span class="count" id="count-${sub}">0</span>`;
+      li.onclick = () => selectSub(li, sub);
+      list.appendChild(li);
+    });
+  }
+
+  function renderKeywords() {
+    const container = document.getElementById('keywordTags');
+    KEYWORDS.forEach(kw => {
+      const tag = document.createElement('span');
+      tag.className = 'tag hotel';
+      tag.innerHTML = `${kw} <span class="remove" onclick="this.parentElement.remove()">×</span>`;
+      container.appendChild(tag);
+    });
+  }
+
+  // ============================================
+  // REDDIT API (uses public JSON endpoints)
+  // ============================================
+  async function fetchRedditPosts(subreddit, keyword) {
+    const query = encodeURIComponent(keyword);
+    const url = `https://www.reddit.com/r/${subreddit}/search.json?q=${query}&restrict_sr=on&sort=new&limit=10&t=week`;
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'DiscoveristMonitor/1.0' }
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      if (!data.data || !data.data.children) return [];
+      return data.data.children.map(c => c.data).filter(p => p && p.title);
+    } catch(e) {
+      console.warn(`Failed: r/${subreddit} "${keyword}"`, e);
+      return [];
+    }
+  }
+
+  async function refreshFeed() {
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('loading');
+    btn.querySelector('.spinner').style.animation = 'spin 0.8s linear infinite';
+
+    posts = [];
+    const seen = new Set();
+    const searchKeywords = ['hotel recommendation', 'where to stay', 'best hotel', 'which hotel'];
+
+    for (const sub of SUBREDDITS) {
+      for (const kw of searchKeywords) {
+        const results = await fetchRedditPosts(sub, kw);
+        for (const p of results) {
+          if (!seen.has(p.id)) {
+            seen.add(p.id);
+            posts.push({
+              id: p.id,
+              title: p.title,
+              body: p.selftext || '',
+              subreddit: p.subreddit,
+              author: p.author,
+              score: p.score,
+              numComments: p.num_comments,
+              created: p.created_utc,
+              url: `https://reddit.com${p.permalink}`,
+              flair: p.link_flair_text || '',
+              // Derived fields
+              value: scorePost(p),
+              destination: extractDestination(p.title + ' ' + (p.selftext || '')),
+              priceRange: detectPriceRange(p.title + ' ' + (p.selftext || '')),
+              loyaltyMention: /bonvoy|marriott|hilton|hyatt|ihg|loyalty/i.test(p.title + ' ' + (p.selftext || ''))
+            });
+          }
+        }
+        // small delay to avoid rate limiting
+        await new Promise(r => setTimeout(r, 300));
+      }
+    }
+
+    // Sort by value score
+    posts.sort((a, b) => b.value - a.value);
+
+    btn.classList.remove('loading');
+    renderPosts();
+    updateStats();
+  }
+
+  function scorePost(p) {
+    let score = 0;
+    const text = (p.title + ' ' + (p.selftext || '')).toLowerCase();
+
+    // High intent keywords
+    if (/where (should|can|do) i stay/i.test(text)) score += 30;
+    if (/hotel recommend/i.test(text)) score += 25;
+    if (/best hotel/i.test(text)) score += 20;
+    if (/which hotel/i.test(text)) score += 20;
+    if (/suggest.*(hotel|resort|accommodation)/i.test(text)) score += 20;
+    if (/looking for.*(hotel|place to stay)/i.test(text)) score += 20;
+
+    // Recency bonus
+    const hoursAgo = (Date.now()/1000 - p.created_utc) / 3600;
+    if (hoursAgo < 6) score += 25;
+    else if (hoursAgo < 24) score += 15;
+    else if (hoursAgo < 48) score += 5;
+
+    // Low comments = less competition
+    if (p.num_comments < 5) score += 15;
+    else if (p.num_comments < 15) score += 5;
+
+    // Loyalty program mention
+    if (/bonvoy|marriott/i.test(text)) score += 15;
+
+    // Engagement
+    if (p.score > 10) score += 5;
+
+    return Math.min(score, 100);
+  }
+
+  function extractDestination(text) {
+    // Simple destination extraction
+    const patterns = [
+      /(?:visiting|going to|trip to|traveling to|heading to|stay in|hotels? in)\s+([A-Z][a-zA-Z\s]{2,20})/,
+      /([A-Z][a-zA-Z]+(?:\s[A-Z][a-zA-Z]+)?)\s+hotel/,
+    ];
+    for (const p of patterns) {
+      const m = text.match(p);
+      if (m) return m[1].trim();
+    }
+    return null;
+  }
+
+  function detectPriceRange(text) {
+    if (/budget|cheap|affordable|backpack|hostel/i.test(text)) return 'budget';
+    if (/luxury|premium|5.star|five.star|suite|splurge/i.test(text)) return 'luxury';
+    return 'mid';
+  }
+
+  // ============================================
+  // RENDERING
+  // ============================================
+  function renderPosts() {
+    const container = document.getElementById('postList');
+    let filtered = posts;
+
+    if (currentSub !== 'all') {
+      filtered = filtered.filter(p => p.subreddit.toLowerCase() === currentSub.toLowerCase());
+    }
+
+    if (currentFilter === 'high') filtered = filtered.filter(p => p.value >= 50);
+    if (currentFilter === 'unanswered') filtered = filtered.filter(p => p.numComments < 5);
+    if (currentFilter === 'recent') {
+      const dayAgo = Date.now()/1000 - 86400;
+      filtered = filtered.filter(p => p.created > dayAgo);
+    }
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No matching posts found.<br>Try broadening your filters or scanning again.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map((p, i) => {
+      const timeAgo = getTimeAgo(p.created);
+      const valueClass = p.value >= 60 ? 'high' : p.value >= 30 ? 'medium' : 'low';
+      const valueLabel = p.value >= 60 ? 'High Value' : p.value >= 30 ? 'Medium' : 'Low';
+      const responded = respondedPosts.has(p.id);
+      const titleHighlighted = highlightKeywords(escapeHtml(p.title));
+
+      return `
+        <div class="post-card ${selectedPost === i ? 'selected' : ''}" onclick="selectPost(${i})" style="${responded ? 'opacity:0.5;' : ''}">
+          <div class="post-engagement">
+            <div class="post-score">${p.value}</div>
+            <div class="post-score-label">Score</div>
+          </div>
+          <div class="post-meta">
+            <span class="post-source reddit">Reddit</span>
+            <span>r/${escapeHtml(p.subreddit)}</span>
+            <span>•</span>
+            <span>u/${escapeHtml(p.author)}</span>
+            <span>•</span>
+            <span>${timeAgo}</span>
+            <span>•</span>
+            <span>${p.numComments} comments</span>
+          </div>
+          <div class="post-title">${titleHighlighted}</div>
+          <div class="post-snippet">${escapeHtml((p.body || '').slice(0, 200))}${p.body && p.body.length > 200 ? '...' : ''}</div>
+          <div class="post-tags">
+            <span class="post-tag ${valueClass}">${valueLabel}</span>
+            ${p.destination ? `<span class="post-tag">📍 ${escapeHtml(p.destination)}</span>` : ''}
+            ${p.loyaltyMention ? '<span class="post-tag">⭐ Loyalty</span>' : ''}
+            ${p.priceRange !== 'mid' ? `<span class="post-tag">${p.priceRange === 'budget' ? '💰 Budget' : '✨ Luxury'}</span>` : ''}
+            ${responded ? '<span class="post-tag" style="color:var(--green);">✓ Responded</span>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function highlightKeywords(text) {
+    const terms = ['hotel', 'recommend', 'stay', 'marriott', 'bonvoy', 'resort', 'suggest'];
+    let result = text;
+    terms.forEach(t => {
+      const regex = new RegExp(`(${t})`, 'gi');
+      result = result.replace(regex, '<span class="highlight">$1</span>');
+    });
+    return result;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function getTimeAgo(utc) {
+    const diff = Date.now()/1000 - utc;
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    return Math.floor(diff/86400) + 'd ago';
+  }
+
+  function updateStats() {
+    document.getElementById('statPosts').textContent = posts.length;
+    document.getElementById('statHigh').textContent = posts.filter(p => p.value >= 50).length;
+    document.getElementById('statResponded').textContent = respondedPosts.size;
+    document.getElementById('totalCount').textContent = posts.length;
+
+    // Update subreddit counts
+    SUBREDDITS.forEach(sub => {
+      const el = document.getElementById(`count-${sub}`);
+      if (el) el.textContent = posts.filter(p => p.subreddit.toLowerCase() === sub.toLowerCase()).length;
+    });
+  }
+
+  // ============================================
+  // INTERACTIONS
+  // ============================================
+  function selectPost(index) {
+    selectedPost = index;
+    renderPosts();
+    generateResponse();
+  }
+
+  function selectSub(el, sub) {
+    document.querySelectorAll('.subreddit-list li').forEach(li => li.classList.remove('active'));
+    el.classList.add('active');
+    currentSub = sub;
+    renderPosts();
+  }
+
+  function setFilter(el, filter) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    currentFilter = filter;
+    renderPosts();
+  }
+
+  function selectTemplate(index) {
+    selectedTemplate = index;
+    document.querySelectorAll('.template-card').forEach((c,i) => {
+      c.classList.toggle('active', i === index);
+    });
+    if (selectedPost !== null) generateResponse();
+  }
+
+  function generateResponse() {
+    if (selectedPost === null) return;
+    const post = posts[selectedPost];
+    const template = TEMPLATES[selectedTemplate];
+    const response = template.generate(post);
+
+    document.getElementById('composerText').value = response;
+
+    // Show affiliate preview
+    const preview = document.getElementById('affiliatePreview');
+    preview.style.display = 'block';
+    document.getElementById('affiliateLink').textContent =
+      `https://discoveristjournal.com/go/hotel/${(post.destination || 'booking').toLowerCase().replace(/\s+/g,'-')}?ref=reddit&post=${post.id}`;
+  }
+
+  function copyResponse() {
+    const text = document.getElementById('composerText').value;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.target;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy to Clipboard', 2000);
+    });
+  }
+
+  function openReddit() {
+    if (selectedPost !== null) {
+      window.open(posts[selectedPost].url, '_blank');
+    }
+  }
+
+  function markResponded() {
+    if (selectedPost !== null) {
+      respondedPosts.add(posts[selectedPost].id);
+      renderPosts();
+      updateStats();
+    }
+  }
+
+  function addSubredditPrompt() {
+    const sub = prompt('Enter subreddit name (without r/):');
+    if (sub && sub.trim()) {
+      SUBREDDITS.push(sub.trim());
+      const list = document.getElementById('subredditList');
+      const li = document.createElement('li');
+      li.innerHTML = `<span>r/${sub.trim()}</span><span class="count" id="count-${sub.trim()}">0</span>`;
+      li.onclick = () => selectSub(li, sub.trim());
+      list.appendChild(li);
+    }
+  }
+
+  // Init
+  init();
+</script>
+</body>
+</html>
