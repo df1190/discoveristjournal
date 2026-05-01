@@ -1367,16 +1367,11 @@
     btn.textContent = 'Sending...';
     btn.disabled = true;
 
-    const body = new FormData();
-    body.append('email', email);
-    if (name) body.append('full_name', name);
-    body.append('utm_source', 'website');
-    body.append('utm_medium', 'organic');
-
     try {
-      const res = await fetch('https://embeds.beehiiv.com/b57e4531-01f4-4068-aaac-5dff55a7f0c8', {
+      const res = await fetch('/subscribe.php', {
         method: 'POST',
-        body,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name }),
       });
       if (res.ok || res.status === 201) {
         btn.textContent = 'Subscribed ✓';
@@ -1393,6 +1388,7 @@
       setTimeout(() => { btn.textContent = 'Subscribe'; btn.style.background = ''; }, 3000);
     }
   }
+
 </script>
 </body>
 </html>
