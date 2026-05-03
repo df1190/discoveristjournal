@@ -196,6 +196,59 @@
     .follow-btn-text{display:flex;flex-direction:column;text-align:left}
     .follow-handle{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;color:#1a1a18;line-height:1}
     .follow-platform{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7a5c3e;margin-top:3px}
+  /* Bikes & Numbers Gallery */
+  .rally-gallery-section {
+    padding: 5rem 2rem 4rem;
+    background: #fff;
+  }
+  .rally-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .rally-gallery-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .rally-gallery-img-wrap {
+    overflow: hidden;
+    border-radius: 6px;
+    aspect-ratio: 3/4;
+    background: #111;
+  }
+  .rally-gallery-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .rally-gallery-card:hover .rally-gallery-img-wrap img {
+    transform: scale(1.03);
+  }
+  .rally-gallery-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+    text-align: center;
+  }
+  @media (max-width: 768px) {
+    .rally-gallery-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .rally-gallery-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+  }
   </style>
 </head>
 <body>
@@ -348,6 +401,43 @@
       </div>
       <span class="trip-tag">Coming Soon 2026</span>
     </a>
+
+  </div>
+</section>
+
+<!-- BIKES & NUMBERS GALLERY -->
+<section class="rally-gallery-section">
+  <div class="section-label" style="text-align:center;margin-bottom:0.5rem">The Machines</div>
+  <h2 class="section-title" style="text-align:center;margin-bottom:2rem">Bikes &amp; Numbers</h2>
+  <div class="rally-gallery-grid">
+
+    <div class="rally-gallery-card">
+      <div class="rally-gallery-img-wrap">
+        <img src="/Media/Moto/KTM-Bosnia/790s-my-bike.JPG" alt="KTM 790 Adventure rally bike, Bosnia" loading="lazy">
+      </div>
+      <div class="rally-gallery-label">Bosnia</div>
+    </div>
+
+    <div class="rally-gallery-card">
+      <div class="rally-gallery-img-wrap">
+        <img src="/Media/Moto/KTM-France/ktm-adventure-rally-france-2022-rider-helmet-portrait-number-107.jpg" alt="KTM Adventure Rally France 2022 rider number 107" loading="lazy">
+      </div>
+      <div class="rally-gallery-label">France</div>
+    </div>
+
+    <div class="rally-gallery-card">
+      <div class="rally-gallery-img-wrap">
+        <img src="/Media/Moto/KTM-Norway/ktm-adventure-rally-norway-2023-race-number-159-ktm-headlight.jpg" alt="KTM Adventure Rally Norway 2023 race number 159" loading="lazy">
+      </div>
+      <div class="rally-gallery-label">Norway</div>
+    </div>
+
+    <div class="rally-gallery-card">
+      <div class="rally-gallery-img-wrap">
+        <img src="/Media/Moto/KTM-Romania/rider-number-main.jpg" alt="KTM Adventure Rally Romania rider race number" loading="lazy">
+      </div>
+      <div class="rally-gallery-label">Romania</div>
+    </div>
 
   </div>
 </section>
