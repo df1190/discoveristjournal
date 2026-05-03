@@ -243,56 +243,111 @@
 
   /* ── KTM RALLY BANNER ── */
   .rally-banner {
-    background: var(--charcoal);
-    padding: 0 3rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 340px;
+    display: flex; align-items: center;
+  }
+  .rally-banner-bg {
+    position: absolute; inset: 0;
+    background-image: url('../Media/Moto/KTM-Norway/ktm-adventure-rally-norway-2023-rider-ktm-snow-mountain-panorama.jpg');
+    background-size: cover;
+    background-position: center 30%;
+    filter: brightness(0.32);
   }
   .rally-banner-inner {
+    position: relative; z-index: 1;
     display: flex; align-items: center; justify-content: space-between;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 2rem 0;
-    gap: 2rem;
+    padding: 4rem 3rem;
+    width: 100%;
+    gap: 3rem;
   }
   .rally-banner-label {
     font-size: 0.65rem;
     font-weight: 600;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--moto-red);
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.8rem;
   }
   .rally-banner-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    letter-spacing: 0.06em;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    letter-spacing: 0.04em;
     color: #fff;
-    line-height: 1;
-    margin-bottom: 0.4rem;
+    line-height: 0.95;
+    margin-bottom: 1rem;
+  }
+  .rally-banner-title em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--clay);
+    display: block;
+    font-size: 0.38em;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
   }
   .rally-banner-sub {
-    font-size: 0.82rem;
-    color: rgba(245,240,234,0.5);
+    font-size: 0.85rem;
+    color: rgba(245,240,234,0.55);
     font-weight: 300;
+    line-height: 1.6;
+    max-width: 480px;
+  }
+  .rally-editions {
+    display: flex; gap: 0.6rem; flex-wrap: wrap;
+    margin-top: 1.4rem;
+  }
+  .rally-edition-chip {
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+  }
+  .rally-banner-right {
+    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 1.2rem;
   }
   .rally-banner-btn {
-    flex-shrink: 0;
     display: inline-block;
-    border: 1.5px solid rgba(255,255,255,0.25);
+    background: var(--moto-red);
+    border: none;
     color: #fff;
     font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.18em;
+    font-weight: 600;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    padding: 0.75rem 1.8rem;
+    padding: 1rem 2.2rem;
     border-radius: 100px;
     text-decoration: none;
-    transition: background 0.3s, border-color 0.3s;
+    transition: background 0.3s, transform 0.2s;
     white-space: nowrap;
   }
-  .rally-banner-btn:hover { background: var(--moto-red); border-color: var(--moto-red); }
+  .rally-banner-btn:hover { background: #b8321f; transform: translateY(-1px); }
+  .rally-banner-stat {
+    text-align: right;
+  }
+  .rally-banner-stat strong {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: #fff;
+    display: block;
+    line-height: 1;
+  }
+  .rally-banner-stat span {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
   @media (max-width: 768px) {
-    .rally-banner { padding: 0 1.4rem; }
-    .rally-banner-inner { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+    .rally-banner-inner { flex-direction: column; align-items: flex-start; padding: 3rem 1.4rem; gap: 2rem; }
+    .rally-banner-right { align-items: flex-start; }
+    .rally-banner-stat { text-align: left; }
   }
 
   /* ── SOCIAL ICONS ── */
@@ -925,13 +980,26 @@
 
 <!-- ── KTM RALLY SERIES BANNER ── -->
 <div class="rally-banner">
+  <div class="rally-banner-bg"></div>
   <div class="rally-banner-inner">
     <div class="rally-banner-text">
-      <p class="rally-banner-label">Rally Series</p>
-      <h3 class="rally-banner-title">KTM Adventure Rally</h3>
-      <p class="rally-banner-sub">Norway · France · Romania · Italy — follow the full series on and off the beaten track.</p>
+      <p class="rally-banner-label">The Rally Series</p>
+      <h3 class="rally-banner-title"><em>KTM Adventure Rally</em>On & Off<br/>The Road</h3>
+      <p class="rally-banner-sub">Four countries. One rally series. From the fjords of Norway to the mountains of Romania — real riding, real roads, real adventure.</p>
+      <div class="rally-editions">
+        <span class="rally-edition-chip">🇳🇴 Norway</span>
+        <span class="rally-edition-chip">🇫🇷 France</span>
+        <span class="rally-edition-chip">🇷🇴 Romania</span>
+        <span class="rally-edition-chip">🇮🇹 Italy</span>
+      </div>
     </div>
-    <a href="/moto/ktm-rally" class="rally-banner-btn">See the Series &rarr;</a>
+    <div class="rally-banner-right">
+      <div class="rally-banner-stat">
+        <strong>4</strong>
+        <span>Editions</span>
+      </div>
+      <a href="/moto/ktm-rally" class="rally-banner-btn">See the Full Series &rarr;</a>
+    </div>
   </div>
 </div>
 
@@ -1074,35 +1142,35 @@
       <p class="section-label">The Shop</p>
       <h2 class="section-title">Visit Our Store</h2>
     </div>
-    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="btn-outline">See All Products</a>
+    <a href="https://moto.discoveristjournal.com" target="_blank" rel="noopener" class="btn-outline">See All Products</a>
   </div>
   <div class="store-grid">
-    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
-      <div class="store-card-img store-placeholder"></div>
+    <a href="https://moto.discoveristjournal.com" target="_blank" rel="noopener" class="store-card">
+      <img class="store-card-img" src="../Media/Store/moto-phone-cases-collection-ducati-bmw-ktm.jpg" alt="Moto phone cases collection Ducati BMW KTM" />
       <div class="store-card-info">
-        <span class="store-tag">Coming Soon</span>
-        <h4>Product 1</h4>
+        <span class="store-tag">Phone Cases</span>
+        <h4>Full Collection</h4>
       </div>
     </a>
-    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
-      <div class="store-card-img store-placeholder"></div>
+    <a href="https://moto.discoveristjournal.com" target="_blank" rel="noopener" class="store-card">
+      <img class="store-card-img" src="../Media/Store/moto-phone-case-ktm-890-adventure-r-black-lifestyle-alps.jpg" alt="KTM 890 Adventure R phone case black lifestyle alps" />
       <div class="store-card-info">
-        <span class="store-tag">Coming Soon</span>
-        <h4>Product 2</h4>
+        <span class="store-tag">Phone Case</span>
+        <h4>KTM 890 Adventure R</h4>
       </div>
     </a>
-    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
-      <div class="store-card-img store-placeholder"></div>
+    <a href="https://moto.discoveristjournal.com" target="_blank" rel="noopener" class="store-card">
+      <img class="store-card-img" src="../Media/Store/moto-phone-case-ducati-panigale-red-lifestyle-alps.jpg" alt="Ducati Panigale red phone case lifestyle alps" />
       <div class="store-card-info">
-        <span class="store-tag">Coming Soon</span>
-        <h4>Product 3</h4>
+        <span class="store-tag">Phone Case</span>
+        <h4>Ducati Panigale — Red</h4>
       </div>
     </a>
-    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
-      <div class="store-card-img store-placeholder"></div>
+    <a href="https://moto.discoveristjournal.com" target="_blank" rel="noopener" class="store-card">
+      <img class="store-card-img" src="../Media/Store/moto-phone-case-ducati-panigale-red-lifestyle-porsche.jpg" alt="Ducati Panigale red phone case lifestyle Porsche museum" />
       <div class="store-card-info">
-        <span class="store-tag">Coming Soon</span>
-        <h4>Product 4</h4>
+        <span class="store-tag">Phone Case</span>
+        <h4>Ducati Panigale — Lifestyle</h4>
       </div>
     </a>
   </div>
