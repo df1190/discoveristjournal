@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MOTO × TRAVEL — Visual Stories | The Discoverist Journal</title>
+<meta name="description" content="A visual portfolio of motorcycle travel photography from The Discoverist Journal. Alpine passes, remote roads, and the details only found from two wheels.">
+<link rel="canonical" href="https://discoveristjournal.com/moto">
+<meta property="og:site_name" content="The Discoverist Journal">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MOTO × TRAVEL — Visual Stories | The Discoverist Journal">
+<meta property="og:description" content="A visual portfolio of motorcycle travel photography from The Discoverist Journal. Alpine passes, remote roads, and the details only found from two wheels.">
+<meta property="og:image" content="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg">
+<meta property="og:url" content="https://discoveristjournal.com/portfolio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MOTO × TRAVEL — Visual Stories | The Discoverist Journal">
+<meta name="twitter:description" content="A visual portfolio of motorcycle travel photography from The Discoverist Journal. Alpine passes, remote roads, and the details only found from two wheels.">
+<meta name="twitter:image" content="https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#fdfcfb">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f5f0ea;
+    --sand: #e8ddd0;
+    --clay: #c9b49a;
+    --charcoal: #1a1a18;
+    --moto-red: #d64230;
+    --sage: #8a9e8a;
+    --ink: #2c2c2a;
+    --white: #fdfcfb;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--charcoal);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.4rem 3rem;
+    background: rgba(253,252,251,0.82);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    transition: padding 0.3s;
+  }
+  nav.shrink { padding: 0.8rem 3rem; }
+  .nav-brand {
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .nav-logo-parent {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.15em;
+    color: var(--charcoal);
+    text-decoration: none;
+  }
+  .nav-logo-parent:hover { color: var(--moto-red); }
+  .nav-brand-sep {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: rgba(44,44,42,0.25);
+    letter-spacing: 0;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    color: var(--charcoal);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--moto-red); }
+  .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 3px;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0;
+    width: 0; height: 1.5px;
+    background: var(--moto-red);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── SCROLL EXPANSION HERO ── */
+  .hero-wrapper {
+    position: relative;
+    height: 350vh;
+  }
+  .hero-sticky {
+    position: sticky; top: 0;
+    height: 100vh; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-media {
+    position: absolute; inset: 0;
+    background: url('../media/Moto/moto-hub/moto-hero.jpg') center/cover no-repeat;
+    transform-origin: center center;
+    transform: scale(0.42) translateY(8%);
+    border-radius: 24px;
+    transition: transform 0.05s linear, border-radius 0.1s linear;
+    will-change: transform, border-radius;
+  }
+  .hero-media::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.55) 100%);
+    border-radius: inherit;
+  }
+  .hero-text {
+    position: relative; z-index: 2;
+    text-align: center;
+    transform: translateY(0);
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 13rem);
+    line-height: 0.9;
+    color: #fff;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  .hero-title em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--clay);
+    display: block;
+    font-size: 0.42em;
+    letter-spacing: 0.08em;
+  }
+  .hero-scroll-hint {
+    position: absolute; bottom: 2.4rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    z-index: 3;
+    opacity: 0;
+    animation: fadeIn 1s 1.2s forwards;
+  }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: rgba(255,255,255,0.3);
+    position: relative; overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute; top: -100%; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255,255,255,0.8);
+    animation: scrollDrop 1.6s 1.4s ease-in-out infinite;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes scrollDrop {
+    0%   { top: -100%; }
+    100% { top: 100%; }
+  }
+
+  /* ── SECTION LABELS ── */
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--moto-red);
+    margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: var(--charcoal);
+  }
+
+  /* ── ABOUT STRIP ── */
+  .about-strip {
+    background: var(--charcoal);
+    color: var(--cream);
+    padding: 5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+  .about-strip p {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 300;
+    max-width: 700px;
+    line-height: 1.7;
+    color: rgba(245,240,234,0.85);
+  }
+  .about-strip p em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--clay);
+  }
+  .about-ktm {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    opacity: 0.9;
+  }
+
+  /* ── KTM RALLY BANNER ── */
+  .rally-banner {
+    background: var(--charcoal);
+    padding: 0 3rem;
+  }
+  .rally-banner-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 2rem 0;
+    gap: 2rem;
+  }
+  .rally-banner-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--moto-red);
+    margin-bottom: 0.4rem;
+  }
+  .rally-banner-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.06em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .rally-banner-sub {
+    font-size: 0.82rem;
+    color: rgba(245,240,234,0.5);
+    font-weight: 300;
+  }
+  .rally-banner-btn {
+    flex-shrink: 0;
+    display: inline-block;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.8rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: background 0.3s, border-color 0.3s;
+    white-space: nowrap;
+  }
+  .rally-banner-btn:hover { background: var(--moto-red); border-color: var(--moto-red); }
+  @media (max-width: 768px) {
+    .rally-banner { padding: 0 1.4rem; }
+    .rally-banner-inner { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+  }
+
+  /* ── SOCIAL ICONS ── */
+  .footer-socials {
+    display: flex; gap: 0.9rem; margin-top: 1.4rem; flex-wrap: wrap;
+  }
+  .social-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    transition: transform 0.2s, opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .social-icon:hover { transform: translateY(-2px); opacity: 0.9; }
+  .social-icon.ig {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  }
+  .social-icon.yt { background: #ff0000; }
+  .social-icon.tt { background: #000; }
+  .social-icon.amz { background: #ff9900; }
+
+  /* ── STICKY SCROLL GALLERY ── */
+  .sticky-section {
+    position: relative;
+    padding: 6rem 3rem 0;
+    background: var(--white);
+  }
+  .sticky-section-header {
+    max-width: 600px;
+    margin-bottom: 4rem;
+  }
+  .sticky-gallery {
+    display: flex; gap: 2rem;
+  }
+  .gallery-sticky-col {
+    position: sticky; top: 90px;
+    width: 40%;
+    flex-shrink: 0;
+    height: calc(100vh - 110px);
+    display: flex; flex-direction: column;
+    justify-content: center;
+  }
+  .gallery-sticky-col .featured-img {
+    width: 100%; aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.14);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .gallery-scroll-col {
+    flex: 1;
+    padding-bottom: 6rem;
+  }
+  .gallery-card {
+    margin-bottom: 2.2rem;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s;
+  }
+  .gallery-card.visible {
+    opacity: 1; transform: translateY(0);
+  }
+  .gallery-card:hover { box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .gallery-card img {
+    width: 100%; aspect-ratio: 16/10;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .gallery-card:hover img { transform: scale(1.04); }
+  .card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .gallery-card:hover .card-overlay { opacity: 1; }
+  .card-info {
+    position: absolute; bottom: 1.2rem; left: 1.4rem;
+    color: #fff;
+    transform: translateY(10px);
+    transition: transform 0.4s;
+    opacity: 0;
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .gallery-card:hover .card-info { opacity: 1; transform: translateY(0); }
+  .card-info h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.06em; }
+  .card-info span { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.75; }
+  .card-tag {
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--moto-red);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 100px;
+  }
+
+  /* ── VIDEO SECTION ── */
+  .video-section {
+    background: var(--sand);
+    padding: 7rem 3rem;
+  }
+  .video-section-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3.5rem;
+  }
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .video-card {
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(50px) scale(0.96);
+    transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.3s;
+  }
+  .video-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+  /* Row 1: 3-wide hero + 1-wide */
+  .video-card:nth-child(1) { grid-column: span 3; }
+  .video-card:nth-child(2) { grid-column: span 1; }
+  /* Row 2: 1-wide + 1-wide + 2-wide */
+  .video-card:nth-child(3) { grid-column: span 1; }
+  .video-card:nth-child(4) { grid-column: span 1; }
+  .video-card:nth-child(5) { grid-column: span 2; }
+  /* Row 3: full width */
+  .video-card:nth-child(6) { grid-column: span 4; }
+  .video-thumb {
+    width: 100%; aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .video-card:hover .video-thumb { transform: scale(1.04); }
+  .video-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .play-btn {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.5);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .video-card:hover .play-btn {
+    background: var(--moto-red);
+    border-color: var(--moto-red);
+    transform: scale(1.1);
+  }
+  .play-btn svg { fill: #fff; margin-left: 4px; }
+  .video-meta {
+    position: absolute; bottom: 1.2rem; left: 1.4rem; right: 1.4rem;
+    color: #fff;
+  }
+  .video-meta h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.06em; }
+  .video-meta span { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
+  .video-duration {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── MASONRY MOTO SECTION ── */
+  .moto-section {
+    padding: 7rem 3rem;
+    background: var(--white);
+  }
+  .moto-header { margin-bottom: 4rem; }
+  .masonry-grid {
+    columns: 3;
+    column-gap: 1.4rem;
+  }
+  .masonry-item {
+    break-inside: avoid;
+    margin-bottom: 1.4rem;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .masonry-item.visible { opacity: 1; transform: translateY(0); }
+  .masonry-item img {
+    width: 100%; display: block;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .masonry-item:hover img { transform: scale(1.05); }
+  .masonry-item .card-overlay { opacity: 0; transition: opacity 0.4s; }
+  .masonry-item:hover .card-overlay { opacity: 1; }
+  .masonry-item .card-info { opacity: 0; transition: opacity 0.4s, transform 0.4s; }
+  .masonry-item:hover .card-info { opacity: 1; transform: translateY(0); }
+
+  /* ── STORE SECTION ── */
+  .store-section {
+    padding: 7rem 3rem;
+    background: var(--sand);
+  }
+  .store-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3rem;
+  }
+  .store-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.4rem;
+  }
+  .store-card {
+    text-decoration: none;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--white);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: block;
+  }
+  .store-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.13); }
+  .store-card-img {
+    width: 100%; aspect-ratio: 1/1;
+    object-fit: cover; display: block;
+  }
+  .store-placeholder {
+    background: var(--sand);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .store-placeholder::after {
+    content: '+';
+    font-size: 2.5rem;
+    color: var(--clay);
+    opacity: 0.5;
+  }
+  .store-card-info {
+    padding: 1rem 1.2rem 1.2rem;
+  }
+  .store-tag {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--moto-red);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .store-card-info h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.05em;
+    color: var(--charcoal);
+  }
+  .btn-outline {
+    display: inline-block;
+    border: 1.5px solid var(--clay);
+    color: var(--charcoal);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    cursor: pointer;
+  }
+  .btn-outline:hover {
+    background: var(--moto-red);
+    border-color: var(--moto-red);
+    color: #fff;
+  }
+  @media (max-width: 768px) {
+    .store-section { padding: 4rem 1.4rem; }
+    .store-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .store-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  }
+
+  /* ── CONTACT / FOOTER ── */
+  footer {
+    background: var(--cream);
+    padding: 5rem 3rem 3rem;
+    border-top: 1px solid var(--sand);
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 3rem; margin-bottom: 4rem;
+  }
+  .footer-brand .nav-logo { font-size: 2rem; }
+  .footer-brand p {
+    font-size: 0.85rem; line-height: 1.7;
+    color: rgba(28,28,26,0.6);
+    margin-top: 1rem; max-width: 260px;
+  }
+  .footer-col h5 {
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--charcoal); margin-bottom: 1.2rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 0.6rem; }
+  .footer-col ul li a {
+    font-size: 0.85rem; color: rgba(28,28,26,0.6);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-col ul li a:hover { color: var(--moto-red); }
+  .footer-bottom {
+    border-top: 1px solid var(--sand);
+    padding-top: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-bottom p { font-size: 0.75rem; color: rgba(28,28,26,0.45); letter-spacing: 0.06em; }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,0.9);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s;
+    backdrop-filter: blur(10px);
+  }
+  .lightbox.open { opacity: 1; pointer-events: all; }
+  .lightbox img { max-width: 90vw; max-height: 88vh; border-radius: 10px; object-fit: contain; }
+  .lightbox-close {
+    position: absolute; top: 1.5rem; right: 2rem;
+    background: none; border: none; color: #fff;
+    font-size: 2rem; cursor: pointer; line-height: 1;
+    opacity: 0.7; transition: opacity 0.2s;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  /* ── CURSOR DOT ── */
+  .cursor-dot {
+    position: fixed; top: 0; left: 0;
+    width: 8px; height: 8px;
+    background: var(--moto-red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s, width 0.25s, height 0.25s, background 0.25s;
+  }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0;
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(214,66,48,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94), width 0.3s, height 0.3s;
+  }
+
+  /* ── MOBILE RESPONSIVE ── */
+
+  /* Hamburger button */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 200;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--charcoal);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+    transform-origin: center;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile nav drawer */
+  .nav-drawer {
+    display: none;
+    position: fixed; inset: 0; top: 0;
+    background: var(--white);
+    z-index: 150;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s;
+  }
+  .nav-drawer.open { opacity: 1; pointer-events: all; }
+  .nav-drawer a {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 0.1em;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-drawer a:hover { color: var(--moto-red); }
+
+  @media (max-width: 768px) {
+    /* Hide desktop nav links, show hamburger */
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    .nav-drawer { display: flex; }
+    nav { padding: 1.1rem 1.4rem; }
+    nav.shrink { padding: 0.8rem 1.4rem; }
+
+    /* Hero */
+    .hero-wrapper { height: 280vh; }
+    .hero-media { transform: scale(0.55) translateY(6%); }
+    .hero-title { font-size: clamp(3.8rem, 18vw, 7rem); }
+
+    /* About strip — stack vertically */
+    .about-strip {
+      flex-direction: column;
+      padding: 3.5rem 1.4rem;
+      gap: 2.5rem;
+      align-items: flex-start;
+    }
+    .about-ktm svg { width: 160px; }
+
+    /* Sticky gallery — disable sticky, stack vertically */
+    .sticky-section { padding: 4rem 1.4rem 0; }
+    .sticky-gallery { flex-direction: column; }
+    .gallery-sticky-col {
+      position: relative; top: auto;
+      width: 100%; height: auto;
+      margin-bottom: 1.8rem;
+    }
+    .gallery-sticky-col .featured-img {
+      aspect-ratio: 16/9;
+    }
+    .gallery-scroll-col { padding-bottom: 3rem; }
+    .sticky-section-header { margin-bottom: 2rem; }
+
+    /* Video grid — single column */
+    .video-section { padding: 4rem 1.4rem; }
+    .video-section-header { flex-direction: column; align-items: flex-start; gap: 1.2rem; margin-bottom: 2rem; }
+    .video-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .video-card:nth-child(1) { grid-column: span 2; }
+    .video-card:nth-child(2), .video-card:nth-child(3), .video-card:nth-child(4) { grid-column: span 1; }
+    .video-card:nth-child(5) { grid-column: span 2; }
+    .video-card:nth-child(6) { grid-column: span 2; }
+
+    /* Masonry — 1 column */
+    .moto-section { padding: 4rem 1.4rem; }
+    .masonry-grid { columns: 1; }
+
+    /* Routes banner — stack */
+    .routes-banner { flex-direction: column; gap: 3rem; padding: 4rem 1.4rem; }
+    .routes-banner::before { font-size: 40vw; }
+    .routes-text h2 { font-size: clamp(2.6rem, 11vw, 4.5rem); }
+
+    /* Footer */
+    footer { padding: 3.5rem 1.4rem 2rem; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+
+    /* Section titles */
+    .section-title { font-size: clamp(2.4rem, 9vw, 4rem); }
+
+    /* Hide cursor on touch */
+    .cursor-dot, .cursor-ring { display: none; }
+
+    /* Card info always visible on mobile (no hover) */
+    .card-overlay { opacity: 1 !important; background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%) !important; }
+    .card-info { opacity: 1 !important; transform: translateY(0) !important; }
+    .masonry-item .card-overlay { opacity: 1 !important; }
+    .masonry-item .card-info { opacity: 1 !important; transform: translateY(0) !important; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: clamp(3.2rem, 20vw, 5.5rem); }
+    .about-ktm svg { width: 130px; }
+    .play-btn { width: 52px; height: 52px; }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    nav { padding: 1.2rem 2rem; }
+    .about-strip { padding: 4rem 2rem; flex-wrap: wrap; }
+    .sticky-section { padding: 5rem 2rem 0; }
+    .video-section { padding: 5rem 2rem; }
+    .moto-section { padding: 5rem 2rem; }
+    .masonry-grid { columns: 2; }
+    .video-grid { grid-template-columns: repeat(4, 1fr); }
+    .video-card:nth-child(1) { grid-column: span 2; }
+    .video-card:nth-child(2) { grid-column: span 2; }
+    .video-card:nth-child(3) { grid-column: span 1; }
+    .video-card:nth-child(4) { grid-column: span 1; }
+    .video-card:nth-child(5) { grid-column: span 2; }
+    .video-card:nth-child(6) { grid-column: span 4; }
+    .routes-banner { padding: 5rem 2rem; gap: 3rem; }
+    footer { padding: 4rem 2rem 2.5rem; }
+  }
+
+  /* ── HORIZONTAL TICKER ── */
+  .ticker {
+    overflow: hidden;
+    background: var(--moto-red);
+    padding: 1rem 0;
+    white-space: nowrap;
+  }
+  .ticker-track {
+    display: inline-flex; gap: 0;
+    animation: ticker 22s linear infinite;
+  }
+  .ticker-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.16em;
+    color: rgba(255,255,255,0.85);
+    padding: 0 2.5rem;
+  }
+  .ticker-item::before { content: '✦ '; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-brand">
+    <a href="/" class="nav-logo-parent">The Discoverist</a>
+    <span class="nav-brand-sep">—</span>
+    <a href="/moto" class="nav-logo">MOTO<span>×</span>TRAVEL</a>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#travel">Travel</a></li>
+    <li><a href="#videos">Videos</a></li>
+    <li><a href="#moto">Motorcycles</a></li>
+    <li><a href="#routes">Routes</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Drawer -->
+<div class="nav-drawer" id="navDrawer">
+  <a href="#travel" class="drawer-link">Travel</a>
+  <a href="#videos" class="drawer-link">Videos</a>
+  <a href="#moto" class="drawer-link">Motorcycles</a>
+  <a href="#routes" class="drawer-link">Routes</a>
+  <a href="#contact" class="drawer-link">Contact</a>
+</div>
+
+<!-- ── SCROLL EXPANSION HERO ── -->
+<div class="hero-wrapper" id="heroWrapper">
+  <div class="hero-sticky">
+    <div class="hero-media" id="heroMedia"></div>
+    <div class="hero-text" id="heroText">
+      <p class="hero-eyebrow">Photography & Film</p>
+      <h1 class="hero-title">
+        Ride<br/>
+        <em>& Adventure</em>
+      </h1>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item">Alps</span>
+    <span class="ticker-item">Austrian Alps</span>
+    <span class="ticker-item">Colombia Offroad</span>
+    <span class="ticker-item">California</span>
+    <span class="ticker-item">Italy</span>
+    <span class="ticker-item">Romania</span>
+    <span class="ticker-item">France</span>
+    <span class="ticker-item">Pyrenees</span>
+    <span class="ticker-item">Portugal</span>
+    <span class="ticker-item">Norwegian Fjords</span>
+    <span class="ticker-item">Bosnia</span>
+    <span class="ticker-item">Croatia</span>
+    <span class="ticker-item">Alps</span>
+    <span class="ticker-item">Austrian Alps</span>
+    <span class="ticker-item">Colombia Offroad</span>
+    <span class="ticker-item">California</span>
+    <span class="ticker-item">Italy</span>
+    <span class="ticker-item">Romania</span>
+    <span class="ticker-item">France</span>
+    <span class="ticker-item">Pyrenees</span>
+    <span class="ticker-item">Portugal</span>
+    <span class="ticker-item">Norwegian Fjords</span>
+    <span class="ticker-item">Bosnia</span>
+    <span class="ticker-item">Croatia</span>
+  </div>
+</div>
+
+<!-- ABOUT STRIP -->
+<div class="about-strip">
+  <p>Two wheels, open roads, and a <em>relentless curiosity</em> for what's around the next bend. From Andean passes to Alpine cols, I ride to explore and document the world at its most raw. Follow along on my socials and let's work together.</p>
+  <div class="about-ktm">
+    <img src="Media/Moto/ktm-svg-logo.png" alt="KTM" style="width:200px;height:auto;display:block;" />
+  </div>
+</div>
+
+<!-- ── KTM RALLY SERIES BANNER ── -->
+<div class="rally-banner">
+  <div class="rally-banner-inner">
+    <div class="rally-banner-text">
+      <p class="rally-banner-label">Rally Series</p>
+      <h3 class="rally-banner-title">KTM Adventure Rally</h3>
+      <p class="rally-banner-sub">Norway · France · Romania · Italy — follow the full series on and off the beaten track.</p>
+    </div>
+    <a href="/moto/ktm-rally" class="rally-banner-btn">See the Series &rarr;</a>
+  </div>
+</div>
+
+<!-- ── STICKY SCROLL TRAVEL GALLERY ── -->
+<section class="sticky-section" id="travel">
+  <div class="sticky-section-header">
+    <p class="section-label">Chapter 01 — Adventures</p>
+    <h2 class="section-title">Travel<br/>Stories</h2>
+  </div>
+  <div class="sticky-gallery">
+    <div class="gallery-sticky-col">
+      <img class="featured-img" id="featuredImg"
+        src="../media/Moto/KTM-Norway/ktm-adventure-rally-norway-2023-rider-ktm-snow-mountain-panorama.jpg"
+        alt="KTM Adventure Rally Norway 2023 rider KTM snow mountain panorama" />
+    </div>
+    <div class="gallery-scroll-col">
+      <!-- Cards -->
+      <a href="/moto/ktm-rally" class="gallery-card" style="text-decoration:none;display:block;">
+        <img src="../media/Moto/KTM-France/ktm-adventure-rally-france-2022-start-line-redbull-arch-departure.jpg" alt="KTM Adventure Rally France 2022 start line Red Bull arch departure" />
+        <div class="card-overlay"></div>
+        <div class="card-info"><h4>KTM Adventure Rally</h4><span>Rally Series</span></div>
+        <div class="card-tag">Rally</div>
+      </a>
+      <div class="gallery-card" data-img="media/Moto/moto-hub/moto-rider/rider-snowbiking-british-columbia-canada.JPG">
+        <img src="../media/Moto/moto-hub/moto-rider/rider-snowbiking-british-columbia-canada.JPG" alt="Rider snowbiking British Columbia Canada" />
+        <div class="card-overlay"></div>
+        <div class="card-info"><h4>Snowbike BC</h4><span>British Columbia, Canada</span></div>
+        <div class="card-tag">Adventure</div>
+      </div>
+      <div class="gallery-card" data-img="media/Moto/moto-hub/motos/ktm-red-bull-adventure-rally-73-event-ceremony.jpg">
+        <img src="../media/Moto/moto-hub/motos/ktm-red-bull-adventure-rally-73-event-ceremony.jpg" alt="KTM Red Bull Adventure Rally 73 event ceremony" />
+        <div class="card-overlay"></div>
+        <div class="card-info"><h4>KTM Adventure Rally Bikes</h4><span>Event Ceremony</span></div>
+        <div class="card-tag">Rally</div>
+      </div>
+      <div class="gallery-card" data-img="media/Moto/moto-hub/rides-events/alpine-pass-winding-road-mountain-valley-ride.jpg">
+        <img src="../media/Moto/moto-hub/rides-events/alpine-pass-winding-road-mountain-valley-ride.jpg" alt="Alpine pass winding road mountain valley ride" />
+        <div class="card-overlay"></div>
+        <div class="card-info"><h4>Alpine Passes</h4><span>Europe</span></div>
+        <div class="card-tag">Roads</div>
+      </div>
+      <div class="gallery-card" data-img="media/Moto/moto-hub/rides-events/erzberg1.JPG">
+        <img src="../media/Moto/moto-hub/rides-events/erzberg1.JPG" alt="Red Bull Erzbergrodeo Austria" />
+        <div class="card-overlay"></div>
+        <div class="card-info"><h4>Erzbergrodeo</h4><span>Austria</span></div>
+        <div class="card-tag">Enduro</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section class="video-section" id="videos">
+  <div class="video-section-header">
+    <div>
+      <p class="section-label">Chapter 02 — Videos</p>
+      <h2 class="section-title">Mainly Off, Also On Road</h2>
+    </div>
+    <a href="https://www.youtube.com/@df1190?sub_confirmation=1" target="_blank" rel="noopener" class="btn-outline">All Videos</a>
+  </div>
+  <div class="video-grid">
+    <div class="video-card" data-video="ps5gb7RLPuI">
+      <img class="video-thumb" src="https://img.youtube.com/vi/ps5gb7RLPuI/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/ps5gb7RLPuI/mqdefault.jpg'" alt="Video" />
+      <div class="video-overlay">
+        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+    </div>
+    <div class="video-card" data-video="x2KLwC7-3G4">
+      <img class="video-thumb" src="https://img.youtube.com/vi/x2KLwC7-3G4/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/x2KLwC7-3G4/mqdefault.jpg'" alt="Video" />
+      <div class="video-overlay">
+        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+    </div>
+    <div class="video-card" data-video="E0-0tRUSUC8">
+      <img class="video-thumb" src="https://img.youtube.com/vi/E0-0tRUSUC8/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/E0-0tRUSUC8/mqdefault.jpg'" alt="Video" />
+      <div class="video-overlay">
+        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+    </div>
+    <div class="video-card" data-video="dU4x7GdjvSU">
+      <img class="video-thumb" src="https://img.youtube.com/vi/dU4x7GdjvSU/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/dU4x7GdjvSU/mqdefault.jpg'" alt="Video" />
+      <div class="video-overlay">
+        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+    </div>
+    <div class="video-card" data-video="tcBhYpxsRw8">
+      <img class="video-thumb" src="https://img.youtube.com/vi/tcBhYpxsRw8/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/tcBhYpxsRw8/mqdefault.jpg'" alt="Video" />
+      <div class="video-overlay">
+        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+    </div>
+    <div class="video-card" data-video="zTuqDcds_pw">
+      <img class="video-thumb" src="https://img.youtube.com/vi/zTuqDcds_pw/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/zTuqDcds_pw/mqdefault.jpg'" alt="Video" />
+      <div class="video-overlay">
+        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MOTO MASONRY -->
+<section class="moto-section" id="moto">
+  <div class="moto-header">
+    <p class="section-label">Chapter 03 — Off Road Motorcycles</p>
+    <h2 class="section-title">Motorcycles</h2>
+  </div>
+  <div class="masonry-grid">
+    <div class="masonry-item" data-img="media/Moto/moto-hub/motos/ktm-890-adventure-bike-snowy-alpine-pass.jpg">
+      <img src="../media/Moto/moto-hub/motos/ktm-890-adventure-bike-snowy-alpine-pass.jpg" alt="KTM 890 Adventure bike snowy alpine pass" />
+      <div class="card-overlay"></div>
+      <div class="card-info"><h4>KTM 890 — Alpine Snow</h4><span>Europe</span></div>
+    </div>
+    <div class="masonry-item" data-img="media/Moto/moto-hub/motos/bmw-gs-adventure-bike-coastal-sand-dune-ocean.jpg">
+      <img src="../media/Moto/moto-hub/motos/bmw-gs-adventure-bike-coastal-sand-dune-ocean.jpg" alt="BMW GS Adventure bike coastal sand dune ocean" />
+      <div class="card-overlay"></div>
+      <div class="card-info"><h4>BMW GS — Coastal Dunes</h4><span>Portugal</span></div>
+    </div>
+    <div class="masonry-item" data-img="media/Moto/moto-hub/motos/honda-snow-bike-winter-forest-close-up.jpg">
+      <img src="../media/Moto/moto-hub/motos/honda-snow-bike-winter-forest-close-up.jpg" alt="Honda snow bike winter forest close up" />
+      <div class="card-overlay"></div>
+      <div class="card-info"><h4>Honda CRF — Snow</h4><span>British Columbia</span></div>
+    </div>
+    <div class="masonry-item" data-img="media/Moto/moto-hub/motos/yamaha-factory-racing-enduro-bike-21-event-display.jpg">
+      <img src="../media/Moto/moto-hub/motos/yamaha-factory-racing-enduro-bike-21-event-display.jpg" alt="Yamaha factory racing enduro bike 21 event display" />
+      <div class="card-overlay"></div>
+      <div class="card-info"><h4>Yamaha Enduro — Factory</h4><span>Racing</span></div>
+    </div>
+    <div class="masonry-item" data-img="media/Moto/moto-hub/motos/ktm-1290-adventure-bike-valley-road-south-tyrol.jpg">
+      <img src="../media/Moto/moto-hub/motos/ktm-1290-adventure-bike-valley-road-south-tyrol.jpg" alt="KTM 1290 Adventure bike valley road South Tyrol Italy" />
+      <div class="card-overlay"></div>
+      <div class="card-info"><h4>KTM 1290 — South Tyrol</h4><span>Italy</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STORE SECTION -->
+<section class="store-section" id="store">
+  <div class="store-header">
+    <div>
+      <p class="section-label">The Shop</p>
+      <h2 class="section-title">Visit Our Store</h2>
+    </div>
+    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="btn-outline">See All Products</a>
+  </div>
+  <div class="store-grid">
+    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
+      <div class="store-card-img store-placeholder"></div>
+      <div class="store-card-info">
+        <span class="store-tag">Coming Soon</span>
+        <h4>Product 1</h4>
+      </div>
+    </a>
+    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
+      <div class="store-card-img store-placeholder"></div>
+      <div class="store-card-info">
+        <span class="store-tag">Coming Soon</span>
+        <h4>Product 2</h4>
+      </div>
+    </a>
+    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
+      <div class="store-card-img store-placeholder"></div>
+      <div class="store-card-info">
+        <span class="store-tag">Coming Soon</span>
+        <h4>Product 3</h4>
+      </div>
+    </a>
+    <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="store-card">
+      <div class="store-card-img store-placeholder"></div>
+      <div class="store-card-info">
+        <span class="store-tag">Coming Soon</span>
+        <h4>Product 4</h4>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER / CONTACT -->
+<footer id="contact">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-brand">
+        <a href="/" class="nav-logo-parent">The Discoverist</a>
+        <span class="nav-brand-sep">—</span>
+        <a href="/moto" class="nav-logo">MOTO<span style="color:var(--moto-red)">×</span>TRAVEL</a>
+      </div>
+      <p>Visual stories from roads less traveled. Available for editorial assignments, brand collaborations, and print.</p>
+      <div class="footer-socials">
+        <!-- Instagram -->
+        <a href="https://www.instagram.com/fmancillag/" target="_blank" rel="noopener" class="social-icon ig" aria-label="Instagram">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5.5"/>
+            <circle cx="12" cy="12" r="4.5"/>
+            <circle cx="17.6" cy="6.4" r="1" fill="#fff" stroke="none"/>
+          </svg>
+        </a>
+        <!-- YouTube -->
+        <a href="https://www.youtube.com/@df1190" target="_blank" rel="noopener" class="social-icon yt" aria-label="YouTube">
+          <svg width="22" height="16" viewBox="0 0 24 17" fill="none">
+            <rect width="24" height="17" rx="4" fill="#ff0000"/>
+            <polygon points="9.5,4 9.5,13 17,8.5" fill="#fff"/>
+          </svg>
+        </a>
+        <!-- TikTok -->
+        <a href="https://www.tiktok.com/@df.1190" target="_blank" rel="noopener" class="social-icon tt" aria-label="TikTok">
+          <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
+            <path d="M13 0.5h-3v13a2.5 2.5 0 1 1-2.5-2.5c.25 0 .49.04.72.1V7.6A6.5 6.5 0 1 0 14.5 14V5.7A7.8 7.8 0 0 0 18 6.8V3.85A4.4 4.4 0 0 1 13 0.5z" fill="#fff"/>
+            <path d="M12.5 0h-2.5v13a2.5 2.5 0 1 1-2-2.45V7.1A7 7 0 1 0 14 14V5.5a7.8 7.8 0 0 0 4 1.1V3.6A4.4 4.4 0 0 1 12.5 0z" fill="#69C9D0" opacity="0.7"/>
+          </svg>
+        </a>
+        <!-- Amazon -->
+        <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="social-icon amz" aria-label="Amazon Store">
+          <svg width="22" height="20" viewBox="0 0 48 32" fill="none">
+            <text x="2" y="22" font-family="'Arial Black', sans-serif" font-size="18" font-weight="900" fill="#111">amazon</text>
+            <path d="M6 27 Q24 35 42 27" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <polygon points="40,24 44,27 40,30" fill="#111"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Navigate</h5>
+      <ul>
+        <li><a href="#travel">Adventures</a></li>
+        <li><a href="#videos">Videos</a></li>
+        <li><a href="#moto">Motorcycles</a></li>
+        <li><a href="/moto/ktm-rally">KTM Rally Series</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Follow</h5>
+      <ul>
+        <li><a href="https://www.instagram.com/fmancillag/" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a href="https://www.youtube.com/@df1190" target="_blank" rel="noopener">YouTube</a></li>
+        <li><a href="https://www.tiktok.com/@df.1190" target="_blank" rel="noopener">TikTok</a></li>
+        <li><a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener">Amazon Store</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 The Discoverist — MOTO×TRAVEL. All rights reserved.</p>
+    <p>Photography & Film by David Mancilla</p>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <img id="lightboxImg" src="" alt="" />
+</div>
+
+<!-- VIDEO LIGHTBOX -->
+<div class="lightbox video-lightbox" id="videoLightbox">
+  <button class="lightbox-close" id="videoLightboxClose">✕</button>
+  <iframe id="videoFrame" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:90vw;max-width:1100px;aspect-ratio:16/9;border-radius:10px;"></iframe>
+</div>
+
+<script>
+// ── Hamburger menu
+const hamburger = document.getElementById('hamburger');
+const navDrawer = document.getElementById('navDrawer');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  navDrawer.classList.toggle('open');
+  document.body.style.overflow = navDrawer.classList.contains('open') ? 'hidden' : '';
+});
+document.querySelectorAll('.drawer-link').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    navDrawer.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+});
+
+// ── Cursor
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
+(function animRing(){
+  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,.gallery-card,.masonry-item,.video-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.width='56px'; ring.style.height='56px'; });
+  el.addEventListener('mouseleave', () => { ring.style.width='36px'; ring.style.height='36px'; });
+});
+
+// ── Nav shrink
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('shrink', window.scrollY > 60);
+});
+
+// ── Scroll Expansion Hero
+const heroWrapper = document.getElementById('heroWrapper');
+const heroMedia = document.getElementById('heroMedia');
+const heroText = document.getElementById('heroText');
+window.addEventListener('scroll', () => {
+  const isMobile = window.innerWidth <= 768;
+  const startScale = isMobile ? 0.62 : 0.42;
+  const rect = heroWrapper.getBoundingClientRect();
+  const total = heroWrapper.offsetHeight - window.innerHeight;
+  const progress = Math.max(0, Math.min(1, -rect.top / total));
+  const scale = startScale + progress * (1 - startScale);
+  const br = Math.max(0, 24 - progress * 24);
+  heroMedia.style.transform = `scale(${scale}) translateY(${8 - progress*8}%)`;
+  heroMedia.style.borderRadius = br + 'px';
+  heroText.style.opacity = Math.max(0, 1 - progress * 2.5);
+});
+
+// ── Intersection Observer for scroll-in animations
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      const delay = e.target.dataset.delay || 0;
+      setTimeout(() => e.target.classList.add('visible'), delay * 120);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.gallery-card, .video-card, .masonry-item').forEach((el, i) => {
+  el.dataset.delay = i % 4;
+  observer.observe(el);
+});
+
+// ── Chips observer
+
+// ── Sticky featured image update on scroll
+const featuredImg = document.getElementById('featuredImg');
+const cards = document.querySelectorAll('.gallery-card');
+const cardImgs = [
+  'media/Moto/KTM-Norway/ktm-adventure-rally-norway-2023-rider-ktm-snow-mountain-panorama.jpg',
+  'media/Moto/moto-hub/motos/honda-crf-snowbike-bc-canada-1.JPG',
+  'media/Moto/moto-hub/motos/ktm-red-bull-dakar-rally-bikes-museum-display.jpg',
+  'media/Moto/moto-hub/motos/ktm-890-adventure-bike-gravel-road-rocky-mountain-peaks.jpg',
+  'media/Moto/moto-hub/rides-events/red-bull-erzbergrodeo-event-sign-austria.jpg',
+];
+const cardObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = Array.from(cards).indexOf(entry.target);
+      if (idx !== -1) {
+        featuredImg.style.opacity = '0';
+        setTimeout(() => {
+          featuredImg.src = cardImgs[idx];
+          featuredImg.style.opacity = '1';
+        }, 200);
+      }
+    }
+  });
+}, { threshold: 0.5 });
+cards.forEach(c => cardObs.observe(c));
+
+// ── Lightbox
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+document.querySelectorAll('.gallery-card[data-img], .masonry-item[data-img]').forEach(el => {
+  el.addEventListener('click', () => {
+    lightboxImg.src = el.dataset.img;
+    lightbox.classList.add('open');
+  });
+});
+document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
+lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+
+// ── Video lightbox
+const videoLightbox = document.getElementById('videoLightbox');
+const videoFrame = document.getElementById('videoFrame');
+document.querySelectorAll('.video-card[data-video]').forEach(el => {
+  el.addEventListener('click', () => {
+    videoFrame.src = `https://www.youtube.com/embed/${el.dataset.video}?autoplay=1&rel=0`;
+    videoLightbox.classList.add('open');
+  });
+});
+document.getElementById('videoLightboxClose').addEventListener('click', () => { videoLightbox.classList.remove('open'); videoFrame.src = ''; });
+videoLightbox.addEventListener('click', e => { if (e.target === videoLightbox) { videoLightbox.classList.remove('open'); videoFrame.src = ''; } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { lightbox.classList.remove('open'); videoLightbox.classList.remove('open'); videoFrame.src = ''; } });
+</script>
+</body>
+</html>
