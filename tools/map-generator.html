@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moto Map Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:   #0B1829;
+  --gold:   #C9A84C;
+  --bg:     #060d18;
+  --panel:  #0b1422;
+  --card:   #111d2e;
+  --border: #1a2a3d;
+  --text:   #cdd4dc;
+  --dim:    #5a6b7c;
+  --radius: 8px;
+}
+
+html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; overflow: hidden; }
+
+/* ── Layout ── */
+.app { display: flex; height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 360px; min-width: 360px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 22px 20px 28px;
+  gap: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* ── Logo ── */
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--gold); letter-spacing: 3px;
+  text-transform: uppercase;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.logo small {
+  display: block; font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 400; letter-spacing: 1.5px;
+  color: var(--dim); margin-top: 5px; text-transform: uppercase;
+}
+
+/* ── Sections ── */
+.section { display: flex; flex-direction: column; gap: 9px; }
+.section-title {
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--dim);
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+
+/* ── Tabs ── */
+.tabs { display: flex; gap: 3px; background: var(--card); padding: 3px; border-radius: var(--radius); border: 1px solid var(--border); }
+.tab-btn {
+  flex: 1; padding: 7px 6px; border: none; background: transparent;
+  color: var(--dim); border-radius: 6px; cursor: pointer;
+  font-size: 11.5px; font-family: 'Inter', sans-serif; font-weight: 500;
+  transition: all 0.18s; letter-spacing: 0.3px;
+}
+.tab-btn.active { background: var(--gold); color: #0B1829; }
+.tab-pane { display: none; flex-direction: column; gap: 9px; }
+.tab-pane.active { display: flex; }
+
+/* ── Inputs ── */
+label { font-size: 11.5px; color: var(--dim); }
+input[type="text"] {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 12px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 13.5px;
+  outline: none; transition: border-color 0.18s;
+}
+input[type="text"]:focus { border-color: var(--gold); }
+input[type="text"]::placeholder { color: var(--dim); opacity: 0.55; }
+
+/* ── Drop zone ── */
+.drop-zone {
+  border: 1.5px dashed var(--border); border-radius: var(--radius);
+  padding: 22px 14px; text-align: center; color: var(--dim);
+  cursor: pointer; transition: all 0.18s; font-size: 12.5px; line-height: 1.7;
+}
+.drop-zone:hover, .drop-zone.over { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.04); }
+.drop-zone.has-file { border-color: var(--gold); border-style: solid; background: rgba(201,168,76,0.06); color: var(--text); }
+.drop-file-name { font-weight: 500; color: var(--gold); font-size: 12px; margin-top: 6px; }
+
+/* ── Color pickers ── */
+.color-rows { display: flex; flex-direction: column; gap: 7px; }
+.color-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 9px 12px;
+}
+.color-row span { flex: 1; font-size: 13px; }
+input[type="color"] { width: 34px; height: 24px; border: none; border-radius: 4px; padding: 0; cursor: pointer; background: none; }
+
+/* ── Buttons ── */
+.btn-primary {
+  width: 100%; padding: 13px; background: var(--gold); color: #0B1829;
+  border: none; border-radius: var(--radius); font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: opacity 0.18s, transform 0.1s; margin-top: 2px;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+.dl-btns { display: none; flex-direction: column; gap: 7px; }
+.dl-btns.show { display: flex; }
+.btn-outline {
+  width: 100%; padding: 11px 14px; background: transparent;
+  color: var(--gold); border: 1px solid rgba(201,168,76,0.45);
+  border-radius: var(--radius); font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.18s; text-align: left;
+}
+.btn-outline:hover { background: rgba(201,168,76,0.08); border-color: var(--gold); }
+.btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-outline .btn-icon { margin-right: 8px; font-size: 13px; }
+
+/* ── Status log ── */
+.status-log { display: flex; flex-direction: column; gap: 5px; min-height: 0; font-size: 12px; }
+.log-item { display: flex; align-items: flex-start; gap: 8px; animation: fadeUp 0.25s ease; line-height: 1.5; }
+.log-item::before { flex-shrink: 0; margin-top: 1px; }
+.log-item.done::before   { content: "✓"; color: var(--gold); }
+.log-item.loading::before{ content: "○"; color: var(--dim); }
+.log-item.error::before  { content: "✕"; color: #d96060; }
+.log-item.error { color: #d96060; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+/* ── Preview panel ── */
+.preview-panel {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); position: relative; overflow: hidden; padding: 28px;
+}
+
+.placeholder {
+  position: absolute; text-align: center; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.placeholder-title {
+  font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300;
+  letter-spacing: 10px; color: var(--border); text-transform: uppercase; line-height: 1;
+}
+.placeholder-sub { font-size: 12px; color: var(--dim); letter-spacing: 0.5px; }
+
+#preview-canvas { max-width: 100%; max-height: 100%; border-radius: 3px; box-shadow: 0 24px 80px rgba(0,0,0,0.7); display: none; }
+#preview-canvas.show { display: block; }
+
+/* ── Stats chip ── */
+.stats-chip {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: rgba(11,20,34,0.92); backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: 100px;
+  padding: 8px 22px; font-size: 12px; color: var(--dim);
+  display: none; gap: 16px; white-space: nowrap;
+}
+.stats-chip.show { display: flex; }
+.stats-chip strong { color: var(--gold); font-weight: 500; }
+</style>
+</head>
+<body>
+<div id="file-warning" style="display:none;background:#7a3b00;color:#ffd580;padding:10px 20px;font-size:12.5px;text-align:center;border-bottom:1px solid #a05000;">
+  ⚠️ &nbsp;Open via <strong>Launch Map Generator.command</strong> (double-click it) — not directly in Chrome. This fixes the map data connection.
+</div>
+<div class="app">
+
+  <!-- ─── Sidebar ─── -->
+  <aside class="sidebar">
+    <div class="logo">
+      Moto Map
+      <small>Motorcycle Pass Poster Generator</small>
+    </div>
+
+    <!-- Route source -->
+    <div class="section">
+      <div class="section-title">Route Source</div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="name">Pass Name</button>
+        <button class="tab-btn" data-tab="file">GPX / KML File</button>
+      </div>
+
+      <div class="tab-pane active" id="tab-name">
+        <label for="pass-name">Mountain pass or location</label>
+        <input type="text" id="pass-name" placeholder="e.g. Stelvio Pass, Col du Galibier…">
+      </div>
+
+      <div class="tab-pane" id="tab-file">
+        <div class="drop-zone" id="drop-zone">
+          <div>Drop a <strong>.gpx</strong> or <strong>.kml</strong> file here</div>
+          <div style="font-size:11px;margin-top:4px;opacity:.5">or click to browse files</div>
+          <div class="drop-file-name" id="drop-filename" style="display:none"></div>
+        </div>
+        <input type="file" id="file-input" accept=".gpx,.kml,.kmz" style="display:none">
+      </div>
+    </div>
+
+    <!-- Poster text -->
+    <div class="section">
+      <div class="section-title">Poster Text</div>
+      <label>Title</label>
+      <input type="text" id="poster-title" placeholder="STELVIO PASS">
+      <label>Country / Subtitle</label>
+      <input type="text" id="poster-subtitle" placeholder="ITALY">
+    </div>
+
+    <!-- Colors -->
+    <div class="section">
+      <div class="section-title">Colors</div>
+      <div class="color-rows">
+        <div class="color-row"><span>Background</span><input type="color" id="col-bg"    value="#0B1829"></div>
+        <div class="color-row"><span>Road network</span><input type="color" id="col-roads" value="#C9A84C"></div>
+        <div class="color-row"><span>Route line</span><input type="color" id="col-route" value="#FFFFFF"></div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="generate-btn">Generate Map</button>
+
+    <!-- Downloads -->
+    <div class="dl-btns" id="dl-btns">
+      <button class="btn-outline" id="dl-svg"><span class="btn-icon">↓</span> Download SVG  <span style="opacity:.5;font-size:10px">(Illustrator / Inkscape)</span></button>
+      <button class="btn-outline" id="dl-png"><span class="btn-icon">↓</span> Download PNG — 300 DPI  <span style="opacity:.5;font-size:10px">(Printify)</span></button>
+    </div>
+
+    <!-- Log -->
+    <div class="status-log" id="status-log"></div>
+  </aside>
+
+  <!-- ─── Preview ─── -->
+  <main class="preview-panel">
+    <div class="placeholder" id="placeholder">
+      <div class="placeholder-title">Your Map</div>
+      <div class="placeholder-sub">Fill in the details on the left, then click Generate</div>
+    </div>
+    <canvas id="preview-canvas"></canvas>
+    <div class="stats-chip" id="stats-chip"></div>
+  </main>
+
+</div>
+
+<script>
+// Show warning if opened as file://
+if (location.protocol === "file:") {
+  document.getElementById("file-warning").style.display = "block";
+}
+
+// ─────────────────────────────────────────────
+// Config
+// ─────────────────────────────────────────────
+const CANVAS_W = 2400, CANVAS_H = 3400, TITLE_H = 420;
+
+const ROAD_STYLES = [
+  { types: ["footway","cycleway","path","steps","bridleway"], opacity: 0.14, width: 0.38 },
+  { types: ["track"],                                          opacity: 0.22, width: 0.50 },
+  { types: ["service","living_street"],                        opacity: 0.35, width: 0.72 },
+  { types: ["residential","pedestrian"],                       opacity: 0.50, width: 1.00 },
+  { types: ["unclassified"],                                   opacity: 0.60, width: 1.30 },
+  { types: ["tertiary","tertiary_link"],                       opacity: 0.70, width: 1.70 },
+  { types: ["secondary","secondary_link"],                     opacity: 0.82, width: 2.20 },
+  { types: ["primary","primary_link"],                         opacity: 0.90, width: 2.80 },
+  { types: ["trunk","trunk_link"],                             opacity: 0.95, width: 3.50 },
+  { types: ["motorway","motorway_link"],                       opacity: 1.00, width: 4.00 },
+];
+
+const OVERPASS_MIRRORS = [
+  "https://overpass.private.coffee/api/interpreter",
+  "https://overpass-api.de/api/interpreter",
+  "https://lz4.overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+];
+
+// ─────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────
+const S = { routePts: [], roads: [], project: null, opts: null };
+
+// ─────────────────────────────────────────────
+// Projection (Web Mercator)
+// ─────────────────────────────────────────────
+function toMerc(lat, lon) {
+  return [
+    Math.PI / 180 * lon,
+    Math.log(Math.tan(Math.PI / 4 + Math.PI / 180 * lat / 2))
+  ];
+}
+
+function makeProjector(minLat, maxLat, minLon, maxLon, pad = 0.18) {
+  const dlat = Math.max((maxLat - minLat) * pad, 0.025);
+  const dlon = Math.max((maxLon - minLon) * pad, 0.025);
+  minLat -= dlat; maxLat += dlat; minLon -= dlon; maxLon += dlon;
+
+  const [x0, y0] = toMerc(minLat, minLon);
+  const [x1, y1] = toMerc(maxLat, maxLon);
+  const mapH = CANVAS_H - TITLE_H;
+  const sc = Math.min(CANVAS_W / (x1 - x0), mapH / (y1 - y0));
+  const ox = (CANVAS_W - sc * (x1 - x0)) / 2;
+  const oy = (mapH   - sc * (y1 - y0)) / 2;
+
+  return (lat, lon) => {
+    const [mx, my] = toMerc(lat, lon);
+    return [ox + (mx - x0) * sc, oy + (y1 - my) * sc];
+  };
+}
+
+// ─────────────────────────────────────────────
+// Stats
+// ─────────────────────────────────────────────
+function hav(lat1, lon1, lat2, lon2) {
+  const R = 6371, d2r = Math.PI / 180;
+  const dlat = (lat2 - lat1) * d2r, dlon = (lon2 - lon1) * d2r;
+  const a = Math.sin(dlat/2)**2 + Math.cos(lat1*d2r)*Math.cos(lat2*d2r)*Math.sin(dlon/2)**2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+function calcStats(pts) {
+  let km = 0, gain = 0;
+  for (let i = 1; i < pts.length; i++) {
+    km += hav(pts[i-1].lat, pts[i-1].lon, pts[i].lat, pts[i].lon);
+    if (pts[i].ele != null && pts[i-1].ele != null) {
+      const d = pts[i].ele - pts[i-1].ele;
+      if (d > 0) gain += d;
+    }
+  }
+  return { km, gain };
+}
+
+// ─────────────────────────────────────────────
+// File parsers
+// ─────────────────────────────────────────────
+function parseGPX(text) {
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  const pts = [];
+  for (const sel of ["trkpt","rtept","wpt"]) {
+    for (const n of doc.querySelectorAll(sel)) {
+      const lat = +n.getAttribute("lat"), lon = +n.getAttribute("lon");
+      const eleEl = n.querySelector("ele");
+      pts.push({ lat, lon, ele: eleEl ? +eleEl.textContent : null });
+    }
+    if (pts.length) break;
+  }
+  return pts;
+}
+
+function parseKML(text) {
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  const pts = [];
+  for (const el of doc.querySelectorAll("coordinates")) {
+    for (const tok of el.textContent.trim().split(/\s+/)) {
+      const p = tok.split(",");
+      if (p.length >= 2) {
+        const lon = +p[0], lat = +p[1], ele = p[2] ? +p[2] : null;
+        if (!isNaN(lat) && !isNaN(lon)) pts.push({ lat, lon, ele });
+      }
+    }
+    if (pts.length) break;
+  }
+  if (!pts.length) {
+    for (const el of doc.querySelectorAll("coord")) {
+      const p = el.textContent.trim().split(/\s+/);
+      if (p.length >= 2) pts.push({ lat: +p[1], lon: +p[0], ele: p[2] ? +p[2] : null });
+    }
+  }
+  return pts;
+}
+
+// ─────────────────────────────────────────────
+// API helpers
+// ─────────────────────────────────────────────
+async function geocode(name) {
+  const r = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,
+    { headers: { Accept: "application/json" } }
+  );
+  if (!r.ok) throw new Error("Geocoding request failed.");
+  const d = await r.json();
+  if (!d.length) throw new Error(`Could not find "${name}". Try a more specific pass name.`);
+  return { lat: +d[0].lat, lon: +d[0].lon };
+}
+
+async function fetchOSRM(lat1, lon1, lat2, lon2) {
+  const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error("Routing request failed.");
+  const d = await r.json();
+  if (d.code !== "Ok") throw new Error("No route found. Try a different pass name or use a GPX file.");
+  return d.routes[0].geometry.coordinates.map(([lon, lat]) => ({ lat, lon, ele: null }));
+}
+
+async function overpass(query) {
+  const body = "data=" + encodeURIComponent(query);
+  for (const m of OVERPASS_MIRRORS) {
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 90000);
+      const r = await fetch(m, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
+        signal: ctrl.signal
+      });
+      clearTimeout(timer);
+      if (r.ok) {
+        const data = await r.json();
+        return data.elements || [];
+      }
+      console.warn(`${m} → ${r.status}`);
+    } catch(e) { console.warn(`${m} failed:`, e.message); }
+  }
+  throw new Error("OpenStreetMap server unavailable. Check your internet connection and try again.");
+}
+
+async function resolvePassName(name) {
+  const { lat, lon } = await geocode(name);
+  logUpdate("Searching for the road through the pass…", "loading", "roads-nearby");
+  const nearby = await overpass(`
+[out:json][timeout:30];
+(way["highway"~"primary|secondary|tertiary|trunk|unclassified"](around:7000,${lat},${lon}););
+out geom;`);
+  if (!nearby.length) throw new Error("No roads found near this location. Try a GPX file instead.");
+
+  const best = nearby.reduce((a, b) => (b.geometry?.length || 0) > (a.geometry?.length || 0) ? b : a);
+  const g = best.geometry || [];
+  if (g.length < 2) throw new Error("Couldn't build a route. Try a GPX file instead.");
+
+  logUpdate("Building route along the pass…", "loading", "roads-nearby");
+  return fetchOSRM(g[0].lat, g[0].lon, g[g.length-1].lat, g[g.length-1].lon);
+}
+
+async function fetchRoads(minLat, maxLat, minLon, maxLon) {
+  return overpass(`
+[out:json][timeout:120];
+(
+  way["highway"~"motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|service|living_street|pedestrian|track|footway|cycleway|path|bridleway|steps"]
+  (${minLat},${minLon},${maxLat},${maxLon});
+);
+out geom;`);
+}
+
+// ─────────────────────────────────────────────
+// Canvas renderer
+// ─────────────────────────────────────────────
+function hexRgb(hex) {
+  const h = hex.replace("#","");
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+}
+
+function drawMap(canvas, sc, routePts, roads, project, opts) {
+  const W = Math.round(CANVAS_W * sc), H = Math.round(CANVAS_H * sc);
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  // Background
+  ctx.fillStyle = opts.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Roads
+  const [rr, rg, rb] = hexRgb(opts.roads);
+  for (const { types, opacity, width } of ROAD_STYLES) {
+    ctx.strokeStyle = `rgba(${rr},${rg},${rb},${opacity})`;
+    ctx.lineWidth = Math.max(0.5, width * sc);
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    for (const el of roads) {
+      if (!types.includes(el.tags?.highway)) continue;
+      const geom = el.geometry; if (!geom || geom.length < 2) continue;
+      ctx.beginPath();
+      for (let i = 0; i < geom.length; i++) {
+        const [px, py] = project(geom[i].lat, geom[i].lon);
+        i ? ctx.lineTo(px*sc, py*sc) : ctx.moveTo(px*sc, py*sc);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // Route
+  if (routePts.length > 1) {
+    const rpts = routePts.map(p => project(p.lat, p.lon));
+    const [er, eg, eb] = hexRgb(opts.route);
+    const drawRoute = (alpha, lw) => {
+      ctx.strokeStyle = `rgba(${er},${eg},${eb},${alpha})`;
+      ctx.lineWidth = lw * sc; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath();
+      rpts.forEach(([px, py], i) => i ? ctx.lineTo(px*sc,py*sc) : ctx.moveTo(px*sc,py*sc));
+      ctx.stroke();
+    };
+    drawRoute(0.18, 9);    // glow
+    drawRoute(0.08, 16);   // wide soft glow
+    drawRoute(1.00, 3.5);  // solid line
+  }
+
+  // ── Title block ──
+  const mapH  = (CANVAS_H - TITLE_H) * sc;
+  const ruleY = mapH + 42 * sc;
+  const cx    = W / 2;
+  const [gr, gg, gb] = hexRgb(opts.roads);
+  const goldRgb = `rgb(${gr},${gg},${gb})`;
+
+  // Separator rule
+  ctx.strokeStyle = `rgba(${gr},${gg},${gb},0.55)`;
+  ctx.lineWidth = 1.5 * sc;
+  ctx.beginPath(); ctx.moveTo(80*sc, ruleY); ctx.lineTo(W-80*sc, ruleY); ctx.stroke();
+
+  ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = goldRgb;
+
+  // Title
+  const ts = Math.round(88 * sc);
+  ctx.font = `600 ${ts}px "Cormorant Garamond", Georgia, serif`;
+  if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(16*sc)}px`;
+  ctx.fillText(opts.title.toUpperCase(), cx, ruleY + 140*sc);
+
+  // Subtitle
+  if (opts.subtitle) {
+    ctx.font = `300 ${Math.round(34*sc)}px "Cormorant Garamond", Georgia, serif`;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(9*sc)}px`;
+    ctx.fillStyle = `rgba(${gr},${gg},${gb},0.82)`;
+    ctx.fillText(opts.subtitle.toUpperCase(), cx, ruleY + 198*sc);
+  }
+
+  // Coords
+  const coordY = ruleY + (opts.subtitle ? 246 : 195) * sc;
+  ctx.font = `300 ${Math.round(24*sc)}px "Cormorant Garamond", Georgia, serif`;
+  if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(3*sc)}px`;
+  ctx.fillStyle = `rgba(${gr},${gg},${gb},0.55)`;
+  const latStr = `${Math.abs(opts.cLat).toFixed(4)}° ${opts.cLat >= 0 ? "N" : "S"}`;
+  const lonStr = `${Math.abs(opts.cLon).toFixed(4)}° ${opts.cLon >= 0 ? "E" : "W"}`;
+  ctx.fillText(`${latStr}  /  ${lonStr}`, cx, coordY);
+
+  // Stats
+  const statParts = [];
+  if (opts.km  > 0) statParts.push(`${opts.km.toFixed(1)} km`);
+  if (opts.gain > 0) statParts.push(`${Math.round(opts.gain).toLocaleString()} m elevation gain`);
+  if (statParts.length) {
+    ctx.font = `300 ${Math.round(22*sc)}px "Cormorant Garamond", Georgia, serif`;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(2*sc)}px`;
+    ctx.fillStyle = `rgba(${gr},${gg},${gb},0.45)`;
+    ctx.fillText(statParts.join("  ·  "), cx, coordY + 42*sc);
+  }
+
+  // Attribution
+  ctx.font = `300 ${Math.round(14*sc)}px "Inter", Arial, sans-serif`;
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  ctx.textAlign = "right";
+  ctx.fillStyle = `rgba(${gr},${gg},${gb},0.28)`;
+  ctx.fillText("© OpenStreetMap contributors", W - 22*sc, H - 24*sc);
+}
+
+// ─────────────────────────────────────────────
+// SVG generator
+// ─────────────────────────────────────────────
+function buildSVG(routePts, roads, project, opts) {
+  const W = CANVAS_W, H = CANVAS_H;
+  const [gr, gg, gb] = hexRgb(opts.roads);
+  const goldRgb = `rgb(${gr},${gg},${gb})`;
+  const [er, eg, eb] = hexRgb(opts.route);
+  const mapH = H - TITLE_H;
+  const ruleY = mapH + 42;
+  const cx = W / 2;
+
+  let out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">
+<defs>
+  <style>@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&amp;display=swap');</style>
+</defs>
+<rect width="${W}" height="${H}" fill="${opts.bg}"/>
+`;
+
+  // Roads
+  for (const { types, opacity, width } of ROAD_STYLES) {
+    out += `<g stroke="${goldRgb}" stroke-opacity="${opacity}" stroke-width="${width}" fill="none" stroke-linecap="round" stroke-linejoin="round">\n`;
+    for (const el of roads) {
+      if (!types.includes(el.tags?.highway)) continue;
+      const g = el.geometry; if (!g || g.length < 2) continue;
+      const pts = g.map(n => { const [x,y] = project(n.lat, n.lon); return `${x.toFixed(1)},${y.toFixed(1)}`; }).join(" ");
+      out += `<polyline points="${pts}"/>\n`;
+    }
+    out += `</g>\n`;
+  }
+
+  // Route
+  if (routePts.length > 1) {
+    const rp = routePts.map(p => { const [x,y] = project(p.lat, p.lon); return `${x.toFixed(1)},${y.toFixed(1)}`; }).join(" ");
+    out += `<polyline points="${rp}" stroke="rgb(${er},${eg},${eb})" stroke-opacity="0.18" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+    out += `<polyline points="${rp}" stroke="${opts.route}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+  }
+
+  // Rule
+  out += `<line x1="80" y1="${ruleY}" x2="${W-80}" y2="${ruleY}" stroke="${goldRgb}" stroke-opacity="0.55" stroke-width="1.5"/>\n`;
+
+  // Title
+  out += `<text x="${cx}" y="${ruleY+140}" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="88" font-weight="600" letter-spacing="16" fill="${goldRgb}">${esc(opts.title.toUpperCase())}</text>\n`;
+
+  if (opts.subtitle) {
+    out += `<text x="${cx}" y="${ruleY+198}" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="34" font-weight="300" letter-spacing="9" fill="${goldRgb}" opacity="0.82">${esc(opts.subtitle.toUpperCase())}</text>\n`;
+  }
+
+  const coordY = ruleY + (opts.subtitle ? 246 : 195);
+  const latStr = `${Math.abs(opts.cLat).toFixed(4)}° ${opts.cLat >= 0 ? "N" : "S"}`;
+  const lonStr = `${Math.abs(opts.cLon).toFixed(4)}° ${opts.cLon >= 0 ? "E" : "W"}`;
+  out += `<text x="${cx}" y="${coordY}" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="24" font-weight="300" letter-spacing="3" fill="${goldRgb}" opacity="0.55">${latStr}  /  ${lonStr}</text>\n`;
+
+  const sp = [];
+  if (opts.km   > 0) sp.push(`${opts.km.toFixed(1)} km`);
+  if (opts.gain > 0) sp.push(`${Math.round(opts.gain).toLocaleString()} m elevation gain`);
+  if (sp.length) {
+    out += `<text x="${cx}" y="${coordY+42}" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="22" font-weight="300" letter-spacing="2" fill="${goldRgb}" opacity="0.45">${sp.join("  ·  ")}</text>\n`;
+  }
+
+  out += `<text x="${W-22}" y="${H-20}" text-anchor="end" font-family="Arial,sans-serif" font-size="14" fill="${goldRgb}" opacity="0.28">© OpenStreetMap contributors</text>\n`;
+  out += `</svg>`;
+  return out;
+}
+
+function esc(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ─────────────────────────────────────────────
+// UI helpers
+// ─────────────────────────────────────────────
+const logEl      = document.getElementById("status-log");
+const genBtn     = document.getElementById("generate-btn");
+const dlBtns     = document.getElementById("dl-btns");
+const previewCvs = document.getElementById("preview-canvas");
+const placeholder= document.getElementById("placeholder");
+const statsChip  = document.getElementById("stats-chip");
+
+const logRegistry = {};
+
+function logAdd(msg, type, id) {
+  const key = id || msg;
+  if (logRegistry[key]) {
+    logRegistry[key].className = `log-item ${type}`;
+    logRegistry[key].querySelector("span").textContent = msg;
+    return;
+  }
+  const el = document.createElement("div");
+  el.className = `log-item ${type}`;
+  el.innerHTML = `<span>${msg}</span>`;
+  logEl.appendChild(el);
+  logRegistry[key] = el;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function logUpdate(msg, type, id) { logAdd(msg, type, id); }
+function logClear() { logEl.innerHTML = ""; Object.keys(logRegistry).forEach(k => delete logRegistry[k]); }
+
+function setGenerating(v) {
+  genBtn.disabled = v;
+  genBtn.textContent = v ? "Generating…" : "Generate Map";
+}
+
+// ─────────────────────────────────────────────
+// Tab switching
+// ─────────────────────────────────────────────
+document.querySelectorAll(".tab-btn").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    document.querySelectorAll(".tab-pane").forEach(x => x.classList.remove("active"));
+    document.getElementById(`tab-${b.dataset.tab}`).classList.add("active");
+  });
+});
+
+// ─────────────────────────────────────────────
+// Drag & drop / file picker
+// ─────────────────────────────────────────────
+const dropZone   = document.getElementById("drop-zone");
+const fileInput  = document.getElementById("file-input");
+const dropNameEl = document.getElementById("drop-filename");
+let filePoints   = null;
+
+dropZone.addEventListener("click", () => fileInput.click());
+dropZone.addEventListener("dragover",  e => { e.preventDefault(); dropZone.classList.add("over"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault(); dropZone.classList.remove("over");
+  if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener("change", () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const txt = e.target.result;
+    const name = file.name.toLowerCase();
+    const pts = name.endsWith(".gpx") ? parseGPX(txt) : parseKML(txt);
+    if (!pts.length) {
+      dropZone.innerHTML = `<div style="color:#d96060">Could not read file. Make sure it's a valid GPX or KML.</div>`;
+      filePoints = null; return;
+    }
+    filePoints = pts;
+    dropZone.classList.add("has-file");
+    dropZone.querySelector("div").textContent = "";
+    dropNameEl.style.display = "block";
+    dropNameEl.textContent = `${file.name}  ·  ${pts.length.toLocaleString()} points`;
+  };
+  reader.readAsText(file);
+}
+
+// ─────────────────────────────────────────────
+// Generate
+// ─────────────────────────────────────────────
+document.getElementById("generate-btn").addEventListener("click", async () => {
+  logClear();
+  setGenerating(true);
+  dlBtns.classList.remove("show");
+  statsChip.classList.remove("show");
+  previewCvs.classList.remove("show");
+  placeholder.style.display = "";
+
+  try {
+    const title    = document.getElementById("poster-title").value.trim()    || "UNTITLED PASS";
+    const subtitle = document.getElementById("poster-subtitle").value.trim();
+    const bg       = document.getElementById("col-bg").value;
+    const roads    = document.getElementById("col-roads").value;
+    const route    = document.getElementById("col-route").value;
+    const activeTab = document.querySelector(".tab-btn.active").dataset.tab;
+
+    // ── Route ──
+    logAdd("Resolving route…", "loading", "route");
+    let pts = [];
+
+    if (activeTab === "file") {
+      if (!filePoints?.length) throw new Error("No file loaded. Drop a GPX or KML file first.");
+      pts = filePoints;
+      logUpdate(`Route loaded — ${pts.length.toLocaleString()} points`, "done", "route");
+    } else {
+      const passName = document.getElementById("pass-name").value.trim();
+      if (!passName) throw new Error("Enter a pass name or switch to the file tab.");
+      logUpdate(`Finding "${passName}"…`, "loading", "route");
+      pts = await resolvePassName(passName);
+      logUpdate(`Route found — ${pts.length.toLocaleString()} points`, "done", "route");
+    }
+
+    // ── Bounding box ──
+    const lats = pts.map(p => p.lat), lons = pts.map(p => p.lon);
+    const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+    const minLon = Math.min(...lons), maxLon = Math.max(...lons);
+    const cLat = (minLat + maxLat) / 2, cLon = (minLon + maxLon) / 2;
+    const { km, gain } = calcStats(pts);
+
+    const PAD = 0.18, MIN = 0.025;
+    const dlat = Math.max((maxLat - minLat) * PAD, MIN);
+    const dlon = Math.max((maxLon - minLon) * PAD, MIN);
+
+    // ── Road network ──
+    logAdd("Fetching road network from OpenStreetMap…", "loading", "osm");
+    const roadEls = await fetchRoads(minLat - dlat, maxLat + dlat, minLon - dlon, maxLon + dlon);
+    logUpdate(`${roadEls.length.toLocaleString()} road segments loaded`, "done", "osm");
+
+    // ── Build projector ──
+    const project = makeProjector(minLat, maxLat, minLon, maxLon, PAD);
+
+    // ── Save state ──
+    S.routePts = pts; S.roads = roadEls; S.project = project;
+    S.opts = { title, subtitle, bg, roads, route, km, gain, cLat, cLon };
+
+    // ── Render preview ──
+    logAdd("Rendering preview…", "loading", "render");
+    const panel = document.querySelector(".preview-panel");
+    const avW = panel.clientWidth  - 56;
+    const avH = panel.clientHeight - 56;
+    const previewSc = Math.min(avW / CANVAS_W, avH / CANVAS_H);
+
+    await new Promise(r => setTimeout(r, 20)); // let log paint
+    drawMap(previewCvs, previewSc, pts, roadEls, project, S.opts);
+    previewCvs.classList.add("show");
+    placeholder.style.display = "none";
+    logUpdate("Preview ready ✓", "done", "render");
+
+    // Stats chip
+    const chipParts = [];
+    if (km   > 0) chipParts.push(`<strong>${km.toFixed(1)} km</strong>`);
+    if (gain > 0) chipParts.push(`<strong>${Math.round(gain).toLocaleString()} m</strong> elevation gain`);
+    if (chipParts.length) { statsChip.innerHTML = chipParts.join("&nbsp;&nbsp;·&nbsp;&nbsp;"); statsChip.classList.add("show"); }
+
+    dlBtns.classList.add("show");
+
+  } catch(err) {
+    logAdd(err.message, "error");
+  } finally {
+    setGenerating(false);
+  }
+});
+
+// ─────────────────────────────────────────────
+// Downloads
+// ─────────────────────────────────────────────
+document.getElementById("dl-svg").addEventListener("click", () => {
+  if (!S.project) return;
+  const svg  = buildSVG(S.routePts, S.roads, S.project, S.opts);
+  const blob = new Blob([svg], { type: "image/svg+xml" });
+  download(URL.createObjectURL(blob), `${slug(S.opts.title)}.svg`);
+});
+
+document.getElementById("dl-png").addEventListener("click", async () => {
+  if (!S.project) return;
+  const btn = document.getElementById("dl-png");
+  btn.disabled = true;
+  btn.textContent = "Rendering 300 DPI…";
+  logAdd("Rendering print PNG (7200×10200 px)…", "loading", "png");
+  await new Promise(r => setTimeout(r, 40));
+  try {
+    const c = document.createElement("canvas");
+    drawMap(c, 3, S.routePts, S.roads, S.project, S.opts);
+    c.toBlob(blob => {
+      download(URL.createObjectURL(blob), `${slug(S.opts.title)}_print.png`);
+      logUpdate("Print PNG downloaded", "done", "png");
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-icon">↓</span> Download PNG — 300 DPI <span style="opacity:.5;font-size:10px">(Printify)</span>';
+    }, "image/png");
+  } catch(e) {
+    logAdd(`PNG failed: ${e.message}`, "error", "png");
+    btn.disabled = false;
+    btn.innerHTML = '<span class="btn-icon">↓</span> Download PNG — 300 DPI <span style="opacity:.5;font-size:10px">(Printify)</span>';
+  }
+});
+
+function download(url, name) {
+  const a = document.createElement("a"); a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+</script>
+</body>
+</html>
