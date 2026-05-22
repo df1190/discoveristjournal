@@ -1068,7 +1068,8 @@ async function exportPNG() {
     const PH  = POSTER_H * PRINT_SCALE;
 
     const offDiv = document.createElement("div");
-    offDiv.style.cssText = `position:fixed;left:-99999px;top:0;width:${POSTER_W}px;height:${MAP_H}px;`;
+    // Keep in viewport so WebGL actually renders (off-screen elements may be skipped by GPU)
+    offDiv.style.cssText = `position:fixed;left:0;top:0;width:${POSTER_W}px;height:${MAP_H}px;opacity:0;pointer-events:none;z-index:-1;`;
     document.body.appendChild(offDiv);
 
     const previewW = document.getElementById("map").clientWidth;
@@ -1098,7 +1099,10 @@ async function exportPNG() {
     addMapLayers(printMap);
 
     await new Promise((res, rej) => {
-      printMap.once("idle", res);
+      printMap.once("idle", () => {
+        // Two rAF cycles to ensure WebGL has fully painted after tiles load
+        requestAnimationFrame(() => requestAnimationFrame(res));
+      });
       setTimeout(() => rej(new Error("Render timeout")), 40000);
     });
 
@@ -1111,8 +1115,9 @@ async function exportPNG() {
     await ensureFonts();
     renderTitleBlock(ctx, PW, PTH, PMH, PW / POSTER_W);
 
-    await new Promise(res => {
+    await new Promise((res, rej) => {
       final.toBlob(blob => {
+        if (!blob) { rej(new Error("Canvas export failed — canvas may be tainted by cross-origin content")); return; }
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = (document.getElementById("title-input").value || "moto-map").toLowerCase().replace(/\s+/g, "-") + "-print.png";
