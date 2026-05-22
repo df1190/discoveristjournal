@@ -3,156 +3,501 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moto Map Generator</title>
+<title>Map Generator — Discoverist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f0f0;color:#222;height:100vh;overflow:hidden;display:flex;flex-direction:column}
-#header{background:#fff;padding:10px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e0e0e0;flex-shrink:0}
-#header h1{font-size:14px;font-weight:700;color:#9a7a2a;letter-spacing:.1em}
-#header p{font-size:11px;color:#aaa}
+/* ── Design tokens (Apple HIG) ───────────────────────────────────────── */
+:root {
+  --bg:      #F2F2F7;
+  --surf:    #FFFFFF;
+  --surf2:   #F9F9FB;
+  --fill:    rgba(120,120,128,.10);
+  --fill2:   rgba(120,120,128,.18);
+  --sep:     rgba(60,60,67,.12);
+  --sep2:    rgba(60,60,67,.06);
+  --lbl:     #1C1C1E;
+  --lbl2:    rgba(60,60,67,.80);
+  --lbl3:    rgba(60,60,67,.50);
+  --lbl4:    rgba(60,60,67,.28);
+  --gold:    #C9A84C;
+  --gold-hi: #D4B56A;
+  --gold-lo: #A88A3A;
+  --gold-f:  rgba(201,168,76,.10);
+  --gold-r:  rgba(201,168,76,.28);
+  --r:       12px;
+  --r-sm:    8px;
+  --r-lg:    16px;
+  --sh:      0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh-md:   0 3px 12px rgba(0,0,0,.09),0 1px 3px rgba(0,0,0,.05);
+  --sh-lg:   0 10px 48px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.07);
+  --font:    "Inter",-apple-system,"SF Pro Text",BlinkMacSystemFont,sans-serif;
+  --mono:    "JetBrains Mono","SF Mono","Menlo",monospace;
+  --ease:    cubic-bezier(.4,0,.2,1);
+  --spring:  cubic-bezier(.34,1.56,.64,1);
+  --t:       150ms;
+  --ts:      280ms;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--lbl);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+#hdr{
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  padding:0 18px;height:50px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--sep);flex-shrink:0;z-index:10;
+}
+.hdr-icon{
+  width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(155deg,var(--gold-hi) 0%,var(--gold-lo) 100%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(168,138,58,.32);
+}
+.hdr-icon svg{width:18px;height:18px;fill:white}
+#hdr h1{font-size:13px;font-weight:600;letter-spacing:-.01em;color:var(--lbl)}
+#hdr-hint{font-size:11px;color:var(--lbl4);margin-left:auto;letter-spacing:0}
+
+/* ── Main layout ─────────────────────────────────────────────────────── */
 #main{display:flex;flex:1;overflow:hidden}
-#sidebar{width:220px;flex-shrink:0;background:#fff;border-right:1px solid #e8e8e8;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
-.sec{display:flex;flex-direction:column;gap:8px}
-.sec-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9a7a2a}
-label{font-size:11px;color:#777}
-input[type=text]{background:#f7f7f7;border:1px solid #ddd;border-radius:5px;color:#222;font-size:12px;padding:7px 9px;width:100%;outline:none}
-input[type=text]:focus{border-color:#C9A84C}
-input[type=file]{background:#f7f7f7;border:1px solid #ddd;border-radius:5px;color:#666;font-size:11px;padding:5px 8px;width:100%;cursor:pointer}
-.or{text-align:center;font-size:10px;color:#bbb;position:relative;margin:2px 0}
-.or::before,.or::after{content:"";position:absolute;top:50%;width:40%;height:1px;background:#e0e0e0}
-.or::before{left:0}.or::after{right:0}
-.color-row{display:flex;gap:10px;flex-wrap:wrap}
-.color-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#777}
-input[type=color]{width:28px;height:24px;border:1px solid #ddd;border-radius:3px;padding:1px;background:none;cursor:pointer}
-.terrain-row{display:flex;justify-content:space-between;align-items:center}
-.toggle{position:relative;width:34px;height:18px;flex-shrink:0}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+#sidebar{
+  width:256px;flex-shrink:0;
+  background:var(--bg);
+  border-right:1px solid var(--sep);
+  overflow-y:auto;padding:10px 10px 20px;
+  display:flex;flex-direction:column;gap:8px;
+  scrollbar-width:thin;scrollbar-color:var(--sep) transparent;
+}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--sep);border-radius:2px}
+
+/* ── Cards ───────────────────────────────────────────────────────────── */
+.card{
+  background:var(--surf);border-radius:var(--r-lg);
+  padding:13px 14px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--sh);
+}
+.ctitle{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--lbl3)}
+
+/* ── Segmented control ───────────────────────────────────────────────── */
+.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.seg-btn{
+  flex:1;padding:5px 4px;font-size:11px;font-weight:500;font-family:var(--font);
+  color:var(--lbl3);background:transparent;border:none;border-radius:7px;
+  cursor:pointer;text-align:center;white-space:nowrap;
+  transition:background var(--t) var(--ease),color var(--t) var(--ease),box-shadow var(--t) var(--ease);
+}
+.seg-btn.active{background:var(--surf);color:var(--lbl);box-shadow:var(--sh)}
+
+/* ── Input panels ────────────────────────────────────────────────────── */
+.panel{display:none;flex-direction:column;gap:8px}
+.panel.on{display:flex}
+
+/* ── Fields ──────────────────────────────────────────────────────────── */
+.field{display:flex;flex-direction:column;gap:4px}
+.flbl{font-size:11px;font-weight:500;color:var(--lbl2)}
+input[type=text]{
+  background:var(--fill);border:1.5px solid transparent;
+  border-radius:var(--r-sm);color:var(--lbl);
+  font-size:12.5px;font-family:var(--font);
+  padding:8px 10px;width:100%;outline:none;
+  transition:border-color var(--t) var(--ease),box-shadow var(--t) var(--ease),background var(--t) var(--ease);
+}
+input[type=text]:focus{background:var(--surf);border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-r)}
+input[type=text]::placeholder{color:var(--lbl4)}
+
+/* ── File drop ───────────────────────────────────────────────────────── */
+.fdrop{
+  border:1.5px dashed var(--sep);border-radius:var(--r-sm);
+  padding:11px 10px;text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  transition:border-color var(--t) var(--ease),background var(--t) var(--ease);
+  position:relative;overflow:hidden;
+}
+.fdrop:hover{border-color:var(--gold);background:var(--gold-f)}
+.fdrop.has-file{border-color:var(--gold);background:var(--gold-f)}
+.fdrop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.fdrop-ico{color:var(--lbl4)}
+.fdrop-txt{font-size:11.5px;font-weight:500;color:var(--lbl3)}
+.fdrop-sub{font-size:10px;color:var(--lbl4)}
+.fdrop.has-file .fdrop-txt{color:var(--gold-lo);font-weight:600}
+
+/* ── Color swatches ──────────────────────────────────────────────────── */
+.color-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cswatch{display:flex;flex-direction:column;align-items:center;gap:5px}
+.cswatch-circle{
+  width:38px;height:38px;border-radius:50%;
+  border:2px solid var(--sep);overflow:hidden;display:block;cursor:pointer;
+  transition:transform var(--t) var(--ease),box-shadow var(--t) var(--ease);
+}
+.cswatch-circle:hover{transform:scale(1.10);box-shadow:var(--sh-md)}
+.cswatch-circle input[type=color]{
+  -webkit-appearance:none;appearance:none;
+  border:none;width:calc(100% + 4px);height:calc(100% + 4px);
+  margin:-2px;cursor:pointer;padding:0;display:block;
+}
+.cswatch-circle input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.cswatch-circle input[type=color]::-webkit-color-swatch{border:none}
+.cswatch-lbl{font-size:10px;color:var(--lbl3);font-weight:500}
+
+/* ── Presets ─────────────────────────────────────────────────────────── */
+.presets{display:flex;gap:6px}
+.preset-pill{
+  flex:1;height:22px;border-radius:5px;cursor:pointer;
+  border:1.5px solid transparent;display:block;
+  transition:transform var(--t) var(--ease),box-shadow var(--t) var(--ease),border-color var(--t) var(--ease);
+}
+.preset-pill:hover{transform:scale(1.06);box-shadow:var(--sh)}
+.preset-pill.active{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-r)}
+
+/* ── Detail segmented ────────────────────────────────────────────────── */
+.detail-seg{display:flex;background:var(--fill);border-radius:var(--r-sm);padding:2px;gap:2px}
+.detail-btn{
+  flex:1;padding:4px 0;font-size:10.5px;font-weight:500;font-family:var(--font);
+  color:var(--lbl3);background:transparent;border:none;border-radius:6px;
+  cursor:pointer;text-align:center;
+  transition:background var(--t) var(--ease),color var(--t) var(--ease),box-shadow var(--t) var(--ease);
+}
+.detail-btn.active{background:var(--surf);color:var(--lbl);box-shadow:var(--sh)}
+.detail-hint{font-size:9.5px;color:var(--lbl4);margin-top:3px}
+
+/* ── Toggle ──────────────────────────────────────────────────────────── */
+.toggle-row{display:flex;justify-content:space-between;align-items:center}
+.tlbl{font-size:12.5px;color:var(--lbl2)}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
-.slider{position:absolute;inset:0;background:#ccc;border-radius:18px;cursor:pointer;transition:.2s}
-.slider:before{content:"";position:absolute;height:12px;width:12px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-input:checked+.slider{background:#C9A84C}
-input:checked+.slider:before{transform:translateX(16px)}
-.range-row{display:flex;flex-direction:column;gap:3px}
-.range-label{display:flex;justify-content:space-between;font-size:10px;color:#aaa}
-input[type=range]{width:100%;accent-color:#C9A84C;height:3px}
-.stats-box{background:#f7f7f7;border:1px solid #e8e8e8;border-radius:6px;padding:9px;font-size:11px;color:#777;line-height:1.6}
-.stats-box strong{color:#9a7a2a}
-.btn{padding:9px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;width:100%;transition:opacity .2s}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-.btn-primary{background:#C9A84C;color:#fff}
-.btn-primary:hover:not(:disabled){opacity:.88}
-.btn-secondary{background:#f0f0f0;color:#9a7a2a;border:1px solid #C9A84C55}
-.btn-secondary:hover:not(:disabled){background:#e8e4d8}
-#status{font-size:11px;color:#aaa;text-align:center;min-height:16px}
-#status.err{color:#d44}
-#status.ok{color:#2a9a5a}
-#preview-area{flex:1;display:flex;align-items:center;justify-content:center;background:#e4e4e4;padding:16px;overflow:hidden}
-#poster-wrap{position:relative;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.slider{position:absolute;inset:0;background:#D1D1D6;border-radius:20px;cursor:pointer;transition:background .2s}
+.slider::before{content:"";position:absolute;height:16px;width:16px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle input:checked+.slider{background:var(--gold)}
+.toggle input:checked+.slider::before{transform:translateX(16px)}
+
+/* ── Range ───────────────────────────────────────────────────────────── */
+.rng-wrap{display:flex;flex-direction:column;gap:5px;transition:opacity var(--t)}
+.rng-wrap.off{opacity:.35;pointer-events:none}
+.rng-hdr{display:flex;justify-content:space-between;align-items:center}
+.rng-lbl{font-size:11.5px;color:var(--lbl2)}
+.rng-val{font-size:11px;font-weight:600;color:var(--gold-lo);font-variant-numeric:tabular-nums}
+input[type=range]{
+  width:100%;height:4px;-webkit-appearance:none;appearance:none;
+  background:var(--fill2);border-radius:2px;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--surf);border:2.5px solid var(--gold);
+  box-shadow:0 1px 3px rgba(0,0,0,.15);cursor:pointer;
+  transition:transform var(--t);
+}
+input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
+
+/* ── Stats ───────────────────────────────────────────────────────────── */
+#stats-card{
+  background:var(--gold-f);border:1px solid rgba(201,168,76,.18);
+  border-radius:var(--r-sm);padding:10px 12px;
+  display:none;flex-direction:column;gap:3px;
+}
+#stats-card.on{display:flex}
+.st-row{display:flex;align-items:baseline;gap:3px;flex-wrap:wrap}
+.st-v{font-size:14px;font-weight:700;color:var(--gold-lo);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.st-u{font-size:10.5px;color:var(--lbl3)}
+.st-sep{font-size:11px;color:var(--lbl4);margin:0 3px}
+.st-coord{font-size:9.5px;color:var(--lbl4);font-family:var(--mono);margin-top:2px}
+
+/* ── Progress steps ──────────────────────────────────────────────────── */
+#progress{display:none;flex-direction:column;gap:5px}
+#progress.on{display:flex}
+.pstep{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--lbl4);transition:color var(--t)}
+.pstep.active{color:var(--lbl2)}
+.pstep.done{color:var(--gold-lo)}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--sep);flex-shrink:0;transition:background var(--t),box-shadow var(--t)}
+.pstep.active .pdot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-r);animation:pdot 1s ease-in-out infinite}
+.pstep.done .pdot{background:var(--gold-lo)}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.btn{
+  padding:10px 14px;border:none;border-radius:var(--r);
+  font-size:13px;font-weight:600;font-family:var(--font);
+  cursor:pointer;width:100%;letter-spacing:.01em;
+  transition:opacity var(--t) var(--ease),transform var(--t) var(--ease),box-shadow var(--t) var(--ease);
+}
+.btn:disabled{opacity:.38;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn:not(:disabled):active{transform:scale(.97)}
+
+.btn-gen{
+  background:linear-gradient(180deg,var(--gold-hi) 0%,var(--gold) 100%);
+  color:#fff;
+  box-shadow:0 2px 10px rgba(168,138,58,.38),0 1px 2px rgba(0,0,0,.10);
+}
+.btn-gen:hover:not(:disabled){opacity:.92;box-shadow:0 4px 16px rgba(168,138,58,.48)}
+
+.exp-row{display:flex;gap:6px}
+.btn-exp{
+  flex:1;padding:9px 8px;border-radius:var(--r-sm);
+  background:var(--surf);color:var(--gold-lo);
+  border:1.5px solid rgba(201,168,76,.28);
+  font-size:11.5px;font-weight:600;font-family:var(--font);
+  cursor:pointer;text-align:center;
+  box-shadow:var(--sh);
+  transition:background var(--t) var(--ease),border-color var(--t) var(--ease),transform var(--t) var(--ease);
+}
+.btn-exp:hover:not(:disabled){background:var(--gold-f);border-color:var(--gold)}
+.btn-exp:not(:disabled):active{transform:scale(.96)}
+.btn-exp:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── Inline status ───────────────────────────────────────────────────── */
+#status-line{font-size:11px;color:var(--lbl3);text-align:center;min-height:14px}
+#status-line.err{color:#c0392b}
+#status-line.ok{color:#1a7a46}
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:rgba(28,28,30,.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  color:#fff;font-size:12.5px;font-weight:500;font-family:var(--font);
+  padding:9px 18px;border-radius:20px;
+  pointer-events:none;z-index:9999;
+  transition:transform var(--ts) var(--spring),opacity var(--ts) var(--ease);
+  opacity:0;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.20);
+}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.ok{background:rgba(22,110,56,.92)}
+#toast.err{background:rgba(175,30,30,.92)}
+
+/* ── Preview area ────────────────────────────────────────────────────── */
+#prev{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);padding:20px;overflow:hidden;position:relative;
+}
+#prev::before{
+  content:"";position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(0,0,0,.055) 1px,transparent 1px);
+  background-size:20px 20px;pointer-events:none;
+}
+#poster{
+  position:relative;display:flex;flex-direction:column;
+  box-shadow:var(--sh-lg);border-radius:3px;overflow:hidden;z-index:1;
+  transition:box-shadow var(--ts) var(--ease);
+}
+#poster:hover{box-shadow:0 14px 60px rgba(0,0,0,.22),0 4px 12px rgba(0,0,0,.08)}
 #map{width:100%}
 #title-canvas{display:block;width:100%}
+
+/* ── MapLibre overrides ──────────────────────────────────────────────── */
 .maplibregl-ctrl-attrib,.maplibregl-ctrl-logo{display:none!important}
-.maplibregl-ctrl-bottom-right{display:block!important}
-.maplibregl-ctrl-group{background:#fff!important;border:1px solid #ddd!important;box-shadow:0 1px 4px rgba(0,0,0,.1)!important}
-.maplibregl-ctrl-group button{background:#fff!important}
-.maplibregl-ctrl-group button:hover{background:#f5f5f5!important}
+.maplibregl-ctrl-bottom-right{display:block!important;bottom:8px!important;right:8px!important}
+.maplibregl-ctrl-group{
+  background:rgba(255,255,255,.88)!important;
+  backdrop-filter:blur(8px)!important;
+  border:1px solid var(--sep)!important;
+  border-radius:10px!important;
+  box-shadow:var(--sh-md)!important;
+  overflow:hidden!important;
+}
+.maplibregl-ctrl-group button{background:transparent!important;border-bottom:1px solid var(--sep2)!important}
+.maplibregl-ctrl-group button:last-child{border-bottom:none!important}
+.maplibregl-ctrl-group button:hover{background:var(--gold-f)!important}
 </style>
 </head>
 <body>
 
-<div id="header">
-  <div>
-    <h1>MOTO MAP GENERATOR</h1>
-    <p>Poster-quality mountain pass maps · right-click drag to rotate</p>
+<!-- ── Header ──────────────────────────────────────────────────────── -->
+<div id="hdr">
+  <div class="hdr-icon">
+    <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 15 L5.5 7.5 L8.5 11.5 L11 8 L16 15 Z" opacity=".95"/>
+      <circle cx="11.5" cy="5.5" r="1.6" opacity=".7"/>
+    </svg>
   </div>
+  <h1>Map Generator</h1>
+  <span id="hdr-hint">Right-click drag to rotate</span>
 </div>
 
+<!-- ── Layout ──────────────────────────────────────────────────────── -->
 <div id="main">
-  <div id="sidebar">
+<div id="sidebar">
 
-    <div class="sec">
-      <div class="sec-title">Route Input</div>
-      <label>Pass or Route Name</label>
-      <input type="text" id="pass-name" placeholder="Stelvio Pass, Col du Galibier…">
-      <div class="or">or</div>
-      <label>Start Coordinates</label>
-      <input type="text" id="coord-from" placeholder="46.52, 10.45">
-      <label>End Coordinates</label>
-      <input type="text" id="coord-to" placeholder="46.61, 10.52">
-      <div class="or">or</div>
-      <label>GPX File</label>
-      <input type="file" id="gpx-file" accept=".gpx">
-      <label>KML File (Google My Maps export)</label>
-      <input type="file" id="kml-file" accept=".kml,.kmz">
+  <!-- Route Input -->
+  <div class="card">
+    <div class="ctitle">Route Input</div>
+    <div class="seg" id="mode-seg">
+      <button class="seg-btn active" data-mode="name">Pass Name</button>
+      <button class="seg-btn" data-mode="coords">Coords</button>
+      <button class="seg-btn" data-mode="file">File</button>
     </div>
 
-    <div class="sec">
-      <div class="sec-title">Poster Text</div>
-      <label>Title</label>
-      <input type="text" id="title-input" placeholder="STELVIO PASS">
-      <label>Subtitle / Country</label>
-      <input type="text" id="subtitle-input" placeholder="ITALY">
-    </div>
-
-    <div class="sec">
-      <div class="sec-title">Colors</div>
-      <div class="color-row">
-        <div class="color-item">
-          <input type="color" id="color-bg" value="#0B1829">
-          <span>Background</span>
-        </div>
-        <div class="color-item">
-          <input type="color" id="color-road" value="#C9A84C">
-          <span>Roads</span>
-        </div>
-        <div class="color-item">
-          <input type="color" id="color-route" value="#FFFFFF">
-          <span>Route</span>
-        </div>
+    <div class="panel on" id="panel-name">
+      <div class="field">
+        <label class="flbl">Mountain pass or route</label>
+        <input type="text" id="pass-name" placeholder="Stelvio Pass, Col du Galibier…">
       </div>
     </div>
 
-    <div class="sec">
-      <div class="sec-title">Terrain</div>
-      <div class="terrain-row">
-        <label style="color:#aaa">Hillshading</label>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-hillshade" checked>
-          <span class="slider"></span>
-        </label>
+    <div class="panel" id="panel-coords">
+      <div class="field">
+        <label class="flbl">Start</label>
+        <input type="text" id="coord-from" placeholder="46.52, 10.45">
       </div>
-      <div class="range-row">
-        <div class="range-label"><span>Intensity</span><span id="hillshade-val">35%</span></div>
-        <input type="range" id="hillshade-intensity" min="0" max="100" value="35">
+      <div class="field">
+        <label class="flbl">End</label>
+        <input type="text" id="coord-to" placeholder="46.61, 10.52">
       </div>
     </div>
 
-    <div class="sec" id="stats-wrap" style="display:none">
-      <div class="stats-box" id="stats-text"></div>
+    <div class="panel" id="panel-file">
+      <div class="fdrop" id="gpx-drop">
+        <svg class="fdrop-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M10 13V4M6 7.5l4-4 4 4"/><path d="M3 16.5h14"/>
+        </svg>
+        <div class="fdrop-txt" id="gpx-lbl">GPX File</div>
+        <div class="fdrop-sub">Click to select .gpx</div>
+        <input type="file" id="gpx-file" accept=".gpx">
+      </div>
+      <div class="fdrop" id="kml-drop">
+        <svg class="fdrop-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M10 13V4M6 7.5l4-4 4 4"/><path d="M3 16.5h14"/>
+        </svg>
+        <div class="fdrop-txt" id="kml-lbl">KML File</div>
+        <div class="fdrop-sub">Google My Maps export</div>
+        <input type="file" id="kml-file" accept=".kml,.kmz">
+      </div>
     </div>
-
-    <div class="sec">
-      <button class="btn btn-primary" id="btn-generate">Generate Map</button>
-      <div id="status"></div>
-      <button class="btn btn-secondary" id="btn-svg" disabled>Download SVG</button>
-      <button class="btn btn-secondary" id="btn-png" disabled>Download PNG (300 DPI)</button>
-    </div>
-
   </div>
 
-  <div id="preview-area">
-    <div id="poster-wrap">
-      <div id="map"></div>
-      <canvas id="title-canvas"></canvas>
+  <!-- Poster Text -->
+  <div class="card">
+    <div class="ctitle">Poster Text</div>
+    <div class="field">
+      <label class="flbl">Title</label>
+      <input type="text" id="title-input" placeholder="STELVIO PASS">
     </div>
+    <div class="field">
+      <label class="flbl">Subtitle</label>
+      <input type="text" id="subtitle-input" placeholder="Italy · The Alps">
+    </div>
+  </div>
+
+  <!-- Style -->
+  <div class="card">
+    <div class="ctitle">Style</div>
+
+    <div class="color-row">
+      <div class="cswatch">
+        <label class="cswatch-circle">
+          <input type="color" id="color-bg" value="#0B1829">
+        </label>
+        <span class="cswatch-lbl">Background</span>
+      </div>
+      <div class="cswatch">
+        <label class="cswatch-circle">
+          <input type="color" id="color-road" value="#C9A84C">
+        </label>
+        <span class="cswatch-lbl">Roads</span>
+      </div>
+      <div class="cswatch">
+        <label class="cswatch-circle">
+          <input type="color" id="color-route" value="#FFFFFF">
+        </label>
+        <span class="cswatch-lbl">Route</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="flbl" style="margin-bottom:6px">Presets</div>
+      <div class="presets">
+        <button class="preset-pill active" data-bg="#0B1829" data-rd="#C9A84C" data-rt="#FFFFFF" title="Navy Gold"
+          style="background:linear-gradient(90deg,#0B1829 50%,#C9A84C 100%)"></button>
+        <button class="preset-pill" data-bg="#1A2E1A" data-rd="#C8C49A" data-rt="#FFFFFF" title="Forest"
+          style="background:linear-gradient(90deg,#1A2E1A 50%,#C8C49A 100%)"></button>
+        <button class="preset-pill" data-bg="#2B1A0D" data-rd="#E8C87A" data-rt="#FAE8C0" title="Desert"
+          style="background:linear-gradient(90deg,#2B1A0D 50%,#E8C87A 100%)"></button>
+        <button class="preset-pill" data-bg="#F7F3EC" data-rd="#7A6044" data-rt="#3A2C1E" title="Parchment"
+          style="background:linear-gradient(90deg,#F7F3EC 50%,#7A6044 100%)"></button>
+      </div>
+    </div>
+
+    <div>
+      <div class="flbl" style="margin-bottom:6px">Road Detail</div>
+      <div class="detail-seg">
+        <button class="detail-btn" data-d="0">Minimal</button>
+        <button class="detail-btn active" data-d="1">Standard</button>
+        <button class="detail-btn" data-d="2">Full</button>
+      </div>
+      <div class="detail-hint" id="detail-hint">Primary + secondary + local roads</div>
+    </div>
+  </div>
+
+  <!-- Terrain -->
+  <div class="card">
+    <div class="ctitle">Terrain</div>
+    <div class="toggle-row">
+      <span class="tlbl">Hillshading</span>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-hillshade" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="rng-wrap" id="hs-wrap">
+      <div class="rng-hdr">
+        <span class="rng-lbl">Intensity</span>
+        <span class="rng-val" id="hillshade-val">35%</span>
+      </div>
+      <input type="range" id="hillshade-intensity" min="0" max="100" value="35">
+    </div>
+  </div>
+
+  <!-- Stats (shown after generate) -->
+  <div id="stats-card">
+    <div class="st-row">
+      <span class="st-v" id="st-dist">—</span><span class="st-u">km</span>
+      <span class="st-sep">·</span>
+      <span class="st-v" id="st-gain">—</span><span class="st-u">m gain</span>
+    </div>
+    <div class="st-coord" id="st-coord"></div>
+  </div>
+
+  <!-- Generate + Export -->
+  <div class="card">
+    <button class="btn btn-gen" id="btn-generate">Generate Map</button>
+    <div id="progress">
+      <div class="pstep" id="s1"><div class="pdot"></div><span>Resolving route</span></div>
+      <div class="pstep" id="s2"><div class="pdot"></div><span>Fetching road network</span></div>
+      <div class="pstep" id="s3"><div class="pdot"></div><span>Rendering</span></div>
+    </div>
+    <div id="status-line"></div>
+    <div class="exp-row">
+      <button class="btn-exp" id="btn-svg" disabled>SVG</button>
+      <button class="btn-exp" id="btn-png" disabled>PNG 300 DPI</button>
+    </div>
+  </div>
+
+</div><!-- /sidebar -->
+
+<div id="prev">
+  <div id="poster">
+    <div id="map"></div>
+    <canvas id="title-canvas"></canvas>
   </div>
 </div>
+</div><!-- /main -->
+
+<div id="toast"></div>
 
 <script>
 // ── Constants ──────────────────────────────────────────────────────────────
 const POSTER_W = 2400, POSTER_H = 3400, TITLE_H = 420;
-const MAP_H = POSTER_H - TITLE_H; // 2980
-const PRINT_SCALE = 3; // 7200 × 10200 px
+const MAP_H = POSTER_H - TITLE_H;
+const PRINT_SCALE = 3;
 
 const ROAD_STYLES = [
   { classes:["footway","cycleway","path","steps","bridleway"], opacity:.14, width:.5  },
@@ -167,6 +512,22 @@ const ROAD_STYLES = [
   { classes:["motorway","motorway_link"],                       opacity:1.0, width:6.0 },
 ];
 
+// Road type queries per detail level (key performance driver)
+const ROAD_QUERIES = [
+  // 0 = Minimal (fast): major roads only
+  "motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link",
+  // 1 = Standard (default): + local network
+  "motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|service|living_street|pedestrian",
+  // 2 = Full (slow): everything
+  "motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|service|living_street|pedestrian|track|path|footway|cycleway|steps|bridleway",
+];
+
+const DETAIL_HINTS = [
+  "Major roads only · Fastest",
+  "Primary + secondary + local roads",
+  "All roads & paths · Slower",
+];
+
 const OVERPASS_MIRRORS = [
   "https://overpass.private.coffee/api/interpreter",
   "https://overpass-api.de/api/interpreter",
@@ -175,20 +536,22 @@ const OVERPASS_MIRRORS = [
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
-let map = null;
+let map        = null;
 let routePoints = [];
 let roadElements = [];
 let routeStats = {};
 let posterReady = false;
+let detailLevel = 1;
+let _toastTimer = null;
 
 // ── Layout ─────────────────────────────────────────────────────────────────
 function layoutPoster() {
-  const area = document.getElementById("preview-area");
-  const wrap = document.getElementById("poster-wrap");
+  const area = document.getElementById("prev");
+  const wrap = document.getElementById("poster");
   const tc   = document.getElementById("title-canvas");
 
-  const aw = area.clientWidth  - 32;
-  const ah = area.clientHeight - 32;
+  const aw = area.clientWidth  - 40;
+  const ah = area.clientHeight - 40;
   const aspect = POSTER_W / POSTER_H;
 
   const pw = (aw / ah < aspect) ? aw : ah * aspect;
@@ -228,16 +591,14 @@ function buildStyle(bgColor) {
     layers: [
       { id:"bg", type:"background", paint:{"background-color": bgColor} },
       {
-        id: "hillshade",
-        type: "hillshade",
-        source: "terrain",
+        id: "hillshade", type: "hillshade", source: "terrain",
         paint: {
-          "hillshade-shadow-color":         "#000000",
-          "hillshade-highlight-color":      "#ffffff",
+          "hillshade-shadow-color":           "#000000",
+          "hillshade-highlight-color":        "#ffffff",
           "hillshade-illumination-direction": 315,
-          "hillshade-illumination-anchor":  "map",
-          "hillshade-exaggeration":         hillshadeExp(),
-          "hillshade-accent-color":         bgColor,
+          "hillshade-illumination-anchor":    "map",
+          "hillshade-exaggeration":           hillshadeExp(),
+          "hillshade-accent-color":           bgColor,
         }
       }
     ]
@@ -264,7 +625,6 @@ function addMapLayers(m) {
   const roadColor  = document.getElementById("color-road").value;
   const routeColor = document.getElementById("color-route").value;
 
-  // Remove existing
   [...Array(ROAD_STYLES.length)].forEach((_,i) => {
     if (m.getLayer("roads-"+i)) m.removeLayer("roads-"+i);
   });
@@ -272,7 +632,6 @@ function addMapLayers(m) {
   if (m.getSource("roads")) m.removeSource("roads");
   if (m.getSource("route")) m.removeSource("route");
 
-  // Road network
   if (roadElements.length) {
     m.addSource("roads", { type:"geojson", data: toGeoJSON(roadElements) });
     ROAD_STYLES.forEach((s,i) => {
@@ -285,7 +644,6 @@ function addMapLayers(m) {
     });
   }
 
-  // Route
   if (routePoints.length) {
     m.addSource("route", {
       type:"geojson",
@@ -293,10 +651,10 @@ function addMapLayers(m) {
         coordinates: routePoints.map(p=>[p.lon,p.lat]) }}
     });
     m.addLayer({ id:"route-glow", type:"line", source:"route",
-      paint:{ "line-color":routeColor,"line-opacity":.30,"line-width":20,"line-blur":8 },
+      paint:{ "line-color":routeColor,"line-opacity":.28,"line-width":24,"line-blur":10 },
       layout:{"line-cap":"round","line-join":"round"} });
     m.addLayer({ id:"route-line", type:"line", source:"route",
-      paint:{ "line-color":routeColor,"line-opacity":1,"line-width":6 },
+      paint:{ "line-color":routeColor,"line-opacity":1,"line-width":5.5 },
       layout:{"line-cap":"round","line-join":"round"} });
   }
 }
@@ -337,13 +695,15 @@ async function overpass(query) {
       console.warn(mirror, r.status);
     } catch(e) { console.warn(mirror, e.message); }
   }
-  throw new Error("OpenStreetMap server unavailable. Check your internet connection.");
+  throw new Error("OpenStreetMap server unavailable. Check your connection.");
 }
 
 async function fetchRoads(bbox) {
   const [S,W,N,E] = bbox;
-  const pad=.04, s=(S-pad).toFixed(6), w=(W-pad).toFixed(6), n=(N+pad).toFixed(6), e=(E+pad).toFixed(6);
-  return overpass(`[out:json][timeout:90];(way["highway"~"motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|service|living_street|pedestrian|track|path|footway|cycleway|steps|bridleway"](${s},${w},${n},${e}););out geom;`);
+  const pad = detailLevel === 2 ? .05 : .04;
+  const s=(S-pad).toFixed(6), w=(W-pad).toFixed(6), n=(N+pad).toFixed(6), e=(E+pad).toFixed(6);
+  const types = ROAD_QUERIES[detailLevel];
+  return overpass(`[out:json][timeout:90];(way["highway"~"${types}"](${s},${w},${n},${e}););out geom;`);
 }
 
 // ── Parse GPX ─────────────────────────────────────────────────────────────
@@ -365,7 +725,6 @@ function parseKML(text) {
     }).filter(p => !isNaN(p.lat));
     if (pts.length > 1) return pts;
   }
-  // gx:coord fallback
   return [...doc.querySelectorAll("coord")].map(c => {
     const [lon,lat,ele] = c.textContent.trim().split(" ").map(Number);
     return { lat, lon, ele: isNaN(ele)?null:ele };
@@ -374,37 +733,41 @@ function parseKML(text) {
 
 // ── Geocoding + routing ────────────────────────────────────────────────────
 async function geocode(name) {
-  const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,
-    { headers:{"User-Agent":"DiscoveristMapGenerator/2.0"} });
+  const r = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,
+    { headers:{"User-Agent":"DiscoveristMapGenerator/2.0"} }
+  );
   const d = await r.json();
   if (!d.length) throw new Error(`Location not found: "${name}"`);
   return { lat:+d[0].lat, lon:+d[0].lon };
 }
 
 async function routeOSRM(la1,lo1,la2,lo2) {
-  const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${lo1},${la1};${lo2},${la2}?overview=full&geometries=geojson`);
+  const r = await fetch(
+    `https://router.project-osrm.org/route/v1/driving/${lo1},${la1};${lo2},${la2}?overview=full&geometries=geojson`
+  );
   const d = await r.json();
   if (!d.routes?.length) throw new Error("No route found between these coordinates.");
   return d.routes[0].geometry.coordinates.map(([lon,lat]) => ({lat,lon,ele:null}));
 }
 
 async function resolvePassName(name) {
-  setStatus("Geocoding location…");
+  setStep(1);
   const c = await geocode(name);
-  const pad=.15;
-  setStatus("Finding road…");
-  const els = await overpass(`[out:json][timeout:60];(way["highway"~"primary|secondary|tertiary|unclassified|trunk|motorway"](${c.lat-pad},${c.lon-pad},${c.lat+pad},${c.lon+pad}););out geom;`);
+  const pad = .15;
+  const els = await overpass(
+    `[out:json][timeout:60];(way["highway"~"primary|secondary|tertiary|unclassified|trunk|motorway"](${c.lat-pad},${c.lon-pad},${c.lat+pad},${c.lon+pad}););out geom;`
+  );
   if (!els.length) throw new Error("No roads found near this location.");
   let best=null, bestD=Infinity;
   for (const w of els.filter(e=>e.type==="way"&&e.geometry?.length>5)) {
     for (const p of w.geometry) {
-      const d=Math.hypot(p.lat-c.lat, p.lon-c.lon);
+      const d = Math.hypot(p.lat-c.lat, p.lon-c.lon);
       if (d<bestD){ bestD=d; best=w; }
     }
   }
   if (!best) throw new Error("Could not find a road near this location.");
   const g=best.geometry, s=g[0], e=g[g.length-1];
-  setStatus("Routing…");
   return routeOSRM(s.lat,s.lon,e.lat,e.lon);
 }
 
@@ -436,59 +799,74 @@ function fmtCoord(lat,lon) {
   return `${Math.abs(lat).toFixed(4)}° ${lat>=0?"N":"S"}  /  ${Math.abs(lon).toFixed(4)}° ${lon>=0?"E":"W"}`;
 }
 
-// ── Title block renderer (shared: preview canvas + export ctx) ─────────────
+// ── Font loading for canvas ────────────────────────────────────────────────
+async function ensureFonts() {
+  if (!document.fonts?.load) return;
+  await Promise.all([
+    document.fonts.load('700 88px Inter'),
+    document.fonts.load('400 28px Inter'),
+    document.fonts.load('300 22px Inter'),
+    document.fonts.load('300 15px "JetBrains Mono"'),
+  ]).catch(() => {});
+}
+
+// ── Title block renderer ───────────────────────────────────────────────────
 function renderTitleBlock(ctx, W, H, yOff, sc) {
-  const bg   = document.getElementById("color-bg").value;
-  const gold = document.getElementById("color-road").value;
-  const title= (document.getElementById("title-input").value||"MOUNTAIN PASS").toUpperCase();
-  const sub  = (document.getElementById("subtitle-input").value||"").toUpperCase();
+  const bg    = document.getElementById("color-bg").value;
+  const gold  = document.getElementById("color-road").value;
+  const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
+  const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
 
   ctx.fillStyle = bg;
   ctx.fillRect(0, yOff, W, H);
 
+  // Decorative rules
   ctx.strokeStyle = gold;
-  ctx.lineWidth = Math.max(1, 2*sc);
+  ctx.lineWidth = Math.max(1, 1.5*sc);
+  const lx1 = Math.round(80*sc), lx2 = W - Math.round(80*sc);
+  ctx.globalAlpha = .50;
+  ctx.beginPath(); ctx.moveTo(lx1, yOff+Math.round(24*sc)); ctx.lineTo(lx2, yOff+Math.round(24*sc)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lx1, yOff+H-Math.round(24*sc)); ctx.lineTo(lx2, yOff+H-Math.round(24*sc)); ctx.stroke();
+  ctx.globalAlpha = 1;
 
-  const lx1=Math.round(60*sc), lx2=W-Math.round(60*sc);
-  ctx.beginPath(); ctx.moveTo(lx1, yOff+Math.round(18*sc)); ctx.lineTo(lx2, yOff+Math.round(18*sc)); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(lx1, yOff+H-Math.round(18*sc)); ctx.lineTo(lx2, yOff+H-Math.round(18*sc)); ctx.stroke();
+  ctx.textAlign = "center";
 
-  ctx.textAlign="center";
-
-  ctx.font = `700 ${Math.round(88*sc)}px Arial, sans-serif`;
+  // Main title
+  ctx.font = `700 ${Math.round(76*sc)}px "Inter", "Arial Narrow", Arial, sans-serif`;
   ctx.fillStyle = gold;
-  ctx.letterSpacing = `${Math.round(10*sc)}px`;
-  ctx.fillText(title, W/2, yOff + Math.round(104*sc));
+  ctx.letterSpacing = `${Math.round(7*sc)}px`;
+  ctx.fillText(title, W/2, yOff + Math.round(108*sc));
 
+  // Subtitle
   if (sub) {
-    ctx.font = `400 ${Math.round(28*sc)}px Arial, sans-serif`;
-    ctx.fillStyle = gold;
-    ctx.globalAlpha = .72;
-    ctx.letterSpacing = `${Math.round(5*sc)}px`;
-    ctx.fillText(sub, W/2, yOff + Math.round(148*sc));
+    ctx.font = `400 ${Math.round(24*sc)}px "Inter", Arial, sans-serif`;
+    ctx.globalAlpha = .62;
+    ctx.letterSpacing = `${Math.round(4*sc)}px`;
+    ctx.fillText(sub, W/2, yOff + Math.round(150*sc));
     ctx.globalAlpha = 1;
   }
 
   ctx.letterSpacing = "0px";
 
+  // Stats
   if (routeStats.distKm) {
     let st = `${routeStats.distKm} km`;
-    if (routeStats.hasEle && routeStats.elevGain>0) st += `  ·  ${routeStats.elevGain.toLocaleString()} m gain`;
-    ctx.font = `300 ${Math.round(22*sc)}px Arial, sans-serif`;
-    ctx.fillStyle = gold;
-    ctx.globalAlpha = .60;
-    ctx.fillText(st, W/2, yOff + Math.round(210*sc));
+    if (routeStats.hasEle && routeStats.elevGain > 0) st += `  ·  ${routeStats.elevGain.toLocaleString()} m gain`;
+    ctx.font = `300 ${Math.round(20*sc)}px "Inter", Arial, sans-serif`;
+    ctx.globalAlpha = .52;
+    ctx.fillText(st, W/2, yOff + Math.round(208*sc));
     ctx.globalAlpha = 1;
 
-    ctx.font = `300 ${Math.round(17*sc)}px "Courier New", monospace`;
-    ctx.globalAlpha = .45;
-    ctx.fillText(fmtCoord(routeStats.centerLat,routeStats.centerLon), W/2, yOff+Math.round(244*sc));
+    ctx.font = `300 ${Math.round(14*sc)}px "JetBrains Mono", "Courier New", monospace`;
+    ctx.globalAlpha = .35;
+    ctx.fillText(fmtCoord(routeStats.centerLat, routeStats.centerLon), W/2, yOff + Math.round(242*sc));
     ctx.globalAlpha = 1;
   }
 
-  ctx.font = `300 ${Math.round(13*sc)}px Arial, sans-serif`;
-  ctx.globalAlpha = .28;
-  ctx.fillText("© OpenStreetMap contributors", W/2, yOff+H-Math.round(30*sc));
+  // Attribution
+  ctx.font = `300 ${Math.round(11*sc)}px "Inter", Arial, sans-serif`;
+  ctx.globalAlpha = .20;
+  ctx.fillText("© OpenStreetMap contributors", W/2, yOff + H - Math.round(28*sc));
   ctx.globalAlpha = 1;
 }
 
@@ -496,229 +874,262 @@ function drawTitleBlock() {
   const tc = document.getElementById("title-canvas");
   if (!tc.width) return;
   const ctx = tc.getContext("2d");
-  const sc = tc.width / POSTER_W;
-  renderTitleBlock(ctx, tc.width, tc.height, 0, sc);
+  renderTitleBlock(ctx, tc.width, tc.height, 0, tc.width / POSTER_W);
 }
 
-// ── Status helper ──────────────────────────────────────────────────────────
+// ── Progress steps ─────────────────────────────────────────────────────────
+function setStep(n) {
+  document.getElementById("progress").classList.add("on");
+  ["s1","s2","s3"].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.classList.remove("active","done");
+    if (i+1 < n)  el.classList.add("done");
+    if (i+1 === n) el.classList.add("active");
+  });
+}
+function clearSteps() {
+  document.getElementById("progress").classList.remove("on");
+  ["s1","s2","s3"].forEach(id => document.getElementById(id).classList.remove("active","done"));
+}
+
+// ── Status + toast ─────────────────────────────────────────────────────────
 function setStatus(msg, cls="") {
-  const el=document.getElementById("status");
-  el.textContent=msg; el.className=cls;
+  const el = document.getElementById("status-line");
+  el.textContent = msg; el.className = cls;
+}
+
+function toast(msg, cls="", dur=3500) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "show" + (cls ? " "+cls : "");
+  clearTimeout(_toastTimer);
+  if (dur > 0) _toastTimer = setTimeout(() => { el.className = ""; }, dur);
 }
 
 // ── Generate ───────────────────────────────────────────────────────────────
 async function generate() {
-  const btn=document.getElementById("btn-generate");
-  btn.disabled=true; posterReady=false;
-  document.getElementById("btn-svg").disabled=true;
-  document.getElementById("btn-png").disabled=true;
-  document.getElementById("stats-wrap").style.display="none";
+  const btn = document.getElementById("btn-generate");
+  btn.disabled = true;
+  btn.textContent = "Generating…";
+  posterReady = false;
+  document.getElementById("btn-svg").disabled = true;
+  document.getElementById("btn-png").disabled = true;
+  document.getElementById("stats-card").classList.remove("on");
+  setStatus(""); clearSteps();
 
   try {
-    let pts=[];
-    const gpx=document.getElementById("gpx-file").files[0];
-    const kml=document.getElementById("kml-file").files[0];
-    const name=document.getElementById("pass-name").value.trim();
-    const cf=document.getElementById("coord-from").value.trim();
-    const ct=document.getElementById("coord-to").value.trim();
+    let pts = [];
+    const gpx  = document.getElementById("gpx-file").files[0];
+    const kml  = document.getElementById("kml-file").files[0];
+    const name = document.getElementById("pass-name").value.trim();
+    const cf   = document.getElementById("coord-from").value.trim();
+    const ct   = document.getElementById("coord-to").value.trim();
+
+    setStep(1);
 
     if (gpx) {
       setStatus("Parsing GPX…");
-      pts=parseGPX(await gpx.text());
-      if (!pts.length) throw new Error("No track points found in GPX file.");
+      pts = parseGPX(await gpx.text());
+      if (!pts.length) throw new Error("No track points found in GPX.");
     } else if (kml) {
       setStatus("Parsing KML…");
-      pts=parseKML(await kml.text());
-      if (!pts.length) throw new Error("No route found in KML. Export as KML from Google My Maps.");
+      pts = parseKML(await kml.text());
+      if (!pts.length) throw new Error("No route in KML. Export from Google My Maps.");
     } else if (cf && ct) {
-      setStatus("Routing between coordinates…");
-      const [la1,lo1]=cf.split(",").map(Number), [la2,lo2]=ct.split(",").map(Number);
+      setStatus("Routing…");
+      const [la1,lo1] = cf.split(",").map(Number);
+      const [la2,lo2] = ct.split(",").map(Number);
       if ([la1,lo1,la2,lo2].some(isNaN)) throw new Error("Invalid coordinates. Use: 46.52, 10.45");
-      pts=await routeOSRM(la1,lo1,la2,lo2);
+      pts = await routeOSRM(la1,lo1,la2,lo2);
     } else if (name) {
-      pts=await resolvePassName(name);
+      pts = await resolvePassName(name);
     } else {
-      throw new Error("Enter a pass name, coordinates, or upload a GPX/KML file.");
+      throw new Error("Enter a pass name, coordinates, or upload a file.");
     }
 
-    if (pts.length<2) throw new Error("Route has too few points.");
+    if (pts.length < 2) throw new Error("Route has too few points.");
 
-    // Decimate if very dense
-    if (pts.length>3000) {
-      const step=Math.ceil(pts.length/3000);
-      pts=pts.filter((_,i)=>i%step===0||i===pts.length-1);
+    if (pts.length > 3000) {
+      const step = Math.ceil(pts.length / 3000);
+      pts = pts.filter((_,i) => i%step===0 || i===pts.length-1);
     }
 
-    routePoints=pts;
-    routeStats=calcStats(pts);
+    routePoints = pts;
+    routeStats  = calcStats(pts);
 
     if (name && !document.getElementById("title-input").value)
-      document.getElementById("title-input").value=name.toUpperCase();
+      document.getElementById("title-input").value = name.toUpperCase();
 
-    const st=routeStats;
-    let html=`<strong>${st.distKm} km</strong>`;
-    if (st.hasEle&&st.elevGain>0) html+=` · <strong>${st.elevGain.toLocaleString()} m</strong> gain`;
-    html+=`<br><span style="opacity:.5">${fmtCoord(st.centerLat,st.centerLon)}</span>`;
-    document.getElementById("stats-text").innerHTML=html;
-    document.getElementById("stats-wrap").style.display="";
+    const st = routeStats;
+    document.getElementById("st-dist").textContent = st.distKm;
+    document.getElementById("st-gain").textContent = st.hasEle && st.elevGain > 0 ? st.elevGain.toLocaleString() : "—";
+    document.getElementById("st-coord").textContent = fmtCoord(st.centerLat, st.centerLon);
+    document.getElementById("stats-card").classList.add("on");
 
-    setStatus("Fetching road network from OpenStreetMap…");
-    roadElements=await fetchRoads(st.bbox);
+    setStep(2);
+    setStatus("Fetching road network…");
+    roadElements = await fetchRoads(st.bbox);
 
-    setStatus("Rendering map…");
-    const [S,W,N,E]=st.bbox;
+    setStep(3);
+    setStatus("Rendering…");
+    const [S,W,N,E] = st.bbox;
     if (!map.isStyleLoaded()) await new Promise(res=>map.once("style.load",res));
-    map.fitBounds([[W,S],[E,N]],{padding:60,duration:600});
+    map.fitBounds([[W,S],[E,N]], { padding:60, duration:600 });
     updateMapLayers();
+    await ensureFonts();
     drawTitleBlock();
 
-    // Wait for camera + tile loading to settle, then re-confirm layers are present
     await new Promise(res=>map.once("idle",res));
     updateMapLayers();
 
-    posterReady=true;
-    document.getElementById("btn-svg").disabled=false;
-    document.getElementById("btn-png").disabled=false;
-    setStatus("Map ready.", "ok");
+    posterReady = true;
+    clearSteps();
+    document.getElementById("btn-svg").disabled = false;
+    document.getElementById("btn-png").disabled = false;
+    setStatus("Map ready", "ok");
+    toast(`Map ready · ${roadElements.length.toLocaleString()} road segments`, "ok");
 
   } catch(e) {
-    setStatus(e.message,"err");
+    clearSteps();
+    setStatus(e.message, "err");
+    toast(e.message, "err");
     console.error(e);
   }
-  btn.disabled=false;
+
+  btn.disabled = false;
+  btn.textContent = "Generate Map";
 }
 
 // ── SVG Export ─────────────────────────────────────────────────────────────
 function buildSVG() {
   if (!routePoints.length) return null;
-  const [S,W,N,E]=routeStats.bbox;
+  const [S,W,N,E] = routeStats.bbox;
   const pad=.05, mn=S-pad, mx=N+pad, mw=W-pad, me=E+pad;
-  const merY=la=>Math.log(Math.tan(Math.PI/4+la*Math.PI/360));
-  const y0=merY(mn),y1=merY(mx),xR=me-mw,yR=y1-y0;
-  const proj=(la,lo)=>[
+  const merY = la => Math.log(Math.tan(Math.PI/4 + la*Math.PI/360));
+  const y0=merY(mn), y1=merY(mx), xR=me-mw, yR=y1-y0;
+  const proj = (la,lo) => [
     (lo-mw)/xR*POSTER_W,
     MAP_H-(merY(la)-y0)/yR*MAP_H
   ];
-  const road=document.getElementById("color-road").value;
-  const route=document.getElementById("color-route").value;
-  const bg=document.getElementById("color-bg").value;
-  const title=(document.getElementById("title-input").value||"MOUNTAIN PASS").toUpperCase();
-  const sub=(document.getElementById("subtitle-input").value||"").toUpperCase();
+  const road  = document.getElementById("color-road").value;
+  const route = document.getElementById("color-route").value;
+  const bg    = document.getElementById("color-bg").value;
+  const title = (document.getElementById("title-input").value||"MOUNTAIN PASS").toUpperCase();
+  const sub   = (document.getElementById("subtitle-input").value||"").toUpperCase();
 
-  let paths="";
+  let paths = "";
   for (const s of ROAD_STYLES) {
     for (const w of roadElements.filter(e=>e.type==="way"&&e.geometry&&s.classes.includes(e.tags?.highway))) {
-      const d="M "+w.geometry.map(p=>proj(p.lat,p.lon).map(v=>v.toFixed(1)).join(",")).join(" L ");
-      paths+=`<path d="${d}" stroke="${road}" stroke-opacity="${s.opacity}" stroke-width="${s.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+      const d = "M "+w.geometry.map(p=>proj(p.lat,p.lon).map(v=>v.toFixed(1)).join(",")).join(" L ");
+      paths += `<path d="${d}" stroke="${road}" stroke-opacity="${s.opacity}" stroke-width="${s.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
     }
   }
-  const rd="M "+routePoints.map(p=>proj(p.lat,p.lon).map(v=>v.toFixed(1)).join(",")).join(" L ");
-  const st=routeStats;
-  const ty=MAP_H;
+  const rd = "M "+routePoints.map(p=>proj(p.lat,p.lon).map(v=>v.toFixed(1)).join(",")).join(" L ");
+  const st = routeStats, ty = MAP_H;
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
+  return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
 <defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 <rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>
 <g id="roads">${paths}</g>
-<path d="${rd}" stroke="${route}" stroke-opacity=".22" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
-<path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="${rd}" stroke="${route}" stroke-opacity=".22" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+<path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 <rect x="0" y="${ty}" width="${POSTER_W}" height="${TITLE_H}" fill="${bg}"/>
-<line x1="60" y1="${ty+18}" x2="${POSTER_W-60}" y2="${ty+18}" stroke="${road}" stroke-width="2"/>
-<line x1="60" y1="${POSTER_H-18}" x2="${POSTER_W-60}" y2="${POSTER_H-18}" stroke="${road}" stroke-width="2"/>
-<text x="${POSTER_W/2}" y="${ty+104}" font-family="Arial Narrow,Arial,sans-serif" font-size="88" font-weight="700" fill="${road}" text-anchor="middle" letter-spacing="10">${title}</text>
-${sub?`<text x="${POSTER_W/2}" y="${ty+148}" font-family="Arial,sans-serif" font-size="28" fill="${road}" text-anchor="middle" letter-spacing="5" opacity=".72">${sub}</text>`:""}
-${st.distKm?`<text x="${POSTER_W/2}" y="${ty+210}" font-family="Arial,sans-serif" font-size="22" font-weight="300" fill="${road}" text-anchor="middle" opacity=".60">${st.distKm} km${st.hasEle&&st.elevGain>0?` · ${st.elevGain.toLocaleString()} m gain`:""}</text>
-<text x="${POSTER_W/2}" y="${ty+244}" font-family="Courier New,monospace" font-size="17" font-weight="300" fill="${road}" text-anchor="middle" opacity=".45">${fmtCoord(st.centerLat,st.centerLon)}</text>`:""}
-<text x="${POSTER_W/2}" y="${POSTER_H-30}" font-family="Arial,sans-serif" font-size="13" font-weight="300" fill="${road}" text-anchor="middle" opacity=".28">© OpenStreetMap contributors</text>
+<line x1="80" y1="${ty+24}" x2="${POSTER_W-80}" y2="${ty+24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
+<line x1="80" y1="${POSTER_H-24}" x2="${POSTER_W-80}" y2="${POSTER_H-24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
+<text x="${POSTER_W/2}" y="${ty+108}" font-family="Inter,Arial Narrow,Arial,sans-serif" font-size="76" font-weight="700" fill="${road}" text-anchor="middle" letter-spacing="7">${title}</text>
+${sub?`<text x="${POSTER_W/2}" y="${ty+150}" font-family="Inter,Arial,sans-serif" font-size="24" fill="${road}" text-anchor="middle" letter-spacing="4" opacity=".62">${sub}</text>`:""}
+${st.distKm?`<text x="${POSTER_W/2}" y="${ty+208}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="300" fill="${road}" text-anchor="middle" opacity=".52">${st.distKm} km${st.hasEle&&st.elevGain>0?` · ${st.elevGain.toLocaleString()} m gain`:""}</text>
+<text x="${POSTER_W/2}" y="${ty+242}" font-family="JetBrains Mono,Courier New,monospace" font-size="14" font-weight="300" fill="${road}" text-anchor="middle" opacity=".35">${fmtCoord(st.centerLat,st.centerLon)}</text>`:""}
+<text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".20">© OpenStreetMap contributors</text>
 </svg>`;
 }
 
 function downloadSVG() {
-  const svg=buildSVG();
-  if (!svg){setStatus("No route data.","err");return;}
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));
-  a.download=(document.getElementById("title-input").value||"moto-map").toLowerCase().replace(/\s+/g,"-")+".svg";
+  const svg = buildSVG();
+  if (!svg) { toast("No route data", "err"); return; }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));
+  a.download = (document.getElementById("title-input").value||"moto-map").toLowerCase().replace(/\s+/g,"-")+".svg";
   a.click(); URL.revokeObjectURL(a.href);
-  setStatus("SVG downloaded.","ok");
+  toast("SVG downloaded", "ok");
 }
 
 // ── PNG Export ─────────────────────────────────────────────────────────────
 async function exportPNG() {
   if (!posterReady) return;
-  setStatus("Generating print PNG (this takes ~20 s)…");
-  document.getElementById("btn-png").disabled=true;
+  toast("Generating 300 DPI PNG…", "", 0);
+  document.getElementById("btn-png").disabled = true;
 
   try {
-    const PW=POSTER_W*PRINT_SCALE;  // 7200
-    const PMH=MAP_H*PRINT_SCALE;    // 8940
-    const PTH=TITLE_H*PRINT_SCALE;  // 1260
-    const PH=POSTER_H*PRINT_SCALE;  // 10200
+    const PW  = POSTER_W * PRINT_SCALE;
+    const PMH = MAP_H    * PRINT_SCALE;
+    const PTH = TITLE_H  * PRINT_SCALE;
+    const PH  = POSTER_H * PRINT_SCALE;
 
-    const offDiv=document.createElement("div");
-    offDiv.style.cssText=`position:fixed;left:-99999px;top:0;width:${POSTER_W}px;height:${MAP_H}px;`;
+    const offDiv = document.createElement("div");
+    offDiv.style.cssText = `position:fixed;left:-99999px;top:0;width:${POSTER_W}px;height:${MAP_H}px;`;
     document.body.appendChild(offDiv);
 
-    const bg=document.getElementById("color-bg").value;
-    const printMap=new maplibregl.Map({
-      container:offDiv,
-      style:buildStyle(bg),
-      center:map.getCenter(),
-      zoom:map.getZoom(),
-      bearing:map.getBearing(),
-      pitch:map.getPitch(),
-      pixelRatio:PRINT_SCALE,
-      preserveDrawingBuffer:true,
-      attributionControl:false,
-      interactive:false,
+    const bg = document.getElementById("color-bg").value;
+    const printMap = new maplibregl.Map({
+      container: offDiv,
+      style: buildStyle(bg),
+      center: map.getCenter(),
+      zoom: map.getZoom(),
+      bearing: map.getBearing(),
+      pitch: map.getPitch(),
+      pixelRatio: PRINT_SCALE,
+      preserveDrawingBuffer: true,
+      attributionControl: false,
+      interactive: false,
     });
 
-    await new Promise((res,rej)=>{
-      printMap.on("load",res);
-      setTimeout(()=>rej(new Error("Print map load timeout")),30000);
+    await new Promise((res,rej) => {
+      printMap.on("load", res);
+      setTimeout(() => rej(new Error("Print map timeout")), 30000);
     });
 
     printMap.setPaintProperty("hillshade","hillshade-exaggeration",hillshadeExp());
     addMapLayers(printMap);
 
-    await new Promise((res,rej)=>{
-      printMap.once("idle",res);
-      setTimeout(()=>rej(new Error("Render timeout")),30000);
+    await new Promise((res,rej) => {
+      printMap.once("idle", res);
+      setTimeout(() => rej(new Error("Render timeout")), 30000);
     });
 
-    const mapCanvas=printMap.getCanvas();
-    const final=document.createElement("canvas");
-    final.width=PW; final.height=PH;
-    const ctx=final.getContext("2d");
-    ctx.drawImage(mapCanvas,0,0,PW,PMH);
-    renderTitleBlock(ctx,PW,PTH,PMH,PW/POSTER_W);
+    const mapCanvas = printMap.getCanvas();
+    const final = document.createElement("canvas");
+    final.width = PW; final.height = PH;
+    const ctx = final.getContext("2d");
+    ctx.drawImage(mapCanvas, 0, 0, PW, PMH);
+    await ensureFonts();
+    renderTitleBlock(ctx, PW, PTH, PMH, PW / POSTER_W);
 
-    await new Promise(res=>{
-      final.toBlob(blob=>{
-        const a=document.createElement("a");
-        a.href=URL.createObjectURL(blob);
-        a.download=(document.getElementById("title-input").value||"moto-map").toLowerCase().replace(/\s+/g,"-")+"-print.png";
+    await new Promise(res => {
+      final.toBlob(blob => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = (document.getElementById("title-input").value||"moto-map").toLowerCase().replace(/\s+/g,"-")+"-print.png";
         a.click(); URL.revokeObjectURL(a.href);
         res();
-      },"image/png");
+      }, "image/png");
     });
 
     printMap.remove();
     document.body.removeChild(offDiv);
-    setStatus("PNG downloaded (7200×10200 px).", "ok");
+    toast("PNG downloaded (7200 × 10200 px)", "ok");
 
   } catch(e) {
-    setStatus("Export failed: "+e.message,"err");
+    toast("Export failed: "+e.message, "err");
     console.error(e);
   }
-  document.getElementById("btn-png").disabled=false;
+  document.getElementById("btn-png").disabled = false;
 }
 
 // ── Live color / terrain updates ───────────────────────────────────────────
 function onColorChange() {
   if (!map) return;
-  const bg=document.getElementById("color-bg").value;
+  const bg = document.getElementById("color-bg").value;
   map.setPaintProperty("bg","background-color",bg);
   map.setPaintProperty("hillshade","hillshade-accent-color",bg);
   updateMapLayers();
@@ -727,21 +1138,66 @@ function onColorChange() {
 
 function onHillshadeChange() {
   if (!map) return;
+  const on  = document.getElementById("toggle-hillshade").checked;
+  const val = document.getElementById("hillshade-intensity").value;
+  document.getElementById("hillshade-val").textContent = on ? val+"%" : "Off";
+  document.getElementById("hs-wrap").classList.toggle("off", !on);
   map.setPaintProperty("hillshade","hillshade-exaggeration",hillshadeExp());
-  const on=document.getElementById("toggle-hillshade").checked;
-  document.getElementById("hillshade-val").textContent=on?document.getElementById("hillshade-intensity").value+"%":"Off";
 }
 
+// ── Mode segmented control ─────────────────────────────────────────────────
+const PANELS = { name:"panel-name", coords:"panel-coords", file:"panel-file" };
+document.getElementById("mode-seg").addEventListener("click", e => {
+  const btn = e.target.closest(".seg-btn");
+  if (!btn) return;
+  const mode = btn.dataset.mode;
+  document.querySelectorAll("#mode-seg .seg-btn").forEach(b => b.classList.toggle("active", b===btn));
+  Object.entries(PANELS).forEach(([m,id]) => document.getElementById(id).classList.toggle("on", m===mode));
+});
+
+// ── Road detail level ──────────────────────────────────────────────────────
+document.querySelectorAll(".detail-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    detailLevel = parseInt(btn.dataset.d);
+    document.querySelectorAll(".detail-btn").forEach(b => b.classList.toggle("active", b===btn));
+    document.getElementById("detail-hint").textContent = DETAIL_HINTS[detailLevel];
+  });
+});
+
+// ── Color presets ──────────────────────────────────────────────────────────
+document.querySelectorAll(".preset-pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.getElementById("color-bg").value    = btn.dataset.bg;
+    document.getElementById("color-road").value  = btn.dataset.rd;
+    document.getElementById("color-route").value = btn.dataset.rt;
+    document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    onColorChange();
+  });
+});
+
+// ── File drop UI ───────────────────────────────────────────────────────────
+document.getElementById("gpx-file").addEventListener("change", e => {
+  const f = e.target.files[0];
+  document.getElementById("gpx-drop").classList.toggle("has-file", !!f);
+  document.getElementById("gpx-lbl").textContent = f ? f.name : "GPX File";
+});
+document.getElementById("kml-file").addEventListener("change", e => {
+  const f = e.target.files[0];
+  document.getElementById("kml-drop").classList.toggle("has-file", !!f);
+  document.getElementById("kml-lbl").textContent = f ? f.name : "KML File";
+});
+
 // ── Event listeners ────────────────────────────────────────────────────────
-document.getElementById("btn-generate").addEventListener("click",generate);
-document.getElementById("btn-svg").addEventListener("click",downloadSVG);
-document.getElementById("btn-png").addEventListener("click",exportPNG);
-document.getElementById("pass-name").addEventListener("keydown",e=>{ if(e.key==="Enter") generate(); });
-["color-bg","color-road","color-route"].forEach(id=>document.getElementById(id).addEventListener("input",onColorChange));
-["title-input","subtitle-input"].forEach(id=>document.getElementById(id).addEventListener("input",drawTitleBlock));
-document.getElementById("toggle-hillshade").addEventListener("change",onHillshadeChange);
-document.getElementById("hillshade-intensity").addEventListener("input",()=>{
-  document.getElementById("hillshade-val").textContent=document.getElementById("hillshade-intensity").value+"%";
+document.getElementById("btn-generate").addEventListener("click", generate);
+document.getElementById("btn-svg").addEventListener("click", downloadSVG);
+document.getElementById("btn-png").addEventListener("click", exportPNG);
+document.getElementById("pass-name").addEventListener("keydown", e => { if (e.key==="Enter") generate(); });
+["color-bg","color-road","color-route"].forEach(id => document.getElementById(id).addEventListener("input", onColorChange));
+["title-input","subtitle-input"].forEach(id => document.getElementById(id).addEventListener("input", drawTitleBlock));
+document.getElementById("toggle-hillshade").addEventListener("change", onHillshadeChange);
+document.getElementById("hillshade-intensity").addEventListener("input", () => {
+  document.getElementById("hillshade-val").textContent = document.getElementById("hillshade-intensity").value + "%";
   onHillshadeChange();
 });
 
