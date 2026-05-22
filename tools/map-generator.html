@@ -149,25 +149,14 @@ input[type=text]::placeholder{color:var(--lbl4)}
 .cswatch-lbl{font-size:10px;color:var(--lbl3);font-weight:500}
 
 /* ── Presets ─────────────────────────────────────────────────────────── */
-.presets{display:flex;gap:6px}
+.presets{display:flex;gap:5px;flex-wrap:wrap}
 .preset-pill{
-  flex:1;height:22px;border-radius:5px;cursor:pointer;
+  flex:1;min-width:30px;height:22px;border-radius:5px;cursor:pointer;
   border:1.5px solid transparent;display:block;
   transition:transform var(--t) var(--ease),box-shadow var(--t) var(--ease),border-color var(--t) var(--ease);
 }
 .preset-pill:hover{transform:scale(1.06);box-shadow:var(--sh)}
 .preset-pill.active{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-r)}
-
-/* ── Detail segmented ────────────────────────────────────────────────── */
-.detail-seg{display:flex;background:var(--fill);border-radius:var(--r-sm);padding:2px;gap:2px}
-.detail-btn{
-  flex:1;padding:4px 0;font-size:10.5px;font-weight:500;font-family:var(--font);
-  color:var(--lbl3);background:transparent;border:none;border-radius:6px;
-  cursor:pointer;text-align:center;
-  transition:background var(--t) var(--ease),color var(--t) var(--ease),box-shadow var(--t) var(--ease);
-}
-.detail-btn.active{background:var(--surf);color:var(--lbl);box-shadow:var(--sh)}
-.detail-hint{font-size:9.5px;color:var(--lbl4);margin-top:3px}
 
 /* ── Toggle ──────────────────────────────────────────────────────────── */
 .toggle-row{display:flex;justify-content:space-between;align-items:center}
@@ -402,19 +391,19 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div class="color-row">
       <div class="cswatch">
         <label class="cswatch-circle">
-          <input type="color" id="color-bg" value="#0B1829">
+          <input type="color" id="color-bg" value="#1E1E28">
         </label>
         <span class="cswatch-lbl">Background</span>
       </div>
       <div class="cswatch">
         <label class="cswatch-circle">
-          <input type="color" id="color-road" value="#C9A84C">
+          <input type="color" id="color-road" value="#C8906A">
         </label>
-        <span class="cswatch-lbl">Roads</span>
+        <span class="cswatch-lbl">Contours</span>
       </div>
       <div class="cswatch">
         <label class="cswatch-circle">
-          <input type="color" id="color-route" value="#FFFFFF">
+          <input type="color" id="color-route" value="#E8A880">
         </label>
         <span class="cswatch-lbl">Route</span>
       </div>
@@ -423,7 +412,9 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div>
       <div class="flbl" style="margin-bottom:6px">Presets</div>
       <div class="presets">
-        <button class="preset-pill active" data-bg="#0B1829" data-rd="#C9A84C" data-rt="#FFFFFF" title="Navy Gold"
+        <button class="preset-pill active" data-bg="#1E1E28" data-rd="#C8906A" data-rt="#E8A880" title="Topo Copper"
+          style="background:linear-gradient(90deg,#1E1E28 50%,#C8906A 100%)"></button>
+        <button class="preset-pill" data-bg="#0B1829" data-rd="#C9A84C" data-rt="#FFFFFF" title="Navy Gold"
           style="background:linear-gradient(90deg,#0B1829 50%,#C9A84C 100%)"></button>
         <button class="preset-pill" data-bg="#1A2E1A" data-rd="#C8C49A" data-rt="#FFFFFF" title="Forest"
           style="background:linear-gradient(90deg,#1A2E1A 50%,#C8C49A 100%)"></button>
@@ -432,16 +423,6 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
         <button class="preset-pill" data-bg="#F7F3EC" data-rd="#7A6044" data-rt="#3A2C1E" title="Parchment"
           style="background:linear-gradient(90deg,#F7F3EC 50%,#7A6044 100%)"></button>
       </div>
-    </div>
-
-    <div>
-      <div class="flbl" style="margin-bottom:6px">Road Detail</div>
-      <div class="detail-seg">
-        <button class="detail-btn" data-d="0">Minimal</button>
-        <button class="detail-btn active" data-d="1">Standard</button>
-        <button class="detail-btn" data-d="2">Full</button>
-      </div>
-      <div class="detail-hint" id="detail-hint">Primary + secondary + local roads</div>
     </div>
 
     <div>
@@ -473,6 +454,13 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
       </div>
       <input type="range" id="hillshade-intensity" min="0" max="100" value="35">
     </div>
+    <div class="rng-wrap">
+      <div class="rng-hdr">
+        <span class="rng-lbl">Contour Lines</span>
+        <span class="rng-val" id="contour-val">70%</span>
+      </div>
+      <input type="range" id="contour-intensity" min="0" max="100" step="5" value="70">
+    </div>
   </div>
 
   <!-- Stats (shown after generate) -->
@@ -490,8 +478,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <button class="btn btn-gen" id="btn-generate">Generate Map</button>
     <div id="progress">
       <div class="pstep" id="s1"><div class="pdot"></div><span>Resolving route</span></div>
-      <div class="pstep" id="s2"><div class="pdot"></div><span>Fetching road network</span></div>
-      <div class="pstep" id="s3"><div class="pdot"></div><span>Rendering</span></div>
+      <div class="pstep" id="s2"><div class="pdot"></div><span>Rendering map</span></div>
     </div>
     <div id="status-line"></div>
     <div class="exp-row">
@@ -515,38 +502,10 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 
 <script>
 // ── Constants ──────────────────────────────────────────────────────────────
+const MAPTILER_KEY = 'pO4p3paZcjFsfdNEcYDM';
 const POSTER_W = 2400, POSTER_H = 3400, TITLE_H = 420;
 const MAP_H = POSTER_H - TITLE_H;
 const PRINT_SCALE = 3;
-
-const ROAD_STYLES = [
-  { classes:["footway","cycleway","path","steps","bridleway"], opacity:.14, width:.5  },
-  { classes:["track"],                                          opacity:.22, width:.7  },
-  { classes:["service","living_street"],                        opacity:.35, width:.9  },
-  { classes:["residential","pedestrian"],                       opacity:.50, width:1.3 },
-  { classes:["unclassified"],                                   opacity:.60, width:1.7 },
-  { classes:["tertiary","tertiary_link"],                       opacity:.72, width:2.2 },
-  { classes:["secondary","secondary_link"],                     opacity:.82, width:3.0 },
-  { classes:["primary","primary_link"],                         opacity:.90, width:4.0 },
-  { classes:["trunk","trunk_link"],                             opacity:.96, width:5.0 },
-  { classes:["motorway","motorway_link"],                       opacity:1.0, width:6.0 },
-];
-
-// Road type queries per detail level (key performance driver)
-const ROAD_QUERIES = [
-  // 0 = Minimal (fast): major roads only
-  "motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link",
-  // 1 = Standard (default): + local network
-  "motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|service|living_street|pedestrian",
-  // 2 = Full (slow): everything
-  "motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|service|living_street|pedestrian|track|path|footway|cycleway|steps|bridleway",
-];
-
-const DETAIL_HINTS = [
-  "Major roads only · Fastest",
-  "Primary + secondary + local roads",
-  "All roads & paths · Slower",
-];
 
 const OVERPASS_MIRRORS = [
   "https://overpass.private.coffee/api/interpreter",
@@ -558,10 +517,8 @@ const OVERPASS_MIRRORS = [
 // ── State ──────────────────────────────────────────────────────────────────
 let map         = null;
 let routePoints = [];
-let roadElements = [];
 let routeStats  = {};
 let posterReady = false;
-let detailLevel = 1;
 let textScale   = 1.0;
 let _toastTimer = null;
 
@@ -598,15 +555,22 @@ function layoutPoster() {
 }
 window.addEventListener("resize", layoutPoster);
 
-// ── MapLibre style builder ─────────────────────────────────────────────────
+// ── Contour helpers ────────────────────────────────────────────────────────
+function contourIntensityVal() {
+  return parseInt(document.getElementById("contour-intensity").value) / 100;
+}
+
+// ── MapLibre style builder — topo contours ─────────────────────────────────
 function hillshadeExp() {
   if (!document.getElementById("toggle-hillshade").checked) return 0;
   return (parseInt(document.getElementById("hillshade-intensity").value) / 100) * 0.8;
 }
 
-function buildStyle(bgColor) {
+function buildStyle(bgColor, roadColor) {
+  const ci = contourIntensityVal();
   return {
     version: 8,
+    glyphs: `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${MAPTILER_KEY}`,
     sources: {
       terrain: {
         type: "raster-dem",
@@ -614,10 +578,14 @@ function buildStyle(bgColor) {
         encoding: "terrarium",
         tileSize: 256,
         maxzoom: 14,
+      },
+      contours: {
+        type: "vector",
+        url: `https://api.maptiler.com/tiles/contours-v2/tiles.json?key=${MAPTILER_KEY}`,
       }
     },
     layers: [
-      { id:"bg", type:"background", paint:{"background-color": bgColor} },
+      { id: "bg", type: "background", paint: { "background-color": bgColor } },
       {
         id: "hillshade", type: "hillshade", source: "terrain",
         paint: {
@@ -628,6 +596,26 @@ function buildStyle(bgColor) {
           "hillshade-exaggeration":           hillshadeExp(),
           "hillshade-accent-color":           bgColor,
         }
+      },
+      {
+        id: "contour-minor", type: "line",
+        source: "contours", "source-layer": "contour",
+        filter: ["==", ["get", "level"], 0],
+        paint: {
+          "line-color":   roadColor,
+          "line-opacity": ci * 0.22,
+          "line-width": ["interpolate",["linear"],["zoom"], 7,0.3, 12,0.55, 16,0.8],
+        }
+      },
+      {
+        id: "contour-index", type: "line",
+        source: "contours", "source-layer": "contour",
+        filter: ["==", ["get", "level"], 1],
+        paint: {
+          "line-color":   roadColor,
+          "line-opacity": ci * 0.48,
+          "line-width": ["interpolate",["linear"],["zoom"], 7,0.55, 12,0.9, 16,1.4],
+        }
       }
     ]
   };
@@ -636,54 +624,38 @@ function buildStyle(bgColor) {
 // ── Init map ───────────────────────────────────────────────────────────────
 function initMap() {
   const bg = document.getElementById("color-bg").value;
+  const rd = document.getElementById("color-road").value;
   map = new maplibregl.Map({
     container: "map",
-    style: buildStyle(bg),
+    style: buildStyle(bg, rd),
     center: [10.45, 46.52],
     zoom: 9,
     preserveDrawingBuffer: true,
     attributionControl: false,
   });
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-right");
-  map.on("styledata", () => { if (roadElements.length && map.isStyleLoaded()) addMapLayers(map); });
+  map.on("styledata", () => { if (routePoints.length && map.isStyleLoaded()) addMapLayers(map); });
 }
 
-// ── Add layers to a MapLibre instance ─────────────────────────────────────
+// ── Add route layers to a MapLibre instance ────────────────────────────────
 function addMapLayers(m) {
-  const roadColor  = document.getElementById("color-road").value;
   const routeColor = document.getElementById("color-route").value;
 
-  [...Array(ROAD_STYLES.length)].forEach((_,i) => {
-    if (m.getLayer("roads-"+i)) m.removeLayer("roads-"+i);
-  });
   ["route-glow","route-line"].forEach(id => { if (m.getLayer(id)) m.removeLayer(id); });
-  if (m.getSource("roads")) m.removeSource("roads");
   if (m.getSource("route")) m.removeSource("route");
-
-  if (roadElements.length) {
-    m.addSource("roads", { type:"geojson", data: toGeoJSON(roadElements) });
-    ROAD_STYLES.forEach((s,i) => {
-      m.addLayer({
-        id: "roads-"+i, type:"line", source:"roads",
-        filter: ["match", ["get","highway"], s.classes, true, false],
-        paint: { "line-color":roadColor, "line-opacity":s.opacity, "line-width":s.width },
-        layout: { "line-cap":"round","line-join":"round" }
-      });
-    });
-  }
 
   if (routePoints.length) {
     m.addSource("route", {
-      type:"geojson",
-      data:{ type:"Feature", geometry:{ type:"LineString",
-        coordinates: routePoints.map(p=>[p.lon,p.lat]) }}
+      type: "geojson",
+      data: { type: "Feature", geometry: { type: "LineString",
+        coordinates: routePoints.map(p => [p.lon, p.lat]) }}
     });
-    m.addLayer({ id:"route-glow", type:"line", source:"route",
-      paint:{ "line-color":routeColor,"line-opacity":.20,"line-width":14,"line-blur":8 },
-      layout:{"line-cap":"round","line-join":"round"} });
-    m.addLayer({ id:"route-line", type:"line", source:"route",
-      paint:{ "line-color":routeColor,"line-opacity":1,"line-width":3.5 },
-      layout:{"line-cap":"round","line-join":"round"} });
+    m.addLayer({ id: "route-glow", type: "line", source: "route",
+      paint: { "line-color": routeColor, "line-opacity": .22, "line-width": 14, "line-blur": 8 },
+      layout: { "line-cap": "round", "line-join": "round" } });
+    m.addLayer({ id: "route-line", type: "line", source: "route",
+      paint: { "line-color": routeColor, "line-opacity": 1, "line-width": 3.5 },
+      layout: { "line-cap": "round", "line-join": "round" } });
   }
 }
 
@@ -692,21 +664,7 @@ function updateMapLayers() {
   addMapLayers(map);
 }
 
-// ── Overpass elements → GeoJSON ────────────────────────────────────────────
-function toGeoJSON(elements) {
-  return {
-    type:"FeatureCollection",
-    features: elements
-      .filter(e => e.type==="way" && e.geometry?.length > 1)
-      .map(e => ({
-        type:"Feature",
-        geometry:{ type:"LineString", coordinates: e.geometry.map(p=>[p.lon,p.lat]) },
-        properties:{ highway: e.tags?.highway || "unclassified" }
-      }))
-  };
-}
-
-// ── Overpass API ───────────────────────────────────────────────────────────
+// ── Overpass API (used only for pass-name route resolution) ────────────────
 async function overpass(query) {
   const body = "data=" + encodeURIComponent(query);
   for (const mirror of OVERPASS_MIRRORS) {
@@ -714,8 +672,8 @@ async function overpass(query) {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 90000);
       const r = await fetch(mirror, {
-        method:"POST",
-        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body, signal: ctrl.signal
       });
       clearTimeout(t);
@@ -726,20 +684,12 @@ async function overpass(query) {
   throw new Error("OpenStreetMap server unavailable. Check your connection.");
 }
 
-async function fetchRoads(bbox) {
-  const [S,W,N,E] = bbox;
-  const pad = detailLevel === 2 ? .05 : .04;
-  const s=(S-pad).toFixed(6), w=(W-pad).toFixed(6), n=(N+pad).toFixed(6), e=(E+pad).toFixed(6);
-  const types = ROAD_QUERIES[detailLevel];
-  return overpass(`[out:json][timeout:90];(way["highway"~"${types}"](${s},${w},${n},${e}););out geom;`);
-}
-
 // ── Parse GPX ─────────────────────────────────────────────────────────────
 function parseGPX(text) {
   const doc = new DOMParser().parseFromString(text, "text/xml");
   return [...doc.querySelectorAll("trkpt,rtept,wpt")].map(el => {
     const ele = el.querySelector("ele");
-    return { lat:+el.getAttribute("lat"), lon:+el.getAttribute("lon"), ele: ele ? +ele.textContent : null };
+    return { lat: +el.getAttribute("lat"), lon: +el.getAttribute("lon"), ele: ele ? +ele.textContent : null };
   }).filter(p => !isNaN(p.lat) && !isNaN(p.lon));
 }
 
@@ -749,13 +699,13 @@ function parseKML(text) {
   for (const el of doc.querySelectorAll("coordinates")) {
     const pts = el.textContent.trim().split(/\s+/).map(s => {
       const [lon,lat,ele] = s.split(",").map(Number);
-      return { lat, lon, ele: isNaN(ele)?null:ele };
+      return { lat, lon, ele: isNaN(ele) ? null : ele };
     }).filter(p => !isNaN(p.lat));
     if (pts.length > 1) return pts;
   }
   return [...doc.querySelectorAll("coord")].map(c => {
     const [lon,lat,ele] = c.textContent.trim().split(" ").map(Number);
-    return { lat, lon, ele: isNaN(ele)?null:ele };
+    return { lat, lon, ele: isNaN(ele) ? null : ele };
   }).filter(p => !isNaN(p.lat));
 }
 
@@ -763,20 +713,20 @@ function parseKML(text) {
 async function geocode(name) {
   const r = await fetch(
     `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,
-    { headers:{"User-Agent":"DiscoveristMapGenerator/2.0"} }
+    { headers: { "User-Agent": "DiscoveristMapGenerator/2.0" } }
   );
   const d = await r.json();
   if (!d.length) throw new Error(`Location not found: "${name}"`);
-  return { lat:+d[0].lat, lon:+d[0].lon };
+  return { lat: +d[0].lat, lon: +d[0].lon };
 }
 
-async function routeOSRM(la1,lo1,la2,lo2) {
+async function routeOSRM(la1, lo1, la2, lo2) {
   const r = await fetch(
     `https://router.project-osrm.org/route/v1/driving/${lo1},${la1};${lo2},${la2}?overview=full&geometries=geojson`
   );
   const d = await r.json();
   if (!d.routes?.length) throw new Error("No route found between these coordinates.");
-  return d.routes[0].geometry.coordinates.map(([lon,lat]) => ({lat,lon,ele:null}));
+  return d.routes[0].geometry.coordinates.map(([lon,lat]) => ({ lat, lon, ele: null }));
 }
 
 async function resolvePassName(name) {
@@ -787,44 +737,45 @@ async function resolvePassName(name) {
     `[out:json][timeout:60];(way["highway"~"primary|secondary|tertiary|unclassified|trunk|motorway"](${c.lat-pad},${c.lon-pad},${c.lat+pad},${c.lon+pad}););out geom;`
   );
   if (!els.length) throw new Error("No roads found near this location.");
-  let best=null, bestD=Infinity;
-  for (const w of els.filter(e=>e.type==="way"&&e.geometry?.length>5)) {
+  let best = null, bestD = Infinity;
+  for (const w of els.filter(e => e.type === "way" && e.geometry?.length > 5)) {
     for (const p of w.geometry) {
-      const d = Math.hypot(p.lat-c.lat, p.lon-c.lon);
-      if (d<bestD){ bestD=d; best=w; }
+      const d = Math.hypot(p.lat - c.lat, p.lon - c.lon);
+      if (d < bestD) { bestD = d; best = w; }
     }
   }
   if (!best) throw new Error("Could not find a road near this location.");
-  const g=best.geometry, s=g[0], e=g[g.length-1];
-  return routeOSRM(s.lat,s.lon,e.lat,e.lon);
+  const g = best.geometry, s = g[0], e = g[g.length - 1];
+  return routeOSRM(s.lat, s.lon, e.lat, e.lon);
 }
 
 // ── Stats ──────────────────────────────────────────────────────────────────
-function haversine(la1,lo1,la2,lo2) {
-  const R=6371000, dLa=(la2-la1)*Math.PI/180, dLo=(lo2-lo1)*Math.PI/180;
-  const a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+function haversine(la1, lo1, la2, lo2) {
+  const R = 6371000, dLa = (la2-la1)*Math.PI/180, dLo = (lo2-lo1)*Math.PI/180;
+  const a = Math.sin(dLa/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function calcStats(pts) {
-  let dist=0, gain=0;
-  for (let i=1;i<pts.length;i++) {
-    dist += haversine(pts[i-1].lat,pts[i-1].lon,pts[i].lat,pts[i].lon);
-    if (pts[i].ele!=null&&pts[i-1].ele!=null&&pts[i].ele>pts[i-1].ele) gain+=pts[i].ele-pts[i-1].ele;
+  let dist = 0, gain = 0;
+  for (let i = 1; i < pts.length; i++) {
+    dist += haversine(pts[i-1].lat, pts[i-1].lon, pts[i].lat, pts[i].lon);
+    if (pts[i].ele != null && pts[i-1].ele != null && pts[i].ele > pts[i-1].ele)
+      gain += pts[i].ele - pts[i-1].ele;
   }
-  const lats=pts.map(p=>p.lat), lons=pts.map(p=>p.lon);
+  const lats = pts.map(p => p.lat), lons = pts.map(p => p.lon);
   return {
-    distKm:(dist/1000).toFixed(1),
-    elevGain:Math.round(gain),
-    hasEle:pts.some(p=>p.ele!=null),
-    centerLat:(Math.min(...lats)+Math.max(...lats))/2,
-    centerLon:(Math.min(...lons)+Math.max(...lons))/2,
-    bbox:[Math.min(...lats),Math.min(...lons),Math.max(...lats),Math.max(...lons)]
+    distKm:    (dist / 1000).toFixed(1),
+    elevGain:  Math.round(gain),
+    hasEle:    pts.some(p => p.ele != null),
+    centerLat: (Math.min(...lats) + Math.max(...lats)) / 2,
+    centerLon: (Math.min(...lons) + Math.max(...lons)) / 2,
+    bbox:      [Math.min(...lats), Math.min(...lons), Math.max(...lats), Math.max(...lons)]
   };
 }
 
-function fmtCoord(lat,lon) {
-  return `${Math.abs(lat).toFixed(4)}° ${lat>=0?"N":"S"}  /  ${Math.abs(lon).toFixed(4)}° ${lon>=0?"E":"W"}`;
+function fmtCoord(lat, lon) {
+  return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}  /  ${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? "E" : "W"}`;
 }
 
 // ── Font loading for canvas ────────────────────────────────────────────────
@@ -844,32 +795,28 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
   const gold  = document.getElementById("color-road").value;
   const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
   const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
-  const ts    = textScale; // 0.6 – 1.4 from slider
+  const ts    = textScale;
 
-  // Scale y-positions from the top rule anchor (24) so text spreads/compresses naturally
   const ty = base => yOff + Math.round((24 + (base - 24) * ts) * sc);
 
   ctx.fillStyle = bg;
   ctx.fillRect(0, yOff, W, H);
 
-  // Decorative rules (fixed, not scaled)
   ctx.strokeStyle = gold;
-  ctx.lineWidth = Math.max(1, 1.5*sc);
-  const lx1 = Math.round(80*sc), lx2 = W - Math.round(80*sc);
+  ctx.lineWidth = Math.max(1, 1.5 * sc);
+  const lx1 = Math.round(80 * sc), lx2 = W - Math.round(80 * sc);
   ctx.globalAlpha = .50;
-  ctx.beginPath(); ctx.moveTo(lx1, yOff+Math.round(24*sc)); ctx.lineTo(lx2, yOff+Math.round(24*sc)); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(lx1, yOff+H-Math.round(24*sc)); ctx.lineTo(lx2, yOff+H-Math.round(24*sc)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lx1, yOff + Math.round(24*sc)); ctx.lineTo(lx2, yOff + Math.round(24*sc)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lx1, yOff + H - Math.round(24*sc)); ctx.lineTo(lx2, yOff + H - Math.round(24*sc)); ctx.stroke();
   ctx.globalAlpha = 1;
 
   ctx.textAlign = "center";
 
-  // Main title
   ctx.font = `700 ${Math.round(76*sc*ts)}px "Inter", "Arial Narrow", Arial, sans-serif`;
   ctx.fillStyle = gold;
   ctx.letterSpacing = `${Math.round(7*sc*ts)}px`;
   ctx.fillText(title, W/2, ty(108));
 
-  // Subtitle
   if (sub) {
     ctx.font = `400 ${Math.round(24*sc*ts)}px "Inter", Arial, sans-serif`;
     ctx.globalAlpha = .62;
@@ -880,7 +827,6 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
 
   ctx.letterSpacing = "0px";
 
-  // Stats
   if (routeStats.distKm) {
     let st = `${routeStats.distKm} km`;
     if (routeStats.hasEle && routeStats.elevGain > 0) st += `  ·  ${routeStats.elevGain.toLocaleString()} m gain`;
@@ -895,10 +841,9 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
     ctx.globalAlpha = 1;
   }
 
-  // Attribution (anchored to bottom)
   ctx.font = `300 ${Math.round(11*sc)}px "Inter", Arial, sans-serif`;
   ctx.globalAlpha = .20;
-  ctx.fillText("© OpenStreetMap contributors", W/2, yOff + H - Math.round(28*sc));
+  ctx.fillText("© OpenStreetMap contributors  ·  © MapTiler", W/2, yOff + H - Math.round(28*sc));
   ctx.globalAlpha = 1;
 }
 
@@ -918,10 +863,8 @@ function renderVignetteToCtx(ctx, W, H) {
   const intensity = vignetteIntensity();
   ctx.clearRect(0, 0, W, H);
   if (intensity <= 0) return;
-
-  // Radial gradient: transparent center → dark corners
   const cx = W / 2, cy = H / 2;
-  const r  = Math.sqrt(cx * cx + cy * cy); // distance to corner
+  const r  = Math.sqrt(cx * cx + cy * cy);
   const grad = ctx.createRadialGradient(cx, cy, r * 0.25, cx, cy, r);
   grad.addColorStop(0,   "rgba(0,0,0,0)");
   grad.addColorStop(0.6, `rgba(0,0,0,${intensity * 0.30})`);
@@ -939,28 +882,28 @@ function drawVignette() {
 // ── Progress steps ─────────────────────────────────────────────────────────
 function setStep(n) {
   document.getElementById("progress").classList.add("on");
-  ["s1","s2","s3"].forEach((id,i) => {
+  ["s1","s2"].forEach((id, i) => {
     const el = document.getElementById(id);
-    el.classList.remove("active","done");
-    if (i+1 < n)  el.classList.add("done");
-    if (i+1 === n) el.classList.add("active");
+    el.classList.remove("active", "done");
+    if (i + 1 < n)  el.classList.add("done");
+    if (i + 1 === n) el.classList.add("active");
   });
 }
 function clearSteps() {
   document.getElementById("progress").classList.remove("on");
-  ["s1","s2","s3"].forEach(id => document.getElementById(id).classList.remove("active","done"));
+  ["s1","s2"].forEach(id => document.getElementById(id).classList.remove("active","done"));
 }
 
 // ── Status + toast ─────────────────────────────────────────────────────────
-function setStatus(msg, cls="") {
+function setStatus(msg, cls = "") {
   const el = document.getElementById("status-line");
   el.textContent = msg; el.className = cls;
 }
 
-function toast(msg, cls="", dur=3500) {
+function toast(msg, cls = "", dur = 3500) {
   const el = document.getElementById("toast");
   el.textContent = msg;
-  el.className = "show" + (cls ? " "+cls : "");
+  el.className = "show" + (cls ? " " + cls : "");
   clearTimeout(_toastTimer);
   if (dur > 0) _toastTimer = setTimeout(() => { el.className = ""; }, dur);
 }
@@ -996,10 +939,10 @@ async function generate() {
       if (!pts.length) throw new Error("No route in KML. Export from Google My Maps.");
     } else if (cf && ct) {
       setStatus("Routing…");
-      const [la1,lo1] = cf.split(",").map(Number);
-      const [la2,lo2] = ct.split(",").map(Number);
-      if ([la1,lo1,la2,lo2].some(isNaN)) throw new Error("Invalid coordinates. Use: 46.52, 10.45");
-      pts = await routeOSRM(la1,lo1,la2,lo2);
+      const [la1, lo1] = cf.split(",").map(Number);
+      const [la2, lo2] = ct.split(",").map(Number);
+      if ([la1, lo1, la2, lo2].some(isNaN)) throw new Error("Invalid coordinates. Use: 46.52, 10.45");
+      pts = await routeOSRM(la1, lo1, la2, lo2);
     } else if (name) {
       pts = await resolvePassName(name);
     } else {
@@ -1010,7 +953,7 @@ async function generate() {
 
     if (pts.length > 3000) {
       const step = Math.ceil(pts.length / 3000);
-      pts = pts.filter((_,i) => i%step===0 || i===pts.length-1);
+      pts = pts.filter((_, i) => i % step === 0 || i === pts.length - 1);
     }
 
     routePoints = pts;
@@ -1026,19 +969,15 @@ async function generate() {
     document.getElementById("stats-card").classList.add("on");
 
     setStep(2);
-    setStatus("Fetching road network…");
-    roadElements = await fetchRoads(st.bbox);
-
-    setStep(3);
     setStatus("Rendering…");
-    const [S,W,N,E] = st.bbox;
-    if (!map.isStyleLoaded()) await new Promise(res=>map.once("style.load",res));
-    map.fitBounds([[W,S],[E,N]], { padding:60, duration:600 });
+    const [S, W, N, E] = st.bbox;
+    if (!map.isStyleLoaded()) await new Promise(res => map.once("style.load", res));
+    map.fitBounds([[W, S], [E, N]], { padding: 60, duration: 600 });
     updateMapLayers();
     await ensureFonts();
     drawTitleBlock();
 
-    await new Promise(res=>map.once("idle",res));
+    await new Promise(res => map.once("idle", res));
     updateMapLayers();
     drawVignette();
 
@@ -1047,7 +986,7 @@ async function generate() {
     document.getElementById("btn-svg").disabled = false;
     document.getElementById("btn-png").disabled = false;
     setStatus("Map ready", "ok");
-    toast(`Map ready · ${roadElements.length.toLocaleString()} road segments`, "ok");
+    toast("Map ready", "ok");
 
   } catch(e) {
     clearSteps();
@@ -1060,36 +999,29 @@ async function generate() {
   btn.textContent = "Generate Map";
 }
 
-// ── SVG Export ─────────────────────────────────────────────────────────────
+// ── SVG Export (route + title only — contours are vector tiles) ────────────
 function buildSVG() {
   if (!routePoints.length) return null;
-  const [S,W,N,E] = routeStats.bbox;
-  const pad=.05, mn=S-pad, mx=N+pad, mw=W-pad, me=E+pad;
+  const [S, W, N, E] = routeStats.bbox;
+  const pad = .05, mn = S-pad, mx = N+pad, mw = W-pad, me = E+pad;
   const merY = la => Math.log(Math.tan(Math.PI/4 + la*Math.PI/360));
-  const y0=merY(mn), y1=merY(mx), xR=me-mw, yR=y1-y0;
-  const proj = (la,lo) => [
+  const y0 = merY(mn), y1 = merY(mx), xR = me-mw, yR = y1-y0;
+  const proj = (la, lo) => [
     (lo-mw)/xR*POSTER_W,
-    MAP_H-(merY(la)-y0)/yR*MAP_H
+    MAP_H - (merY(la)-y0)/yR*MAP_H
   ];
   const road  = document.getElementById("color-road").value;
   const route = document.getElementById("color-route").value;
   const bg    = document.getElementById("color-bg").value;
-  const title = (document.getElementById("title-input").value||"MOUNTAIN PASS").toUpperCase();
-  const sub   = (document.getElementById("subtitle-input").value||"").toUpperCase();
+  const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
+  const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
 
-  let paths = "";
-  for (const s of ROAD_STYLES) {
-    for (const w of roadElements.filter(e=>e.type==="way"&&e.geometry&&s.classes.includes(e.tags?.highway))) {
-      const d = "M "+w.geometry.map(p=>proj(p.lat,p.lon).map(v=>v.toFixed(1)).join(",")).join(" L ");
-      paths += `<path d="${d}" stroke="${road}" stroke-opacity="${s.opacity}" stroke-width="${s.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    }
-  }
-  const rd = "M "+routePoints.map(p=>proj(p.lat,p.lon).map(v=>v.toFixed(1)).join(",")).join(" L ");
+  const rd = "M " + routePoints.map(p => proj(p.lat, p.lon).map(v => v.toFixed(1)).join(",")).join(" L ");
   const st = routeStats, ty = MAP_H;
 
   const vi = vignetteIntensity();
   const vigSvg = vi > 0
-    ? `<defs><radialGradient id="vgr" cx="50%" cy="50%" r="80%" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${POSTER_W}" y2="${MAP_H}">
+    ? `<defs><radialGradient id="vgr" cx="50%" cy="50%" r="80%" gradientUnits="userSpaceOnUse">
         <stop offset="25%" stop-color="#000" stop-opacity="0"/>
         <stop offset="100%" stop-color="#000" stop-opacity="${(vi * 0.72).toFixed(2)}"/>
        </radialGradient></defs>
@@ -1099,18 +1031,17 @@ function buildSVG() {
   return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
 <defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 <rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>
-<g id="roads">${paths}</g>
-<path d="${rd}" stroke="${route}" stroke-opacity=".18" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+<path d="${rd}" stroke="${route}" stroke-opacity=".20" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
 <path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 ${vigSvg}
 <rect x="0" y="${ty}" width="${POSTER_W}" height="${TITLE_H}" fill="${bg}"/>
 <line x1="80" y1="${ty+24}" x2="${POSTER_W-80}" y2="${ty+24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
 <line x1="80" y1="${POSTER_H-24}" x2="${POSTER_W-80}" y2="${POSTER_H-24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
 <text x="${POSTER_W/2}" y="${ty+108}" font-family="Inter,Arial Narrow,Arial,sans-serif" font-size="76" font-weight="700" fill="${road}" text-anchor="middle" letter-spacing="7">${title}</text>
-${sub?`<text x="${POSTER_W/2}" y="${ty+150}" font-family="Inter,Arial,sans-serif" font-size="24" fill="${road}" text-anchor="middle" letter-spacing="4" opacity=".62">${sub}</text>`:""}
-${st.distKm?`<text x="${POSTER_W/2}" y="${ty+208}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="300" fill="${road}" text-anchor="middle" opacity=".52">${st.distKm} km${st.hasEle&&st.elevGain>0?` · ${st.elevGain.toLocaleString()} m gain`:""}</text>
-<text x="${POSTER_W/2}" y="${ty+242}" font-family="JetBrains Mono,Courier New,monospace" font-size="14" font-weight="300" fill="${road}" text-anchor="middle" opacity=".35">${fmtCoord(st.centerLat,st.centerLon)}</text>`:""}
-<text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".20">© OpenStreetMap contributors</text>
+${sub ? `<text x="${POSTER_W/2}" y="${ty+150}" font-family="Inter,Arial,sans-serif" font-size="24" fill="${road}" text-anchor="middle" letter-spacing="4" opacity=".62">${sub}</text>` : ""}
+${st.distKm ? `<text x="${POSTER_W/2}" y="${ty+208}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="300" fill="${road}" text-anchor="middle" opacity=".52">${st.distKm} km${st.hasEle && st.elevGain > 0 ? ` · ${st.elevGain.toLocaleString()} m gain` : ""}</text>
+<text x="${POSTER_W/2}" y="${ty+242}" font-family="JetBrains Mono,Courier New,monospace" font-size="14" font-weight="300" fill="${road}" text-anchor="middle" opacity=".35">${fmtCoord(st.centerLat, st.centerLon)}</text>` : ""}
+<text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".20">© OpenStreetMap contributors  ·  © MapTiler</text>
 </svg>`;
 }
 
@@ -1118,8 +1049,8 @@ function downloadSVG() {
   const svg = buildSVG();
   if (!svg) { toast("No route data", "err"); return; }
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));
-  a.download = (document.getElementById("title-input").value||"moto-map").toLowerCase().replace(/\s+/g,"-")+".svg";
+  a.href = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+  a.download = (document.getElementById("title-input").value || "moto-map").toLowerCase().replace(/\s+/g, "-") + ".svg";
   a.click(); URL.revokeObjectURL(a.href);
   toast("SVG downloaded", "ok");
 }
@@ -1140,15 +1071,14 @@ async function exportPNG() {
     offDiv.style.cssText = `position:fixed;left:-99999px;top:0;width:${POSTER_W}px;height:${MAP_H}px;`;
     document.body.appendChild(offDiv);
 
-    // Adjust zoom so the print map shows the same geographic area as the smaller preview map.
-    // Both containers share the same aspect ratio, so scaling by width is sufficient.
     const previewW = document.getElementById("map").clientWidth;
     const printZoom = map.getZoom() + Math.log2(POSTER_W / previewW);
 
     const bg = document.getElementById("color-bg").value;
+    const rd = document.getElementById("color-road").value;
     const printMap = new maplibregl.Map({
       container: offDiv,
-      style: buildStyle(bg),
+      style: buildStyle(bg, rd),
       center: map.getCenter(),
       zoom: printZoom,
       bearing: map.getBearing(),
@@ -1159,17 +1089,17 @@ async function exportPNG() {
       interactive: false,
     });
 
-    await new Promise((res,rej) => {
+    await new Promise((res, rej) => {
       printMap.on("load", res);
-      setTimeout(() => rej(new Error("Print map timeout")), 30000);
+      setTimeout(() => rej(new Error("Print map timeout")), 40000);
     });
 
-    printMap.setPaintProperty("hillshade","hillshade-exaggeration",hillshadeExp());
+    printMap.setPaintProperty("hillshade", "hillshade-exaggeration", hillshadeExp());
     addMapLayers(printMap);
 
-    await new Promise((res,rej) => {
+    await new Promise((res, rej) => {
       printMap.once("idle", res);
-      setTimeout(() => rej(new Error("Render timeout")), 30000);
+      setTimeout(() => rej(new Error("Render timeout")), 40000);
     });
 
     const mapCanvas = printMap.getCanvas();
@@ -1177,7 +1107,6 @@ async function exportPNG() {
     final.width = PW; final.height = PH;
     const ctx = final.getContext("2d");
     ctx.drawImage(mapCanvas, 0, 0, PW, PMH);
-    // Vignette on map area
     renderVignetteToCtx(ctx, PW, PMH);
     await ensureFonts();
     renderTitleBlock(ctx, PW, PTH, PMH, PW / POSTER_W);
@@ -1186,7 +1115,7 @@ async function exportPNG() {
       final.toBlob(blob => {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = (document.getElementById("title-input").value||"moto-map").toLowerCase().replace(/\s+/g,"-")+"-print.png";
+        a.download = (document.getElementById("title-input").value || "moto-map").toLowerCase().replace(/\s+/g, "-") + "-print.png";
         a.click(); URL.revokeObjectURL(a.href);
         res();
       }, "image/png");
@@ -1197,7 +1126,7 @@ async function exportPNG() {
     toast("PNG downloaded (7200 × 10200 px)", "ok");
 
   } catch(e) {
-    toast("Export failed: "+e.message, "err");
+    toast("Export failed: " + e.message, "err");
     console.error(e);
   }
   document.getElementById("btn-png").disabled = false;
@@ -1207,38 +1136,44 @@ async function exportPNG() {
 function onColorChange() {
   if (!map) return;
   const bg = document.getElementById("color-bg").value;
-  map.setPaintProperty("bg","background-color",bg);
-  map.setPaintProperty("hillshade","hillshade-accent-color",bg);
+  const rd = document.getElementById("color-road").value;
+  map.setPaintProperty("bg", "background-color", bg);
+  map.setPaintProperty("hillshade", "hillshade-accent-color", bg);
+  if (map.getLayer("contour-minor")) {
+    map.setPaintProperty("contour-minor", "line-color", rd);
+    map.setPaintProperty("contour-index", "line-color", rd);
+  }
   updateMapLayers();
   drawTitleBlock();
+}
+
+function onContourChange() {
+  if (!map) return;
+  const ci = contourIntensityVal();
+  document.getElementById("contour-val").textContent = document.getElementById("contour-intensity").value + "%";
+  if (map.getLayer("contour-minor")) {
+    map.setPaintProperty("contour-minor", "line-opacity", ci * 0.22);
+    map.setPaintProperty("contour-index", "line-opacity", ci * 0.48);
+  }
 }
 
 function onHillshadeChange() {
   if (!map) return;
   const on  = document.getElementById("toggle-hillshade").checked;
   const val = document.getElementById("hillshade-intensity").value;
-  document.getElementById("hillshade-val").textContent = on ? val+"%" : "Off";
+  document.getElementById("hillshade-val").textContent = on ? val + "%" : "Off";
   document.getElementById("hs-wrap").classList.toggle("off", !on);
-  map.setPaintProperty("hillshade","hillshade-exaggeration",hillshadeExp());
+  map.setPaintProperty("hillshade", "hillshade-exaggeration", hillshadeExp());
 }
 
 // ── Mode segmented control ─────────────────────────────────────────────────
-const PANELS = { name:"panel-name", coords:"panel-coords", file:"panel-file" };
+const PANELS = { name: "panel-name", coords: "panel-coords", file: "panel-file" };
 document.getElementById("mode-seg").addEventListener("click", e => {
   const btn = e.target.closest(".seg-btn");
   if (!btn) return;
   const mode = btn.dataset.mode;
-  document.querySelectorAll("#mode-seg .seg-btn").forEach(b => b.classList.toggle("active", b===btn));
-  Object.entries(PANELS).forEach(([m,id]) => document.getElementById(id).classList.toggle("on", m===mode));
-});
-
-// ── Road detail level ──────────────────────────────────────────────────────
-document.querySelectorAll(".detail-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    detailLevel = parseInt(btn.dataset.d);
-    document.querySelectorAll(".detail-btn").forEach(b => b.classList.toggle("active", b===btn));
-    document.getElementById("detail-hint").textContent = DETAIL_HINTS[detailLevel];
-  });
+  document.querySelectorAll("#mode-seg .seg-btn").forEach(b => b.classList.toggle("active", b === btn));
+  Object.entries(PANELS).forEach(([m, id]) => document.getElementById(id).classList.toggle("on", m === mode));
 });
 
 // ── Color presets ──────────────────────────────────────────────────────────
@@ -1269,9 +1204,11 @@ document.getElementById("kml-file").addEventListener("change", e => {
 document.getElementById("btn-generate").addEventListener("click", generate);
 document.getElementById("btn-svg").addEventListener("click", downloadSVG);
 document.getElementById("btn-png").addEventListener("click", exportPNG);
-document.getElementById("pass-name").addEventListener("keydown", e => { if (e.key==="Enter") generate(); });
-["color-bg","color-road","color-route"].forEach(id => document.getElementById(id).addEventListener("input", onColorChange));
-["title-input","subtitle-input"].forEach(id => document.getElementById(id).addEventListener("input", drawTitleBlock));
+document.getElementById("pass-name").addEventListener("keydown", e => { if (e.key === "Enter") generate(); });
+["color-bg","color-road","color-route"].forEach(id =>
+  document.getElementById(id).addEventListener("input", onColorChange));
+["title-input","subtitle-input"].forEach(id =>
+  document.getElementById(id).addEventListener("input", drawTitleBlock));
 document.getElementById("toggle-hillshade").addEventListener("change", onHillshadeChange);
 document.getElementById("hillshade-intensity").addEventListener("input", () => {
   document.getElementById("hillshade-val").textContent = document.getElementById("hillshade-intensity").value + "%";
@@ -1286,6 +1223,7 @@ document.getElementById("vignette-intensity").addEventListener("input", e => {
   document.getElementById("vignette-val").textContent = e.target.value + "%";
   drawVignette();
 });
+document.getElementById("contour-intensity").addEventListener("input", onContourChange);
 
 // ── Boot ───────────────────────────────────────────────────────────────────
 layoutPoster();
