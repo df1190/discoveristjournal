@@ -291,6 +291,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 }
 #poster:hover{box-shadow:0 14px 60px rgba(0,0,0,.22),0 4px 12px rgba(0,0,0,.08)}
 #map{width:100%}
+#vignette-canvas{position:absolute;top:0;left:0;pointer-events:none;z-index:2;display:block}
 #title-canvas{display:block;width:100%}
 
 /* ── MapLibre overrides ──────────────────────────────────────────────── */
@@ -385,6 +386,13 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
       <label class="flbl">Subtitle</label>
       <input type="text" id="subtitle-input" placeholder="Italy · The Alps">
     </div>
+    <div class="rng-wrap">
+      <div class="rng-hdr">
+        <span class="rng-lbl">Text Size</span>
+        <span class="rng-val" id="text-size-val">100%</span>
+      </div>
+      <input type="range" id="text-size" min="60" max="140" step="5" value="100">
+    </div>
   </div>
 
   <!-- Style -->
@@ -434,6 +442,17 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
         <button class="detail-btn" data-d="2">Full</button>
       </div>
       <div class="detail-hint" id="detail-hint">Primary + secondary + local roads</div>
+    </div>
+
+    <div>
+      <div class="flbl" style="margin-bottom:6px">Vignette</div>
+      <div class="rng-wrap">
+        <div class="rng-hdr">
+          <span class="rng-lbl">Intensity</span>
+          <span class="rng-val" id="vignette-val">0%</span>
+        </div>
+        <input type="range" id="vignette-intensity" min="0" max="100" step="5" value="0">
+      </div>
     </div>
   </div>
 
@@ -486,6 +505,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 <div id="prev">
   <div id="poster">
     <div id="map"></div>
+    <canvas id="vignette-canvas"></canvas>
     <canvas id="title-canvas"></canvas>
   </div>
 </div>
@@ -536,12 +556,13 @@ const OVERPASS_MIRRORS = [
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
-let map        = null;
+let map         = null;
 let routePoints = [];
 let roadElements = [];
-let routeStats = {};
+let routeStats  = {};
 let posterReady = false;
 let detailLevel = 1;
+let textScale   = 1.0;
 let _toastTimer = null;
 
 // ── Layout ─────────────────────────────────────────────────────────────────
@@ -565,7 +586,14 @@ function layoutPoster() {
   tc.height = Math.round(titlePx * 2);
   tc.style.width = pw + "px";
 
+  const vc = document.getElementById("vignette-canvas");
+  vc.width  = Math.round(pw * 2);
+  vc.height = Math.round(mapPx * 2);
+  vc.style.width  = pw + "px";
+  vc.style.height = mapPx + "px";
+
   if (map) map.resize();
+  drawVignette();
   drawTitleBlock();
 }
 window.addEventListener("resize", layoutPoster);
@@ -651,10 +679,10 @@ function addMapLayers(m) {
         coordinates: routePoints.map(p=>[p.lon,p.lat]) }}
     });
     m.addLayer({ id:"route-glow", type:"line", source:"route",
-      paint:{ "line-color":routeColor,"line-opacity":.28,"line-width":24,"line-blur":10 },
+      paint:{ "line-color":routeColor,"line-opacity":.20,"line-width":14,"line-blur":8 },
       layout:{"line-cap":"round","line-join":"round"} });
     m.addLayer({ id:"route-line", type:"line", source:"route",
-      paint:{ "line-color":routeColor,"line-opacity":1,"line-width":5.5 },
+      paint:{ "line-color":routeColor,"line-opacity":1,"line-width":3.5 },
       layout:{"line-cap":"round","line-join":"round"} });
   }
 }
@@ -816,11 +844,15 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
   const gold  = document.getElementById("color-road").value;
   const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
   const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
+  const ts    = textScale; // 0.6 – 1.4 from slider
+
+  // Scale y-positions from the top rule anchor (24) so text spreads/compresses naturally
+  const ty = base => yOff + Math.round((24 + (base - 24) * ts) * sc);
 
   ctx.fillStyle = bg;
   ctx.fillRect(0, yOff, W, H);
 
-  // Decorative rules
+  // Decorative rules (fixed, not scaled)
   ctx.strokeStyle = gold;
   ctx.lineWidth = Math.max(1, 1.5*sc);
   const lx1 = Math.round(80*sc), lx2 = W - Math.round(80*sc);
@@ -832,17 +864,17 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
   ctx.textAlign = "center";
 
   // Main title
-  ctx.font = `700 ${Math.round(76*sc)}px "Inter", "Arial Narrow", Arial, sans-serif`;
+  ctx.font = `700 ${Math.round(76*sc*ts)}px "Inter", "Arial Narrow", Arial, sans-serif`;
   ctx.fillStyle = gold;
-  ctx.letterSpacing = `${Math.round(7*sc)}px`;
-  ctx.fillText(title, W/2, yOff + Math.round(108*sc));
+  ctx.letterSpacing = `${Math.round(7*sc*ts)}px`;
+  ctx.fillText(title, W/2, ty(108));
 
   // Subtitle
   if (sub) {
-    ctx.font = `400 ${Math.round(24*sc)}px "Inter", Arial, sans-serif`;
+    ctx.font = `400 ${Math.round(24*sc*ts)}px "Inter", Arial, sans-serif`;
     ctx.globalAlpha = .62;
-    ctx.letterSpacing = `${Math.round(4*sc)}px`;
-    ctx.fillText(sub, W/2, yOff + Math.round(150*sc));
+    ctx.letterSpacing = `${Math.round(4*sc*ts)}px`;
+    ctx.fillText(sub, W/2, ty(150));
     ctx.globalAlpha = 1;
   }
 
@@ -852,18 +884,18 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
   if (routeStats.distKm) {
     let st = `${routeStats.distKm} km`;
     if (routeStats.hasEle && routeStats.elevGain > 0) st += `  ·  ${routeStats.elevGain.toLocaleString()} m gain`;
-    ctx.font = `300 ${Math.round(20*sc)}px "Inter", Arial, sans-serif`;
+    ctx.font = `300 ${Math.round(20*sc*ts)}px "Inter", Arial, sans-serif`;
     ctx.globalAlpha = .52;
-    ctx.fillText(st, W/2, yOff + Math.round(208*sc));
+    ctx.fillText(st, W/2, ty(208));
     ctx.globalAlpha = 1;
 
-    ctx.font = `300 ${Math.round(14*sc)}px "JetBrains Mono", "Courier New", monospace`;
+    ctx.font = `300 ${Math.round(14*sc*ts)}px "JetBrains Mono", "Courier New", monospace`;
     ctx.globalAlpha = .35;
-    ctx.fillText(fmtCoord(routeStats.centerLat, routeStats.centerLon), W/2, yOff + Math.round(242*sc));
+    ctx.fillText(fmtCoord(routeStats.centerLat, routeStats.centerLon), W/2, ty(242));
     ctx.globalAlpha = 1;
   }
 
-  // Attribution
+  // Attribution (anchored to bottom)
   ctx.font = `300 ${Math.round(11*sc)}px "Inter", Arial, sans-serif`;
   ctx.globalAlpha = .20;
   ctx.fillText("© OpenStreetMap contributors", W/2, yOff + H - Math.round(28*sc));
@@ -875,6 +907,33 @@ function drawTitleBlock() {
   if (!tc.width) return;
   const ctx = tc.getContext("2d");
   renderTitleBlock(ctx, tc.width, tc.height, 0, tc.width / POSTER_W);
+}
+
+// ── Vignette ───────────────────────────────────────────────────────────────
+function vignetteIntensity() {
+  return parseInt(document.getElementById("vignette-intensity").value) / 100;
+}
+
+function renderVignetteToCtx(ctx, W, H) {
+  const intensity = vignetteIntensity();
+  ctx.clearRect(0, 0, W, H);
+  if (intensity <= 0) return;
+
+  // Radial gradient: transparent center → dark corners
+  const cx = W / 2, cy = H / 2;
+  const r  = Math.sqrt(cx * cx + cy * cy); // distance to corner
+  const grad = ctx.createRadialGradient(cx, cy, r * 0.25, cx, cy, r);
+  grad.addColorStop(0,   "rgba(0,0,0,0)");
+  grad.addColorStop(0.6, `rgba(0,0,0,${intensity * 0.30})`);
+  grad.addColorStop(1,   `rgba(0,0,0,${intensity * 0.72})`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawVignette() {
+  const vc = document.getElementById("vignette-canvas");
+  if (!vc.width) return;
+  renderVignetteToCtx(vc.getContext("2d"), vc.width, vc.height);
 }
 
 // ── Progress steps ─────────────────────────────────────────────────────────
@@ -981,6 +1040,7 @@ async function generate() {
 
     await new Promise(res=>map.once("idle",res));
     updateMapLayers();
+    drawVignette();
 
     posterReady = true;
     clearSteps();
@@ -1027,12 +1087,22 @@ function buildSVG() {
   const rd = "M "+routePoints.map(p=>proj(p.lat,p.lon).map(v=>v.toFixed(1)).join(",")).join(" L ");
   const st = routeStats, ty = MAP_H;
 
+  const vi = vignetteIntensity();
+  const vigSvg = vi > 0
+    ? `<defs><radialGradient id="vgr" cx="50%" cy="50%" r="80%" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${POSTER_W}" y2="${MAP_H}">
+        <stop offset="25%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#000" stop-opacity="${(vi * 0.72).toFixed(2)}"/>
+       </radialGradient></defs>
+       <rect x="0" y="0" width="${POSTER_W}" height="${MAP_H}" fill="url(#vgr)"/>`
+    : "";
+
   return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
 <defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 <rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>
 <g id="roads">${paths}</g>
-<path d="${rd}" stroke="${route}" stroke-opacity=".22" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
-<path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="${rd}" stroke="${route}" stroke-opacity=".18" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+<path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+${vigSvg}
 <rect x="0" y="${ty}" width="${POSTER_W}" height="${TITLE_H}" fill="${bg}"/>
 <line x1="80" y1="${ty+24}" x2="${POSTER_W-80}" y2="${ty+24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
 <line x1="80" y1="${POSTER_H-24}" x2="${POSTER_W-80}" y2="${POSTER_H-24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
@@ -1070,12 +1140,17 @@ async function exportPNG() {
     offDiv.style.cssText = `position:fixed;left:-99999px;top:0;width:${POSTER_W}px;height:${MAP_H}px;`;
     document.body.appendChild(offDiv);
 
+    // Adjust zoom so the print map shows the same geographic area as the smaller preview map.
+    // Both containers share the same aspect ratio, so scaling by width is sufficient.
+    const previewW = document.getElementById("map").clientWidth;
+    const printZoom = map.getZoom() + Math.log2(POSTER_W / previewW);
+
     const bg = document.getElementById("color-bg").value;
     const printMap = new maplibregl.Map({
       container: offDiv,
       style: buildStyle(bg),
       center: map.getCenter(),
-      zoom: map.getZoom(),
+      zoom: printZoom,
       bearing: map.getBearing(),
       pitch: map.getPitch(),
       pixelRatio: PRINT_SCALE,
@@ -1102,6 +1177,8 @@ async function exportPNG() {
     final.width = PW; final.height = PH;
     const ctx = final.getContext("2d");
     ctx.drawImage(mapCanvas, 0, 0, PW, PMH);
+    // Vignette on map area
+    renderVignetteToCtx(ctx, PW, PMH);
     await ensureFonts();
     renderTitleBlock(ctx, PW, PTH, PMH, PW / POSTER_W);
 
@@ -1199,6 +1276,15 @@ document.getElementById("toggle-hillshade").addEventListener("change", onHillsha
 document.getElementById("hillshade-intensity").addEventListener("input", () => {
   document.getElementById("hillshade-val").textContent = document.getElementById("hillshade-intensity").value + "%";
   onHillshadeChange();
+});
+document.getElementById("text-size").addEventListener("input", e => {
+  textScale = parseInt(e.target.value) / 100;
+  document.getElementById("text-size-val").textContent = e.target.value + "%";
+  drawTitleBlock();
+});
+document.getElementById("vignette-intensity").addEventListener("input", e => {
+  document.getElementById("vignette-val").textContent = e.target.value + "%";
+  drawVignette();
 });
 
 // ── Boot ───────────────────────────────────────────────────────────────────
