@@ -6,7 +6,7 @@
 <title>Map Generator — Discoverist</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&family=Bebas+Neue&family=Oswald:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@400;700;900&family=Barlow+Condensed:wght@300;400;700&family=Cormorant+Garamond:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
@@ -113,6 +113,17 @@ input[type=text]{
 }
 input[type=text]:focus{background:var(--surf);border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-r)}
 input[type=text]::placeholder{color:var(--lbl4)}
+select.fsel{
+  background:var(--fill);border:1.5px solid transparent;
+  border-radius:var(--r-sm);color:var(--lbl);
+  font-size:12.5px;font-family:var(--font);
+  padding:7px 28px 7px 10px;width:100%;outline:none;
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+  transition:border-color var(--t) var(--ease),box-shadow var(--t) var(--ease);
+}
+select.fsel:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-r)}
 
 /* ── File drop ───────────────────────────────────────────────────────── */
 .fdrop{
@@ -375,12 +386,32 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
       <label class="flbl">Subtitle</label>
       <input type="text" id="subtitle-input" placeholder="Italy · The Alps">
     </div>
+    <div class="field">
+      <label class="flbl">Font</label>
+      <select id="font-select" class="fsel">
+        <option value="inter">Inter</option>
+        <option value="bebas">Bebas Neue</option>
+        <option value="oswald">Oswald</option>
+        <option value="montserrat">Montserrat</option>
+        <option value="cinzel">Cinzel</option>
+        <option value="playfair">Playfair Display</option>
+        <option value="barlow">Barlow Condensed</option>
+        <option value="cormorant">Cormorant Garamond</option>
+      </select>
+    </div>
     <div class="rng-wrap">
       <div class="rng-hdr">
-        <span class="rng-lbl">Text Size</span>
-        <span class="rng-val" id="text-size-val">100%</span>
+        <span class="rng-lbl">Title Size</span>
+        <span class="rng-val" id="title-size-val">100%</span>
       </div>
-      <input type="range" id="text-size" min="60" max="140" step="5" value="100">
+      <input type="range" id="title-size" min="50" max="160" step="5" value="100">
+    </div>
+    <div class="rng-wrap">
+      <div class="rng-hdr">
+        <span class="rng-lbl">Subtitle Size</span>
+        <span class="rng-val" id="sub-size-val">100%</span>
+      </div>
+      <input type="range" id="sub-size" min="50" max="160" step="5" value="100">
     </div>
   </div>
 
@@ -514,13 +545,27 @@ const OVERPASS_MIRRORS = [
   "https://overpass.kumi.systems/api/interpreter",
 ];
 
+// ── Font configs ───────────────────────────────────────────────────────────
+const FONTS = {
+  inter:      { label:"Inter",              stack:'"Inter","Arial",sans-serif',                       titleW:700, subW:400, spacing:7,  subSpacing:4 },
+  bebas:      { label:"Bebas Neue",         stack:'"Bebas Neue","Arial Narrow",Arial,sans-serif',     titleW:400, subW:400, spacing:10, subSpacing:5 },
+  oswald:     { label:"Oswald",             stack:'"Oswald","Arial Narrow",Arial,sans-serif',         titleW:700, subW:300, spacing:8,  subSpacing:5 },
+  montserrat: { label:"Montserrat",         stack:'"Montserrat",Arial,sans-serif',                    titleW:700, subW:300, spacing:6,  subSpacing:3 },
+  cinzel:     { label:"Cinzel",             stack:'"Cinzel",Georgia,serif',                           titleW:700, subW:400, spacing:9,  subSpacing:5 },
+  playfair:   { label:"Playfair Display",   stack:'"Playfair Display",Georgia,serif',                 titleW:700, subW:400, spacing:3,  subSpacing:2 },
+  barlow:     { label:"Barlow Condensed",   stack:'"Barlow Condensed","Arial Narrow",Arial,sans-serif',titleW:700,subW:300,spacing:8,   subSpacing:4 },
+  cormorant:  { label:"Cormorant Garamond", stack:'"Cormorant Garamond",Georgia,serif',               titleW:700, subW:300, spacing:4,  subSpacing:2 },
+};
+
 // ── State ──────────────────────────────────────────────────────────────────
-let map         = null;
-let routePoints = [];
-let routeStats  = {};
-let posterReady = false;
-let textScale   = 1.0;
-let _toastTimer = null;
+let map             = null;
+let routePoints     = [];
+let routeStats      = {};
+let posterReady     = false;
+let titleScale      = 1.0;
+let subtitleScale   = 1.0;
+let selectedFontKey = "inter";
+let _toastTimer     = null;
 
 // ── Layout ─────────────────────────────────────────────────────────────────
 function layoutPoster() {
@@ -781,11 +826,12 @@ function fmtCoord(lat, lon) {
 // ── Font loading for canvas ────────────────────────────────────────────────
 async function ensureFonts() {
   if (!document.fonts?.load) return;
+  const f = FONTS[selectedFontKey];
+  const name = f.label;
   await Promise.all([
-    document.fonts.load('700 88px Inter'),
-    document.fonts.load('400 28px Inter'),
-    document.fonts.load('300 22px Inter'),
-    document.fonts.load('300 15px "JetBrains Mono"'),
+    document.fonts.load(`${f.titleW} 88px "${name}"`),
+    document.fonts.load(`${f.subW} 28px "${name}"`),
+    document.fonts.load(`300 15px "JetBrains Mono"`),
   ]).catch(() => {});
 }
 
@@ -795,8 +841,11 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
   const gold  = document.getElementById("color-road").value;
   const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
   const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
-  const ts    = textScale;
+  const fnt   = FONTS[selectedFontKey];
+  const ts    = titleScale;
+  const ss    = subtitleScale;
 
+  // vertical positions anchored from top of title block; scaled by title size
   const ty = base => yOff + Math.round((24 + (base - 24) * ts) * sc);
 
   ctx.fillStyle = bg;
@@ -812,32 +861,36 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
 
   ctx.textAlign = "center";
 
-  ctx.font = `700 ${Math.round(76*sc*ts)}px "Inter", "Arial Narrow", Arial, sans-serif`;
+  // Title
+  ctx.font = `${fnt.titleW} ${Math.round(76*sc*ts)}px ${fnt.stack}`;
   ctx.fillStyle = gold;
-  ctx.letterSpacing = `${Math.round(7*sc*ts)}px`;
+  ctx.letterSpacing = `${Math.round(fnt.spacing*sc*ts)}px`;
   ctx.fillText(title, W/2, ty(108));
 
+  // Subtitle — anchored below title, uses its own scale
   if (sub) {
-    ctx.font = `400 ${Math.round(24*sc*ts)}px "Inter", Arial, sans-serif`;
+    const subY = ty(108) + Math.round(48*sc*ss);
+    ctx.font = `${fnt.subW} ${Math.round(24*sc*ss)}px ${fnt.stack}`;
     ctx.globalAlpha = .62;
-    ctx.letterSpacing = `${Math.round(4*sc*ts)}px`;
-    ctx.fillText(sub, W/2, ty(150));
+    ctx.letterSpacing = `${Math.round(fnt.subSpacing*sc*ss)}px`;
+    ctx.fillText(sub, W/2, subY);
     ctx.globalAlpha = 1;
   }
 
   ctx.letterSpacing = "0px";
 
   if (routeStats.distKm) {
+    const statsY = ty(108) + Math.round(sub ? 112*sc : 80*sc);
     let st = `${routeStats.distKm} km`;
     if (routeStats.hasEle && routeStats.elevGain > 0) st += `  ·  ${routeStats.elevGain.toLocaleString()} m gain`;
-    ctx.font = `300 ${Math.round(20*sc*ts)}px "Inter", Arial, sans-serif`;
+    ctx.font = `300 ${Math.round(20*sc)}px "Inter", Arial, sans-serif`;
     ctx.globalAlpha = .52;
-    ctx.fillText(st, W/2, ty(208));
+    ctx.fillText(st, W/2, statsY);
     ctx.globalAlpha = 1;
 
-    ctx.font = `300 ${Math.round(14*sc*ts)}px "JetBrains Mono", "Courier New", monospace`;
+    ctx.font = `300 ${Math.round(14*sc)}px "JetBrains Mono", "Courier New", monospace`;
     ctx.globalAlpha = .35;
-    ctx.fillText(fmtCoord(routeStats.centerLat, routeStats.centerLon), W/2, ty(242));
+    ctx.fillText(fmtCoord(routeStats.centerLat, routeStats.centerLon), W/2, statsY + Math.round(34*sc));
     ctx.globalAlpha = 1;
   }
 
@@ -1028,6 +1081,14 @@ function buildSVG() {
        <rect x="0" y="0" width="${POSTER_W}" height="${MAP_H}" fill="url(#vgr)"/>`
     : "";
 
+  const fnt      = FONTS[selectedFontKey];
+  const titleSz  = Math.round(76 * titleScale);
+  const subSz    = Math.round(24 * subtitleScale);
+  const titleY   = ty + Math.round(24 + (108 - 24) * titleScale);
+  const subY     = titleY + Math.round(48 * subtitleScale);
+  const statsY   = titleY + Math.round(sub ? 112 : 80);
+  const coordY   = statsY + 34;
+
   return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
 <defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 <rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>
@@ -1037,10 +1098,10 @@ ${vigSvg}
 <rect x="0" y="${ty}" width="${POSTER_W}" height="${TITLE_H}" fill="${bg}"/>
 <line x1="80" y1="${ty+24}" x2="${POSTER_W-80}" y2="${ty+24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
 <line x1="80" y1="${POSTER_H-24}" x2="${POSTER_W-80}" y2="${POSTER_H-24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
-<text x="${POSTER_W/2}" y="${ty+108}" font-family="Inter,Arial Narrow,Arial,sans-serif" font-size="76" font-weight="700" fill="${road}" text-anchor="middle" letter-spacing="7">${title}</text>
-${sub ? `<text x="${POSTER_W/2}" y="${ty+150}" font-family="Inter,Arial,sans-serif" font-size="24" fill="${road}" text-anchor="middle" letter-spacing="4" opacity=".62">${sub}</text>` : ""}
-${st.distKm ? `<text x="${POSTER_W/2}" y="${ty+208}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="300" fill="${road}" text-anchor="middle" opacity=".52">${st.distKm} km${st.hasEle && st.elevGain > 0 ? ` · ${st.elevGain.toLocaleString()} m gain` : ""}</text>
-<text x="${POSTER_W/2}" y="${ty+242}" font-family="JetBrains Mono,Courier New,monospace" font-size="14" font-weight="300" fill="${road}" text-anchor="middle" opacity=".35">${fmtCoord(st.centerLat, st.centerLon)}</text>` : ""}
+<text x="${POSTER_W/2}" y="${titleY}" font-family="${fnt.stack}" font-size="${titleSz}" font-weight="${fnt.titleW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.spacing}">${title}</text>
+${sub ? `<text x="${POSTER_W/2}" y="${subY}" font-family="${fnt.stack}" font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing}" opacity=".62">${sub}</text>` : ""}
+${st.distKm ? `<text x="${POSTER_W/2}" y="${statsY}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="300" fill="${road}" text-anchor="middle" opacity=".52">${st.distKm} km${st.hasEle && st.elevGain > 0 ? ` · ${st.elevGain.toLocaleString()} m gain` : ""}</text>
+<text x="${POSTER_W/2}" y="${coordY}" font-family="JetBrains Mono,Courier New,monospace" font-size="14" font-weight="300" fill="${road}" text-anchor="middle" opacity=".35">${fmtCoord(st.centerLat, st.centerLon)}</text>` : ""}
 <text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".20">© OpenStreetMap contributors  ·  © MapTiler</text>
 </svg>`;
 }
@@ -1219,9 +1280,18 @@ document.getElementById("hillshade-intensity").addEventListener("input", () => {
   document.getElementById("hillshade-val").textContent = document.getElementById("hillshade-intensity").value + "%";
   onHillshadeChange();
 });
-document.getElementById("text-size").addEventListener("input", e => {
-  textScale = parseInt(e.target.value) / 100;
-  document.getElementById("text-size-val").textContent = e.target.value + "%";
+document.getElementById("font-select").addEventListener("change", e => {
+  selectedFontKey = e.target.value;
+  ensureFonts().then(drawTitleBlock);
+});
+document.getElementById("title-size").addEventListener("input", e => {
+  titleScale = parseInt(e.target.value) / 100;
+  document.getElementById("title-size-val").textContent = e.target.value + "%";
+  drawTitleBlock();
+});
+document.getElementById("sub-size").addEventListener("input", e => {
+  subtitleScale = parseInt(e.target.value) / 100;
+  document.getElementById("sub-size-val").textContent = e.target.value + "%";
   drawTitleBlock();
 });
 document.getElementById("vignette-intensity").addEventListener("input", e => {
