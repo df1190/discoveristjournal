@@ -292,7 +292,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 #poster:hover{box-shadow:0 14px 60px rgba(0,0,0,.22),0 4px 12px rgba(0,0,0,.08)}
 #map{width:100%}
 #vignette-canvas{position:absolute;top:0;left:0;pointer-events:none;z-index:2;display:block}
-#title-canvas{display:block;width:100%}
+#overlay-canvas{position:absolute;top:0;left:0;pointer-events:none;z-index:3;display:block}
 
 /* ── MapLibre overrides ──────────────────────────────────────────────── */
 .maplibregl-ctrl-attrib,.maplibregl-ctrl-logo{display:none!important}
@@ -524,7 +524,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
   <div id="poster">
     <div id="map"></div>
     <canvas id="vignette-canvas"></canvas>
-    <canvas id="title-canvas"></canvas>
+    <canvas id="overlay-canvas"></canvas>
   </div>
 </div>
 </div><!-- /main -->
@@ -534,8 +534,8 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 <script>
 // ── Constants ──────────────────────────────────────────────────────────────
 const MAPTILER_KEY = 'pO4p3paZcjFsfdNEcYDM';
-const POSTER_W = 2400, POSTER_H = 3400, TITLE_H = 420;
-const MAP_H = POSTER_H - TITLE_H;
+const POSTER_W = 2400, POSTER_H = 3400;
+const MAP_H = POSTER_H; // full-bleed: contours cover entire poster
 const PRINT_SCALE = 3;
 
 const OVERPASS_MIRRORS = [
@@ -571,32 +571,29 @@ let _toastTimer     = null;
 function layoutPoster() {
   const area = document.getElementById("prev");
   const wrap = document.getElementById("poster");
-  const tc   = document.getElementById("title-canvas");
 
   const aw = area.clientWidth  - 40;
   const ah = area.clientHeight - 40;
   const aspect = POSTER_W / POSTER_H;
 
   const pw = (aw / ah < aspect) ? aw : ah * aspect;
-  const mapPx   = pw / POSTER_W * MAP_H;
-  const titlePx = pw / POSTER_W * TITLE_H;
+  const ph = pw * POSTER_H / POSTER_W;
 
-  wrap.style.width = pw + "px";
-  document.getElementById("map").style.height = mapPx + "px";
-  tc.style.height = titlePx + "px";
-  tc.width  = Math.round(pw * 2);
-  tc.height = Math.round(titlePx * 2);
-  tc.style.width = pw + "px";
+  wrap.style.width  = pw + "px";
+  wrap.style.height = ph + "px";
+  document.getElementById("map").style.height = ph + "px";
 
-  const vc = document.getElementById("vignette-canvas");
-  vc.width  = Math.round(pw * 2);
-  vc.height = Math.round(mapPx * 2);
-  vc.style.width  = pw + "px";
-  vc.style.height = mapPx + "px";
+  ["vignette-canvas", "overlay-canvas"].forEach(id => {
+    const c = document.getElementById(id);
+    c.width  = Math.round(pw * 2);
+    c.height = Math.round(ph * 2);
+    c.style.width  = pw + "px";
+    c.style.height = ph + "px";
+  });
 
   if (map) map.resize();
   drawVignette();
-  drawTitleBlock();
+  drawOverlay();
 }
 window.addEventListener("resize", layoutPoster);
 
@@ -835,9 +832,8 @@ async function ensureFonts() {
   ]).catch(() => {});
 }
 
-// ── Title block renderer ───────────────────────────────────────────────────
-function renderTitleBlock(ctx, W, H, yOff, sc) {
-  const bg    = document.getElementById("color-bg").value;
+// ── Overlay renderer (stats top-left + title bottom, no bg fill) ──────────
+function renderOverlay(ctx, W, H, sc) {
   const gold  = document.getElementById("color-road").value;
   const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
   const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
@@ -845,66 +841,95 @@ function renderTitleBlock(ctx, W, H, yOff, sc) {
   const ts    = titleScale;
   const ss    = subtitleScale;
 
-  // vertical positions anchored from top of title block; scaled by title size
-  const ty = base => yOff + Math.round((24 + (base - 24) * ts) * sc);
+  ctx.clearRect(0, 0, W, H);
 
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, yOff, W, H);
-
-  ctx.strokeStyle = gold;
-  ctx.lineWidth = Math.max(1, 1.5 * sc);
-  const lx1 = Math.round(80 * sc), lx2 = W - Math.round(80 * sc);
-  ctx.globalAlpha = .50;
-  ctx.beginPath(); ctx.moveTo(lx1, yOff + Math.round(24*sc)); ctx.lineTo(lx2, yOff + Math.round(24*sc)); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(lx1, yOff + H - Math.round(24*sc)); ctx.lineTo(lx2, yOff + H - Math.round(24*sc)); ctx.stroke();
-  ctx.globalAlpha = 1;
-
-  ctx.textAlign = "center";
-
-  // Title
-  ctx.font = `${fnt.titleW} ${Math.round(76*sc*ts)}px ${fnt.stack}`;
-  ctx.fillStyle = gold;
-  ctx.letterSpacing = `${Math.round(fnt.spacing*sc*ts)}px`;
-  ctx.fillText(title, W/2, ty(108));
-
-  // Subtitle — anchored below title, uses its own scale
-  if (sub) {
-    const subY = ty(108) + Math.round(48*sc*ss);
-    ctx.font = `${fnt.subW} ${Math.round(24*sc*ss)}px ${fnt.stack}`;
-    ctx.globalAlpha = .62;
-    ctx.letterSpacing = `${Math.round(fnt.subSpacing*sc*ss)}px`;
-    ctx.fillText(sub, W/2, subY);
-    ctx.globalAlpha = 1;
-  }
-
-  ctx.letterSpacing = "0px";
-
+  // ── Stats panel — top-left ────────────────────────────────────────────
   if (routeStats.distKm) {
-    const statsY = ty(108) + Math.round(sub ? 112*sc : 80*sc);
-    let st = `${routeStats.distKm} km`;
-    if (routeStats.hasEle && routeStats.elevGain > 0) st += `  ·  ${routeStats.elevGain.toLocaleString()} m gain`;
-    ctx.font = `300 ${Math.round(20*sc)}px "Inter", Arial, sans-serif`;
-    ctx.globalAlpha = .52;
-    ctx.fillText(st, W/2, statsY);
-    ctx.globalAlpha = 1;
+    const entries = [
+      { label: "DISTANCE",    value: `${routeStats.distKm} km` },
+      ...(routeStats.hasEle && routeStats.elevGain > 0
+        ? [{ label: "ELEV GAIN", value: `${routeStats.elevGain.toLocaleString()} m` }]
+        : []),
+      { label: "COORDINATES", value: fmtCoord(routeStats.centerLat, routeStats.centerLon) },
+    ];
 
-    ctx.font = `300 ${Math.round(14*sc)}px "JetBrains Mono", "Courier New", monospace`;
-    ctx.globalAlpha = .35;
-    ctx.fillText(fmtCoord(routeStats.centerLat, routeStats.centerLon), W/2, statsY + Math.round(34*sc));
+    const sx       = Math.round(90 * sc);
+    let   sy       = Math.round(110 * sc);
+    const lblSz    = Math.round(20 * sc);
+    const valSz    = Math.round(28 * sc);
+    const innerGap = Math.round(5 * sc);
+    const entryGap = Math.round(26 * sc);
+
+    ctx.textAlign = "left";
+    entries.forEach(({ label, value }) => {
+      sy += lblSz;
+      ctx.font = `700 ${lblSz}px "Inter", Arial, sans-serif`;
+      ctx.fillStyle = gold;
+      ctx.globalAlpha = 1;
+      ctx.letterSpacing = `${Math.round(3 * sc)}px`;
+      ctx.fillText(label, sx, sy);
+      sy += innerGap + valSz;
+
+      ctx.font = `300 ${valSz}px "Inter", Arial, sans-serif`;
+      ctx.globalAlpha = 0.62;
+      ctx.letterSpacing = "0px";
+      ctx.fillText(value, sx, sy);
+      sy += entryGap;
+    });
     ctx.globalAlpha = 1;
   }
 
-  ctx.font = `300 ${Math.round(11*sc)}px "Inter", Arial, sans-serif`;
-  ctx.globalAlpha = .20;
-  ctx.fillText("© OpenStreetMap contributors  ·  © MapTiler", W/2, yOff + H - Math.round(28*sc));
+  // ── Start / end markers ───────────────────────────────────────────────
+  if (routePoints.length >= 2 && map) {
+    const previewW = document.getElementById("map").clientWidth;
+    const k = W / (previewW * 2); // canvas @2x, map coords in CSS px
+    [[routePoints[0], false], [routePoints[routePoints.length - 1], true]].forEach(([pt, isEnd]) => {
+      const p = map.project([pt.lon, pt.lat]);
+      const px = p.x * 2 * k, py = p.y * 2 * k;
+      const r = Math.round(11 * sc);
+      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fillStyle = gold; ctx.globalAlpha = 1; ctx.fill();
+      if (isEnd) {
+        ctx.beginPath(); ctx.arc(px, py, Math.round(4.5 * sc), 0, Math.PI * 2);
+        ctx.fillStyle = document.getElementById("color-bg").value; ctx.fill();
+      }
+    });
+  }
+
+  // ── Title — bottom center ─────────────────────────────────────────────
+  ctx.textAlign = "center";
+  const titleSz = Math.round(76 * sc * ts);
+  const titleY  = H - Math.round(200 * sc * ts);
+
+  ctx.font = `${fnt.titleW} ${titleSz}px ${fnt.stack}`;
+  ctx.fillStyle = gold;
+  ctx.globalAlpha = 1;
+  ctx.letterSpacing = `${Math.round(fnt.spacing * sc * ts)}px`;
+  ctx.fillText(title, W / 2, titleY);
+
+  if (sub) {
+    const subSz = Math.round(24 * sc * ss);
+    const subY  = titleY + Math.round(50 * sc);
+    ctx.font = `${fnt.subW} ${subSz}px ${fnt.stack}`;
+    ctx.globalAlpha = 0.62;
+    ctx.letterSpacing = `${Math.round(fnt.subSpacing * sc * ss)}px`;
+    ctx.fillText(sub, W / 2, subY);
+    ctx.globalAlpha = 1;
+  }
+
+  // ── Attribution ────────────────────────────────────────────────────────
+  ctx.textAlign = "center";
+  ctx.font = `300 ${Math.round(11 * sc)}px "Inter", Arial, sans-serif`;
+  ctx.globalAlpha = 0.20;
+  ctx.letterSpacing = "0px";
+  ctx.fillText("© OpenStreetMap contributors  ·  © MapTiler", W / 2, H - Math.round(28 * sc));
   ctx.globalAlpha = 1;
 }
 
-function drawTitleBlock() {
-  const tc = document.getElementById("title-canvas");
-  if (!tc.width) return;
-  const ctx = tc.getContext("2d");
-  renderTitleBlock(ctx, tc.width, tc.height, 0, tc.width / POSTER_W);
+function drawOverlay() {
+  const oc = document.getElementById("overlay-canvas");
+  if (!oc.width) return;
+  renderOverlay(oc.getContext("2d"), oc.width, oc.height, oc.width / POSTER_W);
 }
 
 // ── Vignette ───────────────────────────────────────────────────────────────
@@ -1028,7 +1053,7 @@ async function generate() {
     map.fitBounds([[W, S], [E, N]], { padding: 60, duration: 600 });
     updateMapLayers();
     await ensureFonts();
-    drawTitleBlock();
+    drawOverlay();
 
     await new Promise(res => map.once("idle", res));
     updateMapLayers();
@@ -1070,7 +1095,7 @@ function buildSVG() {
   const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
 
   const rd = "M " + routePoints.map(p => proj(p.lat, p.lon).map(v => v.toFixed(1)).join(",")).join(" L ");
-  const st = routeStats, ty = MAP_H;
+  const st = routeStats;
 
   const vi = vignetteIntensity();
   const vigSvg = vi > 0
@@ -1081,27 +1106,51 @@ function buildSVG() {
        <rect x="0" y="0" width="${POSTER_W}" height="${MAP_H}" fill="url(#vgr)"/>`
     : "";
 
-  const fnt      = FONTS[selectedFontKey];
-  const titleSz  = Math.round(76 * titleScale);
-  const subSz    = Math.round(24 * subtitleScale);
-  const titleY   = ty + Math.round(24 + (108 - 24) * titleScale);
-  const subY     = titleY + Math.round(48 * subtitleScale);
-  const statsY   = titleY + Math.round(sub ? 112 : 80);
-  const coordY   = statsY + 34;
+  const fnt     = FONTS[selectedFontKey];
+  const titleSz = Math.round(76 * titleScale);
+  const subSz   = Math.round(24 * subtitleScale);
+  const titleY  = POSTER_H - Math.round(200 * titleScale);
+  const subY    = titleY + Math.round(50);
+
+  // Stats top-left
+  const sx = 90;
+  let svgStats = "";
+  if (st.distKm) {
+    const entries = [
+      { label: "DISTANCE",    value: `${st.distKm} km` },
+      ...(st.hasEle && st.elevGain > 0 ? [{ label: "ELEV GAIN", value: `${st.elevGain.toLocaleString()} m` }] : []),
+      { label: "COORDINATES", value: fmtCoord(st.centerLat, st.centerLon) },
+    ];
+    let sy = 110;
+    entries.forEach(({ label, value }) => {
+      sy += 20;
+      svgStats += `<text x="${sx}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700" fill="${road}" letter-spacing="3" opacity="1">${label}</text>`;
+      sy += 5 + 28;
+      svgStats += `<text x="${sx}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="300" fill="${road}" opacity=".62">${value}</text>`;
+      sy += 26;
+    });
+  }
+
+  // Start / end dots (bbox projection)
+  let svgDots = "";
+  if (routePoints.length >= 2) {
+    [[routePoints[0], false], [routePoints[routePoints.length - 1], true]].forEach(([pt, isEnd]) => {
+      const [dx, dy] = proj(pt.lat, pt.lon);
+      svgDots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="11" fill="${route}" opacity="1"/>`;
+      if (isEnd) svgDots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="4.5" fill="${bg}"/>`;
+    });
+  }
 
   return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
 <defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 <rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>
 <path d="${rd}" stroke="${route}" stroke-opacity=".20" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
 <path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+${svgDots}
 ${vigSvg}
-<rect x="0" y="${ty}" width="${POSTER_W}" height="${TITLE_H}" fill="${bg}"/>
-<line x1="80" y1="${ty+24}" x2="${POSTER_W-80}" y2="${ty+24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
-<line x1="80" y1="${POSTER_H-24}" x2="${POSTER_W-80}" y2="${POSTER_H-24}" stroke="${road}" stroke-width="1.5" stroke-opacity=".50"/>
+${svgStats}
 <text x="${POSTER_W/2}" y="${titleY}" font-family="${fnt.stack}" font-size="${titleSz}" font-weight="${fnt.titleW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.spacing}">${title}</text>
 ${sub ? `<text x="${POSTER_W/2}" y="${subY}" font-family="${fnt.stack}" font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing}" opacity=".62">${sub}</text>` : ""}
-${st.distKm ? `<text x="${POSTER_W/2}" y="${statsY}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="300" fill="${road}" text-anchor="middle" opacity=".52">${st.distKm} km${st.hasEle && st.elevGain > 0 ? ` · ${st.elevGain.toLocaleString()} m gain` : ""}</text>
-<text x="${POSTER_W/2}" y="${coordY}" font-family="JetBrains Mono,Courier New,monospace" font-size="14" font-weight="300" fill="${road}" text-anchor="middle" opacity=".35">${fmtCoord(st.centerLat, st.centerLon)}</text>` : ""}
 <text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".20">© OpenStreetMap contributors  ·  © MapTiler</text>
 </svg>`;
 }
@@ -1123,14 +1172,12 @@ async function exportPNG() {
   document.getElementById("btn-png").disabled = true;
 
   try {
-    const PW  = POSTER_W * PRINT_SCALE;
-    const PMH = MAP_H    * PRINT_SCALE;
-    const PTH = TITLE_H  * PRINT_SCALE;
-    const PH  = POSTER_H * PRINT_SCALE;
+    const PW = POSTER_W * PRINT_SCALE;
+    const PH = POSTER_H * PRINT_SCALE;
 
     const offDiv = document.createElement("div");
     // Keep in viewport so WebGL actually renders (off-screen elements may be skipped by GPU)
-    offDiv.style.cssText = `position:fixed;left:0;top:0;width:${POSTER_W}px;height:${MAP_H}px;opacity:0;pointer-events:none;z-index:-1;`;
+    offDiv.style.cssText = `position:fixed;left:0;top:0;width:${POSTER_W}px;height:${POSTER_H}px;opacity:0;pointer-events:none;z-index:-1;`;
     document.body.appendChild(offDiv);
 
     const previewW = document.getElementById("map").clientWidth;
@@ -1171,10 +1218,10 @@ async function exportPNG() {
     const final = document.createElement("canvas");
     final.width = PW; final.height = PH;
     const ctx = final.getContext("2d");
-    ctx.drawImage(mapCanvas, 0, 0, PW, PMH);
-    renderVignetteToCtx(ctx, PW, PMH);
+    ctx.drawImage(mapCanvas, 0, 0, PW, PH);
+    renderVignetteToCtx(ctx, PW, PH);
     await ensureFonts();
-    renderTitleBlock(ctx, PW, PTH, PMH, PW / POSTER_W);
+    renderOverlay(ctx, PW, PH, PW / POSTER_W);
 
     await new Promise((res, rej) => {
       final.toBlob(blob => {
@@ -1210,7 +1257,7 @@ function onColorChange() {
     map.setPaintProperty("contour-index", "line-color", rd);
   }
   updateMapLayers();
-  drawTitleBlock();
+  drawOverlay();
 }
 
 function onContourChange() {
@@ -1274,7 +1321,7 @@ document.getElementById("pass-name").addEventListener("keydown", e => { if (e.ke
 ["color-bg","color-road","color-route"].forEach(id =>
   document.getElementById(id).addEventListener("input", onColorChange));
 ["title-input","subtitle-input"].forEach(id =>
-  document.getElementById(id).addEventListener("input", drawTitleBlock));
+  document.getElementById(id).addEventListener("input", drawOverlay));
 document.getElementById("toggle-hillshade").addEventListener("change", onHillshadeChange);
 document.getElementById("hillshade-intensity").addEventListener("input", () => {
   document.getElementById("hillshade-val").textContent = document.getElementById("hillshade-intensity").value + "%";
@@ -1282,17 +1329,17 @@ document.getElementById("hillshade-intensity").addEventListener("input", () => {
 });
 document.getElementById("font-select").addEventListener("change", e => {
   selectedFontKey = e.target.value;
-  ensureFonts().then(drawTitleBlock);
+  ensureFonts().then(() => drawOverlay());
 });
 document.getElementById("title-size").addEventListener("input", e => {
   titleScale = parseInt(e.target.value) / 100;
   document.getElementById("title-size-val").textContent = e.target.value + "%";
-  drawTitleBlock();
+  drawOverlay();
 });
 document.getElementById("sub-size").addEventListener("input", e => {
   subtitleScale = parseInt(e.target.value) / 100;
   document.getElementById("sub-size-val").textContent = e.target.value + "%";
-  drawTitleBlock();
+  drawOverlay();
 });
 document.getElementById("vignette-intensity").addEventListener("input", e => {
   document.getElementById("vignette-val").textContent = e.target.value + "%";
