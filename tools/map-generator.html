@@ -411,7 +411,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
         <span class="rng-lbl">Subtitle Size</span>
         <span class="rng-val" id="sub-size-val">100%</span>
       </div>
-      <input type="range" id="sub-size" min="50" max="160" step="5" value="100">
+      <input type="range" id="sub-size" min="50" max="300" step="5" value="100">
     </div>
   </div>
 
@@ -461,9 +461,9 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
       <div class="rng-wrap">
         <div class="rng-hdr">
           <span class="rng-lbl">Intensity</span>
-          <span class="rng-val" id="vignette-val">0%</span>
+          <span class="rng-val" id="vignette-val">40%</span>
         </div>
-        <input type="range" id="vignette-intensity" min="0" max="100" step="5" value="0">
+        <input type="range" id="vignette-intensity" min="0" max="100" step="5" value="40">
       </div>
     </div>
   </div>
@@ -683,7 +683,7 @@ function initMap() {
 function addMapLayers(m) {
   const routeColor = document.getElementById("color-route").value;
 
-  ["route-glow","route-line"].forEach(id => { if (m.getLayer(id)) m.removeLayer(id); });
+  ["route-glow","route-line","route-shine"].forEach(id => { if (m.getLayer(id)) m.removeLayer(id); });
   if (m.getSource("route")) m.removeSource("route");
 
   if (routePoints.length) {
@@ -692,11 +692,17 @@ function addMapLayers(m) {
       data: { type: "Feature", geometry: { type: "LineString",
         coordinates: routePoints.map(p => [p.lon, p.lat]) }}
     });
+    // Outer halo — wide soft blur in route color
     m.addLayer({ id: "route-glow", type: "line", source: "route",
-      paint: { "line-color": routeColor, "line-opacity": .22, "line-width": 14, "line-blur": 8 },
+      paint: { "line-color": routeColor, "line-opacity": .18, "line-width": 18, "line-blur": 10 },
       layout: { "line-cap": "round", "line-join": "round" } });
+    // Colored route stroke
     m.addLayer({ id: "route-line", type: "line", source: "route",
       paint: { "line-color": routeColor, "line-opacity": 1, "line-width": 3.5 },
+      layout: { "line-cap": "round", "line-join": "round" } });
+    // White inner highlight — the premium "lift" effect
+    m.addLayer({ id: "route-shine", type: "line", source: "route",
+      paint: { "line-color": "#ffffff", "line-opacity": .45, "line-width": 1.2 },
       layout: { "line-cap": "round", "line-join": "round" } });
   }
 }
@@ -896,22 +902,41 @@ function renderOverlay(ctx, W, H, sc) {
     });
   }
 
+  // ── Title area fade — darken bottom 22% so text lifts off contours ───
+  const fadeStart = H * 0.78;
+  const fadeGrad = ctx.createLinearGradient(0, fadeStart, 0, H);
+  fadeGrad.addColorStop(0,   "rgba(0,0,0,0)");
+  fadeGrad.addColorStop(0.5, "rgba(0,0,0,0.28)");
+  fadeGrad.addColorStop(1,   "rgba(0,0,0,0.52)");
+  ctx.fillStyle = fadeGrad;
+  ctx.globalAlpha = 1;
+  ctx.fillRect(0, fadeStart, W, H - fadeStart);
+
   // ── Title — bottom center ─────────────────────────────────────────────
   ctx.textAlign = "center";
   const titleSz = Math.round(76 * sc * ts);
-  const titleY  = H - Math.round(200 * sc * ts);
+  const titleY  = H - Math.round(210 * sc * ts);
+
+  // Gold hairline rules flanking title text
+  const ruleY   = titleY - Math.round(titleSz * 0.82);
+  const ruleGap = Math.round(28 * sc * ts);
+  ctx.strokeStyle = gold;
+  ctx.lineWidth = Math.max(1, sc * 1.5);
+  ctx.globalAlpha = 0.55;
+  ctx.beginPath(); ctx.moveTo(Math.round(80*sc), ruleY); ctx.lineTo(W/2 - ruleGap, ruleY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W/2 + ruleGap, ruleY);    ctx.lineTo(W - Math.round(80*sc), ruleY); ctx.stroke();
+  ctx.globalAlpha = 1;
 
   ctx.font = `${fnt.titleW} ${titleSz}px ${fnt.stack}`;
   ctx.fillStyle = gold;
-  ctx.globalAlpha = 1;
   ctx.letterSpacing = `${Math.round(fnt.spacing * sc * ts)}px`;
   ctx.fillText(title, W / 2, titleY);
 
   if (sub) {
     const subSz = Math.round(24 * sc * ss);
-    const subY  = titleY + Math.round(50 * sc);
+    const subY  = titleY + Math.round(52 * sc);
     ctx.font = `${fnt.subW} ${subSz}px ${fnt.stack}`;
-    ctx.globalAlpha = 0.62;
+    ctx.globalAlpha = 0.72;
     ctx.letterSpacing = `${Math.round(fnt.subSpacing * sc * ss)}px`;
     ctx.fillText(sub, W / 2, subY);
     ctx.globalAlpha = 1;
@@ -920,7 +945,7 @@ function renderOverlay(ctx, W, H, sc) {
   // ── Attribution ────────────────────────────────────────────────────────
   ctx.textAlign = "center";
   ctx.font = `300 ${Math.round(11 * sc)}px "Inter", Arial, sans-serif`;
-  ctx.globalAlpha = 0.20;
+  ctx.globalAlpha = 0.22;
   ctx.letterSpacing = "0px";
   ctx.fillText("© OpenStreetMap contributors  ·  © MapTiler", W / 2, H - Math.round(28 * sc));
   ctx.globalAlpha = 1;
@@ -1109,8 +1134,10 @@ function buildSVG() {
   const fnt     = FONTS[selectedFontKey];
   const titleSz = Math.round(76 * titleScale);
   const subSz   = Math.round(24 * subtitleScale);
-  const titleY  = POSTER_H - Math.round(200 * titleScale);
-  const subY    = titleY + Math.round(50);
+  const titleY  = POSTER_H - Math.round(210 * titleScale);
+  const subY    = titleY + 52;
+  const ruleY   = titleY - Math.round(titleSz * 0.82);
+  const ruleGap = Math.round(28 * titleScale);
 
   // Stats top-left
   const sx = 90;
@@ -1141,17 +1168,31 @@ function buildSVG() {
     });
   }
 
+  const fadeH = Math.round(POSTER_H * 0.22);
+  const fadeY = POSTER_H - fadeH;
+
   return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
-<defs><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<defs>
+  <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#000" stop-opacity=".28"/>
+    <stop offset="100%" stop-color="#000" stop-opacity=".52"/>
+  </linearGradient>
+</defs>
 <rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>
-<path d="${rd}" stroke="${route}" stroke-opacity=".20" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+<path d="${rd}" stroke="${route}" stroke-opacity=".18" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
 <path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="${rd}" stroke="#fff" stroke-opacity=".45" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 ${svgDots}
 ${vigSvg}
+<rect x="0" y="${fadeY}" width="${POSTER_W}" height="${fadeH}" fill="url(#fade)"/>
 ${svgStats}
+<line x1="80" y1="${ruleY}" x2="${POSTER_W/2 - ruleGap}" y2="${ruleY}" stroke="${road}" stroke-width="1.5" stroke-opacity=".55"/>
+<line x1="${POSTER_W/2 + ruleGap}" y1="${ruleY}" x2="${POSTER_W-80}" y2="${ruleY}" stroke="${road}" stroke-width="1.5" stroke-opacity=".55"/>
 <text x="${POSTER_W/2}" y="${titleY}" font-family="${fnt.stack}" font-size="${titleSz}" font-weight="${fnt.titleW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.spacing}">${title}</text>
-${sub ? `<text x="${POSTER_W/2}" y="${subY}" font-family="${fnt.stack}" font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing}" opacity=".62">${sub}</text>` : ""}
-<text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".20">© OpenStreetMap contributors  ·  © MapTiler</text>
+${sub ? `<text x="${POSTER_W/2}" y="${subY}" font-family="${fnt.stack}" font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing}" opacity=".72">${sub}</text>` : ""}
+<text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".22">© OpenStreetMap contributors  ·  © MapTiler</text>
 </svg>`;
 }
 
