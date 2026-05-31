@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Route Overlay — Discoverist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.js"></script>
+<style>
+:root {
+  --bg:      #F2F2F7;
+  --surf:    #FFFFFF;
+  --fill:    rgba(120,120,128,.10);
+  --fill2:   rgba(120,120,128,.18);
+  --sep:     rgba(60,60,67,.12);
+  --lbl:     #1C1C1E;
+  --lbl2:    rgba(60,60,67,.80);
+  --lbl3:    rgba(60,60,67,.50);
+  --lbl4:    rgba(60,60,67,.28);
+  --gold:    #C9A84C;
+  --gold-hi: #D4B56A;
+  --gold-lo: #A88A3A;
+  --gold-f:  rgba(201,168,76,.10);
+  --r:       12px;
+  --r-sm:    8px;
+  --sh:      0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:   0 10px 48px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.07);
+  --font:    "Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:    "JetBrains Mono","SF Mono","Menlo",monospace;
+  --t:       150ms;
+  --ease:    cubic-bezier(.4,0,.2,1);
+  --spring:  cubic-bezier(.34,1.56,.64,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--lbl);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+#hdr{background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:0 18px;height:50px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--sep);flex-shrink:0;z-index:10}
+.hdr-icon{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:linear-gradient(155deg,var(--gold-hi) 0%,var(--gold-lo) 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(168,138,58,.32)}
+.hdr-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#hdr h1{font-size:13px;font-weight:600;letter-spacing:-.01em}
+#hdr-hint{font-size:11px;color:var(--lbl4);margin-left:auto}
+
+#main{display:flex;flex:1;overflow:hidden}
+
+#sidebar{width:260px;flex-shrink:0;background:var(--bg);border-right:1px solid var(--sep);overflow-y:auto;padding:10px 10px 24px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--sep) transparent}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--sep);border-radius:2px}
+
+.card{background:var(--surf);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--sh)}
+.ctitle{font-size:11px;font-weight:600;color:var(--lbl3);letter-spacing:.06em;text-transform:uppercase}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.row label{font-size:12px;color:var(--lbl2);flex-shrink:0;white-space:nowrap}
+
+#drop-zone{border:1.5px dashed var(--sep);border-radius:var(--r-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all var(--t) var(--ease);color:var(--lbl3);font-size:12px;line-height:1.6}
+#drop-zone:hover,#drop-zone.drag-over{border-color:var(--gold);background:var(--gold-f);color:var(--lbl2)}
+#drop-zone strong{display:block;font-size:13px;font-weight:600;color:var(--lbl2);margin-bottom:2px}
+#drop-zone.has-file{border-color:var(--gold);background:var(--gold-f)}
+#drop-zone.has-file strong{color:var(--gold)}
+
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;border-radius:2px;background:var(--fill2);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform var(--t) var(--spring)}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(--sep);padding:2px;cursor:pointer;background:var(--surf)}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0}
+
+.val-badge{font-size:11px;font-weight:500;color:var(--gold);min-width:36px;text-align:right;font-family:var(--mono);flex-shrink:0}
+
+.asp-row{display:flex;gap:5px}
+.asp-btn{flex:1;padding:7px 4px;border-radius:7px;border:1.5px solid var(--sep);background:var(--fill);font-size:11px;font-weight:500;color:var(--lbl3);cursor:pointer;text-align:center;transition:all var(--t) var(--ease);line-height:1.3}
+.asp-btn small{display:block;font-size:9.5px;opacity:.7}
+.asp-btn.active,.asp-btn:hover{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:var(--r-sm);border:none;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t) var(--ease);letter-spacing:.02em}
+.btn-gold{background:var(--gold);color:white;box-shadow:0 2px 6px rgba(168,138,58,.32)}
+.btn-gold:hover:not(:disabled){background:var(--gold-hi)}
+.btn-ghost{background:var(--fill);color:var(--lbl2)}
+.btn-ghost:hover:not(:disabled){background:var(--fill2)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn-row{display:flex;gap:6px}
+.btn-row .btn{flex:1;font-size:11.5px}
+
+.matte-swatches{display:flex;gap:6px;align-items:center}
+.matte-sw{width:22px;height:22px;border-radius:5px;border:2px solid var(--sep);cursor:pointer;transition:border-color var(--t) var(--ease)}
+.matte-sw.active{border-color:var(--gold)}
+
+#prev{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;overflow:hidden;position:relative}
+#checker-wrap{position:relative;box-shadow:var(--sh-lg);border-radius:3px;overflow:hidden;flex-shrink:0}
+#checker-bg{position:absolute;inset:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
+#preview-canvas{position:relative;z-index:1;display:block}
+
+#status{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(28,28,30,.82);backdrop-filter:blur(12px);color:white;font-size:11.5px;padding:7px 14px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;z-index:10}
+#status.show{opacity:1}
+
+#prog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center}
+#prog-overlay.show{display:flex}
+#prog-box{background:var(--surf);border-radius:16px;padding:28px 36px;text-align:center;min-width:280px;display:flex;flex-direction:column;gap:14px}
+#prog-title{font-size:14px;font-weight:600;color:var(--lbl)}
+#prog-label{font-size:12px;color:var(--lbl3)}
+#prog-bar-wrap{height:5px;background:var(--fill2);border-radius:3px;overflow:hidden}
+#prog-bar{height:100%;background:var(--gold);border-radius:3px;transition:width .08s linear;width:0%}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div class="hdr-icon">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <h1>Route Overlay</h1>
+  <span id="hdr-hint">GPX / KML → animated transparent overlay for social media</span>
+</div>
+
+<div id="main">
+  <div id="sidebar">
+
+    <div class="card">
+      <div class="ctitle">Route File</div>
+      <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <strong id="drop-label">Drop GPX or KML here</strong>
+        <span>or click to browse</span>
+      </div>
+      <input type="file" id="file-input" accept=".gpx,.kml" style="display:none">
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Line Style</div>
+      <div class="row">
+        <label>Line Color</label>
+        <input type="color" id="line-color" value="#FC4C02">
+      </div>
+      <div class="row">
+        <label>Line Width</label>
+        <input type="range" id="line-width" min="1" max="20" step="0.5" value="6">
+        <span class="val-badge" id="lw-val">6</span>
+      </div>
+      <div class="row">
+        <label>Glow</label>
+        <input type="range" id="glow-intensity" min="0" max="100" step="5" value="60">
+        <span class="val-badge" id="gi-val">60%</span>
+      </div>
+      <div class="row">
+        <label>Glow Color</label>
+        <input type="color" id="glow-color" value="#FC4C02">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Animation</div>
+      <div class="row">
+        <label>Duration</label>
+        <input type="range" id="duration" min="1" max="12" step="0.5" value="4">
+        <span class="val-badge" id="dur-val">4s</span>
+      </div>
+      <div class="row">
+        <label>Loop pause</label>
+        <input type="range" id="loop-pause" min="0" max="4" step="0.5" value="1">
+        <span class="val-badge" id="lp-val">1s</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Canvas</div>
+      <div class="asp-row">
+        <button class="asp-btn active" data-asp="9:16">9:16<small>Stories</small></button>
+        <button class="asp-btn" data-asp="16:9">16:9<small>YouTube</small></button>
+        <button class="asp-btn" data-asp="1:1">1:1<small>Square</small></button>
+      </div>
+      <div class="row">
+        <label>Padding</label>
+        <input type="range" id="padding" min="5" max="30" step="1" value="15">
+        <span class="val-badge" id="pad-val">15%</span>
+      </div>
+      <div class="row">
+        <label>Start / end dots</label>
+        <input type="checkbox" id="show-markers" checked>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">GIF Matte Color</div>
+      <div class="matte-swatches">
+        <div class="matte-sw active" id="matte-black" style="background:#000" title="Black matte"></div>
+        <div class="matte-sw" id="matte-white" style="background:#fff" title="White matte"></div>
+        <span style="font-size:11px;color:var(--lbl4);line-height:1.4">GIF only — APNG has true&nbsp;alpha</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Export</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btn-svg" disabled onclick="exportSVG()">SVG</button>
+        <button class="btn btn-ghost" id="btn-gif" disabled onclick="exportGIF()">GIF</button>
+        <button class="btn btn-gold" id="btn-apng" disabled onclick="exportAPNG()">APNG</button>
+      </div>
+      <div style="font-size:10.5px;color:var(--lbl4);line-height:1.55">
+        <strong style="color:var(--lbl3)">APNG</strong> = transparent, best for CapCut &amp; Premiere.<br>
+        <strong style="color:var(--lbl3)">GIF</strong> = universal, uses matte background above.<br>
+        <strong style="color:var(--lbl3)">SVG</strong> = vector, plays in browser.
+      </div>
+    </div>
+
+  </div>
+
+  <div id="prev">
+    <div id="checker-wrap">
+      <div id="checker-bg"></div>
+      <canvas id="preview-canvas"></canvas>
+    </div>
+    <div id="status"></div>
+  </div>
+</div>
+
+<div id="prog-overlay">
+  <div id="prog-box">
+    <div id="prog-title">Exporting…</div>
+    <div id="prog-label">Rendering frames</div>
+    <div id="prog-bar-wrap"><div id="prog-bar"></div></div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const ASPECTS = { "9:16": [1080, 1920], "16:9": [1920, 1080], "1:1": [1080, 1080] };
+
+let routePoints   = [];   // [{lat,lon}]
+let normalizedPts = [];   // [{nx,ny}] 0..1
+let previewPts    = [];   // [{x,y}] canvas pixels (preview)
+let previewDists  = [];   // cumulative distances for previewPts
+let animHandle    = null;
+let animStartTs   = null;
+let exportW       = 1080;
+let exportH       = 1920;
+let fileName      = "route";
+let matteColor    = "black";
+let gifWorkerURL  = null;
+
+// ─── Tiny utils ───────────────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+
+function showStatus(msg, ms = 2600) {
+  const el = $("status");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), ms);
+}
+
+function setProgress(label, pct) {
+  $("prog-label").textContent = label;
+  $("prog-bar").style.width = Math.round(pct) + "%";
+}
+
+function showProgress(visible, title = "Exporting…") {
+  $("prog-title").textContent = title;
+  $("prog-overlay").classList.toggle("show", visible);
+}
+
+function download(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+}
+
+function enableExports() {
+  ["btn-svg", "btn-gif", "btn-apng"].forEach(id => $(id).disabled = false);
+}
+
+function getLineW()   { return parseFloat($("line-width").value); }
+function getLineC()   { return $("line-color").value; }
+function getGlowI()   { return parseInt($("glow-intensity").value); }
+function getGlowC()   { return $("glow-color").value; }
+function getDurMs()   { return parseFloat($("duration").value) * 1000; }
+function getPauseMs() { return parseFloat($("loop-pause").value) * 1000; }
+function getPad()     { return parseInt($("padding").value) / 100; }
+
+// scaled line width for a given canvas width
+function scaledLW(canvasW) { return getLineW() * (canvasW / exportW); }
+
+// ─── GPX / KML Parsers ───────────────────────────────────────────────────────
+function parseGPX(text) {
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  const pts = [];
+  doc.querySelectorAll("trkpt").forEach(el => {
+    const lat = parseFloat(el.getAttribute("lat"));
+    const lon = parseFloat(el.getAttribute("lon"));
+    if (!isNaN(lat) && !isNaN(lon)) pts.push({ lat, lon });
+  });
+  if (!pts.length) throw new Error("No track points found in GPX");
+  return pts;
+}
+
+function parseKML(text) {
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+
+  // LineString <coordinates>
+  const lineCoords = doc.querySelectorAll("LineString coordinates");
+  if (lineCoords.length) {
+    const pts = [];
+    lineCoords.forEach(el => {
+      el.textContent.trim().split(/\s+/).forEach(tok => {
+        const p = tok.split(",");
+        if (p.length >= 2) {
+          const lon = parseFloat(p[0]), lat = parseFloat(p[1]);
+          if (!isNaN(lat) && !isNaN(lon)) pts.push({ lat, lon });
+        }
+      });
+    });
+    if (pts.length) return pts;
+  }
+
+  // gx:Track <gx:coord>
+  const ns = ["gx\\:coord", "coord"];
+  for (const sel of ns) {
+    const nodes = doc.querySelectorAll(sel);
+    if (nodes.length) {
+      const pts = [];
+      nodes.forEach(el => {
+        const p = el.textContent.trim().split(/\s+/);
+        if (p.length >= 2) {
+          const lon = parseFloat(p[0]), lat = parseFloat(p[1]);
+          if (!isNaN(lat) && !isNaN(lon)) pts.push({ lat, lon });
+        }
+      });
+      if (pts.length) return pts;
+    }
+  }
+
+  throw new Error("No coordinates found in KML");
+}
+
+// ─── Coordinate processing ───────────────────────────────────────────────────
+function downsample(pts, max = 1200) {
+  if (pts.length <= max) return pts;
+  const step = (pts.length - 1) / (max - 1);
+  return Array.from({ length: max }, (_, i) => pts[Math.round(i * step)]);
+}
+
+function mercY(lat) {
+  return -Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+}
+
+function normalizePoints(pts, pad) {
+  if (!pts.length) return [];
+  const raw = pts.map(p => ({ x: p.lon, y: mercY(p.lat) }));
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  raw.forEach(p => {
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+  });
+  const rX = maxX - minX || 1;
+  const rY = maxY - minY || 1;
+  const maxR = Math.max(rX, rY);
+  const inner = 1 - 2 * pad;
+  const sX = inner * (rX / maxR);
+  const sY = inner * (rY / maxR);
+  const oX = pad + (inner - sX) / 2;
+  const oY = pad + (inner - sY) / 2;
+  return raw.map(p => ({
+    nx: oX + ((p.x - minX) / rX) * sX,
+    ny: oY + ((p.y - minY) / rY) * sY,
+  }));
+}
+
+function toCanvas(npts, W, H) {
+  return npts.map(p => ({ x: p.nx * W, y: p.ny * H }));
+}
+
+function buildDists(pts) {
+  const d = [0];
+  for (let i = 1; i < pts.length; i++) {
+    const dx = pts[i].x - pts[i-1].x;
+    const dy = pts[i].y - pts[i-1].y;
+    d.push(d[i-1] + Math.sqrt(dx*dx + dy*dy));
+  }
+  return d;
+}
+
+// ─── Draw ────────────────────────────────────────────────────────────────────
+function drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc) {
+  if (pts.length < 2 || progress <= 0) return;
+
+  const totalD = dists[dists.length - 1];
+  const targetD = progress * totalD;
+
+  // find end index
+  let ei = 0;
+  while (ei < dists.length - 1 && dists[ei + 1] < targetD) ei++;
+
+  let endPt;
+  if (ei >= pts.length - 1) {
+    endPt = pts[pts.length - 1];
+    ei = pts.length - 1;
+  } else {
+    const segD = dists[ei + 1] - dists[ei];
+    const t = segD > 0 ? (targetD - dists[ei]) / segD : 0;
+    endPt = { x: pts[ei].x + t * (pts[ei+1].x - pts[ei].x), y: pts[ei].y + t * (pts[ei+1].y - pts[ei].y) };
+  }
+
+  const buildPath = () => {
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i <= ei; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.lineTo(endPt.x, endPt.y);
+  };
+
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  // outer glow
+  if (gi > 0) {
+    buildPath();
+    const alpha = 0.28 * (gi / 100);
+    ctx.shadowBlur = lw * 5 * (gi / 100);
+    ctx.shadowColor = gc;
+    ctx.strokeStyle = gc;
+    ctx.lineWidth = lw * 3;
+    ctx.globalAlpha = alpha;
+    ctx.stroke();
+  }
+
+  // inner glow / halo
+  if (gi > 0) {
+    buildPath();
+    ctx.shadowBlur = lw * 2 * (gi / 100);
+    ctx.shadowColor = gc;
+    ctx.strokeStyle = gc;
+    ctx.lineWidth = lw * 1.5;
+    ctx.globalAlpha = 0.5 * (gi / 100);
+    ctx.stroke();
+  }
+
+  // crisp line
+  buildPath();
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = "transparent";
+  ctx.strokeStyle = lc;
+  ctx.lineWidth = lw;
+  ctx.globalAlpha = 1;
+  ctx.stroke();
+
+  // white shine
+  buildPath();
+  ctx.strokeStyle = "rgba(255,255,255,0.55)";
+  ctx.lineWidth = lw * 0.25;
+  ctx.globalAlpha = 1;
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+}
+
+function drawMarkers(ctx, pts, lw, lc) {
+  if (!pts.length) return;
+  const r = Math.max(lw * 2.2, 6);
+
+  // start dot
+  ctx.beginPath();
+  ctx.arc(pts[0].x, pts[0].y, r, 0, Math.PI * 2);
+  ctx.fillStyle = lc;
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = r * 1.5;
+  ctx.shadowColor = lc;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // end dot (donut)
+  const last = pts[pts.length - 1];
+  ctx.beginPath();
+  ctx.arc(last.x, last.y, r, 0, Math.PI * 2);
+  ctx.fillStyle = lc;
+  ctx.shadowBlur = r * 1.5;
+  ctx.shadowColor = lc;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(last.x, last.y, r * 0.38, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+// ─── Preview animation ────────────────────────────────────────────────────────
+function startAnimation() {
+  if (animHandle) { cancelAnimationFrame(animHandle); animHandle = null; }
+  if (!previewPts.length) return;
+  animStartTs = null;
+
+  function frame(ts) {
+    if (!animStartTs) animStartTs = ts;
+    const durMs   = getDurMs();
+    const pauseMs = getPauseMs();
+    const elapsed = (ts - animStartTs) % (durMs + pauseMs);
+    const progress = Math.min(elapsed / durMs, 1);
+
+    const canvas = $("preview-canvas");
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width, H = canvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+    const lw = scaledLW(W);
+    drawRoute(ctx, previewPts, previewDists, progress, lw, getLineC(), getGlowI(), getGlowC());
+    if (progress >= 1 && $("show-markers").checked) {
+      drawMarkers(ctx, previewPts, lw, getLineC());
+    }
+    animHandle = requestAnimationFrame(frame);
+  }
+  animHandle = requestAnimationFrame(frame);
+}
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+function layoutPreview() {
+  const area = $("prev");
+  const aw = area.clientWidth - 40;
+  const ah = area.clientHeight - 40;
+  const aspect = exportW / exportH;
+
+  let pw, ph;
+  if (aw / ah < aspect) { pw = aw; ph = aw / aspect; }
+  else                  { ph = ah; pw = ah * aspect; }
+  pw = Math.round(pw); ph = Math.round(ph);
+
+  const wrap = $("checker-wrap");
+  wrap.style.width  = pw + "px";
+  wrap.style.height = ph + "px";
+
+  const canvas = $("preview-canvas");
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = Math.round(pw * dpr);
+  canvas.height = Math.round(ph * dpr);
+  canvas.style.width  = pw + "px";
+  canvas.style.height = ph + "px";
+
+  // recompute preview pts
+  previewPts   = toCanvas(normalizedPts, canvas.width, canvas.height);
+  previewDists = buildDists(previewPts);
+
+  startAnimation();
+}
+
+// ─── File loading ─────────────────────────────────────────────────────────────
+function onRouteLoaded(pts, name) {
+  fileName      = name;
+  routePoints   = pts;
+  normalizedPts = normalizePoints(downsample(pts), getPad());
+  $("drop-label").textContent = name;
+  $("drop-zone").classList.add("has-file");
+  enableExports();
+  layoutPreview();
+  showStatus(`${pts.length.toLocaleString()} points loaded`);
+}
+
+function readFile(file) {
+  if (!file) return;
+  const isKML = file.name.toLowerCase().endsWith(".kml");
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const pts = isKML ? parseKML(ev.target.result) : parseGPX(ev.target.result);
+      onRouteLoaded(pts, file.name.replace(/\.(gpx|kml)$/i, ""));
+    } catch (err) {
+      showStatus("Error: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ─── SVG Export ───────────────────────────────────────────────────────────────
+function exportSVG() {
+  if (!normalizedPts.length) return;
+  const W = exportW, H = exportH;
+  const pts = toCanvas(normalizedPts, W, H);
+  const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
+
+  // measure path length via temp element
+  const tempSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  tempSvg.style.cssText = "position:absolute;left:-9999px;width:0;height:0;overflow:hidden";
+  const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  tempPath.setAttribute("d", d);
+  tempSvg.appendChild(tempPath);
+  document.body.appendChild(tempSvg);
+  const len = Math.ceil(tempPath.getTotalLength()) + 20;
+  document.body.removeChild(tempSvg);
+
+  const dur    = getDurMs() / 1000;
+  const lw     = getLineW();
+  const lc     = getLineC();
+  const gi     = getGlowI();
+  const gc     = getGlowC();
+  const glowW  = lw * 3;
+  const glowR  = lw * 5 * (gi / 100);
+  const showM  = $("show-markers").checked;
+  const first  = pts[0];
+  const last   = pts[pts.length - 1];
+  const mr     = Math.max(lw * 2.2, 6);
+
+  const glowAlpha = (0.28 * gi / 100).toFixed(3);
+  const animAttr = `stroke-dasharray="${len}" stroke-dashoffset="${len}"`;
+
+  const glowEl = gi > 0 ? `
+  <path d="${d}" fill="none" stroke="${gc}" stroke-width="${glowW}"
+    stroke-linecap="round" stroke-linejoin="round" opacity="${glowAlpha}"
+    filter="url(#glow)" ${animAttr}>
+    <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
+  </path>` : "";
+
+  const markersEl = showM ? `
+  <circle cx="${first.x.toFixed(1)}" cy="${first.y.toFixed(1)}" r="${mr}" fill="${lc}" opacity="0">
+    <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.97;1" dur="${dur}s" fill="freeze"/>
+  </circle>
+  <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="${mr}" fill="${lc}" opacity="0">
+    <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.97;1" dur="${dur}s" fill="freeze"/>
+  </circle>
+  <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="${(mr * 0.38).toFixed(1)}" fill="rgba(255,255,255,0.92)" opacity="0">
+    <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.97;1" dur="${dur}s" fill="freeze"/>
+  </circle>` : "";
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <defs>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="${glowR.toFixed(1)}" result="blur"/>
+    </filter>
+  </defs>
+  ${glowEl}
+  <path d="${d}" fill="none" stroke="${lc}" stroke-width="${lw}"
+    stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
+    <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
+  </path>
+  <path d="${d}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="${(lw * 0.25).toFixed(1)}"
+    stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
+    <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
+  </path>
+  ${markersEl}
+</svg>`;
+
+  download(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }), `${fileName}-overlay.svg`);
+  showStatus("SVG downloaded");
+}
+
+// ─── APNG Export ──────────────────────────────────────────────────────────────
+async function exportAPNG() {
+  if (!normalizedPts.length) return;
+
+  const W = exportW, H = exportH;
+  const FPS = 15;
+  const durMs   = getDurMs();
+  const pauseMs = getPauseMs();
+  const drawFrames  = Math.max(Math.round(durMs / 1000 * FPS), 1);
+  const pauseFrames = Math.max(Math.round(pauseMs / 1000 * FPS), 1);
+  const delayDraw  = Math.round(1000 / FPS);
+  const delayPause = Math.round(pauseMs / pauseFrames);
+
+  const offC = document.createElement("canvas");
+  offC.width = W; offC.height = H;
+  const ctx = offC.getContext("2d");
+
+  const pts   = toCanvas(normalizedPts, W, H);
+  const dists = buildDists(pts);
+  const lw    = getLineW();
+  const lc    = getLineC();
+  const gi    = getGlowI();
+  const gc    = getGlowC();
+  const showM = $("show-markers").checked;
+
+  showProgress(true, "Rendering APNG…");
+
+  const frames = [], delays = [];
+  const total  = drawFrames + pauseFrames;
+
+  for (let i = 0; i < total; i++) {
+    const progress = i < drawFrames ? i / (drawFrames - 1) : 1;
+    ctx.clearRect(0, 0, W, H);
+    drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc);
+    if (progress >= 1 && showM) drawMarkers(ctx, pts, lw, lc);
+
+    frames.push(ctx.getImageData(0, 0, W, H).data.buffer.slice(0));
+    delays.push(i < drawFrames ? delayDraw : delayPause);
+
+    setProgress(`Frame ${i + 1} / ${total}`, (i / total) * 80);
+    if (i % 8 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  setProgress("Encoding APNG…", 85);
+  await new Promise(r => setTimeout(r, 0));
+
+  const buf  = UPNG.encode(frames, W, H, 0, delays);
+  const blob = new Blob([buf], { type: "image/png" });
+
+  showProgress(false);
+  download(blob, `${fileName}-overlay.png`);
+  showStatus("APNG downloaded — import in CapCut / Premiere as overlay layer");
+}
+
+// ─── GIF Export ───────────────────────────────────────────────────────────────
+async function exportGIF() {
+  if (!normalizedPts.length) return;
+
+  // Fetch gif.worker.js as blob to avoid CORS restriction on web workers
+  if (!gifWorkerURL) {
+    try {
+      setProgress("Loading GIF encoder…", 5);
+      const r = await fetch("https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js");
+      const t = await r.text();
+      gifWorkerURL = URL.createObjectURL(new Blob([t], { type: "application/javascript" }));
+    } catch (e) {
+      showStatus("Could not load GIF encoder — check your connection");
+      return;
+    }
+  }
+
+  const W = exportW, H = exportH;
+  const FPS = 12;
+  const durMs   = getDurMs();
+  const pauseMs = getPauseMs();
+  const drawFrames  = Math.max(Math.round(durMs / 1000 * FPS), 1);
+  const pauseFrames = Math.max(Math.round(pauseMs / 1000 * FPS), 1);
+  const delayDraw  = Math.round(1000 / FPS);
+  const delayPause = Math.round(pauseMs / Math.max(pauseFrames, 1));
+
+  const bgColor = matteColor === "white" ? "#ffffff" : "#000000";
+
+  const offC = document.createElement("canvas");
+  offC.width = W; offC.height = H;
+  const ctx = offC.getContext("2d");
+
+  const pts   = toCanvas(normalizedPts, W, H);
+  const dists = buildDists(pts);
+  const lw    = getLineW();
+  const lc    = getLineC();
+  const gi    = getGlowI();
+  const gc    = getGlowC();
+  const showM = $("show-markers").checked;
+
+  showProgress(true, "Rendering GIF…");
+
+  const gif = new GIF({
+    workers: 2,
+    quality: 8,
+    width: W,
+    height: H,
+    workerScript: gifWorkerURL,
+    background: bgColor,
+  });
+
+  const total = drawFrames + pauseFrames;
+
+  for (let i = 0; i < total; i++) {
+    const progress = i < drawFrames ? i / (drawFrames - 1) : 1;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, W, H);
+    drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc);
+    if (progress >= 1 && showM) drawMarkers(ctx, pts, lw, lc);
+
+    gif.addFrame(offC, { copy: true, delay: i < drawFrames ? delayDraw : delayPause });
+
+    setProgress(`Frame ${i + 1} / ${total}`, (i / total) * 55);
+    if (i % 6 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  setProgress("Encoding GIF (this may take a minute)…", 60);
+
+  gif.on("progress", p => setProgress("Encoding GIF…", 60 + p * 38));
+  gif.on("finished", blob => {
+    showProgress(false);
+    download(blob, `${fileName}-overlay.gif`);
+    showStatus("GIF downloaded");
+  });
+
+  gif.render();
+}
+
+// ─── Event wiring ─────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+
+  // File input
+  $("file-input").addEventListener("change", e => readFile(e.target.files[0]));
+
+  // Drag-and-drop
+  const dz = $("drop-zone");
+  dz.addEventListener("dragover",  e => { e.preventDefault(); dz.classList.add("drag-over"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault();
+    dz.classList.remove("drag-over");
+    readFile(e.dataTransfer.files[0]);
+  });
+
+  // Sliders
+  function wireSlider(id, badgeId, fmt, onchange) {
+    const el = $(id), b = $(badgeId);
+    el.addEventListener("input", () => { b.textContent = fmt(el.value); onchange(); });
+    b.textContent = fmt(el.value);
+  }
+
+  wireSlider("line-width",    "lw-val",  v => v,        () => {});  // live — animation reads each frame
+  wireSlider("glow-intensity","gi-val",  v => v + "%",  () => {});
+  wireSlider("duration",      "dur-val", v => v + "s",  () => { animStartTs = null; });
+  wireSlider("loop-pause",    "lp-val",  v => v + "s",  () => { animStartTs = null; });
+  wireSlider("padding",       "pad-val", v => v + "%",  () => {
+    if (routePoints.length) {
+      normalizedPts = normalizePoints(downsample(routePoints), getPad());
+      const c = $("preview-canvas");
+      previewPts   = toCanvas(normalizedPts, c.width, c.height);
+      previewDists = buildDists(previewPts);
+      animStartTs  = null;
+    }
+  });
+
+  // Colors
+  $("line-color").addEventListener("input", () => {});
+  $("glow-color").addEventListener("input", () => {});
+
+  // Markers
+  $("show-markers").addEventListener("change", () => {});
+
+  // Aspect ratio
+  document.querySelectorAll(".asp-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".asp-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      [exportW, exportH] = ASPECTS[btn.dataset.asp];
+      layoutPreview();
+    });
+  });
+
+  // Matte
+  $("matte-black").addEventListener("click", () => {
+    matteColor = "black";
+    $("matte-black").classList.add("active");
+    $("matte-white").classList.remove("active");
+  });
+  $("matte-white").addEventListener("click", () => {
+    matteColor = "white";
+    $("matte-white").classList.add("active");
+    $("matte-black").classList.remove("active");
+  });
+
+  // Resize
+  window.addEventListener("resize", () => {
+    if (normalizedPts.length) layoutPreview();
+  });
+
+  // Initial layout (no route loaded yet — just size the canvas)
+  layoutPreview();
+});
+</script>
+</body>
+</html>
