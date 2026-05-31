@@ -163,6 +163,21 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:poin
     </div>
 
     <div class="card">
+      <div class="ctitle">View</div>
+      <div class="row">
+        <label>Zoom</label>
+        <input type="range" id="zoom" min="0.2" max="4" step="0.05" value="1">
+        <span class="val-badge" id="zoom-val">1×</span>
+      </div>
+      <div class="row">
+        <label>Rotate</label>
+        <input type="range" id="rotation" min="0" max="359" step="1" value="0">
+        <span class="val-badge" id="rot-val">0°</span>
+      </div>
+      <button class="btn btn-ghost" style="font-size:11px;padding:6px" onclick="resetView()">Reset view</button>
+    </div>
+
+    <div class="card">
       <div class="ctitle">Canvas</div>
       <div class="asp-row">
         <button class="asp-btn active" data-asp="9:16">9:16<small>Stories</small></button>
@@ -237,6 +252,23 @@ let exportH       = 1920;
 let fileName      = "route";
 let matteColor    = "black";
 let gifWorkerURL  = null;
+let zoomLevel     = 1.0;
+let rotationDeg   = 0;
+
+// ─── View transform ──────────────────────────────────────────────────────────
+function applyTransform(ctx, W, H) {
+  ctx.translate(W / 2, H / 2);
+  ctx.rotate(rotationDeg * Math.PI / 180);
+  ctx.scale(zoomLevel, zoomLevel);
+  ctx.translate(-W / 2, -H / 2);
+}
+
+function resetView() {
+  zoomLevel = 1.0; rotationDeg = 0;
+  $("zoom").value = 1; $("zoom-val").textContent = "1×";
+  $("rotation").value = 0; $("rot-val").textContent = "0°";
+  animStartTs = null;
+}
 
 // ─── Tiny utils ───────────────────────────────────────────────────────────────
 const $  = id => document.getElementById(id);
@@ -341,13 +373,15 @@ function downsample(pts, max = 1200) {
   return Array.from({ length: max }, (_, i) => pts[Math.round(i * step)]);
 }
 
-function mercY(lat) {
-  return -Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
-}
-
 function normalizePoints(pts, pad) {
   if (!pts.length) return [];
-  const raw = pts.map(p => ({ x: p.lon, y: mercY(p.lat) }));
+  // Both axes must be in the same unit (radians) so the aspect ratio is correct.
+  // x = lon in radians, y = Mercator Y in radians — now directly comparable.
+  const toRad = d => d * Math.PI / 180;
+  const raw = pts.map(p => ({
+    x: toRad(p.lon),
+    y: -Math.log(Math.tan(Math.PI / 4 + toRad(p.lat) / 2)),
+  }));
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   raw.forEach(p => {
     if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
@@ -385,99 +419,83 @@ function buildDists(pts) {
 function drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc) {
   if (pts.length < 2 || progress <= 0) return;
 
-  const totalD = dists[dists.length - 1];
+  const totalD  = dists[dists.length - 1];
   const targetD = progress * totalD;
 
-  // find end index
   let ei = 0;
   while (ei < dists.length - 1 && dists[ei + 1] < targetD) ei++;
 
   let endPt;
   if (ei >= pts.length - 1) {
     endPt = pts[pts.length - 1];
-    ei = pts.length - 1;
+    ei    = pts.length - 1;
   } else {
     const segD = dists[ei + 1] - dists[ei];
-    const t = segD > 0 ? (targetD - dists[ei]) / segD : 0;
-    endPt = { x: pts[ei].x + t * (pts[ei+1].x - pts[ei].x), y: pts[ei].y + t * (pts[ei+1].y - pts[ei].y) };
+    const t    = segD > 0 ? (targetD - dists[ei]) / segD : 0;
+    endPt = { x: pts[ei].x + t * (pts[ei+1].x - pts[ei].x),
+              y: pts[ei].y + t * (pts[ei+1].y - pts[ei].y) };
   }
 
-  const buildPath = () => {
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i <= ei; i++) ctx.lineTo(pts[i].x, pts[i].y);
-    ctx.lineTo(endPt.x, endPt.y);
-  };
+  // Build the path ONCE as Path2D — reused for all stroke passes (no rebuild loop)
+  const path = new Path2D();
+  path.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i <= ei; i++) path.lineTo(pts[i].x, pts[i].y);
+  path.lineTo(endPt.x, endPt.y);
 
-  ctx.lineCap = "round";
+  ctx.lineCap  = "round";
   ctx.lineJoin = "round";
-
-  // outer glow
-  if (gi > 0) {
-    buildPath();
-    const alpha = 0.28 * (gi / 100);
-    ctx.shadowBlur = lw * 5 * (gi / 100);
-    ctx.shadowColor = gc;
-    ctx.strokeStyle = gc;
-    ctx.lineWidth = lw * 3;
-    ctx.globalAlpha = alpha;
-    ctx.stroke();
-  }
-
-  // inner glow / halo
-  if (gi > 0) {
-    buildPath();
-    ctx.shadowBlur = lw * 2 * (gi / 100);
-    ctx.shadowColor = gc;
-    ctx.strokeStyle = gc;
-    ctx.lineWidth = lw * 1.5;
-    ctx.globalAlpha = 0.5 * (gi / 100);
-    ctx.stroke();
-  }
-
-  // crisp line
-  buildPath();
   ctx.shadowBlur = 0;
-  ctx.shadowColor = "transparent";
+
+  // Glow — layered wide strokes (no shadowBlur, much faster)
+  if (gi > 0) {
+    const a = gi / 100;
+    ctx.strokeStyle = gc;
+    ctx.lineWidth   = lw * 8;
+    ctx.globalAlpha = 0.06 * a;
+    ctx.stroke(path);
+
+    ctx.lineWidth   = lw * 4;
+    ctx.globalAlpha = 0.14 * a;
+    ctx.stroke(path);
+
+    ctx.lineWidth   = lw * 2;
+    ctx.globalAlpha = 0.22 * a;
+    ctx.stroke(path);
+  }
+
+  // Crisp line
   ctx.strokeStyle = lc;
-  ctx.lineWidth = lw;
+  ctx.lineWidth   = lw;
   ctx.globalAlpha = 1;
-  ctx.stroke();
+  ctx.stroke(path);
 
-  // white shine
-  buildPath();
-  ctx.strokeStyle = "rgba(255,255,255,0.55)";
-  ctx.lineWidth = lw * 0.25;
-  ctx.globalAlpha = 1;
-  ctx.stroke();
+  // White shine
+  ctx.strokeStyle = "rgba(255,255,255,0.5)";
+  ctx.lineWidth   = Math.max(lw * 0.22, 0.5);
+  ctx.stroke(path);
 
   ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
 }
 
 function drawMarkers(ctx, pts, lw, lc) {
   if (!pts.length) return;
   const r = Math.max(lw * 2.2, 6);
 
+  ctx.shadowBlur = 0;
+
   // start dot
   ctx.beginPath();
   ctx.arc(pts[0].x, pts[0].y, r, 0, Math.PI * 2);
   ctx.fillStyle = lc;
   ctx.globalAlpha = 1;
-  ctx.shadowBlur = r * 1.5;
-  ctx.shadowColor = lc;
   ctx.fill();
-  ctx.shadowBlur = 0;
 
   // end dot (donut)
   const last = pts[pts.length - 1];
   ctx.beginPath();
   ctx.arc(last.x, last.y, r, 0, Math.PI * 2);
   ctx.fillStyle = lc;
-  ctx.shadowBlur = r * 1.5;
-  ctx.shadowColor = lc;
   ctx.fill();
-  ctx.shadowBlur = 0;
   ctx.beginPath();
   ctx.arc(last.x, last.y, r * 0.38, 0, Math.PI * 2);
   ctx.fillStyle = "rgba(255,255,255,0.92)";
@@ -503,11 +521,14 @@ function startAnimation() {
     const W = canvas.width, H = canvas.height;
 
     ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    applyTransform(ctx, W, H);
     const lw = scaledLW(W);
     drawRoute(ctx, previewPts, previewDists, progress, lw, getLineC(), getGlowI(), getGlowC());
     if (progress >= 1 && $("show-markers").checked) {
       drawMarkers(ctx, previewPts, lw, getLineC());
     }
+    ctx.restore();
     animHandle = requestAnimationFrame(frame);
   }
   animHandle = requestAnimationFrame(frame);
@@ -620,12 +641,15 @@ function exportSVG() {
     <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.97;1" dur="${dur}s" fill="freeze"/>
   </circle>` : "";
 
+  const svgTransform = `translate(${W/2}, ${H/2}) rotate(${rotationDeg}) scale(${zoomLevel}) translate(${-W/2}, ${-H/2})`;
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur stdDeviation="${glowR.toFixed(1)}" result="blur"/>
     </filter>
   </defs>
+  <g transform="${svgTransform}">
   ${glowEl}
   <path d="${d}" fill="none" stroke="${lc}" stroke-width="${lw}"
     stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
@@ -636,6 +660,7 @@ function exportSVG() {
     <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
   </path>
   ${markersEl}
+  </g>
 </svg>`;
 
   download(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }), `${fileName}-overlay.svg`);
@@ -675,8 +700,10 @@ async function exportAPNG() {
   for (let i = 0; i < total; i++) {
     const progress = i < drawFrames ? i / (drawFrames - 1) : 1;
     ctx.clearRect(0, 0, W, H);
+    ctx.save(); applyTransform(ctx, W, H);
     drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc);
     if (progress >= 1 && showM) drawMarkers(ctx, pts, lw, lc);
+    ctx.restore();
 
     frames.push(ctx.getImageData(0, 0, W, H).data.buffer.slice(0));
     delays.push(i < drawFrames ? delayDraw : delayPause);
@@ -754,8 +781,10 @@ async function exportGIF() {
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, W, H);
+    ctx.save(); applyTransform(ctx, W, H);
     drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc);
     if (progress >= 1 && showM) drawMarkers(ctx, pts, lw, lc);
+    ctx.restore();
 
     gif.addFrame(offC, { copy: true, delay: i < drawFrames ? delayDraw : delayPause });
 
@@ -802,6 +831,27 @@ document.addEventListener("DOMContentLoaded", () => {
   wireSlider("glow-intensity","gi-val",  v => v + "%",  () => {});
   wireSlider("duration",      "dur-val", v => v + "s",  () => { animStartTs = null; });
   wireSlider("loop-pause",    "lp-val",  v => v + "s",  () => { animStartTs = null; });
+
+  $("zoom").addEventListener("input", () => {
+    zoomLevel = parseFloat($("zoom").value);
+    $("zoom-val").textContent = zoomLevel.toFixed(2).replace(/\.?0+$/, "") + "×";
+    animStartTs = null;
+  });
+  $("rotation").addEventListener("input", () => {
+    rotationDeg = parseInt($("rotation").value);
+    $("rot-val").textContent = rotationDeg + "°";
+    animStartTs = null;
+  });
+
+  // Scroll wheel to zoom on the preview canvas
+  $("preview-canvas").addEventListener("wheel", e => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.08 : -0.08;
+    zoomLevel = Math.min(4, Math.max(0.2, zoomLevel + delta));
+    $("zoom").value = zoomLevel;
+    $("zoom-val").textContent = zoomLevel.toFixed(2).replace(/\.?0+$/, "") + "×";
+    animStartTs = null;
+  }, { passive: false });
   wireSlider("padding",       "pad-val", v => v + "%",  () => {
     if (routePoints.length) {
       normalizedPts = normalizePoints(downsample(routePoints), getPad());
