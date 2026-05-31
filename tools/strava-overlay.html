@@ -189,10 +189,6 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:poin
         <input type="range" id="padding" min="5" max="30" step="1" value="15">
         <span class="val-badge" id="pad-val">15%</span>
       </div>
-      <div class="row">
-        <label>Start / end dots</label>
-        <input type="checkbox" id="show-markers" checked>
-      </div>
     </div>
 
     <div class="card">
@@ -256,11 +252,26 @@ let zoomLevel     = 1.0;
 let rotationDeg   = 0;
 
 // ─── View transform ──────────────────────────────────────────────────────────
-function applyTransform(ctx, W, H) {
-  ctx.translate(W / 2, H / 2);
-  ctx.rotate(rotationDeg * Math.PI / 180);
-  ctx.scale(zoomLevel, zoomLevel);
-  ctx.translate(-W / 2, -H / 2);
+// Transform the actual points (not the canvas context) around the route's exact
+// bounding-box center. This guarantees the route stays centered regardless of
+// route shape, aspect ratio, or floating-point drift.
+function getDisplayPts(basePts, zoom, rotDeg) {
+  if (!basePts.length) return basePts;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  basePts.forEach(p => {
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+  });
+  const cx  = (minX + maxX) / 2;
+  const cy  = (minY + maxY) / 2;
+  const cos = Math.cos(rotDeg * Math.PI / 180);
+  const sin = Math.sin(rotDeg * Math.PI / 180);
+  return basePts.map(p => {
+    const dx = (p.x - cx) * zoom;
+    const dy = (p.y - cy) * zoom;
+    return { x: cx + dx * cos - dy * sin,
+             y: cy + dx * sin + dy * cos };
+  });
 }
 
 function resetView() {
@@ -477,31 +488,6 @@ function drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc) {
   ctx.globalAlpha = 1;
 }
 
-function drawMarkers(ctx, pts, lw, lc) {
-  if (!pts.length) return;
-  const r = Math.max(lw * 2.2, 6);
-
-  ctx.shadowBlur = 0;
-
-  // start dot
-  ctx.beginPath();
-  ctx.arc(pts[0].x, pts[0].y, r, 0, Math.PI * 2);
-  ctx.fillStyle = lc;
-  ctx.globalAlpha = 1;
-  ctx.fill();
-
-  // end dot (donut)
-  const last = pts[pts.length - 1];
-  ctx.beginPath();
-  ctx.arc(last.x, last.y, r, 0, Math.PI * 2);
-  ctx.fillStyle = lc;
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(last.x, last.y, r * 0.38, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(255,255,255,0.92)";
-  ctx.fill();
-  ctx.globalAlpha = 1;
-}
 
 // ─── Preview animation ────────────────────────────────────────────────────────
 function startAnimation() {
@@ -521,14 +507,10 @@ function startAnimation() {
     const W = canvas.width, H = canvas.height;
 
     ctx.clearRect(0, 0, W, H);
-    ctx.save();
-    applyTransform(ctx, W, H);
     const lw = scaledLW(W);
-    drawRoute(ctx, previewPts, previewDists, progress, lw, getLineC(), getGlowI(), getGlowC());
-    if (progress >= 1 && $("show-markers").checked) {
-      drawMarkers(ctx, previewPts, lw, getLineC());
-    }
-    ctx.restore();
+    const dPts = getDisplayPts(previewPts, zoomLevel, rotationDeg);
+    const dDists = buildDists(dPts);
+    drawRoute(ctx, dPts, dDists, progress, lw, getLineC(), getGlowI(), getGlowC());
     animHandle = requestAnimationFrame(frame);
   }
   animHandle = requestAnimationFrame(frame);
@@ -595,7 +577,8 @@ function readFile(file) {
 function exportSVG() {
   if (!normalizedPts.length) return;
   const W = exportW, H = exportH;
-  const pts = toCanvas(normalizedPts, W, H);
+  const rawPts = toCanvas(normalizedPts, W, H);
+  const pts = getDisplayPts(rawPts, zoomLevel, rotationDeg);
   const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
 
   // measure path length via temp element
@@ -615,11 +598,6 @@ function exportSVG() {
   const gc     = getGlowC();
   const glowW  = lw * 3;
   const glowR  = lw * 5 * (gi / 100);
-  const showM  = $("show-markers").checked;
-  const first  = pts[0];
-  const last   = pts[pts.length - 1];
-  const mr     = Math.max(lw * 2.2, 6);
-
   const glowAlpha = (0.28 * gi / 100).toFixed(3);
   const animAttr = `stroke-dasharray="${len}" stroke-dashoffset="${len}"`;
 
@@ -630,26 +608,12 @@ function exportSVG() {
     <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
   </path>` : "";
 
-  const markersEl = showM ? `
-  <circle cx="${first.x.toFixed(1)}" cy="${first.y.toFixed(1)}" r="${mr}" fill="${lc}" opacity="0">
-    <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.97;1" dur="${dur}s" fill="freeze"/>
-  </circle>
-  <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="${mr}" fill="${lc}" opacity="0">
-    <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.97;1" dur="${dur}s" fill="freeze"/>
-  </circle>
-  <circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="${(mr * 0.38).toFixed(1)}" fill="rgba(255,255,255,0.92)" opacity="0">
-    <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.97;1" dur="${dur}s" fill="freeze"/>
-  </circle>` : "";
-
-  const svgTransform = `translate(${W/2}, ${H/2}) rotate(${rotationDeg}) scale(${zoomLevel}) translate(${-W/2}, ${-H/2})`;
-
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur stdDeviation="${glowR.toFixed(1)}" result="blur"/>
     </filter>
   </defs>
-  <g transform="${svgTransform}">
   ${glowEl}
   <path d="${d}" fill="none" stroke="${lc}" stroke-width="${lw}"
     stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
@@ -659,8 +623,6 @@ function exportSVG() {
     stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
     <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
   </path>
-  ${markersEl}
-  </g>
 </svg>`;
 
   download(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }), `${fileName}-overlay.svg`);
@@ -684,13 +646,11 @@ async function exportAPNG() {
   offC.width = W; offC.height = H;
   const ctx = offC.getContext("2d");
 
-  const pts   = toCanvas(normalizedPts, W, H);
-  const dists = buildDists(pts);
-  const lw    = getLineW();
-  const lc    = getLineC();
-  const gi    = getGlowI();
-  const gc    = getGlowC();
-  const showM = $("show-markers").checked;
+  const pts = toCanvas(normalizedPts, W, H);
+  const lw  = getLineW();
+  const lc  = getLineC();
+  const gi  = getGlowI();
+  const gc  = getGlowC();
 
   showProgress(true, "Rendering APNG…");
 
@@ -700,10 +660,9 @@ async function exportAPNG() {
   for (let i = 0; i < total; i++) {
     const progress = i < drawFrames ? i / (drawFrames - 1) : 1;
     ctx.clearRect(0, 0, W, H);
-    ctx.save(); applyTransform(ctx, W, H);
-    drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc);
-    if (progress >= 1 && showM) drawMarkers(ctx, pts, lw, lc);
-    ctx.restore();
+    const dPts = getDisplayPts(pts, zoomLevel, rotationDeg);
+    const dDists = buildDists(dPts);
+    drawRoute(ctx, dPts, dDists, progress, lw, lc, gi, gc);
 
     frames.push(ctx.getImageData(0, 0, W, H).data.buffer.slice(0));
     delays.push(i < drawFrames ? delayDraw : delayPause);
@@ -755,13 +714,11 @@ async function exportGIF() {
   offC.width = W; offC.height = H;
   const ctx = offC.getContext("2d");
 
-  const pts   = toCanvas(normalizedPts, W, H);
-  const dists = buildDists(pts);
-  const lw    = getLineW();
-  const lc    = getLineC();
-  const gi    = getGlowI();
-  const gc    = getGlowC();
-  const showM = $("show-markers").checked;
+  const pts = toCanvas(normalizedPts, W, H);
+  const lw  = getLineW();
+  const lc  = getLineC();
+  const gi  = getGlowI();
+  const gc  = getGlowC();
 
   showProgress(true, "Rendering GIF…");
 
@@ -781,10 +738,9 @@ async function exportGIF() {
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, W, H);
-    ctx.save(); applyTransform(ctx, W, H);
-    drawRoute(ctx, pts, dists, progress, lw, lc, gi, gc);
-    if (progress >= 1 && showM) drawMarkers(ctx, pts, lw, lc);
-    ctx.restore();
+    const dPts = getDisplayPts(pts, zoomLevel, rotationDeg);
+    const dDists = buildDists(dPts);
+    drawRoute(ctx, dPts, dDists, progress, lw, lc, gi, gc);
 
     gif.addFrame(offC, { copy: true, delay: i < drawFrames ? delayDraw : delayPause });
 
@@ -867,7 +823,6 @@ document.addEventListener("DOMContentLoaded", () => {
   $("glow-color").addEventListener("input", () => {});
 
   // Markers
-  $("show-markers").addEventListener("change", () => {});
 
   // Aspect ratio
   document.querySelectorAll(".asp-btn").forEach(btn => {
