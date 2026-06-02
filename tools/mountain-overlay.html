@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Mountain Route — Discoverist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+<style>
+:root {
+  --bg:      #F2F2F7;
+  --surf:    #FFFFFF;
+  --fill:    rgba(120,120,128,.10);
+  --fill2:   rgba(120,120,128,.18);
+  --sep:     rgba(60,60,67,.12);
+  --lbl:     #1C1C1E;
+  --lbl2:    rgba(60,60,67,.80);
+  --lbl3:    rgba(60,60,67,.50);
+  --lbl4:    rgba(60,60,67,.28);
+  --gold:    #C9A84C;
+  --gold-hi: #D4B56A;
+  --gold-lo: #A88A3A;
+  --gold-f:  rgba(201,168,76,.10);
+  --r:       12px;
+  --r-sm:    8px;
+  --sh:      0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:   0 10px 48px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.07);
+  --font:    "Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:    "JetBrains Mono","SF Mono","Menlo",monospace;
+  --t:       150ms;
+  --ease:    cubic-bezier(.4,0,.2,1);
+  --spring:  cubic-bezier(.34,1.56,.64,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--lbl);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+#hdr{background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:0 18px;height:50px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--sep);flex-shrink:0;z-index:10}
+.hdr-icon{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:linear-gradient(155deg,var(--gold-hi) 0%,var(--gold-lo) 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(168,138,58,.32)}
+.hdr-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#hdr h1{font-size:13px;font-weight:600;letter-spacing:-.01em}
+#hdr-hint{font-size:11px;color:var(--lbl4);margin-left:auto}
+
+#main{display:flex;flex:1;overflow:hidden}
+
+#sidebar{width:272px;flex-shrink:0;background:var(--bg);border-right:1px solid var(--sep);overflow-y:auto;padding:10px 10px 24px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--sep) transparent}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--sep);border-radius:2px}
+
+.card{background:var(--surf);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--sh)}
+.ctitle{font-size:11px;font-weight:600;color:var(--lbl3);letter-spacing:.06em;text-transform:uppercase}
+.row{display:flex;align-items:center;gap:6px}
+.row label{font-size:12px;color:var(--lbl2);flex-shrink:0;white-space:nowrap;width:80px}
+
+#drop-zone{border:1.5px dashed var(--sep);border-radius:var(--r-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all var(--t) var(--ease);color:var(--lbl3);font-size:12px;line-height:1.6}
+#drop-zone:hover,#drop-zone.drag-over{border-color:var(--gold);background:var(--gold-f);color:var(--lbl2)}
+#drop-zone strong{display:block;font-size:13px;font-weight:600;color:var(--lbl2);margin-bottom:2px}
+#drop-zone.has-file{border-color:var(--gold);background:var(--gold-f)}
+#drop-zone.has-file strong{color:var(--gold)}
+
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;border-radius:2px;background:var(--fill2);outline:none;cursor:pointer;min-width:0;flex:1}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform var(--t) var(--spring)}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=color]{width:30px;height:26px;border-radius:5px;border:1px solid var(--sep);padding:2px;cursor:pointer;background:var(--surf);flex-shrink:0}
+
+.num-wrap{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.num-input{width:42px;padding:3px 5px;border-radius:5px;border:1px solid var(--sep);background:var(--fill);color:var(--gold);font-family:var(--mono);font-size:11px;font-weight:500;text-align:right;outline:none;-moz-appearance:textfield}
+.num-input::-webkit-outer-spin-button,.num-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.num-input:focus{border-color:var(--gold);background:var(--surf)}
+.num-unit{font-size:10px;color:var(--lbl3);font-family:var(--mono);margin-left:1px}
+
+.sl-wrap{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+
+/* Segmented buttons */
+.seg-row{display:flex;gap:4px}
+.seg-btn{flex:1;padding:6px 4px;border-radius:7px;border:1.5px solid var(--sep);background:var(--fill);font-size:11px;font-weight:500;color:var(--lbl3);cursor:pointer;text-align:center;transition:all var(--t) var(--ease);line-height:1.2;font-family:var(--font)}
+.seg-btn small{display:block;font-size:9.5px;opacity:.7;margin-top:1px}
+.seg-btn.active,.seg-btn:hover{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
+
+/* Color pair */
+.color-pair{display:flex;align-items:center;gap:5px}
+.color-pair span{font-size:10px;color:var(--lbl4)}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between}
+.toggle-label{font-size:12px;color:var(--lbl2)}
+.toggle-switch{position:relative;width:34px;height:20px;cursor:pointer;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-knob{position:absolute;inset:0;border-radius:10px;background:var(--fill2);transition:background var(--t) var(--ease)}
+.toggle-knob::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:2px;transition:transform var(--t) var(--spring);box-shadow:0 1px 3px rgba(0,0,0,.22)}
+.toggle-switch input:checked + .toggle-knob{background:var(--gold)}
+.toggle-switch input:checked + .toggle-knob::after{transform:translateX(14px)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:var(--r-sm);border:none;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t) var(--ease);letter-spacing:.02em}
+.btn-gold{background:var(--gold);color:white;box-shadow:0 2px 6px rgba(168,138,58,.32)}
+.btn-gold:hover:not(:disabled){background:var(--gold-hi)}
+.btn-ghost{background:var(--fill);color:var(--lbl2)}
+.btn-ghost:hover:not(:disabled){background:var(--fill2)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn-row{display:flex;gap:6px}
+
+#status-line{font-size:11px;color:var(--lbl3);text-align:center;min-height:14px}
+
+/* Preview */
+#preview{flex:1;position:relative;overflow:hidden;background:#0d1117}
+#map-container{width:100%;height:100%}
+
+/* Floating map buttons */
+#map-btns{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.map-btn{width:36px;height:36px;border-radius:10px;border:none;background:rgba(255,255,255,.90);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.22);transition:all var(--t) var(--ease)}
+.map-btn:hover{background:white;transform:scale(1.06)}
+.map-btn svg{width:16px;height:16px;stroke:var(--lbl);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Progress overlay */
+#prog-overlay{position:absolute;inset:0;background:rgba(0,0,0,.70);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:20}
+#prog-overlay.show{display:flex}
+#prog-box{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+#prog-title{color:white;font-size:14px;font-weight:600}
+#prog-msg{color:rgba(255,255,255,.55);font-size:12px}
+#prog-bar-wrap{width:220px;height:3px;background:rgba(255,255,255,.15);border-radius:2px}
+#prog-bar{height:100%;background:var(--gold);border-radius:2px;transition:width .06s linear;width:0%}
+
+/* Toast */
+#toast{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:rgba(28,28,30,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:white;font-size:11.5px;padding:8px 16px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap;z-index:15}
+#toast.show{opacity:1}
+
+/* MapLibre overrides */
+.maplibregl-ctrl-attrib,.maplibregl-ctrl-logo{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div class="hdr-icon">
+    <svg viewBox="0 0 24 24"><polyline points="3 17 7 9 11 13 15 6 19 10 21 8"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
+  </div>
+  <h1>3D Mountain Route</h1>
+  <span id="hdr-hint">GPX / KML → animated 3D terrain with route draw-on</span>
+</div>
+
+<div id="main">
+  <div id="sidebar">
+
+    <!-- File -->
+    <div class="card">
+      <div class="ctitle">Route File</div>
+      <div id="drop-zone" onclick="document.getElementById('file-in').click()">
+        <strong id="drop-label">Drop GPX or KML here</strong>
+        or click to browse
+      </div>
+      <input type="file" id="file-in" accept=".gpx,.kml" style="display:none">
+    </div>
+
+    <!-- Map Style -->
+    <div class="card">
+      <div class="ctitle">Map Style</div>
+      <div class="seg-row" id="style-btns">
+        <button class="seg-btn" data-style="outdoor">Outdoor<small>Topo</small></button>
+        <button class="seg-btn" data-style="satellite">Satellite<small>Photo</small></button>
+        <button class="seg-btn active" data-style="night">Night<small>Dark</small></button>
+        <button class="seg-btn" data-style="clean">Clean<small>Minimal</small></button>
+      </div>
+      <div class="row">
+        <label>Elevation ×</label>
+        <div class="sl-wrap">
+          <input type="range" id="exag-sl" min="1" max="5" step="0.1" value="2">
+          <div class="num-wrap">
+            <input type="number" id="exag-num" class="num-input" min="1" max="5" step="0.1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route Style -->
+    <div class="card">
+      <div class="ctitle">Route Style</div>
+      <div class="row">
+        <label>Colors</label>
+        <div class="color-pair">
+          <input type="color" id="color1" value="#FC4C02">
+          <span>→</span>
+          <input type="color" id="color2" value="#FFCC00">
+        </div>
+      </div>
+      <div class="row">
+        <label>Width</label>
+        <div class="sl-wrap">
+          <input type="range" id="width-sl" min="2" max="16" step="0.5" value="5">
+          <div class="num-wrap">
+            <input type="number" id="width-num" class="num-input" min="2" max="16" step="0.5">
+            <span class="num-unit">px</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Glow</label>
+        <div class="sl-wrap">
+          <input type="range" id="glow-sl" min="0" max="100" step="5" value="75">
+          <div class="num-wrap">
+            <input type="number" id="glow-num" class="num-input" min="0" max="100" step="5">
+            <span class="num-unit">%</span>
+          </div>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Gradient color</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="gradient-on" checked>
+          <span class="toggle-knob"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Glowing tip dot</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="tipdot-on" checked>
+          <span class="toggle-knob"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Camera -->
+    <div class="card">
+      <div class="ctitle">Camera</div>
+      <div class="row">
+        <label>Tilt</label>
+        <div class="sl-wrap">
+          <input type="range" id="pitch-sl" min="0" max="85" step="1" value="65">
+          <div class="num-wrap">
+            <input type="number" id="pitch-num" class="num-input" min="0" max="85">
+            <span class="num-unit">°</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Bearing</label>
+        <div class="sl-wrap">
+          <input type="range" id="bearing-sl" min="0" max="359" step="1" value="0">
+          <div class="num-wrap">
+            <input type="number" id="bearing-num" class="num-input" min="0" max="359">
+            <span class="num-unit">°</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Zoom offset</label>
+        <div class="sl-wrap">
+          <input type="range" id="zoom-sl" min="-3" max="3" step="0.5" value="0">
+          <div class="num-wrap">
+            <input type="number" id="zoom-num" class="num-input" min="-3" max="3" step="0.5">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animation -->
+    <div class="card">
+      <div class="ctitle">Animation</div>
+      <div class="seg-row" id="anim-btns">
+        <button class="seg-btn active" data-anim="orbit">Orbit</button>
+        <button class="seg-btn" data-anim="flyover">Flyover</button>
+        <button class="seg-btn" data-anim="static">Static</button>
+      </div>
+      <div class="row">
+        <label>Duration</label>
+        <div class="sl-wrap">
+          <input type="range" id="dur-sl" min="3" max="20" step="1" value="10">
+          <div class="num-wrap">
+            <input type="number" id="dur-num" class="num-input" min="3" max="20">
+            <span class="num-unit">s</span>
+          </div>
+        </div>
+      </div>
+      <div class="row" id="orbit-row">
+        <label>Rotations</label>
+        <div class="sl-wrap">
+          <input type="range" id="rot-sl" min="1" max="4" step="0.5" value="1">
+          <div class="num-wrap">
+            <input type="number" id="rot-num" class="num-input" min="1" max="4" step="0.5">
+            <span class="num-unit">×</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Draw speed</label>
+        <div class="sl-wrap">
+          <input type="range" id="draw-sl" min="1" max="15" step="0.5" value="5">
+          <div class="num-wrap">
+            <input type="number" id="draw-num" class="num-input" min="1" max="15" step="0.5">
+            <span class="num-unit">s</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export -->
+    <div class="card">
+      <div class="ctitle">Export</div>
+      <div class="row">
+        <label>GIF FPS</label>
+        <div class="seg-row" id="fps-btns" style="flex:1">
+          <button class="seg-btn" data-fps="10">10</button>
+          <button class="seg-btn active" data-fps="12">12</button>
+          <button class="seg-btn" data-fps="15">15</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="btn-gif" disabled style="flex:1">Export GIF</button>
+        <button class="btn btn-ghost" id="btn-png" disabled style="flex:1">Save PNG</button>
+      </div>
+      <div id="status-line"></div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <div id="preview">
+    <div id="map-container"></div>
+
+    <div id="map-btns">
+      <button class="map-btn" id="btn-pause" title="Pause / Resume — freely adjust view while paused">
+        <svg id="pause-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        <svg id="play-icon"  viewBox="0 0 24 24" style="display:none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <button class="map-btn" id="btn-replay" title="Replay from start">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+      </button>
+      <button class="map-btn" id="btn-fit" title="Fit route">
+        <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      </button>
+    </div>
+
+    <div id="prog-overlay">
+      <div id="prog-box">
+        <div id="prog-title">Rendering…</div>
+        <div id="prog-msg"></div>
+        <div id="prog-bar-wrap"><div id="prog-bar"></div></div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+  </div>
+</div>
+
+<script>
+const MAPTILER_KEY = 'pO4p3paZcjFsfdNEcYDM';
+const STYLES = {
+  outdoor:   `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${MAPTILER_KEY}`,
+  satellite: `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_KEY}`,
+  night:     `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAPTILER_KEY}`,
+  clean:     `https://api.maptiler.com/maps/backdrop/style.json?key=${MAPTILER_KEY}`,
+};
+
+const $ = id => document.getElementById(id);
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let map = null;
+let routePoints       = [];
+let fittedZoom        = 10;
+let fittedCenter      = null;
+let routeBounds       = null;
+let animFrameId       = null;
+let animStartTs       = null;
+let drawProgress      = 0;
+let isPaused          = false;
+let pausedDrawProgress = 0;
+let gifWorkerURL      = null;
+let fileName          = 'route';
+let currentStyle      = 'night';
+let currentAnim       = 'orbit';
+let gifFPS            = 12;
+let toastTimer        = null;
+
+// ─── Getters ──────────────────────────────────────────────────────────────────
+const getExag     = () => parseFloat($('exag-sl').value);
+const getColor1   = () => $('color1').value;
+const getColor2   = () => $('color2').value;
+const getWidth    = () => parseFloat($('width-sl').value);
+const getGlow     = () => parseFloat($('glow-sl').value) / 100;
+const getDrawDur  = () => parseFloat($('draw-sl').value);
+const getPitch    = () => parseFloat($('pitch-sl').value);
+const getBearing  = () => parseFloat($('bearing-sl').value);
+const getZoomOff  = () => parseFloat($('zoom-sl').value);
+const getDur      = () => parseFloat($('dur-sl').value);
+const getRot      = () => parseFloat($('rot-sl').value);
+const useGradient = () => $('gradient-on').checked;
+const useTipDot   = () => $('tipdot-on').checked;
+
+// ─── GPX / KML Parsers ────────────────────────────────────────────────────────
+function parseGPX(text) {
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  const pts = [];
+  doc.querySelectorAll('trkpt').forEach(el => {
+    const lat = parseFloat(el.getAttribute('lat'));
+    const lon = parseFloat(el.getAttribute('lon'));
+    if (!isNaN(lat) && !isNaN(lon)) pts.push({ lat, lon });
+  });
+  if (!pts.length) throw new Error('No track points found in GPX');
+  return pts;
+}
+
+function parseKML(text) {
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  const lineCoords = doc.querySelectorAll('LineString coordinates');
+  if (lineCoords.length) {
+    const pts = [];
+    lineCoords.forEach(el => {
+      el.textContent.trim().split(/\s+/).forEach(tok => {
+        const p = tok.split(',');
+        if (p.length >= 2) {
+          const lon = parseFloat(p[0]), lat = parseFloat(p[1]);
+          if (!isNaN(lat) && !isNaN(lon)) pts.push({ lat, lon });
+        }
+      });
+    });
+    if (pts.length) return pts;
+  }
+  for (const sel of ['gx\\:coord', 'coord']) {
+    const nodes = doc.querySelectorAll(sel);
+    if (nodes.length) {
+      const pts = [];
+      nodes.forEach(el => {
+        const p = el.textContent.trim().split(/\s+/);
+        if (p.length >= 2) {
+          const lon = parseFloat(p[0]), lat = parseFloat(p[1]);
+          if (!isNaN(lat) && !isNaN(lon)) pts.push({ lat, lon });
+        }
+      });
+      if (pts.length) return pts;
+    }
+  }
+  throw new Error('No coordinates found in KML');
+}
+
+// ─── File handling ────────────────────────────────────────────────────────────
+function readFile(file) {
+  if (!file) return;
+  fileName = file.name.replace(/\.[^.]+$/, '');
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['gpx', 'kml'].includes(ext)) { toast('Please upload a .gpx or .kml file'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      routePoints = ext === 'gpx' ? parseGPX(e.target.result) : parseKML(e.target.result);
+      const dz = $('drop-zone');
+      dz.classList.add('has-file');
+      $('drop-label').textContent = file.name;
+      dz.querySelector('span') && (dz.querySelector('span').textContent = `${routePoints.length.toLocaleString()} points`);
+      $('hdr-hint').textContent = `${routePoints.length.toLocaleString()} pts · ${currentAnim}`;
+      if (map && map.isStyleLoaded()) { addRouteLayers(); fitRoute(); }
+    } catch(err) { toast('Parse error: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+// ─── Map init ─────────────────────────────────────────────────────────────────
+function initMap() {
+  map = new maplibregl.Map({
+    container:            'map-container',
+    style:                STYLES[currentStyle],
+    center:               [10, 46],
+    zoom:                 4,
+    pitch:                65,
+    bearing:              0,
+    antialias:            true,
+    preserveDrawingBuffer: true,
+  });
+  map.on('load',       onMapLoad);
+  map.on('error',      e => console.warn('[MapLibre]', e));
+}
+
+function onMapLoad() {
+  addTerrain();
+  addSky();
+  addFog();
+  if (routePoints.length) { addRouteLayers(); fitRoute(); }
+}
+
+function addTerrain() {
+  if (!map.getSource('terrain')) {
+    map.addSource('terrain', {
+      type: 'raster-dem',
+      url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${MAPTILER_KEY}`,
+      tileSize: 256, maxzoom: 14,
+    });
+  }
+  map.setTerrain({ source: 'terrain', exaggeration: getExag() });
+}
+
+function addSky() {
+  if (!map.getLayer('sky')) {
+    map.addLayer({ id: 'sky', type: 'sky', paint: {
+      'sky-type':                      'atmosphere',
+      'sky-atmosphere-sun':             [0, 90],
+      'sky-atmosphere-sun-intensity':   15,
+      'sky-atmosphere-color':           'rgba(32, 80, 160, 1)',
+      'sky-atmosphere-halo-color':      'rgba(24, 60, 130, 0.8)',
+    }});
+  }
+}
+
+function addFog() {
+  try {
+    map.setFog({
+      'horizon-blend': 0.05,
+      'high-color':    '#243c8a',
+      'space-color':   '#000a1e',
+      'star-intensity': 0.65,
+    });
+  } catch(e) { /* fog not supported in this style */ }
+}
+
+// ─── Route layers ─────────────────────────────────────────────────────────────
+const EMPTY = { type: 'FeatureCollection', features: [] };
+
+function routeGeoJSON(pts) {
+  return { type: 'FeatureCollection', features: [{
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: pts.map(p => [p.lon, p.lat]) },
+  }]};
+}
+
+function tipGeoJSON(pt) {
+  return { type: 'FeatureCollection', features: [{
+    type: 'Feature', geometry: { type: 'Point', coordinates: [pt.lon, pt.lat] },
+  }]};
+}
+
+function addRouteLayers() {
+  const c1 = getColor1(), c2 = useGradient() ? getColor2() : getColor1();
+  const w  = getWidth(),  gi = getGlow();
+
+  if (!map.getSource('route')) {
+    map.addSource('route',     { type: 'geojson', data: EMPTY, lineMetrics: true });
+    map.addSource('route-tip', { type: 'geojson', data: EMPTY });
+  } else {
+    // Remove old layers for clean re-add after style switch
+    ['route-outer','route-mid','route-line','tip-halo','tip-dot'].forEach(id => {
+      if (map.getLayer(id)) map.removeLayer(id);
+    });
+    if (map.getSource('route'))     map.removeSource('route');
+    if (map.getSource('route-tip')) map.removeSource('route-tip');
+    map.addSource('route',     { type: 'geojson', data: EMPTY, lineMetrics: true });
+    map.addSource('route-tip', { type: 'geojson', data: EMPTY });
+  }
+
+  // Outer glow
+  map.addLayer({ id: 'route-outer', type: 'line', source: 'route', paint: {
+    'line-color': c1, 'line-width': w * 10, 'line-opacity': Math.min(0.08 * gi * 1.2, 0.25), 'line-blur': 12,
+  }});
+  // Inner glow
+  map.addLayer({ id: 'route-mid', type: 'line', source: 'route', paint: {
+    'line-color': c1, 'line-width': w * 3.5, 'line-opacity': Math.min(0.25 * gi, 0.7), 'line-blur': 4,
+  }});
+  // Main gradient line
+  map.addLayer({ id: 'route-line', type: 'line', source: 'route',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-width':    w,
+      'line-gradient': ['interpolate', ['linear'], ['line-progress'], 0, c1, 1, c2],
+    },
+  });
+  // Tip halo
+  map.addLayer({ id: 'tip-halo', type: 'circle', source: 'route-tip', paint: {
+    'circle-radius': w * 3.5, 'circle-color': c1, 'circle-opacity': 0.30,
+    'circle-pitch-alignment': 'map',
+  }});
+  // Tip dot
+  map.addLayer({ id: 'tip-dot', type: 'circle', source: 'route-tip', paint: {
+    'circle-radius':       w * 1.4,
+    'circle-color':        '#FFFFFF',
+    'circle-stroke-color': c1,
+    'circle-stroke-width': Math.max(2, w * 0.55),
+    'circle-pitch-alignment': 'map',
+  }});
+}
+
+// ─── Update drawn route portion ───────────────────────────────────────────────
+function updateDraw(t) {
+  if (!routePoints.length || !map || !map.getSource('route')) return;
+  const n = routePoints.length;
+  const count = Math.min(n, Math.max(2, Math.ceil(t * (n - 1)) + 1));
+  const slice = routePoints.slice(0, count);
+
+  map.getSource('route').setData(routeGeoJSON(slice));
+
+  if (map.getSource('route-tip')) {
+    const showTip = useTipDot() && t < 0.999;
+    map.getSource('route-tip').setData(showTip ? tipGeoJSON(slice[slice.length - 1]) : EMPTY);
+  }
+}
+
+// ─── Fit route ────────────────────────────────────────────────────────────────
+function fitRoute(dur = 1400) {
+  if (!routePoints.length) return;
+  const lons = routePoints.map(p => p.lon);
+  const lats = routePoints.map(p => p.lat);
+  routeBounds = [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]];
+
+  map.fitBounds(routeBounds, {
+    padding: { top: 90, bottom: 90, left: 90, right: 90 },
+    pitch: getPitch(), bearing: getBearing(), duration: dur,
+  });
+
+  map.once('moveend', () => {
+    fittedZoom = map.getZoom();
+    fittedCenter = [map.getCenter().lng, map.getCenter().lat];
+    $('btn-gif').disabled = false;
+    $('btn-png').disabled = false;
+    startAnim();
+  });
+}
+
+// ─── Animation loop ───────────────────────────────────────────────────────────
+function stopAnim() {
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  animStartTs = null;
+}
+
+// fromDraw: 0 = fresh start, 1 = route already fully drawn (e.g. after export)
+// savedDraw: fractional progress to resume from mid-draw (used after un-pause)
+function startAnim(fromDraw = 0, savedDraw = fromDraw) {
+  stopAnim();
+  isPaused = false;
+  updatePauseBtn();
+  if (!routePoints.length || !fittedCenter) return;
+
+  const drawDurMs = getDrawDur() * 1000;
+  // Compute elapsed offset so animation "continues" from savedDraw
+  const elapsedOffset = savedDraw >= 1 ? drawDurMs : savedDraw * drawDurMs;
+
+  function loop(ts) {
+    if (animStartTs === null) animStartTs = ts - elapsedOffset;
+    const elapsed = ts - animStartTs;
+    const durMs   = getDur() * 1000;
+
+    if (currentAnim === 'orbit') {
+      const drawT = Math.min(elapsed / drawDurMs, 1);
+      drawProgress = drawT;
+      updateDraw(drawT);
+      const camT    = (elapsed % durMs) / durMs;
+      const bearing = (getBearing() + getRot() * 360 * camT) % 360;
+      map.jumpTo({ center: fittedCenter, zoom: fittedZoom + getZoomOff(), bearing, pitch: getPitch() });
+
+    } else if (currentAnim === 'flyover') {
+      const camT  = (elapsed % durMs) / durMs;
+      const drawT = Math.min(camT + 0.10, 1);
+      drawProgress = drawT;
+      updateDraw(drawT);
+      applyFlyoverCamera(camT);
+
+    } else {
+      const drawT = Math.min(elapsed / drawDurMs, 1);
+      drawProgress = drawT;
+      updateDraw(drawT);
+    }
+
+    animFrameId = requestAnimationFrame(loop);
+  }
+  animFrameId = requestAnimationFrame(loop);
+}
+
+// ─── Pause / Resume ───────────────────────────────────────────────────────────
+function pause() {
+  if (!animFrameId) return;
+  isPaused = true;
+  pausedDrawProgress = drawProgress;
+  stopAnim();
+  updatePauseBtn();
+  toast('Paused — drag / zoom / tilt freely, then Resume');
+}
+
+function resume() {
+  isPaused = false;
+  // Adopt current camera as new orbit pivot (preserves manual adjustment)
+  if (fittedCenter) {
+    fittedCenter = [map.getCenter().lng, map.getCenter().lat];
+    fittedZoom   = map.getZoom();
+  }
+  startAnim(pausedDrawProgress, pausedDrawProgress);
+}
+
+function togglePause() {
+  if (isPaused) resume();
+  else          pause();
+}
+
+function updatePauseBtn() {
+  const btn = $('btn-pause');
+  if (!btn) return;
+  $('pause-icon').style.display = isPaused ? 'none'  : '';
+  $('play-icon').style.display  = isPaused ? ''      : 'none';
+  btn.title = isPaused ? 'Resume animation' : 'Pause — freely adjust view';
+  btn.style.background = isPaused ? 'rgba(201,168,76,.92)' : '';
+}
+
+function applyFlyoverCamera(t) {
+  const n = routePoints.length;
+  const rawIdx = t * (n - 1);
+  const idx  = Math.min(Math.floor(rawIdx), n - 2);
+  const frac = rawIdx - idx;
+  const cur  = routePoints[idx];
+  const nxt  = routePoints[idx + 1];
+  const lon  = cur.lon + frac * (nxt.lon - cur.lon);
+  const lat  = cur.lat + frac * (nxt.lat - cur.lat);
+  const la   = routePoints[Math.min(idx + Math.max(1, Math.ceil(n * 0.03)), n - 1)];
+  const bearing = Math.atan2(
+    (la.lon - cur.lon) * Math.cos(cur.lat * Math.PI / 180),
+    la.lat - cur.lat
+  ) * 180 / Math.PI;
+  map.jumpTo({ center: [lon, lat], zoom: fittedZoom + getZoomOff() + 1.5, bearing, pitch: getPitch() });
+}
+
+// ─── Apply style changes live ─────────────────────────────────────────────────
+function applyRouteStyle() {
+  if (!map || !map.getLayer('route-line')) return;
+  const c1 = getColor1(), c2 = useGradient() ? getColor2() : getColor1();
+  const w  = getWidth(),  gi = getGlow();
+  map.setPaintProperty('route-outer', 'line-color',   c1);
+  map.setPaintProperty('route-outer', 'line-width',   w * 10);
+  map.setPaintProperty('route-outer', 'line-opacity', Math.min(0.08 * gi * 1.2, 0.25));
+  map.setPaintProperty('route-mid',   'line-color',   c1);
+  map.setPaintProperty('route-mid',   'line-width',   w * 3.5);
+  map.setPaintProperty('route-mid',   'line-opacity', Math.min(0.25 * gi, 0.7));
+  map.setPaintProperty('route-line',  'line-width',   w);
+  map.setPaintProperty('route-line',  'line-gradient', ['interpolate', ['linear'], ['line-progress'], 0, c1, 1, c2]);
+  map.setPaintProperty('tip-halo',    'circle-color',        c1);
+  map.setPaintProperty('tip-halo',    'circle-radius',       w * 3.5);
+  map.setPaintProperty('tip-dot',     'circle-stroke-color', c1);
+  map.setPaintProperty('tip-dot',     'circle-radius',       w * 1.4);
+  map.setPaintProperty('tip-dot',     'circle-stroke-width', Math.max(2, w * 0.55));
+}
+
+// ─── Style switching ──────────────────────────────────────────────────────────
+function setMapStyle(name) {
+  if (!map || name === currentStyle) return;
+  currentStyle = name;
+  stopAnim();
+  map.setStyle(STYLES[name]);
+  map.once('style.load', () => {
+    addTerrain(); addSky(); addFog();
+    if (routePoints.length) {
+      addRouteLayers();
+      if (fittedCenter) startAnim(1, 1);
+    }
+  });
+}
+
+// ─── Export helpers ───────────────────────────────────────────────────────────
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+}
+
+// Reliable WebGL→2D canvas frame capture
+async function captureFrame(offCanvas, offCtx) {
+  await new Promise(resolve => {
+    const done = () => { map.off('render', done); setTimeout(resolve, 8); };
+    map.on('render', done);
+    map.triggerRepaint();
+  });
+  offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
+  offCtx.drawImage(map.getCanvas(), 0, 0);
+}
+
+// ─── Export: PNG ──────────────────────────────────────────────────────────────
+function exportPNG() {
+  if (!map) return;
+  stopAnim();
+  setTimeout(() => {
+    map.once('idle', () => {
+      map.getCanvas().toBlob(blob => {
+        if (!blob) { toast('PNG capture failed — try again'); startAnim(); return; }
+        download(blob, `${fileName}-3d.png`);
+        const c = map.getCanvas();
+        toast(`PNG saved — ${c.width}×${c.height}px`);
+        startAnim(1, 1);
+      }, 'image/png');
+    });
+    map.triggerRepaint();
+  }, 100);
+}
+
+// ─── Export: GIF ──────────────────────────────────────────────────────────────
+async function exportGIF() {
+  if (!routePoints.length) { toast('Upload a route file first'); return; }
+  stopAnim();
+
+  // Load gif.js worker via Blob URL (required to bypass CORS for web workers)
+  if (!gifWorkerURL) {
+    showProgress(true, 'Loading GIF encoder…', '');
+    try {
+      const r = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const t = await r.text();
+      gifWorkerURL = URL.createObjectURL(new Blob([t], { type: 'application/javascript' }));
+    } catch(e) {
+      showProgress(false);
+      toast('Could not load GIF encoder — check internet connection');
+      startAnim();
+      return;
+    }
+  }
+
+  const glCanvas = map.getCanvas();
+  const W = glCanvas.width, H = glCanvas.height;
+  const durMs = getDur() * 1000;
+  const isStatic = currentAnim === 'static';
+  const totalFrames = isStatic ? 1 : Math.max(Math.round(durMs / 1000 * gifFPS), 2);
+  const delay = isStatic ? 2000 : Math.round(1000 / gifFPS);
+  const startBearing = getBearing();
+  const n = routePoints.length;
+
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = W; offCanvas.height = H;
+  const offCtx = offCanvas.getContext('2d');
+
+  const gif = new GIF({ workers: 2, quality: 8, width: W, height: H, workerScript: gifWorkerURL });
+
+  showProgress(true, 'Rendering GIF…', `0 / ${totalFrames} frames`);
+
+  for (let i = 0; i < totalFrames; i++) {
+    const t = totalFrames > 1 ? i / (totalFrames - 1) : 1;
+
+    // Update route draw
+    const drawT = currentAnim === 'orbit'    ? Math.min(t / 0.65, 1) :
+                  currentAnim === 'flyover'  ? Math.min(t + 0.10, 1) : 1;
+    updateDraw(drawT);
+
+    // Move camera
+    if (currentAnim === 'orbit') {
+      map.jumpTo({
+        center: fittedCenter, zoom: fittedZoom + getZoomOff(),
+        bearing: (startBearing + getRot() * 360 * t) % 360, pitch: getPitch(),
+      });
+    } else if (currentAnim === 'flyover') {
+      applyFlyoverCamera(t);
+    }
+
+    // Capture
+    await captureFrame(offCanvas, offCtx);
+    gif.addFrame(offCanvas, { copy: true, delay });
+
+    const pct = (i / totalFrames) * 60;
+    showProgress(true, 'Rendering GIF…', `${i + 1} / ${totalFrames} frames`);
+    $('prog-bar').style.width = Math.round(pct) + '%';
+    if (i % 3 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+
+  showProgress(true, 'Encoding GIF…', 'please wait…');
+  gif.on('progress', p => { $('prog-bar').style.width = Math.round(60 + p * 38) + '%'; });
+  gif.on('finished', blob => {
+    showProgress(false);
+    download(blob, `${fileName}-3d.gif`);
+    toast(`GIF saved — ${W}×${H}px · ${totalFrames} frames`);
+    $('status-line').textContent = `${W}×${H}px · ${totalFrames} frames`;
+    startAnim(1, 1); // resume with route fully drawn
+  });
+  gif.render();
+}
+
+// ─── UI helpers ───────────────────────────────────────────────────────────────
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+function showProgress(show, title = '', msg = '') {
+  const el = $('prog-overlay');
+  if (show) {
+    el.classList.add('show');
+    $('prog-title').textContent = title;
+    $('prog-msg').textContent   = msg;
+  } else {
+    el.classList.remove('show');
+    $('prog-bar').style.width = '0%';
+  }
+}
+
+function wireSlider(sliderId, numId, onchange) {
+  const sl = $(sliderId), num = $(numId);
+  const mn = parseFloat(sl.min), mx = parseFloat(sl.max);
+  sl.addEventListener('input', () => { num.value = sl.value; onchange(sl.value); });
+  num.addEventListener('input', () => {
+    const v = parseFloat(num.value);
+    if (isNaN(v)) return;
+    sl.value = Math.min(mx, Math.max(mn, v));
+    onchange(sl.value);
+  });
+  num.addEventListener('blur', () => { num.value = sl.value; });
+  num.value = sl.value;
+}
+
+// ─── Event wiring ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+
+  // File upload
+  $('file-in').addEventListener('change', e => readFile(e.target.files[0]));
+  const dz = $('drop-zone');
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    readFile(e.dataTransfer.files[0]);
+  });
+
+  // Style buttons
+  $('style-btns').querySelectorAll('.seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('style-btns').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setMapStyle(btn.dataset.style);
+    });
+  });
+
+  // Animation mode buttons
+  $('anim-btns').querySelectorAll('.seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('anim-btns').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentAnim = btn.dataset.anim;
+      $('orbit-row').style.display = currentAnim === 'orbit' ? '' : 'none';
+      if (fittedCenter) startAnim();
+    });
+  });
+
+  // FPS buttons
+  $('fps-btns').querySelectorAll('.seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('fps-btns').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      gifFPS = parseInt(btn.dataset.fps);
+    });
+  });
+
+  // Sliders
+  wireSlider('exag-sl', 'exag-num', v => {
+    if (map && map.getSource('terrain')) map.setTerrain({ source: 'terrain', exaggeration: parseFloat(v) });
+  });
+  wireSlider('width-sl',   'width-num',   () => applyRouteStyle());
+  wireSlider('glow-sl',    'glow-num',    () => applyRouteStyle());
+  wireSlider('pitch-sl',   'pitch-num',   v => { if (map) map.setPitch(parseFloat(v)); });
+  wireSlider('bearing-sl', 'bearing-num', v => { if (map) map.setBearing(parseFloat(v)); });
+  wireSlider('zoom-sl',    'zoom-num',    () => { if (fittedCenter && currentAnim !== 'flyover') map.setZoom(fittedZoom + getZoomOff()); });
+  wireSlider('dur-sl',  'dur-num',  () => {});
+  wireSlider('rot-sl',  'rot-num',  () => {});
+  wireSlider('draw-sl', 'draw-num', () => {});
+
+  // Color pickers + toggles
+  $('color1').addEventListener('input',       applyRouteStyle);
+  $('color2').addEventListener('input',       applyRouteStyle);
+  $('gradient-on').addEventListener('change', applyRouteStyle);
+  $('tipdot-on').addEventListener('change',   applyRouteStyle);
+
+  // Map overlay buttons
+  $('btn-pause').addEventListener('click',  togglePause);
+  $('btn-replay').addEventListener('click', () => { if (routePoints.length && fittedCenter) startAnim(0, 0); });
+  $('btn-fit').addEventListener('click',    () => { if (routePoints.length) fitRoute(800); });
+
+  // Export
+  $('btn-gif').addEventListener('click', exportGIF);
+  $('btn-png').addEventListener('click', exportPNG);
+});
+</script>
+</body>
+</html>
