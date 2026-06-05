@@ -277,14 +277,14 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
     <div class="card">
       <div class="ctitle">Export</div>
       <div class="btn-row">
-        <button class="btn btn-ghost" id="btn-svg" disabled onclick="exportSVG()">SVG</button>
+        <button class="btn btn-ghost" id="btn-webm" disabled onclick="exportWebM()">WebM</button>
         <button class="btn btn-ghost" id="btn-gif" disabled onclick="exportGIF()">GIF</button>
         <button class="btn btn-gold" id="btn-apng" disabled onclick="exportAPNG()">APNG</button>
       </div>
       <div style="font-size:10.5px;color:var(--lbl4);line-height:1.55">
-        <strong style="color:var(--lbl3)">APNG</strong> = transparent, best for CapCut &amp; Premiere.<br>
-        <strong style="color:var(--lbl3)">GIF</strong> = universal, uses matte background above.<br>
-        <strong style="color:var(--lbl3)">SVG</strong> = vector, plays in browser.
+        <strong style="color:var(--lbl3)">APNG</strong> = transparent · CapCut mobile · iOS apps<br>
+        <strong style="color:var(--lbl3)">WebM</strong> = transparent · DaVinci · Premiere · CapCut PC<br>
+        <strong style="color:var(--lbl3)">GIF</strong> = universal · Instagram apps · solid bg
       </div>
     </div>
 
@@ -400,7 +400,7 @@ function download(blob, name) {
   setTimeout(()=>URL.revokeObjectURL(a.href),30000);
 }
 function enableExports() {
-  ["btn-svg","btn-gif","btn-apng"].forEach(id=>$(id).disabled=false);
+  ["btn-webm","btn-gif","btn-apng"].forEach(id=>$(id).disabled=false);
 }
 
 // ─── GPX / KML Parsers ───────────────────────────────────────────────────────
@@ -720,15 +720,18 @@ async function exportAPNG() {
   if (!normalizedPts.length) return;
 
   const W=exportW, H=exportH;
-  const FPS=24;
   const durMs=getDurMs(), pauseMs=getPauseMs();
-  const drawFrames = Math.max(Math.round(durMs/1000*FPS), 2);
-  const delayDraw  = Math.round(1000/FPS); // ~42ms
 
-  // Pulse frames during pause (12fps) so the pulse effect exports too
+  // Cap total frames at 80 to prevent OOM on long routes / large canvases.
+  // Auto-reduce FPS so the full animation still plays — just at fewer frames.
+  const MAX_DRAW = Math.max(2, Math.min(60, Math.round(80 * durMs / (durMs + pauseMs))));
+  const MAX_PAUSE = Math.max(0, 80 - MAX_DRAW);
+  const drawFrames = Math.min(Math.max(Math.round(durMs/1000*24), 2), MAX_DRAW);
+  const delayDraw  = Math.round(durMs / drawFrames);
+
   const PFPS = 12;
-  const pauseFrames = pauseMs > 0 ? Math.max(Math.round(pauseMs/1000*PFPS), 2) : 0;
-  const delayPause  = pauseMs > 0 ? Math.round(pauseMs/pauseFrames) : 0;
+  const pauseFrames = pauseMs > 0 ? Math.min(Math.max(Math.round(pauseMs/1000*PFPS), 2), MAX_PAUSE) : 0;
+  const delayPause  = pauseMs > 0 && pauseFrames > 0 ? Math.round(pauseMs/pauseFrames) : 0;
 
   const offC = document.createElement("canvas");
   offC.width=W; offC.height=H;
@@ -753,7 +756,7 @@ async function exportAPNG() {
     frames.push(ctx.getImageData(0,0,W,H).data.buffer.slice(0));
     delays.push(delayDraw);
     setProgress(`Frame ${i+1} / ${total}`, (i/total)*75);
-    if (i%5===0) await new Promise(r=>setTimeout(r,0));
+    if (i%2===0) await new Promise(r=>setTimeout(r,0));
   }
 
   // Pause frames — pulse glow animates here
@@ -765,7 +768,7 @@ async function exportAPNG() {
     frames.push(ctx.getImageData(0,0,W,H).data.buffer.slice(0));
     delays.push(delayPause);
     setProgress(`Pause frame ${i+1} / ${pauseFrames}`, 75+(i/pauseFrames)*10);
-    if (i%4===0) await new Promise(r=>setTimeout(r,0));
+    if (i%2===0) await new Promise(r=>setTimeout(r,0));
   }
 
   setProgress("Encoding APNG…", 87);
@@ -774,7 +777,66 @@ async function exportAPNG() {
   const blob = new Blob([buf],{type:"image/png"});
   showProgress(false);
   download(blob, `${fileName}-overlay.png`);
-  showStatus("APNG downloaded — import in CapCut / Premiere as overlay layer");
+  showStatus(`APNG downloaded — ${total} frames · ${W}×${H}px`);
+}
+
+// ─── WebM Export ──────────────────────────────────────────────────────────────
+async function exportWebM() {
+  if (!normalizedPts.length) return;
+
+  const mimeType = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
+    .find(t => MediaRecorder.isTypeSupported(t)) || null;
+  if (!mimeType) { showStatus('WebM not supported in this browser — use Chrome or Edge'); return; }
+
+  const W=exportW, H=exportH;
+  const FPS=30;
+  const durMs=getDurMs(), pauseMs=getPauseMs();
+  const totalMs=durMs+pauseMs+250; // 250ms tail so last frame is flushed
+
+  const lw=getLineW(), lc=getLineC(), lc2=getLineC2();
+  const gi=getGlowI(), gc=getGlowC();
+  const taper=getTaper(), tipDot=getTipDot(), pulse=getPulse(), gradient=getGradient();
+
+  // Off-screen full-res canvas attached to DOM (required for captureStream)
+  const offC=document.createElement('canvas');
+  offC.width=W; offC.height=H;
+  offC.style.cssText='position:fixed;left:-9999px;top:0;pointer-events:none;opacity:0';
+  document.body.appendChild(offC);
+  const ctx=offC.getContext('2d',{alpha:true});
+
+  const pts    = toCanvas(normalizedPts, W, H);
+  const dPts   = getDisplayPts(pts, zoomLevel, rotationDeg);
+  const dDists = buildDists(dPts);
+
+  const stream=offC.captureStream(FPS);
+  const recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:12_000_000});
+  const chunks=[];
+  recorder.ondataavailable=e=>{if(e.data.size>0) chunks.push(e.data);};
+  recorder.onstop=()=>{
+    document.body.removeChild(offC);
+    showProgress(false);
+    const blob=new Blob(chunks,{type:'video/webm'});
+    download(blob,`${fileName}-overlay.webm`);
+    showStatus(`WebM saved — ${W}×${H}px · ${mimeType.includes('vp9')?'VP9 (transparent)':'VP8'}`);
+  };
+
+  recorder.start(100);
+  showProgress(true,'Recording WebM…');
+
+  const startTs=performance.now();
+  function frame() {
+    const elapsed=performance.now()-startTs;
+    if (elapsed>=totalMs){ recorder.stop(); return; }
+    const progress=Math.min(elapsed/durMs,1);
+    const inPause=elapsed>=durMs;
+    const pulseMult=pulse&&inPause
+      ?1+0.55*Math.sin((elapsed-durMs)/Math.max(pauseMs,1)*Math.PI*4):1;
+    ctx.clearRect(0,0,W,H);
+    drawRoute(ctx,dPts,dDists,progress,lw,{lc1:lc,lc2,gi,gc,taper,tipDot,pulseMult,gradient});
+    setProgress('Recording…',Math.round((elapsed/totalMs)*100));
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
 // ─── GIF Export ───────────────────────────────────────────────────────────────
@@ -790,9 +852,11 @@ async function exportGIF() {
     } catch(e) { showProgress(false); showStatus("Could not load GIF encoder — check your connection"); return; }
   }
 
+  // Half-res is intentional: full 1080px GIFs with 60+ frames exhaust RAM.
+  // For full-res transparent output use APNG or WebM.
   const GIF_SCALE=0.5;
   const GW=Math.round(exportW*GIF_SCALE), GH=Math.round(exportH*GIF_SCALE);
-  const FPS=8;
+  const FPS=12;
   const durMs=getDurMs(), pauseMs=getPauseMs();
   const drawFrames=Math.max(Math.round(durMs/1000*FPS),2);
   const delayDraw=Math.round(1000/FPS);
@@ -808,7 +872,7 @@ async function exportGIF() {
   const taper=getTaper(), gradient=getGradient();
 
   showProgress(true,"Rendering GIF…");
-  const gif=new GIF({workers:2,quality:6,width:GW,height:GH,workerScript:gifWorkerURL,background:bgColor});
+  const gif=new GIF({workers:4,quality:3,width:GW,height:GH,workerScript:gifWorkerURL,background:bgColor});
   const total=drawFrames+(pauseMs>0?1:0);
 
   for (let i=0; i<drawFrames; i++) {
