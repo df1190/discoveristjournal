@@ -800,9 +800,10 @@ async function exportWebM() {
   const taper=getTaper(), tipDot=getTipDot(), pulse=getPulse(), gradient=getGradient();
 
   // Off-screen full-res canvas attached to DOM (required for captureStream)
+  // opacity:0 can cause captureStream to skip frames in some Chrome builds — use visibility:hidden instead
   const offC=document.createElement('canvas');
   offC.width=W; offC.height=H;
-  offC.style.cssText='position:fixed;left:-9999px;top:0;pointer-events:none;opacity:0';
+  offC.style.cssText='position:fixed;left:-9999px;top:0;pointer-events:none;visibility:hidden';
   document.body.appendChild(offC);
   const ctx=offC.getContext('2d',{alpha:true});
 
@@ -811,7 +812,8 @@ async function exportWebM() {
   const dDists = buildDists(dPts);
 
   const stream=offC.captureStream(FPS);
-  const recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:12_000_000});
+  // 40 Mbps for VP9: sharp-edged transparent overlays need 3–4× normal video bitrate to avoid edge blurring
+  const recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:40_000_000});
   const chunks=[];
   recorder.ondataavailable=e=>{if(e.data.size>0) chunks.push(e.data);};
   recorder.onstop=()=>{
