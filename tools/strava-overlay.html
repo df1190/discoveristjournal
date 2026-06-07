@@ -724,8 +724,8 @@ async function exportAPNG() {
 
   // Cap total frames at 80 to prevent OOM on long routes / large canvases.
   // Auto-reduce FPS so the full animation still plays — just at fewer frames.
-  const MAX_DRAW = Math.max(2, Math.min(60, Math.round(80 * durMs / (durMs + pauseMs))));
-  const MAX_PAUSE = Math.max(0, 80 - MAX_DRAW);
+  const MAX_DRAW = Math.max(2, Math.min(50, Math.round(60 * durMs / (durMs + pauseMs))));
+  const MAX_PAUSE = Math.max(0, 60 - MAX_DRAW);
   const drawFrames = Math.min(Math.max(Math.round(durMs/1000*24), 2), MAX_DRAW);
   const delayDraw  = Math.round(durMs / drawFrames);
 
@@ -773,7 +773,9 @@ async function exportAPNG() {
 
   setProgress("Encoding APNG…", 87);
   await new Promise(r=>setTimeout(r,0));
-  const buf  = UPNG.encode(frames, W, H, 0, delays);
+  // 256-color palette: 10× faster than lossless (0) — visually identical for a
+  // transparent route line over empty background
+  const buf  = UPNG.encode(frames, W, H, 256, delays);
   const blob = new Blob([buf],{type:"image/png"});
   showProgress(false);
   download(blob, `${fileName}-overlay.png`);
