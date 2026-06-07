@@ -281,9 +281,18 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
         <button class="btn btn-ghost" id="btn-gif" disabled onclick="exportGIF()">GIF</button>
         <button class="btn btn-gold" id="btn-apng" disabled onclick="exportAPNG()">APNG</button>
       </div>
-      <div style="font-size:10.5px;color:var(--lbl4);line-height:1.55">
+      <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+        <span style="font-size:10.5px;color:var(--lbl4);white-space:nowrap">WebM bg</span>
+        <div class="matte-swatches">
+          <div class="matte-sw active" id="webm-bg-alpha" data-webmbg="transparent" title="Transparent — CapCut desktop · DaVinci · Premiere" style="background:repeating-conic-gradient(#999 0% 25%,#ddd 0% 50%) 0 0/8px 8px"></div>
+          <div class="matte-sw" id="webm-bg-green" data-webmbg="#00b140" title="Green screen — chroma key in CapCut · Canva · any editor" style="background:#00b140"></div>
+          <div class="matte-sw" id="webm-bg-black" data-webmbg="#000000" title="Black — Screen blend mode in Canva" style="background:#000"></div>
+        </div>
+        <span id="webm-bg-hint" style="font-size:10px;color:var(--lbl4)">transparent</span>
+      </div>
+      <div style="font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-top:6px">
         <strong style="color:var(--lbl3)">APNG</strong> = transparent · CapCut mobile · iOS apps<br>
-        <strong style="color:var(--lbl3)">WebM</strong> = transparent · DaVinci · Premiere · CapCut PC<br>
+        <strong style="color:var(--lbl3)">WebM</strong> = DaVinci · Premiere · CapCut (set bg above)<br>
         <strong style="color:var(--lbl3)">GIF</strong> = universal · Instagram apps · solid bg
       </div>
     </div>
@@ -782,6 +791,10 @@ async function exportAPNG() {
   showStatus(`APNG downloaded — ${total} frames · ${W}×${H}px`);
 }
 
+function getWebMBg() {
+  return document.querySelector('[data-webmbg].active')?.dataset.webmbg || 'transparent';
+}
+
 // ─── WebM Export ──────────────────────────────────────────────────────────────
 async function exportWebM() {
   if (!normalizedPts.length) return;
@@ -793,26 +806,26 @@ async function exportWebM() {
   const W=exportW, H=exportH;
   const FPS=30;
   const durMs=getDurMs(), pauseMs=getPauseMs();
-  const totalMs=durMs+pauseMs+250; // 250ms tail so last frame is flushed
+  const totalMs=durMs+pauseMs+250;
+  const webmBg=getWebMBg();
+  const isTransparent=webmBg==='transparent';
 
   const lw=getLineW(), lc=getLineC(), lc2=getLineC2();
   const gi=getGlowI(), gc=getGlowC();
   const taper=getTaper(), tipDot=getTipDot(), pulse=getPulse(), gradient=getGradient();
 
-  // Off-screen full-res canvas attached to DOM (required for captureStream)
-  // opacity:0 can cause captureStream to skip frames in some Chrome builds — use visibility:hidden instead
   const offC=document.createElement('canvas');
   offC.width=W; offC.height=H;
   offC.style.cssText='position:fixed;left:-9999px;top:0;pointer-events:none;visibility:hidden';
   document.body.appendChild(offC);
-  const ctx=offC.getContext('2d',{alpha:true});
+  const ctx=offC.getContext('2d',{alpha:isTransparent});
 
   const pts    = toCanvas(normalizedPts, W, H);
   const dPts   = getDisplayPts(pts, zoomLevel, rotationDeg);
   const dDists = buildDists(dPts);
 
   const stream=offC.captureStream(FPS);
-  // 40 Mbps for VP9: sharp-edged transparent overlays need 3–4× normal video bitrate to avoid edge blurring
+  // 40 Mbps: sharp transparent overlays need high bitrate to preserve edge quality
   const recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:40_000_000});
   const chunks=[];
   recorder.ondataavailable=e=>{if(e.data.size>0) chunks.push(e.data);};
@@ -820,8 +833,9 @@ async function exportWebM() {
     document.body.removeChild(offC);
     showProgress(false);
     const blob=new Blob(chunks,{type:'video/webm'});
+    const bgLabel = isTransparent ? 'transparent' : webmBg==='#00b140' ? 'green screen' : 'black bg';
     download(blob,`${fileName}-overlay.webm`);
-    showStatus(`WebM saved — ${W}×${H}px · ${mimeType.includes('vp9')?'VP9 (transparent)':'VP8'}`);
+    showStatus(`WebM saved — ${W}×${H}px · ${bgLabel}`);
   };
 
   recorder.start(100);
@@ -836,6 +850,10 @@ async function exportWebM() {
     const pulseMult=pulse&&inPause
       ?1+0.55*Math.sin((elapsed-durMs)/Math.max(pauseMs,1)*Math.PI*4):1;
     ctx.clearRect(0,0,W,H);
+    if (!isTransparent) {
+      ctx.fillStyle=webmBg;
+      ctx.fillRect(0,0,W,H);
+    }
     drawRoute(ctx,dPts,dDists,progress,lw,{lc1:lc,lc2,gi,gc,taper,tipDot,pulseMult,gradient});
     setProgress('Recording…',Math.round((elapsed/totalMs)*100));
     requestAnimationFrame(frame);
@@ -977,6 +995,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("matte-black").addEventListener("click",()=>{ matteColor="black"; $("matte-black").classList.add("active"); $("matte-white").classList.remove("active"); });
   $("matte-white").addEventListener("click",()=>{ matteColor="white"; $("matte-white").classList.add("active"); $("matte-black").classList.remove("active"); });
+
+  const webmBgHints = { transparent:'transparent', '#00b140':'green screen — use chroma key', '#000000':'black — use Screen blend in Canva' };
+  document.querySelectorAll('[data-webmbg]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      document.querySelectorAll('[data-webmbg]').forEach(e=>e.classList.remove('active'));
+      el.classList.add('active');
+      $('webm-bg-hint').textContent = webmBgHints[el.dataset.webmbg] || el.dataset.webmbg;
+    });
+  });
 
   window.addEventListener("resize",()=>{ if(normalizedPts.length) layoutPreview(); });
   layoutPreview();
