@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — The Discoverist Journal</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+  <style>
+    :root{--white:#ffffff;--off-white:#faf9f7;--charcoal:#1a1a1a;--grey:#6b6b6b;--line:#e8e6e2;--moto-red:#e63422}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;font-size:17px;background:var(--white);color:var(--charcoal);min-height:100vh;display:flex;flex-direction:column}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:22px 48px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.12em;color:var(--charcoal);text-decoration:none}
+    .nav-links{display:flex;gap:32px;list-style:none}
+    .nav-links a{font-size:.85rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--charcoal);text-decoration:none;transition:color .25s}
+    .nav-links a:hover{color:var(--moto-red)}
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:140px 24px 80px;text-align:center}
+    .code{font-family:'Bebas Neue',sans-serif;font-size:clamp(7rem,22vw,14rem);line-height:.9;letter-spacing:.04em;color:var(--charcoal)}
+    .code em{font-family:'Playfair Display',serif;font-style:italic;font-weight:500;color:var(--moto-red)}
+    .eyebrow{font-size:.8rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--grey);margin-bottom:18px}
+    .msg{font-size:1.1rem;color:var(--grey);max-width:480px;margin:24px auto 40px;line-height:1.65}
+    .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+    .btn-primary{display:inline-block;padding:15px 34px;background:var(--charcoal);color:#fff;font-size:.85rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .25s}
+    .btn-primary:hover{background:var(--moto-red)}
+    .btn-ghost{display:inline-block;padding:14px 33px;border:1px solid var(--charcoal);color:var(--charcoal);font-size:.85rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:all .25s}
+    .btn-ghost:hover{border-color:var(--moto-red);color:var(--moto-red)}
+    .quick{margin-top:56px;padding-top:36px;border-top:1px solid var(--line);display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+    .quick a{font-size:.85rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--grey);text-decoration:none;transition:color .25s}
+    .quick a:hover{color:var(--moto-red)}
+    footer{border-top:1px solid var(--line);padding:28px 48px;text-align:center}
+    .footer-copy{font-size:.8rem;color:var(--grey)}
+    @media(max-width:768px){nav{padding:18px 24px}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">The Discoverist</a>
+  <ul class="nav-links">
+    <li><a href="/hotels">Hotel Reviews</a></li>
+    <li><a href="/journeys">Trips &amp; Journeys</a></li>
+    <li><a href="/moto">Moto</a></li>
+    <li><a href="/blog/">Journal</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div>
+    <p class="eyebrow">Off the Map</p>
+    <div class="code">4<em>0</em>4</div>
+    <p class="msg">This page doesn't exist, or it moved somewhere new. Like any good detour, it might lead you somewhere better.</p>
+    <div class="actions">
+      <a href="/" class="btn-primary">Back Home</a>
+      <a href="/blog/" class="btn-ghost">Read the Journal</a>
+    </div>
+    <div class="quick">
+      <a href="/hotels">Hotel Reviews</a>
+      <a href="/journeys">Journeys</a>
+      <a href="/moto">Moto</a>
+      <a href="/tools/interactive-map">Travel Map</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p class="footer-copy">© 2026 The Discoverist Journal. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

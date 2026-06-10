@@ -1,4 +1,5 @@
 DirectoryIndex index.html
+ErrorDocument 404 /404.html
 
 RewriteEngine On
 
@@ -11,6 +12,14 @@ Redirect 301 /moto/moto-ktm-romania /moto/ktm-romania
 Redirect 301 /moto/moto-ktm-italy /moto/ktm-italy
 Redirect 301 /moto/moto-alpine-passes /moto/alpine-passes
 Redirect 301 /moto/moto-tools /moto/tools
+
+# Legacy URL previously linked from the homepage (may still be indexed)
+Redirect 301 /weekend-in-the-middle-of-italian-alps /blog/lana-italy/
+
+# A leftover empty store/ directory on the server shadows store.html
+# (Apache redirects /store -> /store/ which 403s). Serve store.html explicitly.
+RewriteRule ^store/$ /store [R=301,L]
+RewriteRule ^store$ store.html [L]
 
 # Remove .html extension — serve /journeys as journeys.html
 RewriteCond %{REQUEST_FILENAME} !-f
