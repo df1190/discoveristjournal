@@ -182,163 +182,103 @@
     }
 
     /* ─── GALLERY MAGAZINE GRID ─────────────────────────────── */
-    .gallery-mag {
+    /* ─── GALLERY (two simple grids — CONFIRMED WORKING) ───── */
+    /* Top block: tall feature left + 4 squares right */
+    .gal-top {
       display: grid;
-      gap: 3px;
-      margin: 2.5rem 0;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 300px 240px;
+      gap: 4px;
+      margin: 32px 0 4px;
+    }
+    .gt-feature { grid-column: 1; grid-row: 1 / 3; }
+    .gt-a       { grid-column: 2; grid-row: 1; }
+    .gt-b       { grid-column: 3; grid-row: 1; }
+    .gt-c       { grid-column: 2; grid-row: 2; }
+    .gt-d       { grid-column: 3; grid-row: 2; }
+
+    /* Bottom block: 2×2 grid */
+    .gal-bot {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 280px 280px;
+      gap: 4px;
+      margin: 0 0 32px;
     }
 
-    /* Layout A: feature left + 2 stacked right + wide footer */
-    .gallery-mag.layout-a {
-      grid-template-columns: 2fr 1fr;
-      grid-template-areas:
-        "big sm1"
-        "big sm2"
-        "wide wide";
-    }
-    .gallery-mag.layout-a .gm-big  { grid-area: big; aspect-ratio: 3/4; }
-    .gallery-mag.layout-a .gm-sm1  { grid-area: sm1; aspect-ratio: 4/3; }
-    .gallery-mag.layout-a .gm-sm2  { grid-area: sm2; aspect-ratio: 4/3; }
-    .gallery-mag.layout-a .gm-wide { grid-area: wide; aspect-ratio: 16/6; }
-
-    /* Layout B: tall left + 4-grid right + wide footer */
-    .gallery-mag.layout-b {
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-areas:
-        "tall g1 g2"
-        "tall g3 g4"
-        "wide wide wide";
-    }
-    .gallery-mag.layout-b .gm-tall { grid-area: tall; aspect-ratio: 2/3; }
-    .gallery-mag.layout-b .gm-g1   { grid-area: g1; aspect-ratio: 1/1; }
-    .gallery-mag.layout-b .gm-g2   { grid-area: g2; aspect-ratio: 1/1; }
-    .gallery-mag.layout-b .gm-g3   { grid-area: g3; aspect-ratio: 1/1; }
-    .gallery-mag.layout-b .gm-g4   { grid-area: g4; aspect-ratio: 1/1; }
-    .gallery-mag.layout-b .gm-wide { grid-area: wide; aspect-ratio: 21/6; }
-
-    /* Layout C: large feature + portrait side (3 images) */
-    .gallery-mag.layout-c {
-      grid-template-columns: 2fr 1fr;
-      grid-template-areas:
-        "feat port"
-        "feat port";
-    }
-    .gallery-mag.layout-c .gm-feat { grid-area: feat; aspect-ratio: 4/3; }
-    .gallery-mag.layout-c .gm-port { grid-area: port; aspect-ratio: 2/3; }
-
-    /* Gallery item base */
-    .gm-item {
+    /* Gallery item — opacity/translateY reveal (RELIABLE, do not use clip-path) */
+    .ge-item {
       overflow: hidden;
       position: relative;
       cursor: pointer;
-      clip-path: inset(0 100% 0 0);
-      transition: clip-path 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-    .gm-item.visible { clip-path: inset(0 0% 0 0); }
-
-    @media (prefers-reduced-motion: reduce) {
-      .gm-item { clip-path: none; opacity: 0; transition: opacity 0.3s ease; }
-      .gm-item.visible { opacity: 1; }
-    }
-
-    .gm-item img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      filter: contrast(1.1) saturate(1.15) brightness(0.96);
-      transition: transform 0.5s ease-out, filter 0.5s ease-out;
-    }
-    .gm-item:hover img {
-      transform: scale(1.06);
-      filter: contrast(1.18) saturate(1.25) brightness(1.02);
-    }
-    .gm-item::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: rgba(214,66,48,0.12);
       opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      transition-delay: calc(var(--i, 0) * 0.07s);
     }
-    .gm-item:hover::after { opacity: 1; }
+    .ge-item.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) { .ge-item { opacity: 1; transform: none; transition: none; } }
+    .ge-item img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.08) saturate(1.1) brightness(0.97); transition: transform 0.5s ease-out, filter 0.4s ease-out; }
+    .ge-item:hover img { transform: scale(1.05); filter: contrast(1.14) saturate(1.18) brightness(1.02); }
+    .ge-item::after { content: ''; position: absolute; inset: 0; background: rgba(214,66,48,0.08); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .ge-item:hover::after { opacity: 1; }
+    .ge-item .zoom-hint { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.55); color: var(--white); font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 4px 8px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .ge-item:hover .zoom-hint { opacity: 1; }
 
-    .gm-item .zoom-hint {
-      position: absolute; bottom: 8px; right: 8px;
-      background: rgba(26,26,24,0.82);
-      color: var(--white);
-      font-size: 0.6rem; letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 4px 8px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-    .gm-item:hover .zoom-hint { opacity: 1; }
-
-    /* Mobile: stack layouts */
-    @media(max-width:600px) {
-      .gallery-mag.layout-a,
-      .gallery-mag.layout-b,
-      .gallery-mag.layout-c {
-        grid-template-columns: 1fr;
-        grid-template-areas: unset;
-      }
-      .gallery-mag .gm-item {
-        grid-area: unset !important;
-        aspect-ratio: 4/3 !important;
-      }
+    @media(max-width: 640px) {
+      .gal-top { grid-template-columns: 1fr 1fr; grid-template-rows: 220px 180px 180px; }
+      .gt-feature { grid-column: 1 / 3; grid-row: 1; }
+      .gt-a { grid-column: 1; grid-row: 2; }
+      .gt-b { grid-column: 2; grid-row: 2; }
+      .gt-c { grid-column: 1; grid-row: 3; }
+      .gt-d { grid-column: 2; grid-row: 3; }
+      .gal-bot { grid-template-columns: 1fr 1fr; grid-template-rows: 200px 200px; }
     }
 
-    /* ─── FILM STRIP ────────────────────────────────────────── */
-    .film-strip-wrap {
-      margin: 2.5rem -3rem; /* bleed past post-layout edges */
-    }
-    @media(max-width:768px) { .film-strip-wrap { margin: 2rem -1.25rem; } }
+    /* ─── RESTAURANT LIST (items link to Google Reviews profile) */
+    .restaurant-list { margin: 20px 0 40px; border: 1px solid var(--sand); }
+    a.restaurant-item { display: block; padding: 22px 24px; border-bottom: 1px solid var(--sand); transition: background 0.2s, border-color 0.2s; text-decoration: none; position: relative; }
+    a.restaurant-item:last-child { border-bottom: none; }
+    a.restaurant-item:hover { background: var(--cream); border-left: 3px solid var(--moto-red); padding-left: 21px; }
+    a.restaurant-item::after { content: 'View on Google Maps →'; position: absolute; right: 24px; top: 50%; transform: translateY(-50%); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--moto-red); opacity: 0; transition: opacity 0.2s; }
+    a.restaurant-item:hover::after { opacity: 1; }
+    .restaurant-name { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.04em; color: var(--charcoal); }
+    .restaurant-tag { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--moto-red); margin: 4px 0 8px; }
+    .restaurant-desc { font-size: 0.88rem; color: var(--ink); line-height: 1.75; }
 
-    .film-strip-label {
-      font-size: 0.62rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--clay);
-      margin-bottom: 6px; padding: 0 3rem;
-    }
-    @media(max-width:768px) { .film-strip-label { padding: 0 1.25rem; } }
+    /* ─── HOTEL CARDS ───────────────────────────────────────── */
+    .hotel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin: 32px 0; }
+    @media(max-width: 640px) { .hotel-grid { grid-template-columns: 1fr; } }
+    .hotel-card { background: var(--cream); border: 1px solid var(--sand); border-top: 3px solid var(--moto-red); display: flex; flex-direction: column; overflow: hidden; }
+    .hotel-img { width: 100%; aspect-ratio: 4/3; overflow: hidden; }
+    .hotel-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease-out; }
+    .hotel-card:hover .hotel-img img { transform: scale(1.04); }
+    .hotel-body { padding: 24px; display: flex; flex-direction: column; flex: 1; }
+    .hotel-type { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--moto-red); margin-bottom: 8px; }
+    .hotel-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; color: var(--charcoal); line-height: 1.1; margin-bottom: 4px; }
+    .hotel-location { font-size: 0.7rem; color: var(--clay); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+    .hotel-desc { font-size: 0.88rem; color: var(--ink); line-height: 1.75; flex: 1; margin-bottom: 20px; }
+    .hotel-btn { display: inline-block; background: var(--moto-red); color: var(--white); font-size: 0.65rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; padding: 10px 22px; text-decoration: none; align-self: flex-start; transition: background 0.2s, transform 0.2s; border: 1.5px solid var(--moto-red); }
+    .hotel-btn:hover { background: transparent; color: var(--moto-red); transform: translateY(-1px); }
 
-    .film-strip {
-      display: flex;
-      gap: 3px;
-      overflow-x: auto;
-      overscroll-behavior: contain;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-      cursor: grab;
-      padding: 0 3rem;
-    }
-    .film-strip::-webkit-scrollbar { display: none; }
-    .film-strip.grabbing { cursor: grabbing; }
-    @media(max-width:768px) { .film-strip { padding: 0 1.25rem; } }
+    /* ─── STORE CTA ─────────────────────────────────────────── */
+    .store-cta { background: var(--charcoal); padding: 32px; margin: 40px 0; border-top: 3px solid var(--moto-red); display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; }
+    @media(max-width: 640px) { .store-cta { grid-template-columns: 1fr; } }
+    .store-cta-text .store-eyebrow { font-size: 0.58rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--moto-red); margin-bottom: 8px; }
+    .store-cta-text .store-headline { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; color: var(--white); margin-bottom: 8px; line-height: 1.1; }
+    .store-cta-text .store-desc { font-size: 0.85rem; color: var(--clay); line-height: 1.75; }
+    .store-btn { white-space: nowrap; display: inline-block; font-size: 0.65rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; padding: 12px 24px; text-decoration: none; border: 1.5px solid var(--moto-red); color: var(--moto-red); transition: background 0.2s, color 0.2s; }
+    .store-btn:hover { background: var(--moto-red); color: var(--white); }
 
-    .film-item {
-      flex: 0 0 260px;
-      aspect-ratio: 3/2;
-      scroll-snap-align: start;
-      overflow: hidden;
-      position: relative;
-      cursor: pointer;
-    }
-    .film-item img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      filter: contrast(1.08) saturate(1.12);
-      transition: transform 0.4s ease-out;
-    }
-    .film-item:hover img { transform: scale(1.05); }
-    .film-item::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: rgba(214,66,48,0.1);
-      opacity: 0;
-      transition: opacity 0.25s ease;
-      pointer-events: none;
-    }
-    .film-item:hover::after { opacity: 1; }
+    /* ─── SOCIAL SECTION ────────────────────────────────────── */
+    .social-follow { margin: 48px 0 0; padding-top: 48px; border-top: 1px solid var(--sand); }
+    .social-follow-eyebrow { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--moto-red); margin-bottom: 10px; }
+    .social-follow-headline { font-family: 'Bebas Neue', sans-serif; font-size: clamp(24px,2.5vw,34px); letter-spacing: 0.04em; color: var(--charcoal); margin-bottom: 24px; }
+    .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 3px; }
+    .social-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px 20px; background: var(--cream); border: 1px solid var(--sand); text-decoration: none; transition: background 0.2s, border-color 0.2s, transform 0.2s; color: var(--charcoal); }
+    .social-card:hover { background: var(--charcoal); border-color: var(--charcoal); transform: translateY(-3px); color: var(--white); }
+    .social-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.06em; }
+    .social-card-handle { font-size: 0.7rem; color: var(--clay); letter-spacing: 0.08em; }
 
     /* ─── LIGHTROOM EMBED ───────────────────────────────────── */
     .lr-section {
@@ -637,55 +577,53 @@
            LIGHTBOX: all items share data-gallery="photos" → openLb('photos', index)
       ═══════════════════════════════════════════════════ -->
 
-      <!-- LAYOUT A DEMO (4 images) -->
-      <div class="gallery-mag layout-a">
-
-        <div class="gm-item gm-big" data-gallery="photos" onclick="openLb('photos',0)" style="--i:0" tabindex="0" role="button" aria-label="Open photo 1">
-          <img src="../../Media/stuben-race/all-cars-1.jpg" alt="<!-- REPLACE: descriptive caption -->" loading="lazy">
+      <!-- ══ GALLERY TOP BLOCK (5 photos: tall feature + 4 squares) ══
+           REPLACE: all image src and alt text
+           --i: keep 0–4 in order for stagger animation -->
+      <div class="gal-top">
+        <div class="ge-item gt-feature" data-gallery="photos" onclick="openLb('photos',0)" style="--i:0" tabindex="0" role="button" aria-label="Open photo 1">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG1.jpg" alt="<!-- REPLACE: descriptive caption -->" loading="lazy">
           <span class="zoom-hint">view full</span>
         </div>
-
-        <div class="gm-item gm-sm1" data-gallery="photos" onclick="openLb('photos',1)" style="--i:1" tabindex="0" role="button" aria-label="Open photo 2">
-          <img src="../../Media/stuben-race/porsche-911-gt3rs-yellow.jpg" alt="<!-- REPLACE -->" loading="lazy">
+        <div class="ge-item gt-a" data-gallery="photos" onclick="openLb('photos',1)" style="--i:1" tabindex="0" role="button" aria-label="Open photo 2">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG2.jpg" alt="<!-- REPLACE -->" loading="lazy">
           <span class="zoom-hint">view full</span>
         </div>
-
-        <div class="gm-item gm-sm2" data-gallery="photos" onclick="openLb('photos',2)" style="--i:2" tabindex="0" role="button" aria-label="Open photo 3">
-          <img src="../../Media/stuben-race/ktm-xbow.jpg" alt="<!-- REPLACE -->" loading="lazy">
+        <div class="ge-item gt-b" data-gallery="photos" onclick="openLb('photos',2)" style="--i:2" tabindex="0" role="button" aria-label="Open photo 3">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG3.jpg" alt="<!-- REPLACE -->" loading="lazy">
           <span class="zoom-hint">view full</span>
         </div>
-
-        <div class="gm-item gm-wide" data-gallery="photos" onclick="openLb('photos',3)" style="--i:3" tabindex="0" role="button" aria-label="Open photo 4">
-          <img src="../../Media/stuben-race/cars.jpg" alt="<!-- REPLACE -->" loading="lazy">
+        <div class="ge-item gt-c" data-gallery="photos" onclick="openLb('photos',3)" style="--i:3" tabindex="0" role="button" aria-label="Open photo 4">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG4.jpg" alt="<!-- REPLACE -->" loading="lazy">
           <span class="zoom-hint">view full</span>
         </div>
-
-      </div><!-- /gallery-mag layout-a -->
-
-      <p class="post-p reveal"><!-- REPLACE: body copy paragraph after gallery --></p>
-
-      <!-- ── FILM STRIP (optional — remove if not needed) ─ -->
-      <!-- Use for extra photos that don't fit the main grid -->
-      <div class="film-strip-wrap reveal">
-        <p class="film-strip-label">More from the day</p>
-        <div class="film-strip" id="filmStrip">
-
-          <div class="film-item" data-gallery="photos" onclick="openLb('photos',4)" tabindex="0" role="button" aria-label="Open photo 5">
-            <img src="../../Media/stuben-race/porsche-911-1.jpg" alt="<!-- REPLACE -->" loading="lazy">
-          </div>
-
-          <div class="film-item" data-gallery="photos" onclick="openLb('photos',5)" tabindex="0" role="button" aria-label="Open photo 6">
-            <img src="../../Media/stuben-race/porsche-911-gt3rs-1.jpg" alt="<!-- REPLACE -->" loading="lazy">
-          </div>
-
-          <div class="film-item" data-gallery="photos" onclick="openLb('photos',6)" tabindex="0" role="button" aria-label="Open photo 7">
-            <img src="../../Media/stuben-race/rally-car.jpg" alt="<!-- REPLACE -->" loading="lazy">
-          </div>
-
-          <!-- Add more .film-item blocks as needed -->
-
+        <div class="ge-item gt-d" data-gallery="photos" onclick="openLb('photos',4)" style="--i:4" tabindex="0" role="button" aria-label="Open photo 5">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG5.jpg" alt="<!-- REPLACE -->" loading="lazy">
+          <span class="zoom-hint">view full</span>
         </div>
-      </div><!-- /film-strip-wrap -->
+      </div>
+
+      <!-- ══ GALLERY BOTTOM BLOCK (4 photos: 2×2 grid) ══ -->
+      <div class="gal-bot">
+        <div class="ge-item" data-gallery="photos" onclick="openLb('photos',5)" style="--i:5" tabindex="0" role="button" aria-label="Open photo 6">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG6.jpg" alt="<!-- REPLACE -->" loading="lazy">
+          <span class="zoom-hint">view full</span>
+        </div>
+        <div class="ge-item" data-gallery="photos" onclick="openLb('photos',6)" style="--i:6" tabindex="0" role="button" aria-label="Open photo 7">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG7.jpg" alt="<!-- REPLACE -->" loading="lazy">
+          <span class="zoom-hint">view full</span>
+        </div>
+        <div class="ge-item" data-gallery="photos" onclick="openLb('photos',7)" style="--i:7" tabindex="0" role="button" aria-label="Open photo 8">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG8.jpg" alt="<!-- REPLACE -->" loading="lazy">
+          <span class="zoom-hint">view full</span>
+        </div>
+        <div class="ge-item" data-gallery="photos" onclick="openLb('photos',8)" style="--i:8" tabindex="0" role="button" aria-label="Open photo 9">
+          <img src="../../Media/REPLACE-FOLDER/REPLACE-IMG9.jpg" alt="<!-- REPLACE -->" loading="lazy">
+          <span class="zoom-hint">view full</span>
+        </div>
+      </div>
+
+      <p class="gallery-caption reveal">Click any photo to open &mdash; use arrow keys to navigate</p>
 
       <!-- ── LIGHTROOM EMBED ─────────────────────────────── -->
       <div class="lr-section reveal">
@@ -757,6 +695,34 @@
         <a href="/blog" class="post-tag"><!-- REPLACE: Country --></a>
         <a href="/blog" class="post-tag"><!-- REPLACE: Camera --></a>
         <a href="/blog" class="post-tag"><!-- REPLACE: Topic --></a>
+      </div>
+
+      <!-- ── SOCIAL SECTION (always include at end of post) ── -->
+      <div class="social-follow reveal">
+        <p class="social-follow-eyebrow">Follow the Journey</p>
+        <h2 class="social-follow-headline">Find me on social</h2>
+        <div class="social-grid">
+          <a href="https://www.instagram.com/fmancillag/" target="_blank" rel="noopener" class="social-card">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            <p class="social-card-name">Instagram</p>
+            <p class="social-card-handle">@fmancillag</p>
+          </a>
+          <a href="https://www.youtube.com/@df1190" target="_blank" rel="noopener" class="social-card">
+            <svg width="36" height="26" viewBox="0 0 36 26" fill="none"><rect width="36" height="26" rx="5" fill="#FF0000"/><polygon points="14,7 14,19 26,13" fill="white"/></svg>
+            <p class="social-card-name">YouTube</p>
+            <p class="social-card-handle">@df1190</p>
+          </a>
+          <a href="https://www.tiktok.com/@df.1190" target="_blank" rel="noopener" class="social-card">
+            <svg width="26" height="30" viewBox="0 0 18 20" fill="none"><path d="M13 0.5h-3v13a2.5 2.5 0 1 1-2.5-2.5c.25 0 .49.04.72.1V7.6A6.5 6.5 0 1 0 14.5 14V5.7A7.8 7.8 0 0 0 18 6.8V3.85A4.4 4.4 0 0 1 13 0.5z" fill="currentColor"/></svg>
+            <p class="social-card-name">TikTok</p>
+            <p class="social-card-handle">@df.1190</p>
+          </a>
+          <a href="https://www.amazon.com/shop/df.1190?ref_=cm_sw_r_cp_ud_aipsfshop_ARAMX6Z9C2T46QNYN3RT" target="_blank" rel="noopener" class="social-card">
+            <svg width="44" height="22" viewBox="0 0 48 22" fill="none"><text x="0" y="16" font-family="Arial Black, sans-serif" font-size="16" font-weight="900" fill="currentColor">amazon</text></svg>
+            <p class="social-card-name">Amazon Store</p>
+            <p class="social-card-handle">@df.1190</p>
+          </a>
+        </div>
       </div>
 
       <!-- ── POST NAV ──────────────────────────────────────── -->
@@ -911,8 +877,8 @@
     });
   }, { threshold: 0.06 });
 
-  document.querySelectorAll('.reveal, .reveal-left, .gm-item').forEach((el, i) => {
-    // For gm-items: stagger via CSS custom property --i (set inline in HTML)
+  document.querySelectorAll('.reveal, .reveal-left, .ge-item').forEach((el, i) => {
+    // For ge-items: stagger via CSS custom property --i (set inline in HTML)
     // For others: natural DOM order stagger already set via inline transition-delay
     observer.observe(el);
   });
