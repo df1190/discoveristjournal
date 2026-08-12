@@ -897,12 +897,15 @@
   document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
 
   /* ── 360 FEATURE GALLERY ── */
+  /* Panoramas are served from GitHub raw, not the local /Media path — Hostinger's
+     CDN silently caps all images to 1600px wide, which is unusable for a 360 viewer. */
+  const PANO_BASE = 'https://raw.githubusercontent.com/df1190/discoveristjournal/main/Media/Hotels/le-meridien-Vienna/';
   const PANO_ITEMS = [
-    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-guest-room.jpg', label:'Guest Room'},
-    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-guest-room-desk-wardrobe.jpg', label:'Guest Room — Desk & Wardrobe'},
-    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-guest-room-balcony-view.jpg', label:'Guest Room — Balcony View'},
-    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-bathroom.jpg', label:'Bathroom'},
-    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-bathroom-vanity.jpg', label:'Bathroom — Vanity'}
+    {src:PANO_BASE+'le-meridien-vienna-360-panorama-guest-room.jpg', label:'Guest Room'},
+    {src:PANO_BASE+'le-meridien-vienna-360-panorama-guest-room-desk-wardrobe.jpg', label:'Guest Room — Desk & Wardrobe'},
+    {src:PANO_BASE+'le-meridien-vienna-360-panorama-guest-room-balcony-view.jpg', label:'Guest Room — Balcony View'},
+    {src:PANO_BASE+'le-meridien-vienna-360-panorama-bathroom.jpg', label:'Bathroom'},
+    {src:PANO_BASE+'le-meridien-vienna-360-panorama-bathroom-vanity.jpg', label:'Bathroom — Vanity'}
   ];
   let _panoIdx = 0, _panoInst = null;
 
