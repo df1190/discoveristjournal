@@ -28,6 +28,8 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -65,11 +67,34 @@
     .header-title em{font-family:'Playfair Display',serif;font-style:italic;color:var(--clay);font-size:0.6em;display:block;letter-spacing:0.01em;line-height:1.3}
     .header-sub{font-size:14px;font-weight:300;color:var(--clay);max-width:520px;line-height:1.7}
 
+    /* 360 FEATURE */
+    .pano-feature{max-width:1200px;margin:64px auto 0;padding:0 3rem}
+    .pano-feature-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
+    .pano-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--moto-red);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .pano-eyebrow::before{content:'';width:16px;height:1px;background:var(--moto-red)}
+    .pano-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.6vw,42px);letter-spacing:0.03em;color:var(--charcoal);line-height:1}
+    .pano-title em{font-family:'Playfair Display',serif;font-style:italic;color:var(--moto-red);font-size:0.85em}
+    .pano-sub{font-size:13px;font-weight:300;color:var(--clay);max-width:440px;line-height:1.6}
+    .pano-frame{position:relative;border:1px solid var(--sand);border-radius:4px;overflow:hidden;box-shadow:0 16px 56px rgba(44,44,42,0.14);background:#111110}
+    .pano-viewer{width:100%;height:460px}
+    .pano-badge{position:absolute;top:16px;left:16px;z-index:5;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--white);background:rgba(214,66,48,0.92);padding:5px 12px;font-family:'DM Sans',sans-serif;font-weight:600;pointer-events:none}
+    .pano-hint{position:absolute;bottom:16px;left:16px;z-index:5;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);background:rgba(26,26,24,0.55);padding:6px 12px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);pointer-events:none}
+    .pano-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:rgba(255,255,255,0.75);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background 0.2s,color 0.2s;z-index:6}
+    .pano-nav:hover{background:rgba(0,0,0,0.7);color:var(--white)}
+    .pano-nav-prev{left:16px}
+    .pano-nav-next{right:16px}
+    .pano-counter{position:absolute;bottom:16px;right:16px;z-index:5;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);background:rgba(26,26,24,0.55);padding:6px 12px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);pointer-events:none}
+    .pano-caption{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--clay);margin-top:12px}
+    @media(max-width:768px){ .pano-viewer{height:320px} }
+
     /* FEATURED HOTEL */
     .featured{max-width:1200px;margin:72px auto 0;padding:0 3rem}
-    .featured-picks-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px}
-    .featured-pick{border:1px solid var(--sand);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow 0.3s,transform 0.2s}
+    .featured-strip-head{margin-bottom:20px}
+    .featured-picks-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px}
+    .featured-pick{position:relative;border:1px solid var(--sand);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow 0.3s,transform 0.2s}
     .featured-pick:hover{box-shadow:0 12px 48px rgba(44,44,42,0.14);transform:translateY(-2px)}
+    .featured-pick--new{border:2px solid var(--moto-red);box-shadow:0 0 0 6px rgba(214,66,48,0.1),0 16px 44px rgba(214,66,48,0.22)}
+    .featured-new-badge{position:absolute;top:14px;left:14px;z-index:5;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:5px 12px;font-family:'DM Sans',sans-serif;font-weight:600}
     .featured-img{overflow:hidden;height:320px}
     .featured-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.8s ease}
     .featured-pick:hover .featured-img img{transform:scale(1.04)}
@@ -200,6 +225,7 @@
     .hm-btn-close-text:hover{color:var(--charcoal);opacity:1}
     /* card clickable */
     .hotel-card[data-hotel]{cursor:pointer}
+    .featured-pick[data-hotel]{cursor:pointer}
 
     /* FOOTER */
     footer{background:var(--charcoal);padding:40px 3rem 28px;border-top:1px solid rgba(255,255,255,0.06)}
@@ -291,9 +317,53 @@
   <p class="header-sub">Every property personally stayed in. No press trips, no comped nights. Europe, the Americas, and growing.</p>
 </div>
 
+<!-- 360 FEATURE -->
+<div class="pano-feature">
+  <div class="pano-feature-head reveal">
+    <div>
+      <p class="pano-eyebrow">New · Interactive Feature</p>
+      <h2 class="pano-title">Step Inside, <em>360°</em></h2>
+    </div>
+    <p class="pano-sub">A new way to preview our hotels — drag around Le Méridien Vienna's rooms, exactly as we experienced them.</p>
+  </div>
+  <div class="pano-frame reveal">
+    <span class="pano-badge">360°</span>
+    <span class="pano-hint">Drag to Look Around</span>
+    <button class="pano-nav pano-nav-prev" onclick="navPano(-1)" aria-label="Previous 360 photo">&#8592;</button>
+    <button class="pano-nav pano-nav-next" onclick="navPano(1)" aria-label="Next 360 photo">&#8594;</button>
+    <span class="pano-counter" id="panoCounter"></span>
+    <div class="pano-viewer" id="panoViewer"></div>
+  </div>
+  <p class="pano-caption" id="panoCaption"></p>
+</div>
+
 <!-- FEATURED HOTEL -->
 <div class="featured">
+  <div class="featured-strip-head reveal">
+    <p class="pano-eyebrow">Editor's Recommended Hotels</p>
+    <h2 class="pano-title">Discoverist <em>Picks</em></h2>
+  </div>
   <div class="featured-picks-grid reveal">
+
+    <!-- Pick 0: Le Méridien Vienna -->
+    <div class="featured-pick featured-pick--new">
+      <span class="featured-new-badge">New Review</span>
+      <div class="featured-img">
+        <img src="Media/Hotels/le-meridien-Vienna/cover.jpg" alt="Le Méridien Vienna hotel exterior facade, Austria" loading="lazy">
+      </div>
+      <div class="featured-body">
+        <span class="featured-badge">Discoverist Pick</span>
+        <p class="featured-country">🇦🇹 Vienna, Austria</p>
+        <h2 class="featured-name">Le Méridien <em>Vienna</em></h2>
+        <div class="featured-tags">
+          <span class="feat-tag">City Center</span>
+          <span class="feat-tag">Full Breakfast</span>
+          <span class="feat-tag">Pool &amp; Gym</span>
+        </div>
+        <p class="featured-desc">Right on the Ring, walking distance to everything in the center. Rooms are properly comfortable, breakfast is a serious spread with plenty of choice, and the staff are consistently friendly. Strong shower pressure, a well-maintained pool, and a gym that's a bit tight on space but well equipped. Feels like a proper Le Méridien.</p>
+        <a href="https://prf.hn/l/mA5BoXq/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
+      </div>
+    </div>
 
     <!-- Pick 1: Vigilius -->
     <div class="featured-pick">
@@ -366,7 +436,7 @@
       <button class="c-tab" onclick="setContinent('europe',this)">Europe</button>
       <button class="c-tab" onclick="setContinent('americas',this)">Americas</button>
     </div>
-    <div class="filter-count"><span id="countNum">23</span><span>hotels</span></div>
+    <div class="filter-count"><span id="countNum">24</span><span>hotels</span></div>
   </div>
   <div class="country-chips" id="countryChips"></div>
 </div>
@@ -441,6 +511,23 @@
         <div class="hotel-footer">
           <div class="hotel-score"><span class="score-num">8.9</span><span class="score-max">/10</span></div>
           <a href="https://prf.hn/l/KjdXwpQ/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-card reveal" data-continent="europe" data-country="austria">
+      <div class="hotel-img">
+        <img src="Media/Hotels/le-meridien-Vienna/cover.jpg" alt="Le Méridien Vienna hotel exterior facade" loading="lazy">
+        <span class="hotel-badge badge-pick">Discoverist Pick</span>
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇦🇹 Vienna, Austria</p>
+        <h3 class="hotel-name">Le Méridien Vienna</h3>
+        <div class="hotel-tags"><span class="h-tag">City Center</span><span class="h-tag">Full Breakfast</span><span class="h-tag">Pool &amp; Gym</span></div>
+        <p class="hotel-desc">Right on the Ring, walkable to the entire center. Comfortable rooms, excellent breakfast choice, strong shower pressure, and a well-maintained pool. Feels like a proper Le Méridien.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">9.2</span><span class="score-max">/10</span></div>
+          <a href="https://prf.hn/l/mA5BoXq/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
         </div>
       </div>
     </div>
@@ -809,6 +896,36 @@
   }), { threshold: 0.06 });
   document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
 
+  /* ── 360 FEATURE GALLERY ── */
+  const PANO_ITEMS = [
+    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-guest-room.jpg', label:'Guest Room'},
+    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-guest-room-desk-wardrobe.jpg', label:'Guest Room — Desk & Wardrobe'},
+    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-guest-room-balcony-view.jpg', label:'Guest Room — Balcony View'},
+    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-bathroom.jpg', label:'Bathroom'},
+    {src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-360-panorama-bathroom-vanity.jpg', label:'Bathroom — Vanity'}
+  ];
+  let _panoIdx = 0, _panoInst = null;
+
+  function loadPano(idx) {
+    _panoIdx = (idx + PANO_ITEMS.length) % PANO_ITEMS.length;
+    const item = PANO_ITEMS[_panoIdx];
+    if (_panoInst) { _panoInst.destroy(); _panoInst = null; }
+    _panoInst = pannellum.viewer('panoViewer', {
+      type: 'equirectangular',
+      panorama: item.src,
+      autoLoad: true,
+      compass: false,
+      showZoomCtrl: true,
+      hfov: 100
+    });
+    document.getElementById('panoCaption').textContent = '🇦🇹 Le Méridien Vienna — ' + item.label;
+    document.getElementById('panoCounter').textContent = (_panoIdx + 1) + ' / ' + PANO_ITEMS.length;
+  }
+
+  function navPano(dir) { loadPano(_panoIdx + dir); }
+
+  loadPano(0);
+
   /* ── FILTER STATE ── */
   const COUNTRIES = {
     europe:   [ {key:'italy',label:'🇮🇹 Italy'}, {key:'switzerland',label:'🇨🇭 Switzerland'},
@@ -885,6 +1002,33 @@
 
   /* ── HOTEL MODAL DATA ── */
   const HOTEL_DATA = {
+    'le-meridien-vienna': {
+      scores:[{n:'9.2',l:'Overall'},{n:'9.5',l:'Location'},{n:'9.3',l:'Breakfast'},{n:'9.0',l:'Service'}],
+      media:[
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/cover.jpg',alt:'Le Méridien Vienna hotel exterior facade, Austria'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-hotel-exterior-daytime-facade-vienna.jpg',alt:'Le Méridien Vienna hotel exterior daytime facade, Vienna'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-hotel-exterior-night-illuminated-sign.jpg',alt:'Le Méridien Vienna hotel exterior at night with illuminated sign'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-lobby-reception-lounge.jpg',alt:'Le Méridien Vienna lobby reception lounge'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-lobby-corridor-marriott-bonvoy.jpg',alt:'Le Méridien Vienna lobby corridor with Marriott Bonvoy signage'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-guest-room-bed-balcony-window.jpg',alt:'Le Méridien Vienna guest room bed with balcony window'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-guest-room-desk-tv-welcome-amenity.jpg',alt:'Le Méridien Vienna guest room desk, TV, and welcome amenity'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-welcome-amenity-mozart-liqueur.jpg',alt:'Le Méridien Vienna welcome amenity, Mozart-branded liqueur'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-restaurant-dining-area.jpg',alt:'Le Méridien Vienna restaurant dining area'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-gym-fitness-equipment.jpg',alt:'Le Méridien Vienna gym fitness equipment'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-hotel-bar-lounge-ambiance.jpg',alt:'Le Méridien Vienna hotel bar lounge ambiance'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-bar-wine-glasses-marble-table.jpg',alt:'Le Méridien Vienna bar wine glasses on marble table'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-breakfast-buffet-hot-dishes.jpg',alt:'Le Méridien Vienna breakfast buffet hot dishes station'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-breakfast-smoothie-juice-station.jpg',alt:'Le Méridien Vienna breakfast smoothie and juice station'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-breakfast-charcuterie-cheese-spread.jpg',alt:'Le Méridien Vienna breakfast charcuterie and cheese spread'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-breakfast-salad-bar-fresh-vegetables.jpg',alt:'Le Méridien Vienna breakfast salad bar with fresh vegetables'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-breakfast-juice-coffee-station.jpg',alt:'Le Méridien Vienna breakfast juice and coffee station'},
+        {type:'image',src:'Media/Hotels/le-meridien-Vienna/le-meridien-vienna-breakfast-bread-pastry-station.jpg',alt:'Le Méridien Vienna breakfast bread and pastry station'}
+      ],
+      review:'Le Méridien Vienna gets the fundamentals right and then some. The location is hard to beat — right on the Ring, with easy access to the center, and if you like to walk, everything in Vienna is reachable on foot from here. Rooms are genuinely comfortable, and breakfast is a proper spread with a lot to choose from — hot dishes, charcuterie and cheese, fresh juices, pastries, all well stocked. Staff throughout were super friendly, no exceptions. One small detail that stood out: the shower water flow and pressure were excellent — a surprisingly rare thing to get right. The gym is a bit tight on space, but the equipment is genuinely good. The pool is well maintained and a nice way to unwind after a day walking the city. It feels like a proper Le Méridien.',
+      highlights:['Prime Ring-side location — easy walking access to Vienna\'s center','Comfortable, well-appointed rooms','Breakfast buffet with real variety — hot dishes, charcuterie, fresh juices, pastries','Excellent shower water flow and pressure','Well-maintained pool','Staff consistently friendly throughout the stay','Gym equipment genuinely good quality'],
+      considerations:['Gym is a bit tight on space, though well equipped'],
+      book:'https://prf.hn/l/mA5BoXq/'
+    },
     'vigilius': {
       scores:[{n:'9.4',l:'Overall'},{n:'9.8',l:'Spa'},{n:'9.2',l:'Location'},{n:'8.8',l:'Value'}],
       media:[
@@ -1248,7 +1392,9 @@
 
   /* Map hotel name text → slug */
   const NAME_TO_SLUG = {
+    'Le Méridien Vienna':'le-meridien-vienna',
     'Vigilius Mountain Resort':'vigilius',
+    'The Brown Guatapé':'the-brown-guatape',
     'Bormio — Pass Base':'bormio',
     'The Cambrian':'cambrian',
     'The Hotel Lucerne':'hotel-lucerne',
@@ -1279,6 +1425,12 @@
   /* Assign data-hotel to each card */
   document.querySelectorAll('.hotel-card').forEach(card => {
     const nameEl = card.querySelector('.hotel-name');
+    if (!nameEl) return;
+    const slug = NAME_TO_SLUG[nameEl.textContent.trim()];
+    if (slug) card.dataset.hotel = slug;
+  });
+  document.querySelectorAll('.featured-pick').forEach(card => {
+    const nameEl = card.querySelector('.featured-name');
     if (!nameEl) return;
     const slug = NAME_TO_SLUG[nameEl.textContent.trim()];
     if (slug) card.dataset.hotel = slug;
@@ -1428,6 +1580,11 @@
   document.getElementById('hotelsGrid').addEventListener('click', e => {
     if (e.target.closest('.hotel-book')) return;
     const card = e.target.closest('.hotel-card[data-hotel]');
+    if (card) openHotelModal(card.dataset.hotel);
+  });
+  document.querySelector('.featured-picks-grid').addEventListener('click', e => {
+    if (e.target.closest('.btn-book')) return;
+    const card = e.target.closest('.featured-pick[data-hotel]');
     if (card) openHotelModal(card.dataset.hotel);
   });
 
