@@ -10,6 +10,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
 :root {
   --bg:      #F2F2F7;
@@ -25,35 +27,54 @@
   --gold-hi: #D4B56A;
   --gold-lo: #A88A3A;
   --gold-f:  rgba(201,168,76,.10);
-  --r:       12px;
-  --r-sm:    8px;
-  --sh:      0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --r:       13px;
+  --r-sm:    9px;
+  --sh:      0 1px 2px rgba(0,0,0,.05),0 1px 1px rgba(0,0,0,.04);
   --sh-lg:   0 10px 48px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.07);
-  --font:    "Inter",-apple-system,BlinkMacSystemFont,sans-serif;
-  --mono:    "JetBrains Mono","SF Mono","Menlo",monospace;
+  --font:    -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",sans-serif;
+  --mono:    "SF Mono","JetBrains Mono","Menlo",monospace;
   --t:       150ms;
   --ease:    cubic-bezier(.4,0,.2,1);
   --spring:  cubic-bezier(.34,1.56,.64,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--lbl);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--lbl);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;font-size:13px}
+button,input,select{font-family:inherit}
+*:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 
-#hdr{background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:0 18px;height:50px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--sep);flex-shrink:0;z-index:10}
-.hdr-icon{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:linear-gradient(155deg,var(--gold-hi) 0%,var(--gold-lo) 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(168,138,58,.32)}
-.hdr-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#hdr h1{font-size:13px;font-weight:600;letter-spacing:-.01em}
-#hdr-hint{font-size:11px;color:var(--lbl4);margin-left:auto}
+#hdr{background:rgba(255,255,255,.72);backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);padding:0 18px;height:52px;display:flex;align-items:center;gap:10px;border-bottom:.5px solid var(--sep);flex-shrink:0;z-index:10}
+.hdr-icon{width:28px;height:28px;border-radius:8px;flex-shrink:0;background:linear-gradient(155deg,var(--gold-hi) 0%,var(--gold-lo) 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(168,138,58,.35),inset 0 1px 0 rgba(255,255,255,.25)}
+.hdr-icon svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#hdr h1{font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+#hdr-hint{font-size:11.5px;color:var(--lbl4);margin-left:auto;font-variant-numeric:tabular-nums}
 
 #main{display:flex;flex:1;overflow:hidden}
 
-#sidebar{width:268px;flex-shrink:0;background:var(--bg);border-right:1px solid var(--sep);overflow-y:auto;padding:10px 10px 24px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--sep) transparent}
+#sidebar{width:272px;flex-shrink:0;background:var(--bg);border-right:.5px solid var(--sep);overflow-y:auto;padding:12px 12px 28px;display:flex;flex-direction:column;gap:20px;scrollbar-width:thin;scrollbar-color:var(--sep) transparent}
 #sidebar::-webkit-scrollbar{width:4px}
 #sidebar::-webkit-scrollbar-thumb{background:var(--sep);border-radius:2px}
 
-.card{background:var(--surf);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--sh)}
+/* Grouped-list ("Settings.app") card style: each section body is one rounded
+   surface; individual .card blocks become flush rows separated by hairlines,
+   not standalone boxes with their own shadow/radius. */
+.card{background:transparent;border-radius:0;padding:13px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:none}
 .ctitle{font-size:11px;font-weight:600;color:var(--lbl3);letter-spacing:.06em;text-transform:uppercase}
 .row{display:flex;align-items:center;justify-content:space-between;gap:6px}
-.row label{font-size:12px;color:var(--lbl2);flex-shrink:0;white-space:nowrap}
+.row label{font-size:12px;color:var(--lbl2);flex-shrink:0;white-space:nowrap;width:64px}
+.hint{font-size:10.5px;color:var(--lbl4);line-height:1.55}
+.hint strong{color:var(--lbl3)}
+
+/* ── Sections (collapsible groups of cards) ─────────────────────────────── */
+.section{display:flex;flex-direction:column}
+.section-header{display:flex;align-items:center;gap:6px;padding:0 6px 7px;cursor:pointer;user-select:none;transition:opacity var(--t) var(--ease)}
+.section-header:hover{opacity:.65}
+.section-header .sec-chevron{width:8px;height:8px;flex-shrink:0;stroke:var(--lbl4);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--t) var(--ease)}
+.section.collapsed .sec-chevron{transform:rotate(-90deg)}
+.section-header h2{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--lbl3)}
+.section-header .sec-count{margin-left:auto;font-size:10px;color:var(--lbl4);font-family:var(--mono)}
+.section-body{display:flex;flex-direction:column;background:var(--surf);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.section.collapsed .section-body{display:none}
+.card + .card{border-top:.5px solid var(--sep)}
 
 #drop-zone{border:1.5px dashed var(--sep);border-radius:var(--r-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all var(--t) var(--ease);color:var(--lbl3);font-size:12px;line-height:1.6}
 #drop-zone:hover,#drop-zone.drag-over{border-color:var(--gold);background:var(--gold-f);color:var(--lbl2)}
@@ -66,11 +87,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(--sep);padding:2px;cursor:pointer;background:var(--surf)}
 
+#trim-slider{position:relative;height:20px;margin:2px 0}
+#trim-slider::before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;transform:translateY(-50%);border-radius:2px;background:var(--fill2)}
+#trim-slider input[type=range]{position:absolute;left:0;right:0;top:0;margin:0;background:none;pointer-events:none}
+#trim-slider input[type=range]::-webkit-slider-runnable-track{background:transparent}
+#trim-slider input[type=range]::-webkit-slider-thumb{pointer-events:auto}
+#trim-slider input[type=range]::-moz-range-track{background:transparent}
+#trim-slider input[type=range]::-moz-range-thumb{pointer-events:auto}
+
 .num-wrap{display:flex;align-items:center;gap:1px;flex-shrink:0}
 .num-input{width:44px;padding:3px 5px;border-radius:5px;border:1px solid var(--sep);background:var(--fill);color:var(--gold);font-family:var(--mono);font-size:11px;font-weight:500;text-align:right;outline:none;-moz-appearance:textfield}
 .num-input::-webkit-outer-spin-button,.num-input::-webkit-inner-spin-button{-webkit-appearance:none}
 .num-input:focus{border-color:var(--gold);background:var(--surf)}
 .num-unit{font-size:10px;color:var(--lbl3);font-family:var(--mono)}
+.text-input{flex:1;min-width:0;padding:6px 9px;border-radius:7px;border:1px solid var(--sep);background:var(--fill);color:var(--lbl);font-family:var(--font);font-size:12px;outline:none}
+.text-input:focus{border-color:var(--gold);background:var(--surf)}
+
+.track-row{display:flex;align-items:center;gap:7px;padding:6px 4px;border-bottom:1px solid var(--sep2)}
+.track-row:last-child{border-bottom:none}
+.track-row input[type=checkbox]{width:15px;height:15px;flex-shrink:0;accent-color:var(--gold);cursor:pointer}
+.track-row .track-name{flex:1;min-width:0;font-size:11.5px;color:var(--lbl2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-row .track-colors{display:flex;gap:3px;flex-shrink:0}
+.track-row input[type=color]{width:20px;height:20px;padding:0;border:1px solid var(--sep);border-radius:4px;cursor:pointer;flex-shrink:0}
+.track-row .track-remove{flex-shrink:0;width:18px;height:18px;border:none;background:var(--fill);border-radius:5px;color:var(--lbl3);cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}
+.track-row .track-remove:hover{background:var(--fill2);color:var(--lbl)}
+#add-track-zone.drag-over{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
 
 /* Toggle switch */
 .toggle-row{display:flex;align-items:center;justify-content:space-between}
@@ -92,14 +133,29 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 .asp-btn small{display:block;font-size:9.5px;opacity:.7}
 .asp-btn.active,.asp-btn:hover{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
 
+.seg-row{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.seg-btn{flex:1;padding:6px 3px;font-size:10.5px;font-weight:500;font-family:var(--font);color:var(--lbl3);background:transparent;border:none;border-radius:7px;cursor:pointer;text-align:center;white-space:nowrap;transition:background var(--t) var(--ease),color var(--t) var(--ease),box-shadow var(--t) var(--ease)}
+.seg-btn.active{background:var(--surf);color:var(--lbl);box-shadow:var(--sh)}
+.seg-btn small{display:block;font-size:9px;opacity:.65}
+.card-sub{overflow:hidden;max-height:420px;transition:max-height var(--ts) var(--ease),opacity var(--ts) var(--ease),margin var(--ts) var(--ease)}
+.card-sub.collapsed{max-height:0!important;opacity:0;margin:0!important}
+
+.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.style-btn{padding:6px 2px;border-radius:7px;border:1.5px solid var(--sep);background:var(--fill);font-size:10.5px;font-weight:500;color:var(--lbl3);cursor:pointer;text-align:center;transition:all var(--t) var(--ease)}
+.style-btn.active,.style-btn:hover{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
+
 .btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:var(--r-sm);border:none;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t) var(--ease);letter-spacing:.02em}
 .btn-gold{background:var(--gold);color:white;box-shadow:0 2px 6px rgba(168,138,58,.32)}
 .btn-gold:hover:not(:disabled){background:var(--gold-hi)}
 .btn-ghost{background:var(--fill);color:var(--lbl2)}
 .btn-ghost:hover:not(:disabled){background:var(--fill2)}
 .btn:disabled{opacity:.38;cursor:not-allowed}
+.btn:active:not(:disabled),.asp-btn:active,.seg-btn:active,.style-btn:active{transform:scale(.96)}
+.matte-sw:active,.track-remove:active{transform:scale(.92)}
 .btn-row{display:flex;gap:6px}
-.btn-row .btn{flex:1;font-size:11.5px}
+.btn-row .btn{flex:1;font-size:11.5px;padding:9px 6px}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn-grid .btn{font-size:11.5px;padding:9px 6px}
 
 .matte-swatches{display:flex;gap:6px;align-items:center}
 .matte-sw{width:22px;height:22px;border-radius:5px;border:2px solid var(--sep);cursor:pointer;transition:border-color var(--t) var(--ease)}
@@ -107,8 +163,20 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 
 #prev{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;overflow:hidden;position:relative}
 #checker-wrap{position:relative;box-shadow:var(--sh-lg);border-radius:3px;overflow:hidden;flex-shrink:0}
-#checker-bg{position:absolute;inset:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
-#preview-canvas{position:relative;z-index:1;display:block}
+#checker-bg{position:absolute;inset:0;z-index:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
+#map-bg{position:absolute;inset:0;z-index:1;display:none}
+#map-bg .maplibregl-ctrl-attrib,#map-bg .maplibregl-ctrl-logo{display:none!important}
+#preview-canvas{position:relative;z-index:2;display:block;transition:opacity var(--ts) var(--ease)}
+
+#empty-state{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--lbl4);pointer-events:none;text-align:center;padding:20px}
+#empty-state svg{width:34px;height:34px;stroke:var(--lbl4);fill:none;stroke-width:1.4;opacity:.6}
+#empty-state span{font-size:12.5px;max-width:220px;line-height:1.5}
+#empty-state.hidden{display:none}
+
+.card{transition:opacity var(--ts) var(--ease)}
+.card.disabled{opacity:.45;pointer-events:none}
+body.mode-static .anim-only{display:none!important}
+body.mode-animated .static-only{display:none!important}
 
 #status{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(28,28,30,.82);backdrop-filter:blur(12px);color:white;font-size:11.5px;padding:7px 14px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;z-index:10}
 #status.show{opacity:1}
@@ -121,39 +189,70 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 #prog-bar-wrap{height:5px;background:var(--fill2);border-radius:3px;overflow:hidden}
 #prog-bar{height:100%;background:var(--gold);border-radius:3px;transition:width .08s linear;width:0%}
 </style>
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-KQMYMPEGLT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-KQMYMPEGLT');
-</script>
 </head>
-<body>
+<body class="mode-animated">
 
 <div id="hdr">
   <div class="hdr-icon">
     <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
   </div>
   <h1>Route Overlay</h1>
-  <span id="hdr-hint">GPX / KML → animated transparent overlay for social media</span>
+  <span id="hdr-hint">GPX / KML → animated route overlay for social media</span>
 </div>
 
 <div id="main">
   <div id="sidebar">
 
-    <div class="card">
-      <div class="ctitle">Route File</div>
-      <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-        <strong id="drop-label">Drop GPX or KML here</strong>
-        <span>or click to browse</span>
+    <div class="section" data-section="route">
+      <div class="section-header">
+        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+        <h2>Route</h2>
       </div>
-      <input type="file" id="file-input" accept=".gpx,.kml" style="display:none">
+      <div class="section-body">
+
+        <div class="card">
+          <div class="ctitle">Route File</div>
+          <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <strong id="drop-label">Drop GPX or KML here</strong>
+            <span>or click to browse</span>
+          </div>
+          <input type="file" id="file-input" accept=".gpx,.kml" style="display:none">
+        </div>
+
+        <div class="card" id="tracks-card" hidden>
+          <div class="ctitle">Tracks</div>
+          <div id="tracks-list"></div>
+          <div id="add-track-zone" style="border:1.5px dashed var(--sep);border-radius:8px;padding:10px 14px;text-align:center;cursor:pointer;font-size:11.5px;color:var(--lbl3);margin-top:6px">
+            + Add another track
+          </div>
+          <input type="file" id="add-track-input" accept=".gpx,.kml" style="display:none">
+        </div>
+
+        <div class="card" id="trim-card" hidden>
+          <div class="ctitle">Trim Range</div>
+          <select id="trim-target" class="text-input" style="margin-bottom:8px;width:100%;padding:6px 8px;font-size:11.5px">
+            <option value="primary">Primary track</option>
+          </select>
+          <div id="trim-slider">
+            <input type="range" id="trim-start" min="0" max="100" step="0.1" value="0">
+            <input type="range" id="trim-end" min="0" max="100" step="0.1" value="100">
+          </div>
+          <div id="trim-readout" style="font-size:11px;color:var(--lbl3);font-family:var(--mono)"></div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:6px" onclick="resetTrim()">Reset trim</button>
+        </div>
+
+      </div>
     </div>
 
-    <div class="card">
-      <div class="ctitle">Line Style</div>
+    <div class="section" data-section="style">
+      <div class="section-header">
+        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+        <h2>Style</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="card">
+          <div class="ctitle">Line Style</div>
       <div class="row">
         <label>Colors</label>
         <div class="color-pair">
@@ -199,14 +298,14 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
           <span class="toggle-knob"></span>
         </label>
       </div>
-      <div class="toggle-row">
+      <div class="toggle-row anim-only">
         <span class="toggle-label">Glowing tip dot</span>
         <label class="toggle-switch">
           <input type="checkbox" id="tip-dot-on" checked>
           <span class="toggle-knob"></span>
         </label>
       </div>
-      <div class="toggle-row">
+      <div class="toggle-row anim-only">
         <span class="toggle-label">Glow pulse on pause</span>
         <label class="toggle-switch">
           <input type="checkbox" id="pulse-on" checked>
@@ -215,53 +314,142 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
       </div>
     </div>
 
-    <div class="card">
-      <div class="ctitle">Animation</div>
-      <div class="row">
-        <label>Duration</label>
-        <input type="range" id="duration" min="1" max="12" step="0.5" value="4">
-        <div class="num-wrap">
-          <input type="number" class="num-input" id="dur-num" min="1" max="12" step="0.5" value="4">
-          <span class="num-unit">s</span>
-        </div>
-      </div>
-      <div class="row">
-        <label>Loop pause</label>
-        <input type="range" id="loop-pause" min="0" max="4" step="0.5" value="1">
-        <div class="num-wrap">
-          <input type="number" class="num-input" id="lp-num" min="0" max="4" step="0.5" value="1">
-          <span class="num-unit">s</span>
-        </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="ctitle">View</div>
-      <div class="row">
-        <label>Zoom</label>
-        <input type="range" id="zoom" min="0.2" max="4" step="0.05" value="1">
-        <div class="num-wrap">
-          <input type="number" class="num-input" id="zoom-num" min="0.2" max="4" step="0.05" value="1">
-          <span class="num-unit">×</span>
-        </div>
+    <div class="section collapsed" data-section="scene">
+      <div class="section-header">
+        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+        <h2>Camera &amp; Scene</h2>
       </div>
-      <div class="row">
-        <label>Rotate</label>
-        <input type="range" id="rotation" min="0" max="359" step="1" value="0">
-        <div class="num-wrap">
-          <input type="number" class="num-input" id="rot-num" min="0" max="359" step="1" value="0">
-          <span class="num-unit">°</span>
+      <div class="section-body">
+
+        <div class="card">
+          <div class="ctitle">Mode</div>
+          <div class="asp-row" id="mode-btns">
+            <button class="asp-btn active" data-mode="animated">Animated<small>Draw-on</small></button>
+            <button class="asp-btn" data-mode="static">Static<small>Full route</small></button>
+          </div>
         </div>
+
+        <div class="card anim-only" id="animation-card">
+          <div class="ctitle">Animation</div>
+          <div class="row">
+            <label>Duration</label>
+            <input type="range" id="duration" min="1" max="12" step="0.5" value="4">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="dur-num" min="1" max="12" step="0.5" value="4">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Loop pause</label>
+            <input type="range" id="loop-pause" min="0" max="4" step="0.5" value="1">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="lp-num" min="0" max="4" step="0.5" value="1">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">Camera</div>
+          <div class="asp-row" id="camera-btns">
+            <button class="asp-btn active" data-camera="overview">Overview<small>Whole route</small></button>
+            <button class="asp-btn" data-camera="follow">Follow<small>Chase the tip</small></button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">Background</div>
+          <div class="asp-row" id="bg-btns">
+            <button class="asp-btn active" data-bg="transparent">Transparent<small>For overlays</small></button>
+            <button class="asp-btn" data-bg="map">Map<small>Real basemap</small></button>
+          </div>
+          <div class="card-sub collapsed" id="map-style-wrap" style="margin-top:9px">
+            <div class="style-grid" id="map-style-btns">
+              <button class="style-btn active" data-style="outdoor">Outdoor</button>
+              <button class="style-btn" data-style="satellite">Satellite</button>
+              <button class="style-btn" data-style="hybrid">Hybrid</button>
+              <button class="style-btn" data-style="streets">Streets</button>
+              <button class="style-btn" data-style="topo">Topo</button>
+              <button class="style-btn" data-style="winter">Winter</button>
+              <button class="style-btn" data-style="bright">Bright</button>
+              <button class="style-btn" data-style="basic">Basic</button>
+              <button class="style-btn" data-style="night">Night</button>
+              <button class="style-btn" data-style="clean">Clean</button>
+              <button class="style-btn" data-style="toner">Toner</button>
+              <button class="style-btn" data-style="ocean">Ocean</button>
+            </div>
+            <div class="row" style="margin-top:9px">
+              <label>Tilt (3D)</label>
+              <input type="range" id="tilt" min="0" max="70" step="1" value="0">
+              <div class="num-wrap">
+                <input type="number" class="num-input" id="tilt-num" min="0" max="70" step="1" value="0">
+                <span class="num-unit">°</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ctitle">View</div>
+          <div class="row">
+            <label>Zoom</label>
+            <input type="range" id="zoom" min="0.2" max="4" step="0.05" value="1">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="zoom-num" min="0.2" max="4" step="0.05" value="1">
+              <span class="num-unit">×</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Rotate</label>
+            <input type="range" id="rotation" min="0" max="359" step="1" value="0">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="rot-num" min="0" max="359" step="1" value="0">
+              <span class="num-unit">°</span>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Auto-rotate while playing</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="auto-rotate-on">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="card-sub collapsed" id="rotate-speed-wrap">
+            <div class="row">
+              <label>Spin speed</label>
+              <input type="range" id="rotate-speed" min="30" max="1080" step="30" value="360">
+              <div class="num-wrap">
+                <input type="number" class="num-input" id="rotate-speed-num" min="30" max="1080" step="30" value="360">
+                <span class="num-unit">°/loop</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:6px" onclick="resetView()">Reset view</button>
+        </div>
+
       </div>
-      <button class="btn btn-ghost" style="font-size:11px;padding:6px" onclick="resetView()">Reset view</button>
     </div>
 
-    <div class="card">
-      <div class="ctitle">Canvas</div>
+    <div class="section" data-section="output">
+      <div class="section-header">
+        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+        <h2>Output</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="card">
+          <div class="ctitle">Canvas</div>
       <div class="asp-row">
         <button class="asp-btn active" data-asp="9:16">9:16<small>Stories</small></button>
         <button class="asp-btn" data-asp="16:9">16:9<small>YouTube</small></button>
         <button class="asp-btn" data-asp="1:1">1:1<small>Square</small></button>
+      </div>
+      <div class="asp-row" id="res-btns" style="margin-top:6px">
+        <button class="asp-btn active" data-res="1">1080p<small id="res-dims-1">1080×1920</small></button>
+        <button class="asp-btn" data-res="2">4K<small id="res-dims-2">2160×3840</small></button>
       </div>
       <div class="row">
         <label>Padding</label>
@@ -274,6 +462,76 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
     </div>
 
     <div class="card">
+      <div class="ctitle">Overlay</div>
+      <div class="asp-row" id="layout-btns">
+        <button class="asp-btn active" data-layout="none">None</button>
+        <button class="asp-btn" data-layout="banner">Banner</button>
+        <button class="asp-btn" data-layout="corner">Corner</button>
+        <button class="asp-btn" data-layout="center">Center</button>
+      </div>
+      <div class="card-sub collapsed" id="overlay-opts" style="margin-top:9px">
+        <div class="row">
+          <label>Title</label>
+          <input type="text" id="overlay-title" placeholder="Route name" class="text-input">
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Distance</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="overlay-distance" checked>
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Elevation gain</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="overlay-elev" checked>
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div class="row">
+          <label>Color</label>
+          <input type="color" id="overlay-color" value="#FFFFFF">
+        </div>
+        <div class="row">
+          <label>Size</label>
+          <input type="range" id="overlay-size" min="0.5" max="2.5" step="0.05" value="1">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="overlay-size-num" min="0.5" max="2.5" step="0.05" value="1">
+            <span class="num-unit">×</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>Nudge X</label>
+          <input type="range" id="overlay-offset-x" min="-200" max="200" step="1" value="0">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="overlay-offset-x-num" min="-200" max="200" step="1" value="0">
+            <span class="num-unit">px</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>Nudge Y</label>
+          <input type="range" id="overlay-offset-y" min="-200" max="200" step="1" value="0">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="overlay-offset-y-num" min="-200" max="200" step="1" value="0">
+            <span class="num-unit">px</span>
+          </div>
+        </div>
+        <div class="ctitle" style="margin-top:2px">Font</div>
+        <div class="seg-row" id="overlay-font-btns">
+          <button class="seg-btn active" data-font="system">System</button>
+          <button class="seg-btn" data-font="serif">Serif</button>
+          <button class="seg-btn" data-font="mono">Mono</button>
+          <button class="seg-btn" data-font="condensed">Condensed</button>
+        </div>
+        <div class="seg-row" id="overlay-weight-btns" style="margin-top:5px">
+          <button class="seg-btn" data-weight="400">Regular</button>
+          <button class="seg-btn active" data-weight="700">Bold</button>
+          <button class="seg-btn" data-weight="900">Black</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card anim-only">
       <div class="ctitle">GIF Matte Color</div>
       <div class="matte-swatches">
         <div class="matte-sw active" id="matte-black" style="background:#000" title="Black matte"></div>
@@ -284,24 +542,41 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 
     <div class="card">
       <div class="ctitle">Export</div>
-      <div class="btn-row">
-        <button class="btn btn-ghost" id="btn-webm" disabled onclick="exportWebM()">WebM</button>
-        <button class="btn btn-ghost" id="btn-gif" disabled onclick="exportGIF()">GIF</button>
-        <button class="btn btn-gold" id="btn-apng" disabled onclick="exportAPNG()">APNG</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
-        <span style="font-size:10.5px;color:var(--lbl4);white-space:nowrap">WebM bg</span>
-        <div class="matte-swatches">
-          <div class="matte-sw active" id="webm-bg-alpha" data-webmbg="transparent" title="Transparent — CapCut desktop · DaVinci · Premiere" style="background:repeating-conic-gradient(#999 0% 25%,#ddd 0% 50%) 0 0/8px 8px"></div>
-          <div class="matte-sw" id="webm-bg-green" data-webmbg="#00b140" title="Green screen — chroma key in CapCut · Canva · any editor" style="background:#00b140"></div>
-          <div class="matte-sw" id="webm-bg-black" data-webmbg="#000000" title="Black — Screen blend mode in Canva" style="background:#000"></div>
+
+      <div class="anim-only">
+        <div class="btn-grid">
+          <button class="btn btn-ghost" id="btn-webm" disabled onclick="exportWebM()">WebM</button>
+          <button class="btn btn-ghost" id="btn-mp4" disabled onclick="exportMP4()">MP4</button>
+          <button class="btn btn-ghost" id="btn-gif" disabled onclick="exportGIF()">GIF</button>
+          <button class="btn btn-gold" id="btn-apng" disabled onclick="exportAPNG()">APNG</button>
         </div>
-        <span id="webm-bg-hint" style="font-size:10px;color:var(--lbl4)">transparent</span>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+          <span style="font-size:10.5px;color:var(--lbl4);white-space:nowrap">Solid bg</span>
+          <div class="matte-swatches">
+            <div class="matte-sw active" id="webm-bg-alpha" data-webmbg="transparent" title="Transparent — CapCut desktop · DaVinci · Premiere (WebM only)" style="background:repeating-conic-gradient(#999 0% 25%,#ddd 0% 50%) 0 0/8px 8px"></div>
+            <div class="matte-sw" id="webm-bg-green" data-webmbg="#00b140" title="Green screen — chroma key in CapCut · Canva · any editor" style="background:#00b140"></div>
+            <div class="matte-sw" id="webm-bg-black" data-webmbg="#000000" title="Black — Screen blend mode in Canva; also used for MP4" style="background:#000"></div>
+          </div>
+          <span id="webm-bg-hint" style="font-size:10px;color:var(--lbl4)">transparent</span>
+        </div>
+        <div style="font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-top:6px">
+          <strong style="color:var(--lbl3)">APNG</strong> = transparent · CapCut mobile · iOS apps<br>
+          <strong style="color:var(--lbl3)">WebM</strong> = DaVinci · Premiere · CapCut (set bg above)<br>
+          <strong style="color:var(--lbl3)">MP4</strong> = universal video, no transparency · Edits · Instagram · iPhone<br>
+          <strong style="color:var(--lbl3)">GIF</strong> = universal · Instagram apps · solid bg
+        </div>
       </div>
-      <div style="font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-top:6px">
-        <strong style="color:var(--lbl3)">APNG</strong> = transparent · CapCut mobile · iOS apps<br>
-        <strong style="color:var(--lbl3)">WebM</strong> = DaVinci · Premiere · CapCut (set bg above)<br>
-        <strong style="color:var(--lbl3)">GIF</strong> = universal · Instagram apps · solid bg
+
+      <div class="static-only" style="font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-bottom:7px">
+        Static mode exports a single finished frame.
+      </div>
+
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn btn-ghost" id="btn-png" disabled onclick="exportPNG()">PNG</button>
+        <button class="btn btn-ghost" id="btn-svg" disabled onclick="exportSVG()">SVG</button>
+      </div>
+    </div>
+
       </div>
     </div>
 
@@ -310,7 +585,12 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
   <div id="prev">
     <div id="checker-wrap">
       <div id="checker-bg"></div>
+      <div id="map-bg"></div>
       <canvas id="preview-canvas"></canvas>
+      <div id="empty-state">
+        <svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        <span>Drop a GPX or KML file to preview your route</span>
+      </div>
     </div>
     <div id="status"></div>
   </div>
@@ -327,6 +607,15 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 <script>
 // ─── State ───────────────────────────────────────────────────────────────────
 const ASPECTS = { "9:16": [1080, 1920], "16:9": [1920, 1080], "1:1": [1080, 1080] };
+function updateExportDims() {
+  const [w,h] = ASPECTS[currentAspect];
+  exportW = w*exportScale; exportH = h*exportScale;
+  document.querySelectorAll("#res-btns .asp-btn").forEach(btn=>{
+    const s = parseInt(btn.dataset.res);
+    const small = btn.querySelector("small");
+    if (small) small.textContent = `${w*s}×${h*s}`;
+  });
+}
 
 let routePoints   = [];
 let normalizedPts = [];
@@ -336,14 +625,60 @@ let animHandle    = null;
 let animStartTs   = null;
 let exportW       = 1080;
 let exportH       = 1920;
+let currentAspect = "9:16";
+let exportScale   = 1; // 1 = 1080p baseline, 2 = 4K
 let fileName      = "route";
 let matteColor    = "black";
 let gifWorkerURL  = null;
 let zoomLevel     = 1.0;
 let rotationDeg   = 0;
+let trimStartFrac = 0;
+let trimEndFrac   = 1;
+let latLonDists   = [];
+let trimTargetId  = "primary"; // "primary" | extraTrack.id (as string)
+let animMode      = "animated"; // "animated" | "static"
+let bgMode         = "transparent"; // "transparent" | "map"
+let currentMapStyle = "outdoor";
+let map              = null;
+let fittedZoom        = 0;
+let fittedCenter      = null;
+let mapProjectedPts   = [];
+let mapProjectedDists = [];
+let pitchDeg          = 0;
+let overlayLayout     = "none"; // "none" | "banner" | "corner" | "center"
+let autoRotate        = false;
+let autoRotateDeg     = 360;
+const STATIC_ORBIT_MS = 8000;
+let cameraMode        = "overview"; // "overview" | "follow"
+let trimmedPts        = [];
+let trimmedLatLonDists = [];
+let previewLatLonDists = [];
+let extraTracks       = []; // { id, fileName, routePoints, latLonDists, color1, color2, visible, trimmedPts, trimmedLatLonDists, previewLatLonDists, normalizedPts, previewPts, previewDists, mapProjectedPts }
+let extraTrackSeq     = 0;
+const TRACK_PALETTE = [
+  ["#3B82F6","#60A5FA"], ["#A855F7","#C084FC"], ["#14B8A6","#5EEAD4"],
+  ["#EC4899","#F9A8D4"], ["#EAB308","#FDE047"], ["#22C55E","#86EFAC"],
+];
+
+const MAPTILER_KEY = 'pO4p3paZcjFsfdNEcYDM';
+const MAP_STYLES = {
+  outdoor:   `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${MAPTILER_KEY}`,
+  satellite: `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_KEY}`,
+  hybrid:    `https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_KEY}`,
+  streets:   `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
+  topo:      `https://api.maptiler.com/maps/topo-v2/style.json?key=${MAPTILER_KEY}`,
+  winter:    `https://api.maptiler.com/maps/winter-v2/style.json?key=${MAPTILER_KEY}`,
+  bright:    `https://api.maptiler.com/maps/bright-v2/style.json?key=${MAPTILER_KEY}`,
+  basic:     `https://api.maptiler.com/maps/basic-v2/style.json?key=${MAPTILER_KEY}`,
+  night:     `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAPTILER_KEY}`,
+  clean:     `https://api.maptiler.com/maps/backdrop/style.json?key=${MAPTILER_KEY}`,
+  toner:     `https://api.maptiler.com/maps/toner-v2/style.json?key=${MAPTILER_KEY}`,
+  ocean:     `https://api.maptiler.com/maps/ocean/style.json?key=${MAPTILER_KEY}`,
+};
 
 // ─── Getters ──────────────────────────────────────────────────────────────────
 const $        = id => document.getElementById(id);
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function getLineW()     { return parseFloat($("line-width").value); }
 function getLineC()     { return $("line-color").value; }
 function getLineC2()    { return $("line-color-2").value; }
@@ -356,6 +691,16 @@ function getGradient()  { return $("gradient-on").checked; }
 function getTaper()     { return $("taper-on").checked; }
 function getTipDot()    { return $("tip-dot-on").checked; }
 function getPulse()     { return $("pulse-on").checked; }
+function getOverlayTitle()    { return $("overlay-title").value.trim() || fileName; }
+function getOverlayDistance() { return $("overlay-distance").checked; }
+function getOverlayElev()     { return $("overlay-elev").checked; }
+function getOverlayColor()    { return $("overlay-color").value; }
+function getOverlaySize()     { return parseFloat($("overlay-size").value); }
+function getOverlayOffsetX()  { return parseFloat($("overlay-offset-x").value); }
+function getOverlayOffsetY()  { return parseFloat($("overlay-offset-y").value); }
+function getOverlayWeight()   { return document.querySelector("#overlay-weight-btns .seg-btn.active")?.dataset.weight || "700"; }
+function getOverlayFont()     { return document.querySelector("#overlay-font-btns .seg-btn.active")?.dataset.font || "system"; }
+function getAutoRotateDeg()   { return parseFloat($("rotate-speed").value); }
 function scaledLW(W)    { return getLineW() * (W / exportW); }
 
 // ─── Color utils ─────────────────────────────────────────────────────────────
@@ -366,6 +711,181 @@ function lerpColor(hex1, hex2, t) {
   const r2=parseInt(hex2.slice(1,3),16), g2=parseInt(hex2.slice(3,5),16), b2=parseInt(hex2.slice(5,7),16);
   return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
 }
+function toRgba(color, alpha) {
+  if (color.startsWith("rgb")) {
+    const [r,g,b] = color.match(/[\d.]+/g).map(Number);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+  const r=parseInt(color.slice(1,3),16), g=parseInt(color.slice(3,5),16), b=parseInt(color.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// ─── Distance / trim utils ───────────────────────────────────────────────────
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R=6371, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R*2*Math.asin(Math.sqrt(a));
+}
+function buildLatLonDists(pts) {
+  const d=[0];
+  for (let i=1;i<pts.length;i++) d.push(d[i-1]+haversineKm(pts[i-1].lat,pts[i-1].lon,pts[i].lat,pts[i].lon));
+  return d;
+}
+function trimPoints(pts, dists, startFrac, endFrac) {
+  if (!pts.length) return pts;
+  if (startFrac<=0 && endFrac>=1) return pts;
+  const total = dists[dists.length-1] || 0;
+  const startD = startFrac*total, endD = endFrac*total;
+  const out = [];
+  for (let i=0;i<pts.length;i++) {
+    const d = dists[i];
+    if (d < startD) {
+      if (i+1<pts.length && dists[i+1] >= startD) {
+        const t=(startD-d)/(dists[i+1]-d || 1);
+        out.push(lerpLatLon(pts[i],pts[i+1],t));
+      }
+      continue;
+    }
+    if (d > endD) {
+      if (i>0 && out.length && dists[i-1] <= endD) {
+        const t=(endD-dists[i-1])/(d-dists[i-1] || 1);
+        out.push(lerpLatLon(pts[i-1],pts[i],t));
+      }
+      break;
+    }
+    out.push(pts[i]);
+  }
+  return out.length>=2 ? out : pts;
+}
+function getTrimmedPoints() { return trimPoints(routePoints, latLonDists, trimStartFrac, trimEndFrac); }
+function lerpLatLon(a,b,t) {
+  const ele = (a.ele!=null && b.ele!=null) ? a.ele+(b.ele-a.ele)*t : (a.ele!=null?a.ele:b.ele);
+  return { lat:a.lat+(b.lat-a.lat)*t, lon:a.lon+(b.lon-a.lon)*t, ele };
+}
+function calcElevGainM(pts) {
+  let gain=0, prev=null;
+  for (const p of pts) {
+    if (prev!=null && p.ele!=null && prev.ele!=null) {
+      const d=p.ele-prev.ele; if (d>0) gain+=d;
+    }
+    if (p.ele!=null) prev=p;
+  }
+  return gain;
+}
+function rebuildFromRoute() { rebuildAllTracks(); }
+function rebuildAllTracks() {
+  trimmedPts = getTrimmedPoints();
+  trimmedLatLonDists = buildLatLonDists(trimmedPts);
+  const dsPrimary = downsample(trimmedPts);
+  previewLatLonDists = buildLatLonDists(dsPrimary);
+
+  extraTracks.forEach(t=>{
+    t.trimmedPts = trimPoints(t.routePoints, t.latLonDists, t.trimStartFrac ?? 0, t.trimEndFrac ?? 1);
+    t.trimmedLatLonDists = buildLatLonDists(t.trimmedPts);
+    t.ds = downsample(t.trimmedPts);
+    t.previewLatLonDists = buildLatLonDists(t.ds);
+  });
+
+  const pad = getPad();
+  const rawPrimary = toMercatorRaw(dsPrimary);
+  const visibleExtras = extraTracks.filter(t=>t.visible);
+  const rawExtras = visibleExtras.map(t=>toMercatorRaw(t.ds));
+  const bbox = mercatorBBox([rawPrimary, ...rawExtras]);
+
+  normalizedPts = normalizeRawWithBBox(rawPrimary, pad, bbox);
+  visibleExtras.forEach((t,i)=>{ t.normalizedPts = normalizeRawWithBBox(rawExtras[i], pad, bbox); });
+  extraTracks.filter(t=>!t.visible).forEach(t=>{ t.normalizedPts = []; });
+
+  const c = $("preview-canvas");
+  if (c.width) {
+    previewPts=toCanvas(normalizedPts,c.width,c.height); previewDists=buildDists(previewPts);
+    extraTracks.forEach(t=>{
+      if (t.normalizedPts && t.normalizedPts.length) {
+        t.previewPts = toCanvas(t.normalizedPts, c.width, c.height);
+        t.previewDists = buildDists(t.previewPts);
+      }
+    });
+  }
+}
+// Visible tracks in draw order: primary first, then extras. Each has its own
+// color but shares all other line-style/animation/camera settings.
+function visibleTrackList() {
+  const primary = { isPrimary:true, previewPts, previewDists, previewLatLonDists, trimmedPts, trimmedLatLonDists, mapProjectedPts, color1:getLineC(), color2:getLineC2() };
+  return [primary, ...extraTracks.filter(t=>t.visible).map(t=>({
+    isPrimary:false, previewPts:t.previewPts, previewDists:t.previewDists, previewLatLonDists:t.previewLatLonDists,
+    trimmedPts:t.trimmedPts, trimmedLatLonDists:t.trimmedLatLonDists, mapProjectedPts:t.mapProjectedPts,
+    color1:t.color1, color2:t.color2,
+  }))];
+}
+function latLonAtProgress(pts, dists, progress) {
+  if (pts.length < 2) return pts[0];
+  const totalD = dists[dists.length-1];
+  const targetD = Math.max(0,Math.min(1,progress)) * totalD;
+  let ei = 0;
+  while (ei < dists.length-1 && dists[ei+1] < targetD) ei++;
+  if (ei >= pts.length-1) return pts[pts.length-1];
+  const segD = dists[ei+1]-dists[ei];
+  const t = segD>0 ? (targetD-dists[ei])/segD : 0;
+  return lerpLatLon(pts[ei], pts[ei+1], t);
+}
+function pointAtProgress(pts, dists, progress) {
+  if (pts.length < 2) return pts[0] || {x:0,y:0};
+  const totalD = dists[dists.length-1];
+  const targetD = Math.max(0,Math.min(1,progress)) * totalD;
+  let ei = 0;
+  while (ei < dists.length-1 && dists[ei+1] < targetD) ei++;
+  if (ei >= pts.length-1) return pts[pts.length-1];
+  const segD = dists[ei+1]-dists[ei];
+  const t = segD>0 ? (targetD-dists[ei])/segD : 0;
+  return { x: pts[ei].x+t*(pts[ei+1].x-pts[ei].x), y: pts[ei].y+t*(pts[ei+1].y-pts[ei].y) };
+}
+// Rotates+scales basePts around `pivot` and re-anchors pivot to the canvas
+// center — used for "Follow" camera mode so the moving tip stays fixed on
+// screen while the rest of the route swings/scales around it.
+function getFollowPts(basePts, zoom, rotDeg, pivot, W, H) {
+  const cos = Math.cos(rotDeg*Math.PI/180), sin = Math.sin(rotDeg*Math.PI/180);
+  return basePts.map(p => {
+    const dx=(p.x-pivot.x)*zoom, dy=(p.y-pivot.y)*zoom;
+    return { x: W/2 + dx*cos - dy*sin, y: H/2 + dx*sin + dy*cos };
+  });
+}
+// Trim range is per-track: "primary" edits the global trimStartFrac/trimEndFrac
+// (backing the original single-track fields), any other id edits that extra
+// track's own trimStartFrac/trimEndFrac stored on the track object.
+function getTrimTarget() {
+  if (trimTargetId === "primary" ) return { isPrimary:true, latLonDists, start:trimStartFrac, end:trimEndFrac };
+  const track = extraTracks.find(t=>String(t.id)===trimTargetId);
+  if (!track) { trimTargetId="primary"; return getTrimTarget(); }
+  return { isPrimary:false, track, latLonDists: track.latLonDists, start: track.trimStartFrac??0, end: track.trimEndFrac??1 };
+}
+function setTrimTarget(startFrac, endFrac) {
+  const t = getTrimTarget();
+  if (t.isPrimary) { trimStartFrac=startFrac; trimEndFrac=endFrac; }
+  else { t.track.trimStartFrac=startFrac; t.track.trimEndFrac=endFrac; }
+}
+function renderTrimTargetOptions() {
+  const sel = $("trim-target");
+  const prev = trimTargetId;
+  sel.innerHTML = `<option value="primary">${escapeHtml(fileName||"Route")} (primary)</option>` +
+    extraTracks.map(t=>`<option value="${t.id}">${escapeHtml(t.fileName)}</option>`).join("");
+  sel.value = extraTracks.some(t=>String(t.id)===prev) || prev==="primary" ? prev : "primary";
+  trimTargetId = sel.value;
+}
+function loadTrimTargetIntoUI() {
+  const t = getTrimTarget();
+  $("trim-start").value = t.start*100;
+  $("trim-end").value = t.end*100;
+  updateTrimReadout();
+}
+function updateTrimReadout() {
+  const t = getTrimTarget();
+  const total = t.latLonDists[t.latLonDists.length-1] || 0;
+  const startKm = t.start*total, endKm = t.end*total;
+  $("trim-readout").textContent = `${startKm.toFixed(1)} km – ${endKm.toFixed(1)} km  ·  ${(endKm-startKm).toFixed(1)} km of ${total.toFixed(1)} km total`;
+}
+function getShownTotalKm()   { const t=latLonDists[latLonDists.length-1]||0; return (trimEndFrac-trimStartFrac)*t; }
+function getShownElevGainM() { return calcElevGainM(getTrimmedPoints()); }
 
 // ─── View transform ──────────────────────────────────────────────────────────
 function getDisplayPts(basePts, zoom, rotDeg) {
@@ -393,10 +913,228 @@ function getDisplayPts(basePts, zoom, rotDeg) {
 }
 
 function resetView() {
-  zoomLevel=1.0; rotationDeg=0;
+  zoomLevel=1.0; rotationDeg=0; pitchDeg=0;
   $("zoom").value=1; $("zoom-num").value=1;
   $("rotation").value=0; $("rot-num").value=0;
+  $("tilt").value=0; $("tilt-num").value=0;
   animStartTs=null;
+  if (bgMode==="map" && map) { applyMapCamera(); recenterOnRoute(getTrimmedPoints()); }
+}
+
+// ─── Map background (MapLibre) ────────────────────────────────────────────────
+function ensureMap() {
+  if (map) return;
+  map = new maplibregl.Map({
+    container: "map-bg",
+    style: MAP_STYLES[currentMapStyle],
+    center: [10, 46], zoom: 3,
+    interactive: false,
+    attributionControl: false,
+    antialias: true,
+    preserveDrawingBuffer: true,
+  });
+  map.on("load", () => {
+    addTerrain(); addSky();
+    if (routePoints.length) fitMapToRoute();
+  });
+  map.on("style.load", () => { addTerrain(); addSky(); });
+  map.on("move", recomputeMapProjectedPts);
+}
+function addTerrain() {
+  if (!map.getSource("terrain")) {
+    map.addSource("terrain", {
+      type: "raster-dem",
+      url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${MAPTILER_KEY}`,
+      tileSize: 256, maxzoom: 14,
+    });
+  }
+  map.setTerrain({ source: "terrain", exaggeration: 1.4 });
+}
+function addSky() {
+  if (!map.getLayer("sky")) {
+    map.addLayer({ id: "sky", type: "sky", paint: {
+      "sky-type": "atmosphere",
+      "sky-atmosphere-sun": [0, 90],
+      "sky-atmosphere-sun-intensity": 15,
+    }});
+  }
+}
+function fitMapToRoute() {
+  if (!map || !map.isStyleLoaded() || !routePoints.length) return;
+  const pts = getTrimmedPoints();
+  const visibleExtraPts = extraTracks.filter(t=>t.visible).flatMap(t=>t.trimmedPts||[]);
+  const allPts = [...pts, ...visibleExtraPts];
+  let minLat=Infinity,maxLat=-Infinity,minLon=Infinity,maxLon=-Infinity;
+  allPts.forEach(p=>{ if(p.lat<minLat)minLat=p.lat; if(p.lat>maxLat)maxLat=p.lat; if(p.lon<minLon)minLon=p.lon; if(p.lon>maxLon)maxLon=p.lon; });
+  map.jumpTo({ bearing: rotationDeg, pitch: pitchDeg });
+  map.fitBounds([[minLon,minLat],[maxLon,maxLat]], { padding: 40, animate: false });
+  fittedZoom = map.getZoom();
+  applyMapCamera();
+  recenterOnRoute(allPts);
+  fittedCenter = map.getCenter();
+}
+// MapLibre's fitBounds/cameraForBounds ignore pitch entirely when solving for
+// center+zoom, so a tilted camera pushes the fitted area toward the bottom of
+// the frame instead of centering it. Compensate by measuring where the route
+// actually lands on screen post-tilt and panning by that pixel offset.
+function recenterOnRoute(pts) {
+  if (!map) return;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  pts.forEach(p=>{
+    const pt = map.project([p.lon, p.lat]);
+    if (pt.x<minX) minX=pt.x; if (pt.x>maxX) maxX=pt.x;
+    if (pt.y<minY) minY=pt.y; if (pt.y>maxY) maxY=pt.y;
+  });
+  const cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+  const c = map.getContainer();
+  map.panBy([cx - c.clientWidth/2, cy - c.clientHeight/2], { animate:false });
+}
+function applyMapCamera() {
+  if (!map) return;
+  map.jumpTo({ zoom: fittedZoom + Math.log2(zoomLevel), bearing: rotationDeg, pitch: pitchDeg });
+}
+function projectLatLonToCanvas(pts, dpr) {
+  return pts.map(p => {
+    const pt = map.project([p.lon, p.lat]);
+    return { x: pt.x*dpr, y: pt.y*dpr };
+  });
+}
+function recomputeMapProjectedPts() {
+  if (!map || !routePoints.length) return;
+  const dpr = window.devicePixelRatio||1;
+  const pts = trimmedPts.length ? trimmedPts : getTrimmedPoints();
+  mapProjectedPts = projectLatLonToCanvas(pts, dpr);
+  mapProjectedDists = buildDists(mapProjectedPts);
+  extraTracks.forEach(t=>{
+    if (t.visible && t.trimmedPts && t.trimmedPts.length) t.mapProjectedPts = projectLatLonToCanvas(t.trimmedPts, dpr);
+  });
+}
+function setMapStyle(key) {
+  currentMapStyle = key;
+  if (!map) return;
+  map.setStyle(MAP_STYLES[key]);
+  map.once("styledata", () => recomputeMapProjectedPts());
+}
+function setBg(mode) {
+  bgMode = mode;
+  $("map-bg").style.display = mode==="map" ? "block" : "none";
+  $("map-style-wrap").classList.toggle("collapsed", mode!=="map");
+  if (mode==="map") {
+    ensureMap();
+    if (map.isStyleLoaded() && routePoints.length) fitMapToRoute();
+  }
+}
+// MapLibre's 'idle' event doesn't reliably re-fire for every camera-only
+// change (e.g. repeated jumpTo calls to already-cached tile areas during
+// Follow-mode export), so waiting on it unconditionally can hang forever.
+// Race it against a timeout so exports always make forward progress.
+function waitMapIdle(maxMs=350) {
+  return new Promise(res => {
+    let timer;
+    const onIdle = () => { clearTimeout(timer); res(); };
+    timer = setTimeout(() => { map.off("idle", onIdle); res(); }, maxMs);
+    map.once("idle", onIdle);
+  });
+}
+// Follow-mode export pans through many small slices of the route, each
+// potentially needing new map tiles — waiting for real network loads on
+// every single frame is what makes those exports slow. Pre-visit a handful
+// of points along the whole route at the follow zoom level once up front so
+// the tile cache is warm and the per-frame waits above become near-instant.
+async function prewarmFollowTiles(zoomFollow, bearing, pitch, onProgress) {
+  if (!trimmedPts.length) return;
+  const SAMPLES = 6;
+  for (let i=0; i<=SAMPLES; i++) {
+    const p = latLonAtProgress(trimmedPts, trimmedLatLonDists, i/SAMPLES);
+    map.jumpTo({ center:[p.lon,p.lat], zoom: zoomFollow, bearing, pitch });
+    await waitMapIdle(1200);
+    if (onProgress) onProgress(i/SAMPLES);
+  }
+}
+// Renders the map at export resolution WxH, returns a still snapshot + points
+// projected in that resolution's pixel space; restores the live preview size after.
+async function resizeMapForExport(W, H) {
+  const bg = $("map-bg");
+  const prev = { w: bg.style.width, h: bg.style.height };
+  const dpr = window.devicePixelRatio||1;
+  bg.style.width=(W/dpr)+"px"; bg.style.height=(H/dpr)+"px";
+  map.resize();
+  await waitMapIdle();
+  return prev;
+}
+// Updates the camera and returns projected points — does NOT snapshot the
+// canvas. Repeated createImageBitmap() calls on a live WebGL canvas (one per
+// exported frame) can stall the GPU readback pipeline; callers that need the
+// per-frame pixels should draw directly from map.getCanvas() instead (as the
+// live preview and WebM export already do). Only the single cached-snapshot
+// path (withMapSnapshot) needs an actual persisted bitmap.
+async function captureMapFrame(opts) {
+  const { bearing, center, zoom, pitch } = opts || {};
+  const dpr = window.devicePixelRatio||1;
+  const bearingChanged = bearing != null && Math.abs(bearing - map.getBearing()) > 0.01;
+  const zoomChanged = zoom != null && Math.abs(zoom - map.getZoom()) > 0.001;
+  if (bearingChanged || zoomChanged || center != null || pitch != null) {
+    const jump = {};
+    if (bearing != null) jump.bearing = bearing;
+    if (center != null) jump.center = center;
+    if (zoom != null) jump.zoom = zoom;
+    if (pitch != null) jump.pitch = pitch;
+    map.jumpTo(jump);
+    await waitMapIdle();
+  }
+  const pts = projectLatLonToCanvas(trimmedPts, dpr);
+  const extras = extraTracks.filter(t=>t.visible && t.trimmedPts && t.trimmedPts.length).map(t=>({
+    track: t, pts: projectLatLonToCanvas(t.trimmedPts, dpr), dists: t.trimmedLatLonDists,
+  }));
+  return { pts, dists: buildDists(pts), extras };
+}
+function restoreMapAfterExport(prev) {
+  const bg = $("map-bg");
+  bg.style.width=prev.w; bg.style.height=prev.h;
+  map.resize();
+  applyMapCamera();
+  recomputeMapProjectedPts();
+}
+async function withMapSnapshot(W, H, bearing) {
+  if (!map) return null;
+  const prev = await resizeMapForExport(W, H);
+  const frame = await captureMapFrame({ bearing: bearing != null ? bearing : rotationDeg });
+  const dpr = window.devicePixelRatio||1;
+  const extras = extraTracks.filter(t=>t.visible && t.trimmedPts && t.trimmedPts.length).map(t=>({
+    track: t, pts: projectLatLonToCanvas(t.trimmedPts, dpr), dists: t.trimmedLatLonDists,
+  }));
+  const snapshot = await createImageBitmap(map.getCanvas());
+  restoreMapAfterExport(prev);
+  return { ...frame, snapshot, extras };
+}
+function loopBearing(loopFraction) {
+  return autoRotate ? (rotationDeg + loopFraction*getAutoRotateDeg()) % 360 : rotationDeg;
+}
+// Smoothstep 0..1 over the pause phase — used to pull the "Follow" camera back
+// to an overview of the whole route once the route finishes drawing.
+function revealEase(pauseElapsed, pauseMs) {
+  const t = pauseMs > 0 ? Math.min(Math.max(pauseElapsed/pauseMs, 0), 1) : 1;
+  return t*t*(3-2*t);
+}
+// Camera state for Follow mode in Map mode, blending from "centered on the
+// moving tip" to "the full fitted overview" as `eased` goes 0 -> 1.
+function followMapCamera(progress, liveBearing, eased) {
+  const tip = latLonAtProgress(trimmedPts, trimmedLatLonDists, progress);
+  const followZoom = fittedZoom + Math.log2(zoomLevel);
+  if (eased <= 0 || !fittedCenter) return { center:[tip.lon,tip.lat], zoom: followZoom, bearing: liveBearing, pitch: pitchDeg };
+  const lon = tip.lon + (fittedCenter.lng - tip.lon)*eased;
+  const lat = tip.lat + (fittedCenter.lat - tip.lat)*eased;
+  const zoom = followZoom + (fittedZoom - followZoom)*eased;
+  return { center:[lon,lat], zoom, bearing: liveBearing, pitch: pitchDeg };
+}
+// Same idea for Transparent mode: blends the follow pivot/zoom toward the
+// route's own bbox center (already ~canvas center) and zoom 1 (whole route).
+function followCanvasCamera(basePts, dists, progress, zoom, bearing, W, H, eased) {
+  const followPivot = pointAtProgress(basePts, dists, progress);
+  if (eased <= 0) return getFollowPts(basePts, zoom, bearing, followPivot, W, H);
+  const pivot = { x: followPivot.x + (W/2-followPivot.x)*eased, y: followPivot.y + (H/2-followPivot.y)*eased };
+  const z = zoom + (1-zoom)*eased;
+  return getFollowPts(basePts, z, bearing, pivot, W, H);
 }
 
 // ─── Tiny utils ───────────────────────────────────────────────────────────────
@@ -417,7 +1155,7 @@ function download(blob, name) {
   setTimeout(()=>URL.revokeObjectURL(a.href),30000);
 }
 function enableExports() {
-  ["btn-webm","btn-gif","btn-apng"].forEach(id=>$(id).disabled=false);
+  ["btn-webm","btn-mp4","btn-gif","btn-apng","btn-svg","btn-png"].forEach(id=>$(id).disabled=false);
 }
 
 // ─── GPX / KML Parsers ───────────────────────────────────────────────────────
@@ -426,7 +1164,9 @@ function parseGPX(text) {
   const pts=[];
   doc.querySelectorAll("trkpt").forEach(el=>{
     const lat=parseFloat(el.getAttribute("lat")), lon=parseFloat(el.getAttribute("lon"));
-    if (!isNaN(lat)&&!isNaN(lon)) pts.push({lat,lon});
+    const eleEl=el.querySelector("ele");
+    const ele=eleEl ? parseFloat(eleEl.textContent) : null;
+    if (!isNaN(lat)&&!isNaN(lon)) pts.push({lat,lon,ele:(ele!=null&&!isNaN(ele))?ele:null});
   });
   if (!pts.length) throw new Error("No track points found in GPX");
   return pts;
@@ -439,7 +1179,11 @@ function parseKML(text) {
     lineCoords.forEach(el=>{
       el.textContent.trim().split(/\s+/).forEach(tok=>{
         const p=tok.split(",");
-        if (p.length>=2){const lon=parseFloat(p[0]),lat=parseFloat(p[1]); if(!isNaN(lat)&&!isNaN(lon)) pts.push({lat,lon});}
+        if (p.length>=2){
+          const lon=parseFloat(p[0]),lat=parseFloat(p[1]);
+          const ele=p.length>=3?parseFloat(p[2]):null;
+          if(!isNaN(lat)&&!isNaN(lon)) pts.push({lat,lon,ele:(ele!=null&&!isNaN(ele))?ele:null});
+        }
       });
     });
     if (pts.length) return pts;
@@ -450,7 +1194,11 @@ function parseKML(text) {
       const pts=[];
       nodes.forEach(el=>{
         const p=el.textContent.trim().split(/\s+/);
-        if (p.length>=2){const lon=parseFloat(p[0]),lat=parseFloat(p[1]); if(!isNaN(lat)&&!isNaN(lon)) pts.push({lat,lon});}
+        if (p.length>=2){
+          const lon=parseFloat(p[0]),lat=parseFloat(p[1]);
+          const ele=p.length>=3?parseFloat(p[2]):null;
+          if(!isNaN(lat)&&!isNaN(lon)) pts.push({lat,lon,ele:(ele!=null&&!isNaN(ele))?ele:null});
+        }
       });
       if (pts.length) return pts;
     }
@@ -464,16 +1212,33 @@ function downsample(pts, max=1200) {
   const step=(pts.length-1)/(max-1);
   return Array.from({length:max},(_,i)=>pts[Math.round(i*step)]);
 }
-function normalizePoints(pts, pad) {
-  if (!pts.length) return [];
+function toMercatorRaw(pts) {
   const toRad=d=>d*Math.PI/180;
-  const raw=pts.map(p=>({x:toRad(p.lon), y:-Math.log(Math.tan(Math.PI/4+toRad(p.lat)/2))}));
+  return pts.map(p=>({x:toRad(p.lon), y:-Math.log(Math.tan(Math.PI/4+toRad(p.lat)/2))}));
+}
+function mercatorBBox(rawArrays) {
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  raw.forEach(p=>{if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;});
+  rawArrays.forEach(raw=>raw.forEach(p=>{
+    if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x; if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y;
+  }));
+  if (!isFinite(minX)) return {minX:0,maxX:1,minY:0,maxY:1};
+  return {minX,maxX,minY,maxY};
+}
+// Normalizes raw mercator points into [0,1]x[0,1] canvas-relative space using
+// a caller-supplied bounding box, so multiple tracks can share one frame
+// (each fit independently would make every track fill the whole canvas on
+// its own scale, ignoring their real position/size relative to each other).
+function normalizeRawWithBBox(raw, pad, bbox) {
+  const {minX,maxX,minY,maxY} = bbox;
   const rX=maxX-minX||1, rY=maxY-minY||1, maxR=Math.max(rX,rY);
   const inner=1-2*pad, sX=inner*(rX/maxR), sY=inner*(rY/maxR);
   const oX=pad+(inner-sX)/2, oY=pad+(inner-sY)/2;
   return raw.map(p=>({nx:oX+((p.x-minX)/rX)*sX, ny:oY+((p.y-minY)/rY)*sY}));
+}
+function normalizePoints(pts, pad) {
+  if (!pts.length) return [];
+  const raw = toMercatorRaw(pts);
+  return normalizeRawWithBBox(raw, pad, mercatorBBox([raw]));
 }
 function toCanvas(npts, W, H) { return npts.map(p=>({x:p.nx*W, y:p.ny*H})); }
 function buildDists(pts) {
@@ -568,7 +1333,7 @@ function drawRoute(ctx, pts, dists, progress, lw, opts) {
     if (gi > 0) {
       const grad = ctx.createRadialGradient(endPt.x, endPt.y, 0, endPt.x, endPt.y, tipR*6);
       grad.addColorStop(0,   "rgba(255,255,255,0.95)");
-      grad.addColorStop(0.25, tipColor.replace("rgb","rgba").replace(")",",0.7)"));
+      grad.addColorStop(0.25, toRgba(tipColor, 0.7));
       grad.addColorStop(1,   "rgba(0,0,0,0)");
       ctx.fillStyle   = grad;
       ctx.globalAlpha = Math.min((gi/100)*pulseMult, 1);
@@ -588,6 +1353,91 @@ function drawRoute(ctx, pts, dists, progress, lw, opts) {
   ctx.globalAlpha = 1;
 }
 
+// ─── Overlay (title / stats) ───────────────────────────────────────────────────
+function formatStats(progress) {
+  const parts = [];
+  if (getOverlayDistance()) parts.push(`${(getShownTotalKm()*progress).toFixed(1)} km`);
+  if (getOverlayElev()) {
+    const g = getShownElevGainM();
+    if (g > 0) parts.push(`${Math.round(g*progress).toLocaleString()} m gain`);
+  }
+  return parts.join("   ·   ");
+}
+const OVERLAY_FONTS = {
+  system: '-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',
+  serif: 'Georgia,"Times New Roman",serif',
+  mono: '"SF Mono","JetBrains Mono",Menlo,monospace',
+  condensed: '"Arial Narrow","Helvetica Neue",Arial,sans-serif',
+};
+function drawOverlay(ctx, W, H, progress) {
+  if (overlayLayout === "none" || !normalizedPts.length) return;
+  const color = getOverlayColor();
+  const title = getOverlayTitle();
+  const stats = formatStats(progress);
+  const scale = (W / 1080) * getOverlaySize();
+  const family = OVERLAY_FONTS[getOverlayFont()] || OVERLAY_FONTS.system;
+  const weight = getOverlayWeight();
+  const px = (W/1080) * getOverlayOffsetX();
+  const py = (W/1080) * getOverlayOffsetY();
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = color;
+
+  if (overlayLayout === "banner") {
+    const barH = 130*scale;
+    const grad = ctx.createLinearGradient(0, H-barH, 0, H);
+    grad.addColorStop(0, "rgba(0,0,0,0)"); grad.addColorStop(1, "rgba(0,0,0,0.55)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(-px, H-barH, W, barH+Math.abs(py)+40);
+    ctx.fillStyle = color;
+    ctx.font = `${weight} ${Math.round(30*scale)}px ${family}`;
+    ctx.textAlign = "left";
+    ctx.fillText(title, 28*scale, H-58*scale);
+    if (stats) {
+      ctx.font = `500 ${Math.round(20*scale)}px "SF Mono",Menlo,monospace`;
+      ctx.globalAlpha = 0.88;
+      ctx.fillText(stats, 28*scale, H-26*scale);
+      ctx.globalAlpha = 1;
+    }
+  } else if (overlayLayout === "corner") {
+    const padX=24*scale, padY=20*scale, titleSize=24*scale, statSize=16*scale;
+    ctx.font = `${weight} ${Math.round(titleSize)}px ${family}`;
+    const titleW = ctx.measureText(title).width;
+    ctx.font = `500 ${Math.round(statSize)}px "SF Mono",Menlo,monospace`;
+    const statW = stats ? ctx.measureText(stats).width : 0;
+    const boxW = Math.max(titleW, statW) + padX*2;
+    const boxH = padY*2 + titleSize + (stats ? statSize+10*scale : 0);
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    const r = 12*scale;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(20*scale, 20*scale, boxW, boxH, r) : ctx.rect(20*scale,20*scale,boxW,boxH);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.textAlign = "left";
+    ctx.font = `${weight} ${Math.round(titleSize)}px ${family}`;
+    ctx.fillText(title, 20*scale+padX, 20*scale+padY+titleSize*0.8);
+    if (stats) {
+      ctx.font = `500 ${Math.round(statSize)}px "SF Mono",Menlo,monospace`;
+      ctx.globalAlpha = 0.85;
+      ctx.fillText(stats, 20*scale+padX, 20*scale+padY+titleSize+statSize*0.8+6*scale);
+      ctx.globalAlpha = 1;
+    }
+  } else if (overlayLayout === "center") {
+    ctx.textAlign = "center";
+    ctx.font = `${weight} ${Math.round(34*scale)}px ${family}`;
+    ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 10*scale;
+    ctx.fillText(title, W/2, H*0.12);
+    if (stats) {
+      ctx.font = `500 ${Math.round(20*scale)}px "SF Mono",Menlo,monospace`;
+      ctx.globalAlpha = 0.9;
+      ctx.fillText(stats, W/2, H*0.12 + 32*scale);
+      ctx.globalAlpha = 1;
+    }
+  }
+  ctx.restore();
+}
+
 // ─── Preview animation ────────────────────────────────────────────────────────
 function startAnimation() {
   if (animHandle) { cancelAnimationFrame(animHandle); animHandle=null; }
@@ -596,32 +1446,60 @@ function startAnimation() {
 
   function frame(ts) {
     if (!animStartTs) animStartTs = ts;
-    const durMs   = getDurMs();
-    const pauseMs = getPauseMs();
-    const elapsed = (ts-animStartTs) % (durMs+pauseMs);
-    const progress = Math.min(elapsed/durMs, 1);
-    const inPause  = elapsed >= durMs;
-
-    // Glow pulses during the pause period
-    const pulseMult = getPulse() && inPause
-      ? 1 + 0.55 * Math.sin((elapsed-durMs)/Math.max(pauseMs,1) * Math.PI * 4)
-      : 1;
+    let progress = 1, pulseMult = 1, loopFraction = 0, reveal = 1;
+    if (animMode === "animated") {
+      const durMs   = getDurMs();
+      const pauseMs = getPauseMs();
+      const elapsed = (ts-animStartTs) % (durMs+pauseMs);
+      progress = Math.min(elapsed/durMs, 1);
+      loopFraction = elapsed/(durMs+pauseMs);
+      const inPause = elapsed >= durMs;
+      reveal = inPause ? revealEase(elapsed-durMs, pauseMs) : 0;
+      pulseMult = getPulse() && inPause
+        ? 1 + 0.55 * Math.sin((elapsed-durMs)/Math.max(pauseMs,1) * Math.PI * 4)
+        : 1;
+    } else if (autoRotate) {
+      loopFraction = ((ts-animStartTs) % STATIC_ORBIT_MS) / STATIC_ORBIT_MS;
+    }
+    const liveBearing = loopBearing(loopFraction);
 
     const canvas = $("preview-canvas");
     const ctx    = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
 
     ctx.clearRect(0, 0, W, H);
-    const lw   = scaledLW(W);
-    const dPts = getDisplayPts(previewPts, zoomLevel, rotationDeg);
-    const dDists = buildDists(dPts);
+    const lw = scaledLW(W);
+    const following = cameraMode === "follow";
+    let getTrackDPts;
+    if (bgMode === "map" && map) {
+      if (following) map.jumpTo(followMapCamera(progress, liveBearing, reveal));
+      else if (autoRotate) map.jumpTo({ bearing: liveBearing });
+      getTrackDPts = (track) => ({
+        pts: track.mapProjectedPts,
+        dists: following ? track.trimmedLatLonDists : (track.isPrimary ? mapProjectedDists : buildDists(track.mapProjectedPts||[])),
+      });
+    } else if (following) {
+      const pivot = pointAtProgress(previewPts, previewLatLonDists, progress);
+      const finalPivot = reveal>0 ? { x: pivot.x+(W/2-pivot.x)*reveal, y: pivot.y+(H/2-pivot.y)*reveal } : pivot;
+      const z = zoomLevel + (1-zoomLevel)*reveal;
+      getTrackDPts = (track) => ({ pts: getFollowPts(track.previewPts, z, liveBearing, finalPivot, W, H), dists: track.previewLatLonDists });
+    } else {
+      getTrackDPts = (track) => { const p = getDisplayPts(track.previewPts, zoomLevel, liveBearing); return { pts:p, dists: buildDists(p) }; };
+    }
 
-    drawRoute(ctx, dPts, dDists, progress, lw, {
-      lc1: getLineC(), lc2: getLineC2(),
-      gi: getGlowI(), gc: getGlowC(),
-      taper: getTaper(), tipDot: getTipDot(),
-      pulseMult, gradient: getGradient(),
+    visibleTrackList().forEach(track => {
+      if (!track.previewPts || !track.previewPts.length) return;
+      const { pts: dPts, dists: dDists } = getTrackDPts(track);
+      if (!dPts || !dPts.length) return;
+      drawRoute(ctx, dPts, dDists, progress, lw, {
+        lc1: track.color1, lc2: track.color2,
+        gi: getGlowI(), gc: getGlowC(),
+        taper: getTaper(),
+        tipDot: track.isPrimary && animMode==="animated" && getTipDot(),
+        pulseMult, gradient: getGradient(),
+      });
     });
+    drawOverlay(ctx, W, H, progress);
 
     animHandle = requestAnimationFrame(frame);
   }
@@ -647,29 +1525,110 @@ function layoutPreview() {
 
   previewPts   = toCanvas(normalizedPts, canvas.width, canvas.height);
   previewDists = buildDists(previewPts);
+  extraTracks.forEach(t=>{
+    if (t.normalizedPts && t.normalizedPts.length) {
+      t.previewPts = toCanvas(t.normalizedPts, canvas.width, canvas.height);
+      t.previewDists = buildDists(t.previewPts);
+    }
+  });
+
+  if (bgMode==="map" && map) {
+    map.resize();
+    if (map.isStyleLoaded() && routePoints.length) fitMapToRoute();
+  }
+
   startAnimation();
 }
 
 // ─── File loading ─────────────────────────────────────────────────────────────
 function onRouteLoaded(pts, name) {
   fileName=name; routePoints=pts;
-  normalizedPts=normalizePoints(downsample(pts), getPad());
+  latLonDists = buildLatLonDists(pts);
+  trimStartFrac=0; trimEndFrac=1;
+  trimTargetId="primary";
+  $("trim-start").value=0; $("trim-end").value=100;
+  $("trim-card").hidden=false;
+  $("tracks-card").hidden=false;
+  updateTrimReadout();
+  rebuildFromRoute();
   $("drop-label").textContent=name;
   $("drop-zone").classList.add("has-file");
+  $("empty-state").classList.add("hidden");
   enableExports(); layoutPreview();
-  showStatus(`${pts.length.toLocaleString()} points loaded`);
+  renderTracksList();
+  renderTrimTargetOptions();
+  if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+  const totalKm = latLonDists[latLonDists.length-1];
+  showStatus(`${pts.length.toLocaleString()} points loaded — ${totalKm.toFixed(1)} km`);
+  $("hdr-hint").textContent = `${name} · ${totalKm.toFixed(1)} km`;
+}
+function parseRouteFile(file) {
+  return new Promise((resolve, reject) => {
+    const isKML = file.name.toLowerCase().endsWith(".kml");
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try { resolve({ pts: isKML ? parseKML(ev.target.result) : parseGPX(ev.target.result), name: file.name.replace(/\.(gpx|kml)$/i,"") }); }
+      catch(err) { reject(err); }
+    };
+    reader.onerror = () => reject(new Error("Could not read file"));
+    reader.readAsText(file);
+  });
 }
 function readFile(file) {
   if (!file) return;
-  const isKML = file.name.toLowerCase().endsWith(".kml");
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const pts = isKML ? parseKML(ev.target.result) : parseGPX(ev.target.result);
-      onRouteLoaded(pts, file.name.replace(/\.(gpx|kml)$/i,""));
-    } catch(err) { showStatus("Error: "+err.message); }
-  };
-  reader.readAsText(file);
+  parseRouteFile(file).then(({pts,name}) => onRouteLoaded(pts, name))
+    .catch(err => showStatus("Error: "+err.message));
+}
+async function addTrackFile(file) {
+  if (!file || !routePoints.length) return;
+  try {
+    const { pts, name } = await parseRouteFile(file);
+    const palette = TRACK_PALETTE[extraTrackSeq % TRACK_PALETTE.length];
+    const track = {
+      id: ++extraTrackSeq, fileName: name, routePoints: pts,
+      latLonDists: buildLatLonDists(pts), color1: palette[0], color2: palette[1], visible: true,
+      trimStartFrac: 0, trimEndFrac: 1,
+    };
+    extraTracks.push(track);
+    rebuildAllTracks(); layoutPreview(); renderTracksList(); renderTrimTargetOptions();
+    if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+    showStatus(`${name} added — ${pts.length.toLocaleString()} points`);
+  } catch(err) { showStatus("Error: "+err.message); }
+}
+function removeTrack(id) {
+  extraTracks = extraTracks.filter(t=>t.id!==id);
+  if (trimTargetId === String(id)) { trimTargetId = "primary"; }
+  rebuildAllTracks(); layoutPreview(); renderTracksList(); renderTrimTargetOptions();
+  if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+}
+function renderTracksList() {
+  const list = $("tracks-list");
+  const rows = [];
+  rows.push(`<div class="track-row"><span class="track-name">${escapeHtml(fileName || "Route")} (primary)</span></div>`);
+  extraTracks.forEach(t => {
+    rows.push(`<div class="track-row" data-track-id="${t.id}">
+      <input type="checkbox" class="track-visible" ${t.visible?"checked":""}>
+      <span class="track-name">${escapeHtml(t.fileName)}</span>
+      <span class="track-colors">
+        <input type="color" class="track-color1" value="${t.color1}" title="Start color">
+        <input type="color" class="track-color2" value="${t.color2}" title="End color">
+      </span>
+      <button class="track-remove" title="Remove track">×</button>
+    </div>`);
+  });
+  list.innerHTML = rows.join("");
+  list.querySelectorAll(".track-row[data-track-id]").forEach(row => {
+    const id = parseInt(row.dataset.trackId);
+    const track = extraTracks.find(t=>t.id===id);
+    row.querySelector(".track-visible").addEventListener("change", e => {
+      track.visible = e.target.checked;
+      rebuildAllTracks(); layoutPreview();
+      if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+    });
+    row.querySelector(".track-color1").addEventListener("input", e => { track.color1 = e.target.value; });
+    row.querySelector(".track-color2").addEventListener("input", e => { track.color2 = e.target.value; });
+    row.querySelector(".track-remove").addEventListener("click", () => removeTrack(id));
+  });
 }
 
 // ─── SVG Export ───────────────────────────────────────────────────────────────
@@ -691,7 +1650,9 @@ function exportSVG() {
   const gi=getGlowI(), gc=getGlowC();
   const glowR=(lw*5*(gi/100)).toFixed(1);
   const glowAlpha=(0.28*gi/100).toFixed(3);
-  const animAttr=`stroke-dasharray="${len}" stroke-dashoffset="${len}"`;
+  const isStatic = animMode==="static";
+  const animAttr = isStatic ? `stroke-dasharray="${len}" stroke-dashoffset="0"` : `stroke-dasharray="${len}" stroke-dashoffset="${len}"`;
+  const animTag = t => isStatic ? "" : `<animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>`;
 
   // Gradient in SVG
   const gradDef = getGradient() ? `
@@ -707,7 +1668,7 @@ function exportSVG() {
   <path d="${d}" fill="none" stroke="${gc}" stroke-width="${lw*3}"
     stroke-linecap="round" stroke-linejoin="round" opacity="${glowAlpha}"
     filter="url(#blur)" ${animAttr}>
-    <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
+    ${animTag()}
   </path>` : "";
 
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
@@ -720,11 +1681,11 @@ function exportSVG() {
   ${glowEl}
   <path d="${d}" fill="none" stroke="${strokeColor}" stroke-width="${lw}"
     stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
-    <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
+    ${animTag()}
   </path>
   <path d="${d}" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="${(lw*0.25).toFixed(1)}"
     stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
-    <animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>
+    ${animTag()}
   </path>
 </svg>`;
 
@@ -741,8 +1702,12 @@ async function exportAPNG() {
 
   // Cap total frames at 80 to prevent OOM on long routes / large canvases.
   // Auto-reduce FPS so the full animation still plays — just at fewer frames.
-  const MAX_DRAW = Math.max(2, Math.min(50, Math.round(60 * durMs / (durMs + pauseMs))));
-  const MAX_PAUSE = Math.max(0, 60 - MAX_DRAW);
+  // Each in-memory frame is W*H*4 bytes; cap frame count harder at higher
+  // export resolutions (4K) so a long/high-res APNG can't exhaust tab memory.
+  const FRAME_CAP = Math.max(8, Math.round(50 / (exportScale*exportScale)));
+  const TOTAL_CAP = Math.max(10, Math.round(60 / (exportScale*exportScale)));
+  const MAX_DRAW = Math.max(2, Math.min(FRAME_CAP, Math.round(60 * durMs / (durMs + pauseMs))));
+  const MAX_PAUSE = Math.max(0, TOTAL_CAP - MAX_DRAW);
   const drawFrames = Math.min(Math.max(Math.round(durMs/1000*24), 2), MAX_DRAW);
   const delayDraw  = Math.round(durMs / drawFrames);
 
@@ -754,9 +1719,21 @@ async function exportAPNG() {
   offC.width=W; offC.height=H;
   const ctx = offC.getContext("2d");
 
-  const pts   = toCanvas(normalizedPts, W, H);
-  const dPts  = getDisplayPts(pts, zoomLevel, rotationDeg);
-  const dDists= buildDists(dPts);
+  const following = cameraMode === "follow";
+  const rotating = (autoRotate || following) && bgMode==="map" && !!map;
+  let mapSnap = null, mapResizePrev = null, basePts = null;
+  if (bgMode==="map" && map) {
+    setProgress("Rendering map background…", 2);
+    if (rotating) {
+      mapResizePrev = await resizeMapForExport(W, H);
+      if (following) {
+        showProgress(true, "Pre-loading map tiles…");
+        await prewarmFollowTiles(fittedZoom+Math.log2(zoomLevel), rotationDeg, pitchDeg, f=>setProgress("Pre-loading map tiles…", f*15));
+      }
+    } else mapSnap = await withMapSnapshot(W, H);
+  } else {
+    basePts = toCanvas(normalizedPts, W, H);
+  }
   const lw=getLineW(), lc=getLineC(), lc2=getLineC2();
   const gi=getGlowI(), gc=getGlowC();
   const taper=getTaper(), tipDot=getTipDot(), pulse=getPulse(), gradient=getGradient();
@@ -764,35 +1741,85 @@ async function exportAPNG() {
   showProgress(true, "Rendering APNG…");
   const frames=[], delays=[];
   const total=drawFrames+pauseFrames;
+  let usedMapBg = !!mapSnap || rotating;
+
+  async function frameAt(loopFraction, progress, reveal) {
+    const bearing = loopBearing(loopFraction);
+    if (rotating) {
+      if (following) {
+        const fd = await captureMapFrame(followMapCamera(progress, bearing, reveal||0));
+        return { pts: fd.pts, dists: trimmedLatLonDists, snapshot: fd.snapshot,
+          extras: (fd.extras||[]).map(e=>({track:e.track, pts:e.pts, dists:e.track.trimmedLatLonDists})) };
+      }
+      return await captureMapFrame({ bearing });
+    }
+    if (mapSnap) return mapSnap;
+    if (following) {
+      const pivot = pointAtProgress(basePts, previewLatLonDists, progress);
+      const finalPivot = reveal>0 ? { x: pivot.x+(W/2-pivot.x)*reveal, y: pivot.y+(H/2-pivot.y)*reveal } : pivot;
+      const z = zoomLevel + (1-zoomLevel)*(reveal||0);
+      return {
+        pts: getFollowPts(basePts, z, bearing, finalPivot, W, H), dists: previewLatLonDists,
+        extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
+          track:t, pts: getFollowPts(t.previewPts, z, bearing, finalPivot, W, H), dists: t.previewLatLonDists,
+        })),
+      };
+    }
+    const p = getDisplayPts(basePts, zoomLevel, bearing);
+    return {
+      pts: p, dists: null,
+      extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>{
+        const ep = getDisplayPts(t.previewPts, zoomLevel, bearing);
+        return { track:t, pts:ep, dists: buildDists(ep) };
+      }),
+    };
+  }
 
   // Draw frames
   for (let i=0; i<drawFrames; i++) {
     const progress = drawFrames>1 ? i/(drawFrames-1) : 1;
+    const fd = await frameAt(i/total, progress);
+    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
     ctx.clearRect(0,0,W,H);
+    if (rotating) ctx.drawImage(map.getCanvas(),0,0,W,H);
+    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,W,H);
     drawRoute(ctx, dPts, dDists, progress, lw, {lc1:lc,lc2,gi,gc,taper,tipDot,pulseMult:1,gradient});
+    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, progress, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:1,gradient}));
+    drawOverlay(ctx, W, H, progress);
     frames.push(ctx.getImageData(0,0,W,H).data.buffer.slice(0));
     delays.push(delayDraw);
     setProgress(`Frame ${i+1} / ${total}`, (i/total)*75);
     if (i%2===0) await new Promise(r=>setTimeout(r,0));
   }
 
-  // Pause frames — pulse glow animates here
+  // Pause frames — pulse glow animates here; Follow mode reveals the whole route.
+  // t must reach exactly 1 on the last frame or the export ends mid-reveal,
+  // slightly off-center instead of settled on the full route.
   for (let i=0; i<pauseFrames; i++) {
-    const t = i/pauseFrames;
+    const t = pauseFrames>1 ? i/(pauseFrames-1) : 1;
     const pm = pulse ? 1+0.55*Math.sin(t*Math.PI*4) : 1;
+    const fd = await frameAt((drawFrames+i)/total, 1, revealEase(t, 1));
+    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
     ctx.clearRect(0,0,W,H);
+    if (rotating) ctx.drawImage(map.getCanvas(),0,0,W,H);
+    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,W,H);
     drawRoute(ctx, dPts, dDists, 1, lw, {lc1:lc,lc2,gi,gc,taper,tipDot:false,pulseMult:pm,gradient});
+    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, 1, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:pm,gradient}));
+    drawOverlay(ctx, W, H, 1);
     frames.push(ctx.getImageData(0,0,W,H).data.buffer.slice(0));
     delays.push(delayPause);
     setProgress(`Pause frame ${i+1} / ${pauseFrames}`, 75+(i/pauseFrames)*10);
     if (i%2===0) await new Promise(r=>setTimeout(r,0));
   }
 
+  if (mapResizePrev) restoreMapAfterExport(mapResizePrev);
+
   setProgress("Encoding APNG…", 87);
   await new Promise(r=>setTimeout(r,0));
-  // 256-color palette: 10× faster than lossless (0) — visually identical for a
-  // transparent route line over empty background
-  const buf  = UPNG.encode(frames, W, H, 256, delays);
+  // 256-color palette is visually identical for a transparent line over empty
+  // background but posterizes photographic map tiles, so use lossless (0) when
+  // a map background is composited in.
+  const buf  = UPNG.encode(frames, W, H, usedMapBg ? 0 : 256, delays);
   const blob = new Blob([buf],{type:"image/png"});
   showProgress(false);
   download(blob, `${fileName}-overlay.png`);
@@ -804,19 +1831,39 @@ function getWebMBg() {
 }
 
 // ─── WebM Export ──────────────────────────────────────────────────────────────
-async function exportWebM() {
+function exportWebM() {
+  return recordVideo({
+    mimeCandidates: ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'],
+    forceOpaque: false,
+    fileExt: 'webm',
+    blobType: 'video/webm',
+    label: 'WebM',
+    unsupportedMsg: 'WebM not supported in this browser — use Chrome or Edge',
+  });
+}
+async function exportMP4() {
+  return recordVideo({
+    mimeCandidates: ['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1','video/mp4;codecs=h264','video/mp4'],
+    forceOpaque: true,
+    fileExt: 'mp4',
+    blobType: 'video/mp4',
+    label: 'MP4',
+    unsupportedMsg: 'MP4 recording isn\'t supported in this browser — try Safari, or export WebM and convert it with HandBrake, ffmpeg, or an online converter.',
+  });
+}
+async function recordVideo({ mimeCandidates, forceOpaque, fileExt, blobType, label, unsupportedMsg }) {
   if (!normalizedPts.length) return;
 
-  const mimeType = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
-    .find(t => MediaRecorder.isTypeSupported(t)) || null;
-  if (!mimeType) { showStatus('WebM not supported in this browser — use Chrome or Edge'); return; }
+  const mimeType = mimeCandidates.find(t => MediaRecorder.isTypeSupported(t)) || null;
+  if (!mimeType) { showStatus(unsupportedMsg); return; }
 
   const W=exportW, H=exportH;
   const FPS=30;
   const durMs=getDurMs(), pauseMs=getPauseMs();
   const totalMs=durMs+pauseMs+250;
   const webmBg=getWebMBg();
-  const isTransparent=webmBg==='transparent';
+  const isTransparent = !forceOpaque && webmBg==='transparent';
+  const bgFillColor = isTransparent ? null : (webmBg==='transparent' ? '#000000' : webmBg);
 
   const lw=getLineW(), lc=getLineC(), lc2=getLineC2();
   const gi=getGlowI(), gc=getGlowC();
@@ -828,9 +1875,22 @@ async function exportWebM() {
   document.body.appendChild(offC);
   const ctx=offC.getContext('2d',{alpha:isTransparent});
 
-  const pts    = toCanvas(normalizedPts, W, H);
-  const dPts   = getDisplayPts(pts, zoomLevel, rotationDeg);
-  const dDists = buildDists(dPts);
+  const following = cameraMode === "follow";
+  const rotating = (autoRotate || following) && bgMode==="map" && !!map;
+  let mapSnap=null, mapResizePrev=null, basePts=null;
+  if (bgMode==="map" && map) {
+    showProgress(true,'Rendering map background…');
+    if (rotating) {
+      mapResizePrev = await resizeMapForExport(W, H);
+      if (following) {
+        showProgress(true, "Pre-loading map tiles…");
+        await prewarmFollowTiles(fittedZoom+Math.log2(zoomLevel), rotationDeg, pitchDeg, f=>setProgress("Pre-loading map tiles…", f*20));
+      }
+    } else mapSnap = await withMapSnapshot(W, H);
+  } else {
+    basePts = toCanvas(normalizedPts, W, H);
+  }
+  const dpr = window.devicePixelRatio||1;
 
   const stream=offC.captureStream(FPS);
   // 40 Mbps: sharp transparent overlays need high bitrate to preserve edge quality
@@ -839,30 +1899,67 @@ async function exportWebM() {
   recorder.ondataavailable=e=>{if(e.data.size>0) chunks.push(e.data);};
   recorder.onstop=()=>{
     document.body.removeChild(offC);
+    if (mapResizePrev) restoreMapAfterExport(mapResizePrev);
     showProgress(false);
-    const blob=new Blob(chunks,{type:'video/webm'});
-    const bgLabel = isTransparent ? 'transparent' : webmBg==='#00b140' ? 'green screen' : 'black bg';
-    download(blob,`${fileName}-overlay.webm`);
-    showStatus(`WebM saved — ${W}×${H}px · ${bgLabel}`);
+    const blob=new Blob(chunks,{type:blobType});
+    const bgLabel = isTransparent ? 'transparent' : bgFillColor==='#00b140' ? 'green screen' : 'black bg';
+    download(blob,`${fileName}-overlay.${fileExt}`);
+    showStatus(`${label} saved — ${W}×${H}px · ${bgLabel}`);
   };
 
   recorder.start(100);
-  showProgress(true,'Recording WebM…');
+  showProgress(true,`Recording ${label}…`);
 
   const startTs=performance.now();
   function frame() {
     const elapsed=performance.now()-startTs;
     if (elapsed>=totalMs){ recorder.stop(); return; }
     const progress=Math.min(elapsed/durMs,1);
+    const loopFraction=elapsed/(durMs+pauseMs);
+    const bearing=loopBearing(loopFraction);
     const inPause=elapsed>=durMs;
+    const reveal = inPause ? revealEase(elapsed-durMs, pauseMs) : 0;
     const pulseMult=pulse&&inPause
       ?1+0.55*Math.sin((elapsed-durMs)/Math.max(pauseMs,1)*Math.PI*4):1;
     ctx.clearRect(0,0,W,H);
-    if (!isTransparent) {
-      ctx.fillStyle=webmBg;
-      ctx.fillRect(0,0,W,H);
+    let dPts, dDists, extraFrames=[];
+    if (rotating) {
+      const jump = following ? followMapCamera(progress, bearing, reveal) : { bearing };
+      map.jumpTo(jump);
+      dPts = projectLatLonToCanvas(trimmedPts, dpr);
+      dDists = following ? trimmedLatLonDists : buildDists(dPts);
+      ctx.drawImage(map.getCanvas(),0,0,W,H);
+      extraFrames = extraTracks.filter(t=>t.visible && t.trimmedPts && t.trimmedPts.length).map(t=>{
+        const p = projectLatLonToCanvas(t.trimmedPts, dpr);
+        return { track:t, pts:p, dists: following ? t.trimmedLatLonDists : buildDists(p) };
+      });
+    } else if (mapSnap) {
+      dPts=mapSnap.pts; dDists=mapSnap.dists;
+      ctx.drawImage(mapSnap.snapshot,0,0,W,H);
+      extraFrames = mapSnap.extras || [];
+    } else {
+      if (!isTransparent) { ctx.fillStyle=bgFillColor; ctx.fillRect(0,0,W,H); }
+      if (following) {
+        const pivot = pointAtProgress(basePts, previewLatLonDists, progress);
+        const finalPivot = reveal>0 ? { x: pivot.x+(W/2-pivot.x)*reveal, y: pivot.y+(H/2-pivot.y)*reveal } : pivot;
+        const z = zoomLevel + (1-zoomLevel)*reveal;
+        dPts = getFollowPts(basePts, z, bearing, finalPivot, W, H);
+        dDists = previewLatLonDists;
+        extraFrames = extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
+          track:t, pts: getFollowPts(t.previewPts, z, bearing, finalPivot, W, H), dists: t.previewLatLonDists,
+        }));
+      } else {
+        dPts = getDisplayPts(basePts, zoomLevel, bearing);
+        dDists = buildDists(dPts);
+        extraFrames = extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>{
+          const p = getDisplayPts(t.previewPts, zoomLevel, bearing);
+          return { track:t, pts:p, dists: buildDists(p) };
+        });
+      }
     }
     drawRoute(ctx,dPts,dDists,progress,lw,{lc1:lc,lc2,gi,gc,taper,tipDot,pulseMult,gradient});
+    extraFrames.forEach(ef => drawRoute(ctx, ef.pts, ef.dists, progress, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult,gradient}));
+    drawOverlay(ctx, W, H, progress);
     setProgress('Recording…',Math.round((elapsed/totalMs)*100));
     requestAnimationFrame(frame);
   }
@@ -894,9 +1991,22 @@ async function exportGIF() {
 
   const offC=document.createElement("canvas"); offC.width=GW; offC.height=GH;
   const ctx=offC.getContext("2d");
-  const pts   = toCanvas(normalizedPts, GW, GH);
-  const dPts  = getDisplayPts(pts, zoomLevel, rotationDeg);
-  const dDists= buildDists(dPts);
+
+  const following = cameraMode === "follow";
+  const rotating = (autoRotate || following) && bgMode==="map" && !!map;
+  let mapSnap=null, mapResizePrev=null, basePts=null;
+  if (bgMode==="map" && map) {
+    setProgress("Rendering map background…", 2);
+    if (rotating) {
+      mapResizePrev = await resizeMapForExport(GW, GH);
+      if (following) {
+        setProgress("Pre-loading map tiles…", 2);
+        await prewarmFollowTiles(fittedZoom+Math.log2(zoomLevel), rotationDeg, pitchDeg, f=>setProgress("Pre-loading map tiles…", f*15));
+      }
+    } else mapSnap = await withMapSnapshot(GW, GH);
+  } else {
+    basePts = toCanvas(normalizedPts, GW, GH);
+  }
   const lw=getLineW()*GIF_SCALE, lc=getLineC(), lc2=getLineC2();
   const gi=getGlowI(), gc=getGlowC();
   const taper=getTaper(), gradient=getGradient();
@@ -905,19 +2015,66 @@ async function exportGIF() {
   const gif=new GIF({workers:4,quality:3,width:GW,height:GH,workerScript:gifWorkerURL,background:bgColor});
   const total=drawFrames+(pauseMs>0?1:0);
 
+  async function frameAt(loopFraction, progress, reveal) {
+    const bearing = loopBearing(loopFraction);
+    if (rotating) {
+      if (following) {
+        const fd = await captureMapFrame(followMapCamera(progress, bearing, reveal||0));
+        return { pts: fd.pts, dists: trimmedLatLonDists, snapshot: fd.snapshot,
+          extras: (fd.extras||[]).map(e=>({track:e.track, pts:e.pts, dists:e.track.trimmedLatLonDists})) };
+      }
+      return await captureMapFrame({ bearing });
+    }
+    if (mapSnap) return mapSnap;
+    if (following) {
+      const pivot = pointAtProgress(basePts, previewLatLonDists, progress);
+      const finalPivot = reveal>0 ? { x: pivot.x+(GW/2-pivot.x)*reveal, y: pivot.y+(GH/2-pivot.y)*reveal } : pivot;
+      const z = zoomLevel + (1-zoomLevel)*(reveal||0);
+      return {
+        pts: getFollowPts(basePts, z, bearing, finalPivot, GW, GH), dists: previewLatLonDists,
+        extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
+          track:t, pts: getFollowPts(t.previewPts, z, bearing, finalPivot, GW, GH), dists: t.previewLatLonDists,
+        })),
+      };
+    }
+    const p = getDisplayPts(basePts, zoomLevel, bearing);
+    return {
+      pts: p, dists: null,
+      extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>{
+        const ep = getDisplayPts(t.previewPts, zoomLevel, bearing);
+        return { track:t, pts:ep, dists: buildDists(ep) };
+      }),
+    };
+  }
+
   for (let i=0; i<drawFrames; i++) {
     const progress=drawFrames>1?i/(drawFrames-1):1;
-    ctx.clearRect(0,0,GW,GH); ctx.fillStyle=bgColor; ctx.fillRect(0,0,GW,GH);
+    const fd = await frameAt(i/total, progress);
+    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
+    ctx.clearRect(0,0,GW,GH);
+    if (rotating) ctx.drawImage(map.getCanvas(),0,0,GW,GH);
+    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,GW,GH);
+    else { ctx.fillStyle=bgColor; ctx.fillRect(0,0,GW,GH); }
     drawRoute(ctx, dPts, dDists, progress, lw, {lc1:lc,lc2,gi,gc,taper,tipDot:false,pulseMult:1,gradient});
+    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, progress, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:1,gradient}));
+    drawOverlay(ctx, GW, GH, progress);
     gif.addFrame(offC,{copy:true,delay:delayDraw});
     setProgress(`Frame ${i+1} / ${total}`, (i/total)*50);
     if (i%4===0) await new Promise(r=>setTimeout(r,0));
   }
   if (pauseMs>0) {
-    ctx.clearRect(0,0,GW,GH); ctx.fillStyle=bgColor; ctx.fillRect(0,0,GW,GH);
+    const fd = await frameAt(drawFrames/total, 1, 1);
+    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
+    ctx.clearRect(0,0,GW,GH);
+    if (rotating) ctx.drawImage(map.getCanvas(),0,0,GW,GH);
+    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,GW,GH);
+    else { ctx.fillStyle=bgColor; ctx.fillRect(0,0,GW,GH); }
     drawRoute(ctx, dPts, dDists, 1, lw, {lc1:lc,lc2,gi,gc,taper,tipDot:false,pulseMult:1,gradient});
+    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, 1, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:1,gradient}));
+    drawOverlay(ctx, GW, GH, 1);
     gif.addFrame(offC,{copy:true,delay:Math.max(Math.round(pauseMs),20)});
   }
+  if (mapResizePrev) restoreMapAfterExport(mapResizePrev);
   setProgress("Encoding GIF…",55);
   gif.on("progress", p=>setProgress("Encoding GIF…",55+p*43));
   gif.on("finished", blob=>{
@@ -927,14 +2084,90 @@ async function exportGIF() {
   gif.render();
 }
 
+// ─── PNG Export (static finished frame) ────────────────────────────────────────
+async function exportPNG() {
+  if (!normalizedPts.length) return;
+  const W=exportW, H=exportH;
+
+  const offC=document.createElement("canvas"); offC.width=W; offC.height=H;
+  const ctx=offC.getContext("2d");
+
+  const following = cameraMode === "follow";
+  let mapSnap=null, dPts, dDists, extraFrames=[];
+  if (bgMode==="map" && map) {
+    showProgress(true,"Rendering map background…");
+    if (following) {
+      const prev = await resizeMapForExport(W, H);
+      const fd = await captureMapFrame(followMapCamera(1, rotationDeg, 1));
+      const snapshot = await createImageBitmap(map.getCanvas());
+      restoreMapAfterExport(prev);
+      mapSnap = { pts: fd.pts, dists: trimmedLatLonDists, snapshot };
+      extraFrames = fd.extras || [];
+    } else {
+      mapSnap = await withMapSnapshot(W, H);
+      extraFrames = mapSnap.extras || [];
+    }
+  }
+  if (mapSnap) { dPts=mapSnap.pts; dDists=mapSnap.dists; }
+  else {
+    const pts = toCanvas(normalizedPts, W, H);
+    if (following) {
+      const pivot = pointAtProgress(pts, previewLatLonDists, 1);
+      dPts = getFollowPts(pts, zoomLevel, rotationDeg, pivot, W, H);
+      dDists = previewLatLonDists;
+      extraFrames = extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
+        track:t, pts: getFollowPts(toCanvas(t.normalizedPts,W,H), zoomLevel, rotationDeg, pivot, W, H), dists: t.previewLatLonDists,
+      }));
+    } else {
+      dPts  = getDisplayPts(pts, zoomLevel, rotationDeg);
+      dDists= buildDists(dPts);
+      extraFrames = extraTracks.filter(t=>t.visible && t.normalizedPts && t.normalizedPts.length).map(t=>{
+        const p = getDisplayPts(toCanvas(t.normalizedPts,W,H), zoomLevel, rotationDeg);
+        return { track:t, pts:p, dists: buildDists(p) };
+      });
+    }
+  }
+
+  ctx.clearRect(0,0,W,H);
+  if (mapSnap) ctx.drawImage(mapSnap.snapshot,0,0,W,H);
+  drawRoute(ctx, dPts, dDists, 1, getLineW(), {
+    lc1:getLineC(), lc2:getLineC2(), gi:getGlowI(), gc:getGlowC(),
+    taper:getTaper(), tipDot:false, pulseMult:1, gradient:getGradient(),
+  });
+  extraFrames.forEach(ef => {
+    drawRoute(ctx, ef.pts, ef.dists, 1, getLineW(), {
+      lc1: ef.track.color1, lc2: ef.track.color2, gi:getGlowI(), gc:getGlowC(),
+      taper:getTaper(), tipDot:false, pulseMult:1, gradient:getGradient(),
+    });
+  });
+  drawOverlay(ctx, W, H, 1);
+
+  offC.toBlob(blob => {
+    showProgress(false);
+    download(blob, `${fileName}-overlay.png`);
+    showStatus(`PNG downloaded — ${W}×${H}px`);
+  }, "image/png");
+}
+
 // ─── Event wiring ─────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+
+  document.querySelectorAll(".section-header").forEach(h=>{
+    h.addEventListener("click", ()=> h.closest(".section").classList.toggle("collapsed"));
+  });
 
   $("file-input").addEventListener("change", e=>readFile(e.target.files[0]));
   const dz=$("drop-zone");
   dz.addEventListener("dragover", e=>{e.preventDefault();dz.classList.add("drag-over");});
   dz.addEventListener("dragleave",()=>dz.classList.remove("drag-over"));
   dz.addEventListener("drop", e=>{e.preventDefault();dz.classList.remove("drag-over");readFile(e.dataTransfer.files[0]);});
+
+  $("add-track-input").addEventListener("change", e=>{ addTrackFile(e.target.files[0]); e.target.value=""; });
+  const atz=$("add-track-zone");
+  atz.addEventListener("click", ()=>$("add-track-input").click());
+  atz.addEventListener("dragover", e=>{e.preventDefault();atz.classList.add("drag-over");});
+  atz.addEventListener("dragleave",()=>atz.classList.remove("drag-over"));
+  atz.addEventListener("drop", e=>{e.preventDefault();atz.classList.remove("drag-over");addTrackFile(e.dataTransfer.files[0]);});
 
   function wireSlider(sliderId, numId, onchange) {
     const sl=$(sliderId), num=$(numId);
@@ -953,34 +2186,67 @@ document.addEventListener("DOMContentLoaded", () => {
   wireSlider("duration",      "dur-num", ()=>{ animStartTs=null; });
   wireSlider("loop-pause",    "lp-num",  ()=>{ animStartTs=null; });
 
-  $("zoom").addEventListener("input",()=>{ zoomLevel=parseFloat($("zoom").value); $("zoom-num").value=$("zoom").value; });
+  function onViewChange() {
+    if (bgMode==="map" && map) { applyMapCamera(); recenterOnRoute(getTrimmedPoints()); }
+  }
+
+  $("zoom").addEventListener("input",()=>{ zoomLevel=parseFloat($("zoom").value); $("zoom-num").value=$("zoom").value; onViewChange(); });
   $("zoom-num").addEventListener("input",()=>{
     const v=parseFloat($("zoom-num").value); if(isNaN(v)) return;
-    zoomLevel=Math.min(4,Math.max(0.2,v)); $("zoom").value=zoomLevel;
+    zoomLevel=Math.min(4,Math.max(0.2,v)); $("zoom").value=zoomLevel; onViewChange();
   });
   $("zoom-num").addEventListener("blur",()=>{ $("zoom-num").value=$("zoom").value; });
 
-  $("rotation").addEventListener("input",()=>{ rotationDeg=parseInt($("rotation").value); $("rot-num").value=$("rotation").value; });
+  $("rotation").addEventListener("input",()=>{ rotationDeg=parseInt($("rotation").value); $("rot-num").value=$("rotation").value; onViewChange(); });
   $("rot-num").addEventListener("input",()=>{
     const v=parseInt($("rot-num").value); if(isNaN(v)) return;
-    rotationDeg=Math.min(359,Math.max(0,v)); $("rotation").value=rotationDeg;
+    rotationDeg=Math.min(359,Math.max(0,v)); $("rotation").value=rotationDeg; onViewChange();
   });
   $("rot-num").addEventListener("blur",()=>{ $("rot-num").value=$("rotation").value; });
+
+  $("tilt").addEventListener("input",()=>{ pitchDeg=parseFloat($("tilt").value); $("tilt-num").value=$("tilt").value; onViewChange(); });
+  $("tilt-num").addEventListener("input",()=>{
+    const v=parseFloat($("tilt-num").value); if(isNaN(v)) return;
+    pitchDeg=Math.min(70,Math.max(0,v)); $("tilt").value=pitchDeg; onViewChange();
+  });
+  $("tilt-num").addEventListener("blur",()=>{ $("tilt-num").value=$("tilt").value; });
 
   $("preview-canvas").addEventListener("wheel", e=>{
     e.preventDefault();
     zoomLevel=Math.min(4,Math.max(0.2, zoomLevel+(e.deltaY<0?0.08:-0.08)));
     $("zoom").value=zoomLevel; $("zoom-num").value=parseFloat(zoomLevel.toFixed(2));
+    onViewChange();
   },{passive:false});
 
   wireSlider("padding","pad-num",()=>{
     if (routePoints.length) {
-      normalizedPts=normalizePoints(downsample(routePoints),getPad());
+      rebuildFromRoute();
       const c=$("preview-canvas");
       previewPts=toCanvas(normalizedPts,c.width,c.height);
       previewDists=buildDists(previewPts);
     }
   });
+
+  function onTrimChange() {
+    let s=parseFloat($("trim-start").value), e=parseFloat($("trim-end").value);
+    if (s>e-1) { s=Math.max(0,e-1); $("trim-start").value=s; }
+    setTrimTarget(s/100, e/100);
+    updateTrimReadout();
+    if (routePoints.length) {
+      rebuildFromRoute(); layoutPreview();
+      if (bgMode==="map" && map) fitMapToRoute();
+    }
+  }
+  $("trim-start").addEventListener("input",onTrimChange);
+  $("trim-end").addEventListener("input",onTrimChange);
+  $("trim-target").addEventListener("change",()=>{
+    trimTargetId = $("trim-target").value;
+    loadTrimTargetIntoUI();
+  });
+  window.resetTrim = () => {
+    $("trim-start").value=0; $("trim-end").value=100;
+    onTrimChange();
+  };
 
   // Colors — live update
   $("line-color").addEventListener("input",()=>{});
@@ -992,12 +2258,94 @@ document.addEventListener("DOMContentLoaded", () => {
     $(id).addEventListener("change",()=>{});
   });
 
-  document.querySelectorAll(".asp-btn").forEach(btn=>{
+  document.querySelectorAll(".asp-btn[data-asp]").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      document.querySelectorAll(".asp-btn").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".asp-btn[data-asp]").forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
-      [exportW,exportH]=ASPECTS[btn.dataset.asp];
+      currentAspect = btn.dataset.asp;
+      updateExportDims();
       layoutPreview();
+    });
+  });
+
+  document.querySelectorAll("#res-btns .asp-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#res-btns .asp-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      exportScale = parseInt(btn.dataset.res);
+      updateExportDims();
+      layoutPreview();
+    });
+  });
+
+  updateExportDims();
+
+  document.querySelectorAll("#mode-btns .asp-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#mode-btns .asp-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      animMode = btn.dataset.mode;
+      document.body.classList.toggle("mode-static", animMode==="static");
+      document.body.classList.toggle("mode-animated", animMode==="animated");
+      animStartTs = null;
+    });
+  });
+
+  document.querySelectorAll("#camera-btns .asp-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#camera-btns .asp-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      cameraMode = btn.dataset.camera;
+      animStartTs = null;
+      if (cameraMode==="overview" && bgMode==="map" && map) { fitMapToRoute(); }
+    });
+  });
+
+  document.querySelectorAll("#bg-btns .asp-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#bg-btns .asp-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      setBg(btn.dataset.bg);
+    });
+  });
+
+  document.querySelectorAll("#layout-btns .asp-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#layout-btns .asp-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      overlayLayout = btn.dataset.layout;
+      $("overlay-opts").classList.toggle("collapsed", overlayLayout==="none");
+    });
+  });
+
+  $("auto-rotate-on").addEventListener("change",()=>{
+    autoRotate = $("auto-rotate-on").checked;
+    $("rotate-speed-wrap").classList.toggle("collapsed", !autoRotate);
+    animStartTs = null;
+  });
+  wireSlider("rotate-speed","rotate-speed-num",()=>{});
+  wireSlider("overlay-size","overlay-size-num",()=>{});
+  wireSlider("overlay-offset-x","overlay-offset-x-num",()=>{});
+  wireSlider("overlay-offset-y","overlay-offset-y-num",()=>{});
+
+  document.querySelectorAll("#overlay-font-btns .seg-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#overlay-font-btns .seg-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+  document.querySelectorAll("#overlay-weight-btns .seg-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#overlay-weight-btns .seg-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+
+  document.querySelectorAll("#map-style-btns .style-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#map-style-btns .style-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      setMapStyle(btn.dataset.style);
     });
   });
 
