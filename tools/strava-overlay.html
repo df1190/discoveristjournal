@@ -7,11 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
 <style>
 :root {
   --bg:      #F2F2F7;
@@ -166,7 +163,26 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 #checker-bg{position:absolute;inset:0;z-index:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
 #map-bg{position:absolute;inset:0;z-index:1;display:none}
 #map-bg .maplibregl-ctrl-attrib,#map-bg .maplibregl-ctrl-logo{display:none!important}
-#preview-canvas{position:relative;z-index:2;display:block;transition:opacity var(--ts) var(--ease)}
+#preview-canvas{position:absolute;z-index:2;display:block;transition:opacity var(--ts) var(--ease)}
+/* Greys out the stage outside the export frame */
+#frame-mask{position:absolute;z-index:3;pointer-events:none;box-shadow:0 0 0 9999px rgba(18,20,26,.52);outline:1.5px solid rgba(255,255,255,.85)}
+#frame-mask[hidden]{display:none}
+/* In Map mode the map underneath takes the mouse, so the shot can be framed by dragging */
+body.bg-map #preview-canvas{pointer-events:none}
+body.bg-map #map-bg{cursor:grab}
+body.bg-map #map-bg:active{cursor:grabbing}
+body.bg-map #checker-wrap{background:#0B1020}
+body:not(.bg-map) .map-only{display:none!important}
+#map-nav{position:absolute;top:10px;right:10px;z-index:4;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#map-nav[hidden]{display:none}
+.card[hidden]{display:none}
+/* Over the map, the "drop a route" hint needs its own backdrop to be readable */
+body.bg-map #empty-state{inset:auto;left:50%;top:50%;transform:translate(-50%,-50%);padding:16px 22px;border-radius:14px;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 4px 18px rgba(0,0,0,.18);color:var(--lbl2)}
+body.bg-map #empty-state svg{stroke:var(--lbl3)}
+#map-nav button{width:30px;height:30px;border:none;background:transparent;font:500 17px/1 var(--font);color:var(--lbl);cursor:pointer;display:flex;align-items:center;justify-content:center}
+#map-nav button+button{border-top:1px solid var(--sep)}
+#map-nav button:hover{background:rgba(0,0,0,.06)}
+#map-nav svg{width:15px;height:15px}
 
 #empty-state{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--lbl4);pointer-events:none;text-align:center;padding:20px}
 #empty-state svg{width:34px;height:34px;stroke:var(--lbl4);fill:none;stroke-width:1.4;opacity:.6}
@@ -188,6 +204,10 @@ body.mode-animated .static-only{display:none!important}
 #prog-label{font-size:12px;color:var(--lbl3)}
 #prog-bar-wrap{height:5px;background:var(--fill2);border-radius:3px;overflow:hidden}
 #prog-bar{height:100%;background:var(--gold);border-radius:3px;transition:width .08s linear;width:0%}
+#prog-eta{font-size:11px;color:var(--lbl4);font-family:var(--mono);font-variant-numeric:tabular-nums;min-height:14px}
+#prog-cancel{align-self:center;padding:7px 18px}
+.export-main{width:100%;padding:11px 14px;font-size:13px;font-weight:600}
+.export-meta{font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-top:7px;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body class="mode-animated">
@@ -284,6 +304,13 @@ body.mode-animated .static-only{display:none!important}
 
     <div class="card">
       <div class="ctitle">Premium Effects</div>
+      <div class="toggle-row" style="border-bottom:1px solid var(--sep);padding-bottom:8px;margin-bottom:2px">
+        <span class="toggle-label" style="font-weight:600;color:var(--lbl)">All effects</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="effects-all" checked>
+          <span class="toggle-knob"></span>
+        </label>
+      </div>
       <div class="toggle-row">
         <span class="toggle-label">Gradient color</span>
         <label class="toggle-switch">
@@ -317,7 +344,7 @@ body.mode-animated .static-only{display:none!important}
       </div>
     </div>
 
-    <div class="section collapsed" data-section="scene">
+    <div class="section" data-section="scene">
       <div class="section-header">
         <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
         <h2>Camera &amp; Scene</h2>
@@ -358,13 +385,41 @@ body.mode-animated .static-only{display:none!important}
             <button class="asp-btn active" data-camera="overview">Overview<small>Whole route</small></button>
             <button class="asp-btn" data-camera="follow">Follow<small>Chase the tip</small></button>
           </div>
+          <div class="card-sub collapsed" id="follow-opts" style="margin-top:9px">
+            <div class="ctitle">Steadiness</div>
+            <div class="seg-row" id="steady-btns" style="margin-top:5px">
+              <button class="seg-btn" data-steady="tight">Tight</button>
+              <button class="seg-btn active" data-steady="smooth">Smooth</button>
+              <button class="seg-btn" data-steady="very">Very smooth</button>
+            </div>
+            <div class="ctitle" style="margin-top:9px">Look ahead</div>
+            <div class="seg-row" id="look-btns" style="margin-top:5px">
+              <button class="seg-btn" data-look="none">Centered</button>
+              <button class="seg-btn active" data-look="little">A little</button>
+              <button class="seg-btn" data-look="more">More</button>
+            </div>
+          </div>
+          <div class="toggle-row anim-only" style="margin-top:6px">
+            <span class="toggle-label">Smooth start &amp; stop</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="ease-on" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row anim-only map-only">
+            <span class="toggle-label">Globe intro (fly in from space)</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="intro-on">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card">
           <div class="ctitle">Background</div>
           <div class="asp-row" id="bg-btns">
-            <button class="asp-btn active" data-bg="transparent">Transparent<small>For overlays</small></button>
-            <button class="asp-btn" data-bg="map">Map<small>Real basemap</small></button>
+            <button class="asp-btn" data-bg="transparent">Transparent<small>For overlays</small></button>
+            <button class="asp-btn active" data-bg="map">Map<small>Real basemap</small></button>
           </div>
           <div class="card-sub collapsed" id="map-style-wrap" style="margin-top:9px">
             <div class="style-grid" id="map-style-btns">
@@ -383,12 +438,35 @@ body.mode-animated .static-only{display:none!important}
             </div>
             <div class="row" style="margin-top:9px">
               <label>Tilt (3D)</label>
-              <input type="range" id="tilt" min="0" max="70" step="1" value="0">
+              <input type="range" id="tilt" min="0" max="65" step="1" value="0">
               <div class="num-wrap">
-                <input type="number" class="num-input" id="tilt-num" min="0" max="70" step="1" value="0">
+                <input type="number" class="num-input" id="tilt-num" min="0" max="65" step="1" value="0">
                 <span class="num-unit">°</span>
               </div>
             </div>
+            <div class="toggle-row">
+              <span class="toggle-label">3D terrain</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="terrain-on" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Names &amp; labels<small style="display:block;font-size:10.5px;color:var(--lbl4)">Cities, countries, peaks, roads</small></span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="labels-on" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="row" id="terrain-height-row">
+              <label>Height</label>
+              <input type="range" id="terrain-height" min="1" max="3" step="0.1" value="1.4">
+              <div class="num-wrap">
+                <input type="number" class="num-input" id="terrain-height-num" min="1" max="3" step="0.1" value="1.4">
+                <span class="num-unit">×</span>
+              </div>
+            </div>
+            <div class="hint">Drag the map to frame your shot: drag to move, right-drag to rotate and tilt, scroll to zoom.</div>
           </div>
         </div>
 
@@ -410,19 +488,18 @@ body.mode-animated .static-only{display:none!important}
               <span class="num-unit">°</span>
             </div>
           </div>
-          <div class="toggle-row">
-            <span class="toggle-label">Auto-rotate while playing</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="auto-rotate-on">
-              <span class="toggle-knob"></span>
-            </label>
+          <div class="ctitle" style="margin-top:2px">Rotation while playing</div>
+          <div class="seg-row" id="rotate-btns">
+            <button class="seg-btn active" data-rotate="off">Off</button>
+            <button class="seg-btn" data-rotate="orbit">Orbit<small>Spin around</small></button>
+            <button class="seg-btn" data-rotate="heading">Follow road<small>Turns with it</small></button>
           </div>
           <div class="card-sub collapsed" id="rotate-speed-wrap">
             <div class="row">
               <label>Spin speed</label>
-              <input type="range" id="rotate-speed" min="30" max="1080" step="30" value="360">
+              <input type="range" id="rotate-speed" min="15" max="720" step="15" value="120">
               <div class="num-wrap">
-                <input type="number" class="num-input" id="rotate-speed-num" min="30" max="1080" step="30" value="360">
+                <input type="number" class="num-input" id="rotate-speed-num" min="15" max="720" step="15" value="120">
                 <span class="num-unit">°/loop</span>
               </div>
             </div>
@@ -453,9 +530,9 @@ body.mode-animated .static-only{display:none!important}
       </div>
       <div class="row">
         <label>Padding</label>
-        <input type="range" id="padding" min="5" max="30" step="1" value="15">
+        <input type="range" id="padding" min="0" max="30" step="1" value="0">
         <div class="num-wrap">
-          <input type="number" class="num-input" id="pad-num" min="5" max="30" step="1" value="15">
+          <input type="number" class="num-input" id="pad-num" min="0" max="30" step="1" value="0">
           <span class="num-unit">%</span>
         </div>
       </div>
@@ -469,6 +546,14 @@ body.mode-animated .static-only{display:none!important}
         <button class="asp-btn" data-layout="corner">Corner</button>
         <button class="asp-btn" data-layout="center">Center</button>
       </div>
+      <div class="toggle-row" style="margin-top:8px">
+        <span class="toggle-label">Elevation profile</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="profile-on">
+          <span class="toggle-knob"></span>
+        </label>
+      </div>
+      <div class="hint" id="profile-hint"></div>
       <div class="card-sub collapsed" id="overlay-opts" style="margin-top:9px">
         <div class="row">
           <label>Title</label>
@@ -531,40 +616,30 @@ body.mode-animated .static-only{display:none!important}
       </div>
     </div>
 
-    <div class="card anim-only">
-      <div class="ctitle">GIF Matte Color</div>
-      <div class="matte-swatches">
-        <div class="matte-sw active" id="matte-black" style="background:#000" title="Black matte"></div>
-        <div class="matte-sw" id="matte-white" style="background:#fff" title="White matte"></div>
-        <span style="font-size:11px;color:var(--lbl4);line-height:1.4">GIF only — APNG has true&nbsp;alpha</span>
-      </div>
-    </div>
-
     <div class="card">
       <div class="ctitle">Export</div>
 
       <div class="anim-only">
-        <div class="btn-grid">
-          <button class="btn btn-ghost" id="btn-webm" disabled onclick="exportWebM()">WebM</button>
-          <button class="btn btn-ghost" id="btn-mp4" disabled onclick="exportMP4()">MP4</button>
-          <button class="btn btn-ghost" id="btn-gif" disabled onclick="exportGIF()">GIF</button>
-          <button class="btn btn-gold" id="btn-apng" disabled onclick="exportAPNG()">APNG</button>
+        <div class="seg-row" id="fps-btns">
+          <button class="seg-btn" data-fps="24">24 fps<small>Cinematic</small></button>
+          <button class="seg-btn active" data-fps="30">30 fps<small>Standard</small></button>
+          <button class="seg-btn" data-fps="60">60 fps<small>Smoothest</small></button>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
-          <span style="font-size:10.5px;color:var(--lbl4);white-space:nowrap">Solid bg</span>
+        <div class="seg-row" id="quality-btns" style="margin-top:5px">
+          <button class="seg-btn" data-quality="good">Good<small>Smaller file</small></button>
+          <button class="seg-btn active" data-quality="high">High<small>Recommended</small></button>
+          <button class="seg-btn" data-quality="max">Max<small>Largest file</small></button>
+        </div>
+        <div id="video-bg-wrap" style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <span style="font-size:10.5px;color:var(--lbl4);white-space:nowrap">Background</span>
           <div class="matte-swatches">
-            <div class="matte-sw active" id="webm-bg-alpha" data-webmbg="transparent" title="Transparent — CapCut desktop · DaVinci · Premiere (WebM only)" style="background:repeating-conic-gradient(#999 0% 25%,#ddd 0% 50%) 0 0/8px 8px"></div>
-            <div class="matte-sw" id="webm-bg-green" data-webmbg="#00b140" title="Green screen — chroma key in CapCut · Canva · any editor" style="background:#00b140"></div>
-            <div class="matte-sw" id="webm-bg-black" data-webmbg="#000000" title="Black — Screen blend mode in Canva; also used for MP4" style="background:#000"></div>
+            <div class="matte-sw active" data-videobg="#00b140" title="Green screen: chroma key it out in DaVinci, CapCut, Premiere" style="background:#00b140"></div>
+            <div class="matte-sw" data-videobg="#000000" title="Black: use Screen / Add blend mode" style="background:#000"></div>
           </div>
-          <span id="webm-bg-hint" style="font-size:10px;color:var(--lbl4)">transparent</span>
+          <span id="video-bg-hint" style="font-size:10px;color:var(--lbl4)">green screen</span>
         </div>
-        <div style="font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-top:6px">
-          <strong style="color:var(--lbl3)">APNG</strong> = transparent · CapCut mobile · iOS apps<br>
-          <strong style="color:var(--lbl3)">WebM</strong> = DaVinci · Premiere · CapCut (set bg above)<br>
-          <strong style="color:var(--lbl3)">MP4</strong> = universal video, no transparency · Edits · Instagram · iPhone<br>
-          <strong style="color:var(--lbl3)">GIF</strong> = universal · Instagram apps · solid bg
-        </div>
+        <button class="btn btn-gold export-main" id="btn-mp4" disabled onclick="exportMP4()" style="margin-top:9px">Export MP4</button>
+        <div class="export-meta" id="export-meta"></div>
       </div>
 
       <div class="static-only" style="font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-bottom:7px">
@@ -572,8 +647,7 @@ body.mode-animated .static-only{display:none!important}
       </div>
 
       <div class="btn-row" style="margin-top:6px">
-        <button class="btn btn-ghost" id="btn-png" disabled onclick="exportPNG()">PNG</button>
-        <button class="btn btn-ghost" id="btn-svg" disabled onclick="exportSVG()">SVG</button>
+        <button class="btn btn-ghost" id="btn-png" disabled onclick="exportPNG()">PNG still</button>
       </div>
     </div>
 
@@ -587,6 +661,13 @@ body.mode-animated .static-only{display:none!important}
       <div id="checker-bg"></div>
       <div id="map-bg"></div>
       <canvas id="preview-canvas"></canvas>
+      <div id="frame-mask" hidden></div>
+      <div id="map-nav" hidden>
+        <button data-nav="in" title="Zoom in">+</button>
+        <button data-nav="out" title="Zoom out">&minus;</button>
+        <button data-nav="north" title="Reset rotation"><svg viewBox="0 0 24 24"><path d="M12 3l4 9h-8z" fill="currentColor"/><path d="M12 21l-4-9h8z" fill="currentColor" opacity=".35"/></svg></button>
+        <button data-nav="fit" title="Fit whole route"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      </div>
       <div id="empty-state">
         <svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
         <span>Drop a GPX or KML file to preview your route</span>
@@ -601,6 +682,8 @@ body.mode-animated .static-only{display:none!important}
     <div id="prog-title">Exporting…</div>
     <div id="prog-label">Rendering frames</div>
     <div id="prog-bar-wrap"><div id="prog-bar"></div></div>
+    <div id="prog-eta"></div>
+    <button class="btn btn-ghost" id="prog-cancel" style="display:none" onclick="cancelExport()">Cancel</button>
   </div>
 </div>
 
@@ -615,6 +698,7 @@ function updateExportDims() {
     const small = btn.querySelector("small");
     if (small) small.textContent = `${w*s}×${h*s}`;
   });
+  updateExportMeta();
 }
 
 let routePoints   = [];
@@ -628,8 +712,11 @@ let exportH       = 1920;
 let currentAspect = "9:16";
 let exportScale   = 1; // 1 = 1080p baseline, 2 = 4K
 let fileName      = "route";
-let matteColor    = "black";
-let gifWorkerURL  = null;
+let exportFps     = 30;
+let exportQuality = "high"; // "good" | "high" | "max"
+let videoBg       = "#00b140"; // MP4 background in Transparent mode (green screen or black)
+let exportCancelled = false;
+let exporting     = false;
 let zoomLevel     = 1.0;
 let rotationDeg   = 0;
 let trimStartFrac = 0;
@@ -637,23 +724,39 @@ let trimEndFrac   = 1;
 let latLonDists   = [];
 let trimTargetId  = "primary"; // "primary" | extraTrack.id (as string)
 let animMode      = "animated"; // "animated" | "static"
-let bgMode         = "transparent"; // "transparent" | "map"
+let bgMode         = "map"; // "transparent" | "map"
 let currentMapStyle = "outdoor";
 let map              = null;
 let fittedZoom        = 0;
 let fittedCenter      = null;
-let mapProjectedPts   = [];
-let mapProjectedDists = [];
 let pitchDeg          = 0;
+// True between setStyle() and the new style's load. A forced map.redraw() in
+// that window crashes MapLibre, so the synced preview/export renders wait.
+let styleSwitching    = false;
+let mapLoaded         = false; // first style finished loading
+// Ready for camera work. (map.isStyleLoaded() is no use here: in MapLibre 5 it
+// stays false whenever any tile is still loading, i.e. most of the time while
+// the camera moves, which silently skipped every re-fit.)
+function mapReady() { return !!map && mapLoaded && !styleSwitching; }
 let overlayLayout     = "none"; // "none" | "banner" | "corner" | "center"
-let autoRotate        = false;
-let autoRotateDeg     = 360;
+let autoRotate        = false; // "Orbit": constant spin while playing
+let headingUp         = false; // "Follow road": Follow camera turns with the route
+let steadiness        = "smooth"; // "tight" | "smooth" | "very"
+let lookAhead         = "little"; // "none" | "little" | "more"
+let terrainOn         = true;
+let terrainHeight     = 1.4;
+let userDriving       = false; // true while the person drags/zooms the map
+let lastBearingOffset = 0;     // live bearing minus rotationDeg on the last preview frame
+let elevProfile       = null;
+let layerPts          = [];    // primary track for the map route layer
+let layerDists        = [];  // { d: [0..1], e: [m], min, max } for the primary track
 const STATIC_ORBIT_MS = 8000;
+const MAX_TILT        = 65; // steeper looks mostly at the horizon
 let cameraMode        = "overview"; // "overview" | "follow"
 let trimmedPts        = [];
 let trimmedLatLonDists = [];
 let previewLatLonDists = [];
-let extraTracks       = []; // { id, fileName, routePoints, latLonDists, color1, color2, visible, trimmedPts, trimmedLatLonDists, previewLatLonDists, normalizedPts, previewPts, previewDists, mapProjectedPts }
+let extraTracks       = []; // { id, fileName, routePoints, latLonDists, color1, color2, visible, trimmedPts, trimmedLatLonDists, previewLatLonDists, normalizedPts, previewPts, previewDists, layerPts, layerDists }
 let extraTrackSeq     = 0;
 const TRACK_PALETTE = [
   ["#3B82F6","#60A5FA"], ["#A855F7","#C084FC"], ["#14B8A6","#5EEAD4"],
@@ -662,16 +765,16 @@ const TRACK_PALETTE = [
 
 const MAPTILER_KEY = 'pO4p3paZcjFsfdNEcYDM';
 const MAP_STYLES = {
-  outdoor:   `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${MAPTILER_KEY}`,
-  satellite: `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_KEY}`,
-  hybrid:    `https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_KEY}`,
-  streets:   `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
-  topo:      `https://api.maptiler.com/maps/topo-v2/style.json?key=${MAPTILER_KEY}`,
-  winter:    `https://api.maptiler.com/maps/winter-v2/style.json?key=${MAPTILER_KEY}`,
+  outdoor:   `https://api.maptiler.com/maps/outdoor-v4/style.json?key=${MAPTILER_KEY}`,
+  satellite: `https://api.maptiler.com/maps/satellite-v4/style.json?key=${MAPTILER_KEY}`,
+  hybrid:    `https://api.maptiler.com/maps/hybrid-v4/style.json?key=${MAPTILER_KEY}`,
+  streets:   `https://api.maptiler.com/maps/streets-v4/style.json?key=${MAPTILER_KEY}`,
+  topo:      `https://api.maptiler.com/maps/topo-v4/style.json?key=${MAPTILER_KEY}`,
+  winter:    `https://api.maptiler.com/maps/winter-v4/style.json?key=${MAPTILER_KEY}`,
   bright:    `https://api.maptiler.com/maps/bright-v2/style.json?key=${MAPTILER_KEY}`,
-  basic:     `https://api.maptiler.com/maps/basic-v2/style.json?key=${MAPTILER_KEY}`,
-  night:     `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAPTILER_KEY}`,
-  clean:     `https://api.maptiler.com/maps/backdrop/style.json?key=${MAPTILER_KEY}`,
+  basic:     `https://api.maptiler.com/maps/base-v4/style.json?key=${MAPTILER_KEY}`,
+  night:     `https://api.maptiler.com/maps/base-v4-dark/style.json?key=${MAPTILER_KEY}`,
+  clean:     `https://api.maptiler.com/maps/backdrop-v4/style.json?key=${MAPTILER_KEY}`,
   toner:     `https://api.maptiler.com/maps/toner-v2/style.json?key=${MAPTILER_KEY}`,
   ocean:     `https://api.maptiler.com/maps/ocean/style.json?key=${MAPTILER_KEY}`,
 };
@@ -701,7 +804,14 @@ function getOverlayOffsetY()  { return parseFloat($("overlay-offset-y").value); 
 function getOverlayWeight()   { return document.querySelector("#overlay-weight-btns .seg-btn.active")?.dataset.weight || "700"; }
 function getOverlayFont()     { return document.querySelector("#overlay-font-btns .seg-btn.active")?.dataset.font || "system"; }
 function getAutoRotateDeg()   { return parseFloat($("rotate-speed").value); }
-function scaledLW(W)    { return getLineW() * (W / exportW); }
+function getEase()            { return $("ease-on").checked; }
+function getProfileOn()       { return $("profile-on").checked; }
+// The globe intro needs a real map and a timeline to live in.
+function getIntroMs()         { return $("intro-on").checked && bgMode==="map" && animMode==="animated" ? 2500 : 0; }
+function getLoopMs()          { return getIntroMs() + getDurMs() + getPauseMs(); }
+// Line width is set in 1080p pixels and scales with the canvas, so 4K and the
+// preview look the same as 1080p, only sharper.
+function scaledLW(W)    { return getLineW() * W * exportScale / exportW; }
 
 // ─── Color utils ─────────────────────────────────────────────────────────────
 function lerpColor(hex1, hex2, t) {
@@ -779,12 +889,19 @@ function rebuildAllTracks() {
   trimmedLatLonDists = buildLatLonDists(trimmedPts);
   const dsPrimary = downsample(trimmedPts);
   previewLatLonDists = buildLatLonDists(dsPrimary);
+  // Map-layer copy: dense enough to follow roads at Follow zoom, light enough
+  // to re-send to MapLibre every frame.
+  layerPts = downsample(trimmedPts, 4000);
+  layerDists = buildLatLonDists(layerPts);
+  elevProfile = buildElevProfile(trimmedPts, trimmedLatLonDists);
 
   extraTracks.forEach(t=>{
     t.trimmedPts = trimPoints(t.routePoints, t.latLonDists, t.trimStartFrac ?? 0, t.trimEndFrac ?? 1);
     t.trimmedLatLonDists = buildLatLonDists(t.trimmedPts);
     t.ds = downsample(t.trimmedPts);
     t.previewLatLonDists = buildLatLonDists(t.ds);
+    t.layerPts = downsample(t.trimmedPts, 4000);
+    t.layerDists = buildLatLonDists(t.layerPts);
   });
 
   const pad = getPad();
@@ -811,19 +928,25 @@ function rebuildAllTracks() {
 // Visible tracks in draw order: primary first, then extras. Each has its own
 // color but shares all other line-style/animation/camera settings.
 function visibleTrackList() {
-  const primary = { isPrimary:true, previewPts, previewDists, previewLatLonDists, trimmedPts, trimmedLatLonDists, mapProjectedPts, color1:getLineC(), color2:getLineC2() };
+  const primary = { isPrimary:true, previewPts, previewDists, previewLatLonDists, trimmedPts, trimmedLatLonDists, color1:getLineC(), color2:getLineC2() };
   return [primary, ...extraTracks.filter(t=>t.visible).map(t=>({
     isPrimary:false, previewPts:t.previewPts, previewDists:t.previewDists, previewLatLonDists:t.previewLatLonDists,
-    trimmedPts:t.trimmedPts, trimmedLatLonDists:t.trimmedLatLonDists, mapProjectedPts:t.mapProjectedPts,
+    trimmedPts:t.trimmedPts, trimmedLatLonDists:t.trimmedLatLonDists,
     color1:t.color1, color2:t.color2,
   }))];
+}
+// Index of the segment containing distance targetD (binary search; the camera
+// samples the route many times per frame).
+function segIndex(dists, targetD) {
+  let lo = 0, hi = dists.length-1;
+  while (hi - lo > 1) { const mid = (lo+hi) >> 1; if (dists[mid] < targetD) lo = mid; else hi = mid; }
+  return lo;
 }
 function latLonAtProgress(pts, dists, progress) {
   if (pts.length < 2) return pts[0];
   const totalD = dists[dists.length-1];
   const targetD = Math.max(0,Math.min(1,progress)) * totalD;
-  let ei = 0;
-  while (ei < dists.length-1 && dists[ei+1] < targetD) ei++;
+  const ei = segIndex(dists, targetD);
   if (ei >= pts.length-1) return pts[pts.length-1];
   const segD = dists[ei+1]-dists[ei];
   const t = segD>0 ? (targetD-dists[ei])/segD : 0;
@@ -833,8 +956,7 @@ function pointAtProgress(pts, dists, progress) {
   if (pts.length < 2) return pts[0] || {x:0,y:0};
   const totalD = dists[dists.length-1];
   const targetD = Math.max(0,Math.min(1,progress)) * totalD;
-  let ei = 0;
-  while (ei < dists.length-1 && dists[ei+1] < targetD) ei++;
+  const ei = segIndex(dists, targetD);
   if (ei >= pts.length-1) return pts[pts.length-1];
   const segD = dists[ei+1]-dists[ei];
   const t = segD>0 ? (targetD-dists[ei])/segD : 0;
@@ -918,7 +1040,7 @@ function resetView() {
   $("rotation").value=0; $("rot-num").value=0;
   $("tilt").value=0; $("tilt-num").value=0;
   animStartTs=null;
-  if (bgMode==="map" && map) { applyMapCamera(); recenterOnRoute(getTrimmedPoints()); }
+  if (bgMode==="map" && map) fitMapToRoute();
 }
 
 // ─── Map background (MapLibre) ────────────────────────────────────────────────
@@ -928,17 +1050,61 @@ function ensureMap() {
     container: "map-bg",
     style: MAP_STYLES[currentMapStyle],
     center: [10, 46], zoom: 3,
-    interactive: false,
+    // Draggable so the shot can be framed by hand. Double-click and keyboard
+    // zoom are off: they animate with easeTo, which (MapLibre 4–5) leaves the
+    // camera's terrain elevation frozen at sea level, inside the mountains.
+    interactive: true,
+    doubleClickZoom: false,
+    keyboard: false,
+    boxZoom: false,
+    maxPitch: MAX_TILT, // hand-tilting stops where the slider does
     attributionControl: false,
     antialias: true,
     preserveDrawingBuffer: true,
+    // Label and tile fades run on wall-clock time, so a frame-by-frame export
+    // would capture them half-faded. Off everywhere so preview matches export.
+    fadeDuration: 0,
   });
-  map.on("load", () => {
-    addTerrain(); addSky();
-    if (routePoints.length) fitMapToRoute();
+  const setupStyle = () => { addTerrain(); addSky(); disableRasterFades(); applyProjection(); ensureRouteLayers(); captureLabelLayers(); applyLabels(); };
+  // "load" waits for every tile, so it can arrive late, even mid-export.
+  // The route is already fitted on style.load.
+  map.on("load", () => { setupStyle(); });
+  // style.load fires for the first style too, well before every tile is in,
+  // so camera work (fitting the route) can start right away.
+  map.on("style.load", () => {
+    setupStyle(); styleSwitching = false;
+    if (!mapLoaded) { mapLoaded = true; if (routePoints.length) fitMapToRoute(); }
   });
-  map.on("style.load", () => { addTerrain(); addSky(); });
-  map.on("move", recomputeMapProjectedPts);
+  // Hand framing: while the person drags/zooms, the preview stops driving the
+  // camera; when they let go, the new view becomes the zoom/rotation/tilt.
+  // (Scroll zoom's movestart carries no originalEvent, hence the wheel listener.)
+  map.on("movestart", e => { if (e.originalEvent) userDriving = true; });
+  map.on("wheel", () => { userDriving = true; });
+  map.on("moveend", e => {
+    if (map.isMoving()) return;
+    map._elevationFreeze = false; // safety net for the easeTo elevation bug above
+    if (userDriving || e.originalEvent) commitUserCamera();
+  });
+}
+function commitUserCamera() {
+  userDriving = false;
+  if (!fittedCenter) return;
+  pitchDeg = Math.min(MAX_TILT, Math.round(map.getPitch()));
+  rotationDeg = Math.round(((map.getBearing() - lastBearingOffset) % 360 + 360) % 360);
+  zoomLevel = Math.min(4, Math.max(0.2, Math.pow(2, map.getZoom() - fittedZoom)));
+  if (cameraMode === "overview") fittedCenter = map.getCenter();
+  syncViewSliders();
+}
+function syncViewSliders() {
+  $("zoom").value = zoomLevel; $("zoom-num").value = parseFloat(zoomLevel.toFixed(2));
+  $("rotation").value = rotationDeg; $("rot-num").value = rotationDeg;
+  $("tilt").value = pitchDeg; $("tilt-num").value = pitchDeg;
+}
+// Globe only when the intro needs it; at route zooms it looks like a flat map anyway.
+function applyProjection() {
+  if (!map) return;
+  // Before the style has loaded this throws; the style.load handler applies it then.
+  try { map.setProjection({ type: getIntroMs() > 0 ? "globe" : "mercator" }); } catch (_) {}
 }
 function addTerrain() {
   if (!map.getSource("terrain")) {
@@ -948,164 +1114,181 @@ function addTerrain() {
       tileSize: 256, maxzoom: 14,
     });
   }
-  map.setTerrain({ source: "terrain", exaggeration: 1.4 });
+  map.setTerrain(terrainOn ? { source: "terrain", exaggeration: terrainHeight } : null);
 }
+// MapLibre has no "sky" layer type; the sky above a tilted horizon is set
+// on the map itself.
 function addSky() {
-  if (!map.getLayer("sky")) {
-    map.addLayer({ id: "sky", type: "sky", paint: {
-      "sky-type": "atmosphere",
-      "sky-atmosphere-sun": [0, 90],
-      "sky-atmosphere-sun-intensity": 15,
-    }});
+  map.setSky({
+    "sky-color": "#7FB2E5",
+    "horizon-color": "#DCE9F5",
+    "fog-color": "#EEF2F6",
+    "sky-horizon-blend": 0.6,
+    "horizon-fog-blend": 0.6,
+    "fog-ground-blend": 0.75,
+    "atmosphere-blend": 0.8,
+  });
+}
+// Names & labels: every symbol layer of the basemap (place names, peaks, road
+// numbers, POIs). Their original visibility is remembered per style so
+// switching labels back on restores the style exactly.
+let labelLayers = {};
+function captureLabelLayers() {
+  // Runs on both load and style.load; only the first sight of a layer counts,
+  // later ones may already be hidden by applyLabels. setMapStyle clears it.
+  map.getStyle().layers.forEach(l => {
+    if (l.type === "symbol" && !l.id.startsWith("route-") && !(l.id in labelLayers)) labelLayers[l.id] = (l.layout && l.layout.visibility) || "visible";
+  });
+}
+function applyLabels() {
+  if (!map || styleSwitching) return;
+  const on = $("labels-on").checked;
+  for (const id in labelLayers) {
+    if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", on ? labelLayers[id] : "none");
   }
 }
+function disableRasterFades() {
+  map.getStyle().layers.forEach(l => {
+    if (l.type === "raster") map.setPaintProperty(l.id, "raster-fade-duration", 0);
+  });
+}
+// Every camera move goes through here. With 3D terrain, MapLibre 5's jumpTo
+// looks up the ground height under the new center using the fractional zoom
+// as a tile zoom, finds no tile, and puts the ground at 0 m, so the camera
+// ends up inside the mountains (blank or fog-only frames). Passing the ground
+// height ourselves, looked up at the whole tile zoom, avoids that.
+function jumpCamera(cam) {
+  if (map.terrain && (cam.center != null || cam.zoom != null)) {
+    const center = maplibregl.LngLat.convert(cam.center ?? map.getCenter());
+    const zoom = cam.zoom ?? map.getZoom();
+    const ground = map.terrain.getElevationForLngLatZoom(center, Math.floor(zoom));
+    cam = { ...cam, elevation: ground || map.transform.elevation };
+  }
+  map.jumpTo(cam);
+}
 function fitMapToRoute() {
-  if (!map || !map.isStyleLoaded() || !routePoints.length) return;
+  if (!mapReady() || !routePoints.length || exporting) return;
   const pts = getTrimmedPoints();
   const visibleExtraPts = extraTracks.filter(t=>t.visible).flatMap(t=>t.trimmedPts||[]);
-  const allPts = [...pts, ...visibleExtraPts];
-  let minLat=Infinity,maxLat=-Infinity,minLon=Infinity,maxLon=-Infinity;
-  allPts.forEach(p=>{ if(p.lat<minLat)minLat=p.lat; if(p.lat>maxLat)maxLat=p.lat; if(p.lon<minLon)minLon=p.lon; if(p.lon>maxLon)maxLon=p.lon; });
-  map.jumpTo({ bearing: rotationDeg, pitch: pitchDeg });
-  map.fitBounds([[minLon,minLat],[maxLon,maxLat]], { padding: 40, animate: false });
+  fitCameraToPoints([...pts, ...visibleExtraPts], getPad());
   fittedZoom = map.getZoom();
-  applyMapCamera();
-  recenterOnRoute(allPts);
   fittedCenter = map.getCenter();
+  applyMapCamera();
 }
-// MapLibre's fitBounds/cameraForBounds ignore pitch entirely when solving for
-// center+zoom, so a tilted camera pushes the fitted area toward the bottom of
-// the frame instead of centering it. Compensate by measuring where the route
-// actually lands on screen post-tilt and panning by that pixel offset.
-function recenterOnRoute(pts) {
-  if (!map) return;
-  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  pts.forEach(p=>{
-    const pt = map.project([p.lon, p.lat]);
-    if (pt.x<minX) minX=pt.x; if (pt.x>maxX) maxX=pt.x;
-    if (pt.y<minY) minY=pt.y; if (pt.y>maxY) maxY=pt.y;
-  });
-  const cx=(minX+maxX)/2, cy=(minY+maxY)/2;
-  const c = map.getContainer();
-  map.panBy([cx - c.clientWidth/2, cy - c.clientHeight/2], { animate:false });
+// Frames the route with the current bearing and tilt. MapLibre's fitBounds
+// ignores pitch and terrain (and in 4.x its easeTo leaves the camera stuck at
+// sea level, inside the mountains), so start from cameraForBounds and then
+// correct center and zoom a few times using where the route really lands on
+// screen. map.project understands both tilt and terrain.
+// padFrac: empty margin as a share of the frame's width/height, the same
+// meaning the Padding slider has in Transparent mode.
+function fitCameraToPoints(pts, padFrac) {
+  let minLat=Infinity,maxLat=-Infinity,minLon=Infinity,maxLon=-Infinity;
+  pts.forEach(p=>{ if(p.lat<minLat)minLat=p.lat; if(p.lat>maxLat)maxLat=p.lat; if(p.lon<minLon)minLon=p.lon; if(p.lon>maxLon)maxLon=p.lon; });
+  // Fit inside the export frame (centered in the stage, so same center).
+  const W = frameCss.w, H = frameCss.h;
+  const padX = padFrac*W, padY = padFrac*H;
+  const bounds = [[minLon,minLat],[maxLon,maxLat]];
+  const cam = map.cameraForBounds(bounds, { padding: { top: padY+frameCss.y, bottom: padY+frameCss.y, left: padX+frameCss.x, right: padX+frameCss.x }, bearing: rotationDeg })
+    || map.cameraForBounds(bounds, { bearing: rotationDeg }); // padding too big for a tiny view
+  if (!cam) return;
+  jumpCamera({ center: cam.center, zoom: cam.zoom, bearing: rotationDeg, pitch: pitchDeg });
+  const sample = pts.length > 400 ? pts.filter((_,i)=>i % Math.ceil(pts.length/400) === 0) : pts;
+  for (let iter=0; iter<4; iter++) {
+    map.redraw(); // refreshes the camera's ground elevation for the new center
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    sample.forEach(p=>{
+      const pt = map.project([p.lon, p.lat]);
+      if (pt.x<minX) minX=pt.x; if (pt.x>maxX) maxX=pt.x;
+      if (pt.y<minY) minY=pt.y; if (pt.y>maxY) maxY=pt.y;
+    });
+    const scale = Math.min((W-2*padX)/Math.max(maxX-minX,1), (H-2*padY)/Math.max(maxY-minY,1));
+    // Screen offset of the route's middle → ground offset, via the local
+    // Jacobian of the projection around the current center.
+    const c = map.getCenter(), e = 1e-4;
+    const p0 = map.project(c), pLng = map.project([c.lng+e, c.lat]), pLat = map.project([c.lng, c.lat+e]);
+    const a = (pLng.x-p0.x)/e, b = (pLat.x-p0.x)/e, cc = (pLng.y-p0.y)/e, d = (pLat.y-p0.y)/e;
+    const det = a*d - b*cc;
+    const dx = (minX+maxX)/2 - p0.x, dy = (minY+maxY)/2 - p0.y;
+    const center = det ? [c.lng + (d*dx - b*dy)/det, c.lat + (a*dy - cc*dx)/det] : [c.lng, c.lat];
+    const dz = Math.max(-2, Math.min(2, Math.log2(scale)));
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1 && Math.abs(dz) < 0.01) break;
+    jumpCamera({ center, zoom: map.getZoom() + dz });
+  }
 }
 function applyMapCamera() {
   if (!map) return;
-  map.jumpTo({ zoom: fittedZoom + Math.log2(zoomLevel), bearing: rotationDeg, pitch: pitchDeg });
-}
-function projectLatLonToCanvas(pts, dpr) {
-  return pts.map(p => {
-    const pt = map.project([p.lon, p.lat]);
-    return { x: pt.x*dpr, y: pt.y*dpr };
-  });
-}
-function recomputeMapProjectedPts() {
-  if (!map || !routePoints.length) return;
-  const dpr = window.devicePixelRatio||1;
-  const pts = trimmedPts.length ? trimmedPts : getTrimmedPoints();
-  mapProjectedPts = projectLatLonToCanvas(pts, dpr);
-  mapProjectedDists = buildDists(mapProjectedPts);
-  extraTracks.forEach(t=>{
-    if (t.visible && t.trimmedPts && t.trimmedPts.length) t.mapProjectedPts = projectLatLonToCanvas(t.trimmedPts, dpr);
-  });
+  jumpCamera({ zoom: fittedZoom + Math.log2(zoomLevel), bearing: rotationDeg, pitch: pitchDeg });
 }
 function setMapStyle(key) {
   currentMapStyle = key;
   if (!map) return;
+  styleSwitching = true;
+  labelLayers = {};
   map.setStyle(MAP_STYLES[key]);
-  map.once("styledata", () => recomputeMapProjectedPts());
 }
 function setBg(mode) {
   bgMode = mode;
   $("map-bg").style.display = mode==="map" ? "block" : "none";
+  document.body.classList.toggle("bg-map", mode==="map");
+  $("map-nav").hidden = mode!=="map";
   $("map-style-wrap").classList.toggle("collapsed", mode!=="map");
+  $("video-bg-wrap").style.display = mode==="map" ? "none" : "flex";
   if (mode==="map") {
     ensureMap();
-    if (map.isStyleLoaded() && routePoints.length) fitMapToRoute();
+    if (routePoints.length) fitMapToRoute();
+    applyProjection();
   }
+  updateExportMeta();
 }
-// MapLibre's 'idle' event doesn't reliably re-fire for every camera-only
-// change (e.g. repeated jumpTo calls to already-cached tile areas during
-// Follow-mode export), so waiting on it unconditionally can hang forever.
-// Race it against a timeout so exports always make forward progress.
-function waitMapIdle(maxMs=350) {
-  return new Promise(res => {
-    let timer;
-    const onIdle = () => { clearTimeout(timer); res(); };
-    timer = setTimeout(() => { map.off("idle", onIdle); res(); }, maxMs);
-    map.once("idle", onIdle);
-  });
-}
-// Follow-mode export pans through many small slices of the route, each
-// potentially needing new map tiles — waiting for real network loads on
-// every single frame is what makes those exports slow. Pre-visit a handful
-// of points along the whole route at the follow zoom level once up front so
-// the tile cache is warm and the per-frame waits above become near-instant.
-async function prewarmFollowTiles(zoomFollow, bearing, pitch, onProgress) {
-  if (!trimmedPts.length) return;
-  const SAMPLES = 6;
-  for (let i=0; i<=SAMPLES; i++) {
-    const p = latLonAtProgress(trimmedPts, trimmedLatLonDists, i/SAMPLES);
-    map.jumpTo({ center:[p.lon,p.lat], zoom: zoomFollow, bearing, pitch });
-    await waitMapIdle(1200);
-    if (onProgress) onProgress(i/SAMPLES);
+// Renders the map synchronously and keeps re-rendering until every tile,
+// the terrain mesh and label placement are complete, so a captured frame
+// never shows half-loaded tiles or a camera that hasn't caught up yet.
+// Gives up after maxMs so a dead tile server can't hang an export.
+async function settleMap(maxMs=6000) {
+  const t0 = performance.now();
+  while (styleSwitching && performance.now()-t0 < 15000) await new Promise(r => setTimeout(r, 50));
+  map.redraw();
+  while (performance.now()-t0 < maxMs) {
+    if (map.loaded() && map.areTilesLoaded() && !map._placementDirty) break;
+    await new Promise(r => setTimeout(r, 16));
+    map.redraw();
   }
+  map.redraw();
 }
-// Renders the map at export resolution WxH, returns a still snapshot + points
-// projected in that resolution's pixel space; restores the live preview size after.
-async function resizeMapForExport(W, H) {
+// Export renders the map at the export resolution by raising its pixel ratio
+// instead of enlarging the container, so the export shows exactly the same
+// area, zoom and label sizes as the preview, just with more pixels.
+async function beginMapExport(W, H) {
   const bg = $("map-bg");
-  const prev = { w: bg.style.width, h: bg.style.height };
-  const dpr = window.devicePixelRatio||1;
-  bg.style.width=(W/dpr)+"px"; bg.style.height=(H/dpr)+"px";
+  const saved = { center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch() };
+  const prevStyle = bg.getAttribute("style") || "";
+  // Shrink the map to just the export frame. The frame is centered and keeps
+  // the stage's height, so the camera center and perspective are unchanged and
+  // the export shows exactly what's inside the frame in the preview.
+  const f = frameCss;
+  Object.assign(bg.style, { inset: "auto", left: f.x+"px", top: f.y+"px", width: f.w+"px", height: f.h+"px" });
   map.resize();
-  await waitMapIdle();
-  return prev;
+  jumpCamera(saved);
+  map.setPixelRatio(W / f.w);
+  await settleMap();
+  return { saved, prevStyle };
 }
-// Updates the camera and returns projected points — does NOT snapshot the
-// canvas. Repeated createImageBitmap() calls on a live WebGL canvas (one per
-// exported frame) can stall the GPU readback pipeline; callers that need the
-// per-frame pixels should draw directly from map.getCanvas() instead (as the
-// live preview and WebM export already do). Only the single cached-snapshot
-// path (withMapSnapshot) needs an actual persisted bitmap.
-async function captureMapFrame(opts) {
-  const { bearing, center, zoom, pitch } = opts || {};
-  const dpr = window.devicePixelRatio||1;
-  const bearingChanged = bearing != null && Math.abs(bearing - map.getBearing()) > 0.01;
-  const zoomChanged = zoom != null && Math.abs(zoom - map.getZoom()) > 0.001;
-  if (bearingChanged || zoomChanged || center != null || pitch != null) {
-    const jump = {};
-    if (bearing != null) jump.bearing = bearing;
-    if (center != null) jump.center = center;
-    if (zoom != null) jump.zoom = zoom;
-    if (pitch != null) jump.pitch = pitch;
-    map.jumpTo(jump);
-    await waitMapIdle();
+function endMapExport(state) {
+  $("map-bg").setAttribute("style", state.prevStyle);
+  map.setPixelRatio(null); // also resizes back to the full stage
+  jumpCamera(state.saved);
+}
+// Visits the camera path once before recording so tiles along the whole
+// route are already cached; the per-frame settle then rarely has to wait.
+async function prewarmTiles(totalMs, onProgress) {
+  const SAMPLES = 40;
+  for (let k=0; k<=SAMPLES; k++) {
+    if (exportCancelled) return;
+    jumpCamera(mapCameraFor(timelineAt(k/SAMPLES*totalMs)));
+    await settleMap(2500);
+    if (onProgress) onProgress(k/SAMPLES);
   }
-  const pts = projectLatLonToCanvas(trimmedPts, dpr);
-  const extras = extraTracks.filter(t=>t.visible && t.trimmedPts && t.trimmedPts.length).map(t=>({
-    track: t, pts: projectLatLonToCanvas(t.trimmedPts, dpr), dists: t.trimmedLatLonDists,
-  }));
-  return { pts, dists: buildDists(pts), extras };
-}
-function restoreMapAfterExport(prev) {
-  const bg = $("map-bg");
-  bg.style.width=prev.w; bg.style.height=prev.h;
-  map.resize();
-  applyMapCamera();
-  recomputeMapProjectedPts();
-}
-async function withMapSnapshot(W, H, bearing) {
-  if (!map) return null;
-  const prev = await resizeMapForExport(W, H);
-  const frame = await captureMapFrame({ bearing: bearing != null ? bearing : rotationDeg });
-  const dpr = window.devicePixelRatio||1;
-  const extras = extraTracks.filter(t=>t.visible && t.trimmedPts && t.trimmedPts.length).map(t=>({
-    track: t, pts: projectLatLonToCanvas(t.trimmedPts, dpr), dists: t.trimmedLatLonDists,
-  }));
-  const snapshot = await createImageBitmap(map.getCanvas());
-  restoreMapAfterExport(prev);
-  return { ...frame, snapshot, extras };
 }
 function loopBearing(loopFraction) {
   return autoRotate ? (rotationDeg + loopFraction*getAutoRotateDeg()) % 360 : rotationDeg;
@@ -1116,25 +1299,138 @@ function revealEase(pauseElapsed, pauseMs) {
   const t = pauseMs > 0 ? Math.min(Math.max(pauseElapsed/pauseMs, 0), 1) : 1;
   return t*t*(3-2*t);
 }
-// Camera state for Follow mode in Map mode, blending from "centered on the
-// moving tip" to "the full fitted overview" as `eased` goes 0 -> 1.
-function followMapCamera(progress, liveBearing, eased) {
-  const tip = latLonAtProgress(trimmedPts, trimmedLatLonDists, progress);
-  const followZoom = fittedZoom + Math.log2(zoomLevel);
-  if (eased <= 0 || !fittedCenter) return { center:[tip.lon,tip.lat], zoom: followZoom, bearing: liveBearing, pitch: pitchDeg };
-  const lon = tip.lon + (fittedCenter.lng - tip.lon)*eased;
-  const lat = tip.lat + (fittedCenter.lat - tip.lat)*eased;
-  const zoom = followZoom + (fittedZoom - followZoom)*eased;
-  return { center:[lon,lat], zoom, bearing: liveBearing, pitch: pitchDeg };
+const easeInOut = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+const lerp = (a, b, t) => a + (b-a)*t;
+function lerpAngle(a, b, t) {
+  const d = ((b - a) % 360 + 540) % 360 - 180;
+  return (a + d*t + 360) % 360;
 }
-// Same idea for Transparent mode: blends the follow pivot/zoom toward the
-// route's own bbox center (already ~canvas center) and zoom 1 (whole route).
-function followCanvasCamera(basePts, dists, progress, zoom, bearing, W, H, eased) {
-  const followPivot = pointAtProgress(basePts, dists, progress);
-  if (eased <= 0) return getFollowPts(basePts, zoom, bearing, followPivot, W, H);
-  const pivot = { x: followPivot.x + (W/2-followPivot.x)*eased, y: followPivot.y + (H/2-followPivot.y)*eased };
-  const z = zoom + (1-zoom)*eased;
-  return getFollowPts(basePts, z, bearing, pivot, W, H);
+// Steadiness = how much of the route the camera averages over, so GPS jitter
+// and tight wiggles don't shake it. Look ahead = how far in front of the tip
+// it aims. Both are shares of the route, which matches how the Follow zoom is
+// set (relative to the whole-route fit).
+const STEADY_WINDOW = { tight: 0.006, smooth: 0.02, very: 0.045 };
+const LOOK_AHEAD    = { none: 0, little: 0.025, more: 0.06 };
+// Average of at(p) over a window around p; at() returns any {kx, ky} point.
+function windowAvg(at, p, w, kx, ky) {
+  const N = 6; let x = 0, y = 0;
+  for (let k=-N; k<=N; k++) {
+    const q = at(Math.min(1, Math.max(0, p + k/N*w)));
+    x += q[kx]; y += q[ky];
+  }
+  return { [kx]: x/(2*N+1), [ky]: y/(2*N+1) };
+}
+const routeLL = p => latLonAtProgress(trimmedPts, trimmedLatLonDists, p);
+const smoothLL = p => windowAvg(routeLL, p, STEADY_WINDOW[steadiness], "lon", "lat");
+// "Follow road" heading. The raw direction of a mountain road flips through
+// 180° at every hairpin, so the camera follows a Gaussian-smoothed version of
+// it. The angle is unwrapped first (no 359°→0° jumps) so alternating hairpins
+// average out to the road's general direction, and the smoothing width is in
+// seconds of animation, so turn speed stays calm whatever the clip length:
+// about 50–80°/s at most on "Smooth" for the Stelvio switchbacks.
+const HEADING_SIGMA_S = { tight: 0.25, smooth: 0.5, very: 0.9 };
+let headingCache = null;
+function headingTrack() {
+  const key = [trimmedPts.length, trimmedLatLonDists[trimmedLatLonDists.length-1], steadiness, getDurMs()].join("|");
+  if (headingCache && headingCache.key === key) return headingCache.track;
+  const N = 1000, raw = [];
+  for (let i = 0, prev = null; i <= N; i++) {
+    const a = routeLL(i/N - 0.004), b = routeLL(i/N + 0.004);
+    let ang = Math.atan2((b.lon - a.lon) * Math.cos(a.lat*Math.PI/180), b.lat - a.lat) * 180/Math.PI;
+    if (prev != null) { while (ang - prev > 180) ang -= 360; while (ang - prev < -180) ang += 360; }
+    raw.push(ang); prev = ang;
+  }
+  const sig = Math.max(1, HEADING_SIGMA_S[steadiness] * 1000 / getDurMs() * N), R = Math.ceil(sig*3);
+  const g = []; for (let k = -R; k <= R; k++) g.push(Math.exp(-0.5*(k/sig)**2));
+  const gSum = g.reduce((x, y) => x + y, 0);
+  const track = raw.map((_, i) => {
+    let acc = 0;
+    for (let k = -R; k <= R; k++) acc += raw[Math.min(N, Math.max(0, i+k))] * g[k+R];
+    return acc / gSum;
+  });
+  headingCache = { key, track };
+  return track;
+}
+// Direction of travel at p as a map bearing (0 = north).
+function mapHeadingAt(p) {
+  const t = headingTrack(), x = Math.max(0, Math.min(1, p)) * (t.length-1);
+  const i = Math.floor(x), v = i >= t.length-1 ? t[t.length-1] : t[i] + (t[i+1]-t[i])*(x-i);
+  return (v % 360 + 360) % 360;
+}
+// Camera state for Follow mode in Map mode, blending from "chasing the tip"
+// to "the full fitted overview" as `eased` goes 0 -> 1.
+function followMapCamera(progress, liveBearing, eased) {
+  const c = smoothLL(progress + LOOK_AHEAD[lookAhead]);
+  const followZoom = fittedZoom + Math.log2(zoomLevel);
+  const followBearing = headingUp ? (mapHeadingAt(progress) + rotationDeg) % 360 : liveBearing;
+  if (eased <= 0 || !fittedCenter) return { center:[c.lon,c.lat], zoom: followZoom, bearing: followBearing, pitch: pitchDeg };
+  return {
+    center: [lerp(c.lon, fittedCenter.lng, eased), lerp(c.lat, fittedCenter.lat, eased)],
+    zoom: lerp(followZoom, fittedZoom, eased),
+    bearing: lerpAngle(followBearing, liveBearing, eased),
+    pitch: pitchDeg,
+  };
+}
+function overviewCamera(bearing) {
+  if (!fittedCenter) return { bearing };
+  return { center:[fittedCenter.lng, fittedCenter.lat], zoom: fittedZoom + Math.log2(zoomLevel), bearing, pitch: pitchDeg };
+}
+// Globe intro: start high above the planet, slightly turned away, and plunge
+// into the first camera of the route.
+function introCamera(end, f) {
+  const e = easeInOut(f), spin = Math.pow(1-f, 3);
+  const [lng, lat] = Array.isArray(end.center) ? end.center : [end.center.lng, end.center.lat];
+  return {
+    center: [lng - 50*spin, lat - 12*spin],
+    zoom: lerp(1.6, end.zoom, e),
+    bearing: lerpAngle(0, end.bearing, e),
+    pitch: lerp(0, end.pitch, e*e),
+  };
+}
+// Transparent mode equivalent of followMapCamera, in canvas pixels.
+function followCanvasView(basePts, lld, tl, W, H) {
+  const at = p => pointAtProgress(basePts, lld, p);
+  const smooth = p => windowAvg(at, p, STEADY_WINDOW[steadiness], "x", "y");
+  const c = smooth(tl.progress + LOOK_AHEAD[lookAhead]);
+  let rot = tl.bearing;
+  // Canvas points are Mercator with north up, so the map heading applies directly.
+  if (headingUp) rot = rotationDeg - mapHeadingAt(tl.progress);
+  return {
+    pivot: { x: lerp(c.x, W/2, tl.reveal), y: lerp(c.y, H/2, tl.reveal) },
+    z: lerp(zoomLevel, 1, tl.reveal),
+    rot: lerpAngle(rot, tl.bearing, tl.reveal),
+  };
+}
+// Animation state as a pure function of time within one loop. The live
+// preview and the frame-by-frame export both call this, so a given moment
+// always looks identical in both.
+function timelineAt(elapsedMs) {
+  if (animMode !== "animated") {
+    const loopFraction = autoRotate ? (elapsedMs % STATIC_ORBIT_MS) / STATIC_ORBIT_MS : 0;
+    return { progress:1, loopFraction, reveal:1, pulseMult:1, intro:1, bearing: loopBearing(loopFraction) };
+  }
+  const introMs = getIntroMs(), durMs = getDurMs(), pauseMs = getPauseMs();
+  const loopFraction = elapsedMs/(introMs+durMs+pauseMs);
+  const bearing = loopBearing(loopFraction);
+  if (elapsedMs < introMs) return { progress:0, loopFraction, reveal:0, pulseMult:1, intro: elapsedMs/introMs, bearing };
+  const e = elapsedMs - introMs;
+  const raw = Math.min(e/durMs, 1);
+  const progress = getEase() ? easeInOut(raw) : raw;
+  const inPause = pauseMs > 0 && e >= durMs;
+  const reveal = inPause ? revealEase(e-durMs, pauseMs) : 0;
+  const pulseMult = getPulse() && inPause
+    ? 1 + 0.55 * Math.sin((e-durMs)/pauseMs * Math.PI * 4)
+    : 1;
+  return { progress, loopFraction, reveal, pulseMult, intro:1, bearing };
+}
+// Whether the map camera changes over time (otherwise the person can frame
+// the shot freely and nothing overrides it).
+function cameraMoves(tl) {
+  return cameraMode === "follow" || autoRotate || tl.intro < 1;
+}
+function mapCameraFor(tl) {
+  const cam = cameraMode === "follow" ? followMapCamera(tl.progress, tl.bearing, tl.reveal) : overviewCamera(tl.bearing);
+  return tl.intro < 1 ? introCamera(cam, tl.intro) : cam;
 }
 
 // ─── Tiny utils ───────────────────────────────────────────────────────────────
@@ -1142,20 +1438,27 @@ function showStatus(msg, ms=2600) {
   const el=$("status"); el.textContent=msg; el.classList.add("show");
   clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),ms);
 }
-function setProgress(label, pct) {
+function setProgress(label, pct, eta="") {
   $("prog-label").textContent=label;
   $("prog-bar").style.width=Math.round(pct)+"%";
+  $("prog-eta").textContent=eta;
 }
-function showProgress(visible, title="Exporting…") {
+function showProgress(visible, title="Exporting…", cancellable=false) {
   $("prog-title").textContent=title;
+  $("prog-cancel").style.display = cancellable ? "" : "none";
+  if (visible) setProgress("", 0);
   $("prog-overlay").classList.toggle("show",visible);
+}
+function fmtEta(ms) {
+  const s = Math.max(1, Math.ceil(ms/1000));
+  return s < 60 ? `${s} s` : `${Math.floor(s/60)} min ${s%60} s`;
 }
 function download(blob, name) {
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),30000);
 }
 function enableExports() {
-  ["btn-webm","btn-mp4","btn-gif","btn-apng","btn-svg","btn-png"].forEach(id=>$(id).disabled=false);
+  ["btn-mp4","btn-png"].forEach(id=>$(id).disabled=false);
 }
 
 // ─── GPX / KML Parsers ───────────────────────────────────────────────────────
@@ -1204,6 +1507,72 @@ function parseKML(text) {
     }
   }
   throw new Error("No coordinates found in KML");
+}
+
+// ─── Elevation from terrain data ──────────────────────────────────────────────
+// Routes drawn in Google My Maps / Google Earth (KML) usually have no altitude,
+// or 0 m everywhere. Fill it in from MapTiler's terrain tiles (the same data as
+// the 3D map) so the elevation profile and "m gain" work for them too.
+function hasElevation(pts) {
+  let n = 0, mn = Infinity, mx = -Infinity;
+  for (const p of pts) if (p.ele != null) { n++; if (p.ele < mn) mn = p.ele; if (p.ele > mx) mx = p.ele; }
+  return n >= 2 && mx - mn >= 1;
+}
+async function fillElevationFromTerrain(pts) {
+  const step = Math.max(1, Math.ceil(pts.length / 1500));
+  const idx = [];
+  for (let i = 0; i < pts.length; i += step) idx.push(i);
+  if (idx[idx.length-1] !== pts.length-1) idx.push(pts.length-1);
+  const tileXY = (p, z) => {
+    const n = 2 ** z, s = Math.sin(p.lat * Math.PI/180);
+    return [(p.lon + 180) / 360 * n, (0.5 - Math.log((1+s)/(1-s)) / (4*Math.PI)) * n];
+  };
+  const keyAt = (p, z) => tileXY(p, z).map(Math.floor).join("/");
+  // Finest zoom (≈30 m pixels) that keeps the download small.
+  let z = 12;
+  while (z > 6 && new Set(idx.map(i => keyAt(pts[i], z))).size > 48) z--;
+  const tiles = new Map();
+  await Promise.all([...new Set(idx.map(i => keyAt(pts[i], z)))].map(async key => {
+    try {
+      const [x, y] = key.split("/");
+      const res = await fetch(`https://api.maptiler.com/tiles/terrain-rgb-v2/${z}/${x}/${y}.webp?key=${MAPTILER_KEY}`);
+      if (!res.ok) return;
+      const bmp = await createImageBitmap(await res.blob(), { colorSpaceConversion: "none", premultiplyAlpha: "none" });
+      const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height;
+      const cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(bmp, 0, 0);
+      tiles.set(key, { size: bmp.width, data: cx.getImageData(0, 0, bmp.width, bmp.height).data });
+    } catch (_) {}
+  }));
+  const sampled = idx.map(i => {
+    const [x, y] = tileXY(pts[i], z), t = tiles.get(keyAt(pts[i], z));
+    if (!t) return null;
+    const px = Math.min(t.size-1, Math.floor((x - Math.floor(x)) * t.size));
+    const py = Math.min(t.size-1, Math.floor((y - Math.floor(y)) * t.size));
+    const o = (py * t.size + px) * 4;
+    return -10000 + (t.data[o]*65536 + t.data[o+1]*256 + t.data[o+2]) * 0.1; // terrain-RGB
+  });
+  if (sampled.filter(v => v != null).length < 2) return false;
+  // Terrain pixels next to a road on a steep slope are noisy, which would
+  // inflate "m gain"; a short moving average keeps the real climbs.
+  const raw = sampled.slice();
+  for (let k = 0; k < raw.length; k++) {
+    let sum = 0, n = 0;
+    for (let j = Math.max(0, k-4); j <= Math.min(raw.length-1, k+4); j++) if (raw[j] != null) { sum += raw[j]; n++; }
+    if (raw[k] != null) sampled[k] = sum / n;
+  }
+  for (let k = 0; k < idx.length-1; k++) {
+    const a = idx[k], b = idx[k+1], ea = sampled[k], eb = sampled[k+1];
+    if (ea == null || eb == null) continue;
+    for (let i = a; i <= b; i++) pts[i].ele = ea + (eb-ea) * (i-a) / ((b-a) || 1);
+  }
+  return true;
+}
+let elevSource = "none"; // "file" | "terrain" | "none" (primary track)
+function updateProfileHint() {
+  $("profile-hint").textContent = !routePoints.length ? "" :
+    elevSource === "file" ? "Elevation from your route file." :
+    elevSource === "terrain" ? "Your file had no elevation, so it was looked up from terrain data." :
+    "No elevation available for this route.";
 }
 
 // ─── Coordinate processing ───────────────────────────────────────────────────
@@ -1441,50 +1810,44 @@ function drawOverlay(ctx, W, H, progress) {
 // ─── Preview animation ────────────────────────────────────────────────────────
 function startAnimation() {
   if (animHandle) { cancelAnimationFrame(animHandle); animHandle=null; }
-  if (!previewPts.length) return;
+  if (!previewPts.length || exporting) return;
   animStartTs = null;
 
   function frame(ts) {
     if (!animStartTs) animStartTs = ts;
-    let progress = 1, pulseMult = 1, loopFraction = 0, reveal = 1;
-    if (animMode === "animated") {
-      const durMs   = getDurMs();
-      const pauseMs = getPauseMs();
-      const elapsed = (ts-animStartTs) % (durMs+pauseMs);
-      progress = Math.min(elapsed/durMs, 1);
-      loopFraction = elapsed/(durMs+pauseMs);
-      const inPause = elapsed >= durMs;
-      reveal = inPause ? revealEase(elapsed-durMs, pauseMs) : 0;
-      pulseMult = getPulse() && inPause
-        ? 1 + 0.55 * Math.sin((elapsed-durMs)/Math.max(pauseMs,1) * Math.PI * 4)
-        : 1;
-    } else if (autoRotate) {
-      loopFraction = ((ts-animStartTs) % STATIC_ORBIT_MS) / STATIC_ORBIT_MS;
-    }
-    const liveBearing = loopBearing(loopFraction);
+    const elapsed = animMode === "animated" ? (ts-animStartTs) % getLoopMs() : ts-animStartTs;
+    const tl = timelineAt(elapsed);
+    const { progress, pulseMult } = tl;
 
     const canvas = $("preview-canvas");
     const ctx    = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
-
     ctx.clearRect(0, 0, W, H);
-    const lw = scaledLW(W);
-    const following = cameraMode === "follow";
-    let getTrackDPts;
+
     if (bgMode === "map" && map) {
-      if (following) map.jumpTo(followMapCamera(progress, liveBearing, reveal));
-      else if (autoRotate) map.jumpTo({ bearing: liveBearing });
-      getTrackDPts = (track) => ({
-        pts: track.mapProjectedPts,
-        dists: following ? track.trimmedLatLonDists : (track.isPrimary ? mapProjectedDists : buildDists(track.mapProjectedPts||[])),
-      });
-    } else if (following) {
-      const pivot = pointAtProgress(previewPts, previewLatLonDists, progress);
-      const finalPivot = reveal>0 ? { x: pivot.x+(W/2-pivot.x)*reveal, y: pivot.y+(H/2-pivot.y)*reveal } : pivot;
-      const z = zoomLevel + (1-zoomLevel)*reveal;
-      getTrackDPts = (track) => ({ pts: getFollowPts(track.previewPts, z, liveBearing, finalPivot, W, H), dists: track.previewLatLonDists });
+      // The route is a map layer here; the canvas only carries the overlays.
+      setRouteData(tl);
+      // Drive the camera unless the person is framing the shot by hand, and
+      // render right away so the map and the overlays come from the same frame.
+      if (!cameraMoves(tl)) lastBearingOffset = 0;
+      else if (!userDriving) {
+        const cam = mapCameraFor(tl);
+        jumpCamera(cam);
+        lastBearingOffset = cam.bearing - rotationDeg;
+        if (!styleSwitching) map.redraw();
+      }
+      drawOverlays(ctx, W, H, progress);
+      animHandle = requestAnimationFrame(frame);
+      return;
+    }
+
+    const lw = scaledLW(W);
+    let getTrackDPts;
+    if (cameraMode === "follow") {
+      const { pivot, z, rot } = followCanvasView(previewPts, previewLatLonDists, tl, W, H);
+      getTrackDPts = (track) => ({ pts: getFollowPts(track.previewPts, z, rot, pivot, W, H), dists: track.previewLatLonDists });
     } else {
-      getTrackDPts = (track) => { const p = getDisplayPts(track.previewPts, zoomLevel, liveBearing); return { pts:p, dists: buildDists(p) }; };
+      getTrackDPts = (track) => { const p = getDisplayPts(track.previewPts, zoomLevel, tl.bearing); return { pts:p, dists: buildDists(p) }; };
     }
 
     visibleTrackList().forEach(track => {
@@ -1499,7 +1862,7 @@ function startAnimation() {
         pulseMult, gradient: getGradient(),
       });
     });
-    drawOverlay(ctx, W, H, progress);
+    drawOverlays(ctx, W, H, progress);
 
     animHandle = requestAnimationFrame(frame);
   }
@@ -1507,21 +1870,35 @@ function startAnimation() {
 }
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
+// The preview stage is always a wide 16:9 view. The export frame (9:16, 1:1
+// or 16:9) sits in its middle at full stage height and everything outside it
+// is greyed out, so the shot can be framed with the surroundings in view.
+// Full height matters: MapLibre's perspective depends on the view's height,
+// so the export (which shrinks the map to just the frame) looks identical.
+const STAGE_ASPECT = 16/9;
+let frameCss = { x: 0, y: 0, w: 0, h: 0 }; // export frame inside the stage, CSS px
 function layoutPreview() {
+  if (exporting) return;
   const area = $("prev");
   const aw = area.clientWidth-40, ah = area.clientHeight-40;
+  let sw, sh;
+  if (aw/ah < STAGE_ASPECT) { sw=aw; sh=aw/STAGE_ASPECT; } else { sh=ah; sw=ah*STAGE_ASPECT; }
+  sw=Math.round(sw); sh=Math.round(sh);
   const aspect = exportW/exportH;
   let pw, ph;
-  if (aw/ah < aspect) { pw=aw; ph=aw/aspect; } else { ph=ah; pw=ah*aspect; }
-  pw=Math.round(pw); ph=Math.round(ph);
+  if (aspect >= STAGE_ASPECT) { pw=sw; ph=Math.round(sw/aspect); } else { ph=sh; pw=Math.round(sh*aspect); }
+  frameCss = { x: Math.round((sw-pw)/2), y: Math.round((sh-ph)/2), w: pw, h: ph };
 
   const wrap = $("checker-wrap");
-  wrap.style.width=pw+"px"; wrap.style.height=ph+"px";
+  wrap.style.width=sw+"px"; wrap.style.height=sh+"px";
+  const mask = $("frame-mask");
+  Object.assign(mask.style, { left: frameCss.x+"px", top: frameCss.y+"px", width: pw+"px", height: ph+"px" });
+  mask.hidden = pw === sw && ph === sh;
 
   const canvas = $("preview-canvas");
   const dpr = window.devicePixelRatio||1;
   canvas.width=Math.round(pw*dpr); canvas.height=Math.round(ph*dpr);
-  canvas.style.width=pw+"px"; canvas.style.height=ph+"px";
+  Object.assign(canvas.style, { width: pw+"px", height: ph+"px", left: frameCss.x+"px", top: frameCss.y+"px" });
 
   previewPts   = toCanvas(normalizedPts, canvas.width, canvas.height);
   previewDists = buildDists(previewPts);
@@ -1534,7 +1911,7 @@ function layoutPreview() {
 
   if (bgMode==="map" && map) {
     map.resize();
-    if (map.isStyleLoaded() && routePoints.length) fitMapToRoute();
+    if (routePoints.length) fitMapToRoute();
   }
 
   startAnimation();
@@ -1557,9 +1934,19 @@ function onRouteLoaded(pts, name) {
   enableExports(); layoutPreview();
   renderTracksList();
   renderTrimTargetOptions();
-  if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+  if (bgMode==="map" && map) fitMapToRoute();
   const totalKm = latLonDists[latLonDists.length-1];
   showStatus(`${pts.length.toLocaleString()} points loaded — ${totalKm.toFixed(1)} km`);
+  elevSource = hasElevation(pts) ? "file" : "none";
+  updateProfileHint();
+  if (elevSource === "none") {
+    fillElevationFromTerrain(pts).then(ok => {
+      if (!ok || routePoints !== pts) return;
+      elevSource = "terrain";
+      rebuildFromRoute(); updateProfileHint();
+      showStatus("Elevation looked up from terrain data");
+    });
+  }
   $("hdr-hint").textContent = `${name} · ${totalKm.toFixed(1)} km`;
 }
 function parseRouteFile(file) {
@@ -1590,8 +1977,9 @@ async function addTrackFile(file) {
       trimStartFrac: 0, trimEndFrac: 1,
     };
     extraTracks.push(track);
+    if (!hasElevation(pts)) fillElevationFromTerrain(pts).then(ok => { if (ok) rebuildAllTracks(); });
     rebuildAllTracks(); layoutPreview(); renderTracksList(); renderTrimTargetOptions();
-    if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+    if (bgMode==="map" && map) fitMapToRoute();
     showStatus(`${name} added — ${pts.length.toLocaleString()} points`);
   } catch(err) { showStatus("Error: "+err.message); }
 }
@@ -1599,7 +1987,7 @@ function removeTrack(id) {
   extraTracks = extraTracks.filter(t=>t.id!==id);
   if (trimTargetId === String(id)) { trimTargetId = "primary"; }
   rebuildAllTracks(); layoutPreview(); renderTracksList(); renderTrimTargetOptions();
-  if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+  if (bgMode==="map" && map) fitMapToRoute();
 }
 function renderTracksList() {
   const list = $("tracks-list");
@@ -1623,7 +2011,7 @@ function renderTracksList() {
     row.querySelector(".track-visible").addEventListener("change", e => {
       track.visible = e.target.checked;
       rebuildAllTracks(); layoutPreview();
-      if (bgMode==="map" && map && map.isStyleLoaded()) fitMapToRoute();
+      if (bgMode==="map" && map) fitMapToRoute();
     });
     row.querySelector(".track-color1").addEventListener("input", e => { track.color1 = e.target.value; });
     row.querySelector(".track-color2").addEventListener("input", e => { track.color2 = e.target.value; });
@@ -1631,522 +2019,352 @@ function renderTracksList() {
   });
 }
 
-// ─── SVG Export ───────────────────────────────────────────────────────────────
-function exportSVG() {
-  if (!normalizedPts.length) return;
-  const W=exportW, H=exportH;
-  const rawPts = toCanvas(normalizedPts, W, H);
-  const pts    = getDisplayPts(rawPts, zoomLevel, rotationDeg);
-  const d = pts.map((p,i)=>`${i===0?"M":"L"}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
-
-  const tempSvg  = document.createElementNS("http://www.w3.org/2000/svg","svg");
-  tempSvg.style.cssText = "position:absolute;left:-9999px;width:0;height:0;overflow:hidden";
-  const tempPath = document.createElementNS("http://www.w3.org/2000/svg","path");
-  tempPath.setAttribute("d",d); tempSvg.appendChild(tempPath); document.body.appendChild(tempSvg);
-  const len = Math.ceil(tempPath.getTotalLength())+20;
-  document.body.removeChild(tempSvg);
-
-  const dur=getDurMs()/1000, lw=getLineW(), lc=getLineC(), lc2=getLineC2();
-  const gi=getGlowI(), gc=getGlowC();
-  const glowR=(lw*5*(gi/100)).toFixed(1);
-  const glowAlpha=(0.28*gi/100).toFixed(3);
-  const isStatic = animMode==="static";
-  const animAttr = isStatic ? `stroke-dasharray="${len}" stroke-dashoffset="0"` : `stroke-dasharray="${len}" stroke-dashoffset="${len}"`;
-  const animTag = t => isStatic ? "" : `<animate attributeName="stroke-dashoffset" from="${len}" to="0" dur="${dur}s" fill="freeze"/>`;
-
-  // Gradient in SVG
-  const gradDef = getGradient() ? `
-    <linearGradient id="rgrad" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse"
-      x1="${pts[0].x.toFixed(1)}" y1="${pts[0].y.toFixed(1)}"
-      x2="${pts[pts.length-1].x.toFixed(1)}" y2="${pts[pts.length-1].y.toFixed(1)}">
-      <stop offset="0%" stop-color="${lc}"/>
-      <stop offset="100%" stop-color="${lc2}"/>
-    </linearGradient>` : "";
-
-  const strokeColor = getGradient() ? "url(#rgrad)" : lc;
-  const glowEl = gi > 0 ? `
-  <path d="${d}" fill="none" stroke="${gc}" stroke-width="${lw*3}"
-    stroke-linecap="round" stroke-linejoin="round" opacity="${glowAlpha}"
-    filter="url(#blur)" ${animAttr}>
-    ${animTag()}
-  </path>` : "";
-
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  <defs>
-    <filter id="blur" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="${glowR}"/>
-    </filter>
-    ${gradDef}
-  </defs>
-  ${glowEl}
-  <path d="${d}" fill="none" stroke="${strokeColor}" stroke-width="${lw}"
-    stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
-    ${animTag()}
-  </path>
-  <path d="${d}" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="${(lw*0.25).toFixed(1)}"
-    stroke-linecap="round" stroke-linejoin="round" ${animAttr}>
-    ${animTag()}
-  </path>
-</svg>`;
-
-  download(new Blob([svg],{type:"image/svg+xml;charset=utf-8"}),`${fileName}-overlay.svg`);
-  showStatus("SVG downloaded");
+// ─── Route as map layers (Map mode) ───────────────────────────────────────────
+// In Map mode MapLibre draws the route itself, so it lies on the 3D terrain and
+// ridges in front of it hide it. The look matches the canvas route: banded
+// gradient + taper, three-pass glow, white shine and a glowing tip dot.
+const ROUTE_SRC = "route-anim";
+const EMPTY_FC = { type: "FeatureCollection", features: [] };
+let lastRouteKey = "";
+function ensureRouteLayers() {
+  if (!map || map.getSource(ROUTE_SRC)) return;
+  lastRouteKey = "";
+  map.addSource(ROUTE_SRC, { type: "geojson", data: EMPTY_FC });
+  const layout = { "line-cap": "round", "line-join": "round" };
+  const kind = k => ["==", ["get", "kind"], k];
+  [[8, 0.06], [4, 0.14], [2, 0.22]].forEach(([k, a], i) => map.addLayer({
+    id: `route-glow-${i}`, type: "line", source: ROUTE_SRC, layout, filter: kind("glow"),
+    paint: {
+      "line-color": ["get", "color"],
+      "line-width": ["*", ["get", "w"], k],
+      "line-opacity": ["min", 1, ["*", ["get", "a"], a * 1.3]],
+      "line-blur": ["*", ["get", "w"], k * 0.15],
+    },
+  }));
+  map.addLayer({ id: "route-main", type: "line", source: ROUTE_SRC, layout, filter: kind("band"),
+    paint: { "line-color": ["get", "color"], "line-width": ["get", "w"] } });
+  map.addLayer({ id: "route-shine", type: "line", source: ROUTE_SRC, layout, filter: kind("band"),
+    paint: { "line-color": "rgba(255,255,255,0.48)", "line-width": ["max", ["*", ["get", "w"], 0.22], 0.5] } });
+  map.addLayer({ id: "route-tip-halo", type: "circle", source: ROUTE_SRC, filter: kind("tip"),
+    paint: { "circle-radius": ["*", ["get", "r"], 6], "circle-color": ["get", "color"], "circle-blur": 1, "circle-opacity": ["get", "a"] } });
+  map.addLayer({ id: "route-tip", type: "circle", source: ROUTE_SRC, filter: kind("tip"),
+    paint: { "circle-radius": ["*", ["get", "r"], 0.85], "circle-color": "#ffffff" } });
 }
-
-// ─── APNG Export ──────────────────────────────────────────────────────────────
-async function exportAPNG() {
-  if (!normalizedPts.length) return;
-
-  const W=exportW, H=exportH;
-  const durMs=getDurMs(), pauseMs=getPauseMs();
-
-  // Cap total frames at 80 to prevent OOM on long routes / large canvases.
-  // Auto-reduce FPS so the full animation still plays — just at fewer frames.
-  // Each in-memory frame is W*H*4 bytes; cap frame count harder at higher
-  // export resolutions (4K) so a long/high-res APNG can't exhaust tab memory.
-  const FRAME_CAP = Math.max(8, Math.round(50 / (exportScale*exportScale)));
-  const TOTAL_CAP = Math.max(10, Math.round(60 / (exportScale*exportScale)));
-  const MAX_DRAW = Math.max(2, Math.min(FRAME_CAP, Math.round(60 * durMs / (durMs + pauseMs))));
-  const MAX_PAUSE = Math.max(0, TOTAL_CAP - MAX_DRAW);
-  const drawFrames = Math.min(Math.max(Math.round(durMs/1000*24), 2), MAX_DRAW);
-  const delayDraw  = Math.round(durMs / drawFrames);
-
-  const PFPS = 12;
-  const pauseFrames = pauseMs > 0 ? Math.min(Math.max(Math.round(pauseMs/1000*PFPS), 2), MAX_PAUSE) : 0;
-  const delayPause  = pauseMs > 0 && pauseFrames > 0 ? Math.round(pauseMs/pauseFrames) : 0;
-
-  const offC = document.createElement("canvas");
-  offC.width=W; offC.height=H;
-  const ctx = offC.getContext("2d");
-
-  const following = cameraMode === "follow";
-  const rotating = (autoRotate || following) && bgMode==="map" && !!map;
-  let mapSnap = null, mapResizePrev = null, basePts = null;
-  if (bgMode==="map" && map) {
-    setProgress("Rendering map background…", 2);
-    if (rotating) {
-      mapResizePrev = await resizeMapForExport(W, H);
-      if (following) {
-        showProgress(true, "Pre-loading map tiles…");
-        await prewarmFollowTiles(fittedZoom+Math.log2(zoomLevel), rotationDeg, pitchDeg, f=>setProgress("Pre-loading map tiles…", f*15));
-      }
-    } else mapSnap = await withMapSnapshot(W, H);
-  } else {
-    basePts = toCanvas(normalizedPts, W, H);
-  }
-  const lw=getLineW(), lc=getLineC(), lc2=getLineC2();
-  const gi=getGlowI(), gc=getGlowC();
-  const taper=getTaper(), tipDot=getTipDot(), pulse=getPulse(), gradient=getGradient();
-
-  showProgress(true, "Rendering APNG…");
-  const frames=[], delays=[];
-  const total=drawFrames+pauseFrames;
-  let usedMapBg = !!mapSnap || rotating;
-
-  async function frameAt(loopFraction, progress, reveal) {
-    const bearing = loopBearing(loopFraction);
-    if (rotating) {
-      if (following) {
-        const fd = await captureMapFrame(followMapCamera(progress, bearing, reveal||0));
-        return { pts: fd.pts, dists: trimmedLatLonDists, snapshot: fd.snapshot,
-          extras: (fd.extras||[]).map(e=>({track:e.track, pts:e.pts, dists:e.track.trimmedLatLonDists})) };
-      }
-      return await captureMapFrame({ bearing });
+// Coordinates of the part of a track drawn at `progress`, ending exactly at the tip.
+function drawnCoords(ll, lld, progress) {
+  if (ll.length < 2 || progress <= 0) return [];
+  const totalD = lld[lld.length-1];
+  if (progress >= 1) return ll.map(p => [p.lon, p.lat]);
+  const targetD = progress * totalD;
+  const ei = segIndex(lld, targetD);
+  const out = [];
+  for (let i = 0; i <= ei; i++) out.push([ll[i].lon, ll[i].lat]);
+  const segD = lld[ei+1] - lld[ei];
+  const tip = lerpLatLon(ll[ei], ll[ei+1], segD > 0 ? (targetD - lld[ei]) / segD : 0);
+  out.push([tip.lon, tip.lat]);
+  return out;
+}
+function routeFeatures(tl) {
+  const feats = [];
+  const line = (coordinates, props) => feats.push({ type: "Feature", properties: props, geometry: { type: "LineString", coordinates } });
+  // Widths in CSS pixels; the export raises the pixel ratio, so they scale with it.
+  const lw = scaledLW(frameCss.w);
+  const gi = getGlowI(), gc = getGlowC(), taper = getTaper(), gradient = getGradient();
+  const tipOn = animMode === "animated" && getTipDot();
+  mapTracks().forEach(t => {
+    const coords = drawnCoords(t.ll, t.lld, tl.progress);
+    const K = coords.length;
+    if (K < 2) return;
+    if (gi > 0) line(coords, { kind: "glow", color: gc, w: lw, a: (gi/100) * tl.pulseMult });
+    const BANDS = Math.max(1, Math.min(20, K-1));
+    for (let b = 0; b < BANDS; b++) {
+      const iStart = Math.floor(b*(K-1)/BANDS);
+      const iEnd = Math.min(Math.floor((b+1)*(K-1)/BANDS)+1, K-1);
+      if (iStart >= iEnd) continue;
+      const tMid = (iStart+iEnd) / 2 / (K-1);
+      const taperFactor = taper ? (0.18 + 0.82 * Math.pow(tMid, 0.45)) : 1;
+      line(coords.slice(iStart, iEnd+1), { kind: "band", color: gradient ? lerpColor(t.color1, t.color2, tMid) : t.color1, w: lw*taperFactor });
     }
-    if (mapSnap) return mapSnap;
-    if (following) {
-      const pivot = pointAtProgress(basePts, previewLatLonDists, progress);
-      const finalPivot = reveal>0 ? { x: pivot.x+(W/2-pivot.x)*reveal, y: pivot.y+(H/2-pivot.y)*reveal } : pivot;
-      const z = zoomLevel + (1-zoomLevel)*(reveal||0);
-      return {
-        pts: getFollowPts(basePts, z, bearing, finalPivot, W, H), dists: previewLatLonDists,
-        extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
-          track:t, pts: getFollowPts(t.previewPts, z, bearing, finalPivot, W, H), dists: t.previewLatLonDists,
-        })),
-      };
+    if (t.isPrimary && tipOn && tl.progress < 1) {
+      feats.push({ type: "Feature", geometry: { type: "Point", coordinates: coords[K-1] }, properties: {
+        kind: "tip", r: lw*1.1, color: gradient ? lerpColor(t.color1, t.color2, tl.progress) : t.color1,
+        a: gi > 0 ? Math.min((gi/100) * tl.pulseMult, 1) : 0,
+      } });
     }
-    const p = getDisplayPts(basePts, zoomLevel, bearing);
-    return {
-      pts: p, dists: null,
-      extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>{
-        const ep = getDisplayPts(t.previewPts, zoomLevel, bearing);
-        return { track:t, pts:ep, dists: buildDists(ep) };
-      }),
-    };
-  }
-
-  // Draw frames
-  for (let i=0; i<drawFrames; i++) {
-    const progress = drawFrames>1 ? i/(drawFrames-1) : 1;
-    const fd = await frameAt(i/total, progress);
-    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
-    ctx.clearRect(0,0,W,H);
-    if (rotating) ctx.drawImage(map.getCanvas(),0,0,W,H);
-    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,W,H);
-    drawRoute(ctx, dPts, dDists, progress, lw, {lc1:lc,lc2,gi,gc,taper,tipDot,pulseMult:1,gradient});
-    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, progress, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:1,gradient}));
-    drawOverlay(ctx, W, H, progress);
-    frames.push(ctx.getImageData(0,0,W,H).data.buffer.slice(0));
-    delays.push(delayDraw);
-    setProgress(`Frame ${i+1} / ${total}`, (i/total)*75);
-    if (i%2===0) await new Promise(r=>setTimeout(r,0));
-  }
-
-  // Pause frames — pulse glow animates here; Follow mode reveals the whole route.
-  // t must reach exactly 1 on the last frame or the export ends mid-reveal,
-  // slightly off-center instead of settled on the full route.
-  for (let i=0; i<pauseFrames; i++) {
-    const t = pauseFrames>1 ? i/(pauseFrames-1) : 1;
-    const pm = pulse ? 1+0.55*Math.sin(t*Math.PI*4) : 1;
-    const fd = await frameAt((drawFrames+i)/total, 1, revealEase(t, 1));
-    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
-    ctx.clearRect(0,0,W,H);
-    if (rotating) ctx.drawImage(map.getCanvas(),0,0,W,H);
-    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,W,H);
-    drawRoute(ctx, dPts, dDists, 1, lw, {lc1:lc,lc2,gi,gc,taper,tipDot:false,pulseMult:pm,gradient});
-    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, 1, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:pm,gradient}));
-    drawOverlay(ctx, W, H, 1);
-    frames.push(ctx.getImageData(0,0,W,H).data.buffer.slice(0));
-    delays.push(delayPause);
-    setProgress(`Pause frame ${i+1} / ${pauseFrames}`, 75+(i/pauseFrames)*10);
-    if (i%2===0) await new Promise(r=>setTimeout(r,0));
-  }
-
-  if (mapResizePrev) restoreMapAfterExport(mapResizePrev);
-
-  setProgress("Encoding APNG…", 87);
-  await new Promise(r=>setTimeout(r,0));
-  // 256-color palette is visually identical for a transparent line over empty
-  // background but posterizes photographic map tiles, so use lossless (0) when
-  // a map background is composited in.
-  const buf  = UPNG.encode(frames, W, H, usedMapBg ? 0 : 256, delays);
-  const blob = new Blob([buf],{type:"image/png"});
-  showProgress(false);
-  download(blob, `${fileName}-overlay.png`);
-  showStatus(`APNG downloaded — ${total} frames · ${W}×${H}px`);
-}
-
-function getWebMBg() {
-  return document.querySelector('[data-webmbg].active')?.dataset.webmbg || 'transparent';
-}
-
-// ─── WebM Export ──────────────────────────────────────────────────────────────
-function exportWebM() {
-  return recordVideo({
-    mimeCandidates: ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'],
-    forceOpaque: false,
-    fileExt: 'webm',
-    blobType: 'video/webm',
-    label: 'WebM',
-    unsupportedMsg: 'WebM not supported in this browser — use Chrome or Edge',
   });
+  return { type: "FeatureCollection", features: feats };
 }
-async function exportMP4() {
-  return recordVideo({
-    mimeCandidates: ['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1','video/mp4;codecs=h264','video/mp4'],
-    forceOpaque: true,
-    fileExt: 'mp4',
-    blobType: 'video/mp4',
-    label: 'MP4',
-    unsupportedMsg: 'MP4 recording isn\'t supported in this browser — try Safari, or export WebM and convert it with HandBrake, ffmpeg, or an online converter.',
-  });
+// Sends the route for timeline state `tl` to the map. Returns a promise that
+// resolves once MapLibre has processed it (the export waits on it; the live
+// preview doesn't). Skips the update when nothing visible changed.
+function setRouteData(tl, wait=false) {
+  const src = map && map.getSource(ROUTE_SRC);
+  if (!src) return Promise.resolve();
+  const key = [tl.progress.toFixed(5), tl.pulseMult.toFixed(3), getLineW(), getGlowI(), getGlowC(), getTaper(), getGradient(), getTipDot(),
+    getLineC(), getLineC2(), extraTracks.map(t => t.visible + t.color1 + t.color2).join(), layerPts.length, layerDists[layerDists.length-1],
+    frameCss.w, exportScale, exportW].join("|");
+  if (key === lastRouteKey) return Promise.resolve();
+  lastRouteKey = key;
+  const r = src.setData(routeFeatures(tl), wait);
+  return wait ? r : Promise.resolve();
 }
-async function recordVideo({ mimeCandidates, forceOpaque, fileExt, blobType, label, unsupportedMsg }) {
-  if (!normalizedPts.length) return;
 
-  const mimeType = mimeCandidates.find(t => MediaRecorder.isTypeSupported(t)) || null;
-  if (!mimeType) { showStatus(unsupportedMsg); return; }
-
-  const W=exportW, H=exportH;
-  const FPS=30;
-  const durMs=getDurMs(), pauseMs=getPauseMs();
-  const totalMs=durMs+pauseMs+250;
-  const webmBg=getWebMBg();
-  const isTransparent = !forceOpaque && webmBg==='transparent';
-  const bgFillColor = isTransparent ? null : (webmBg==='transparent' ? '#000000' : webmBg);
-
-  const lw=getLineW(), lc=getLineC(), lc2=getLineC2();
-  const gi=getGlowI(), gc=getGlowC();
-  const taper=getTaper(), tipDot=getTipDot(), pulse=getPulse(), gradient=getGradient();
-
-  const offC=document.createElement('canvas');
-  offC.width=W; offC.height=H;
-  offC.style.cssText='position:fixed;left:-9999px;top:0;pointer-events:none;visibility:hidden';
-  document.body.appendChild(offC);
-  const ctx=offC.getContext('2d',{alpha:isTransparent});
-
-  const following = cameraMode === "follow";
-  const rotating = (autoRotate || following) && bgMode==="map" && !!map;
-  let mapSnap=null, mapResizePrev=null, basePts=null;
-  if (bgMode==="map" && map) {
-    showProgress(true,'Rendering map background…');
-    if (rotating) {
-      mapResizePrev = await resizeMapForExport(W, H);
-      if (following) {
-        showProgress(true, "Pre-loading map tiles…");
-        await prewarmFollowTiles(fittedZoom+Math.log2(zoomLevel), rotationDeg, pitchDeg, f=>setProgress("Pre-loading map tiles…", f*20));
-      }
-    } else mapSnap = await withMapSnapshot(W, H);
-  } else {
-    basePts = toCanvas(normalizedPts, W, H);
+// ─── Elevation profile overlay ────────────────────────────────────────────────
+function buildElevProfile(pts, dists) {
+  const total = dists[dists.length-1];
+  if (!total || pts.filter(p => p.ele != null).length < 2) return null;
+  const N = 240, e = [];
+  let last = pts.find(p => p.ele != null).ele;
+  for (let i = 0; i <= N; i++) {
+    const p = latLonAtProgress(pts, dists, i/N);
+    if (p.ele != null) last = p.ele;
+    e.push(last);
   }
-  const dpr = window.devicePixelRatio||1;
-
-  const stream=offC.captureStream(FPS);
-  // 40 Mbps: sharp transparent overlays need high bitrate to preserve edge quality
-  const recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:40_000_000});
-  const chunks=[];
-  recorder.ondataavailable=e=>{if(e.data.size>0) chunks.push(e.data);};
-  recorder.onstop=()=>{
-    document.body.removeChild(offC);
-    if (mapResizePrev) restoreMapAfterExport(mapResizePrev);
-    showProgress(false);
-    const blob=new Blob(chunks,{type:blobType});
-    const bgLabel = isTransparent ? 'transparent' : bgFillColor==='#00b140' ? 'green screen' : 'black bg';
-    download(blob,`${fileName}-overlay.${fileExt}`);
-    showStatus(`${label} saved — ${W}×${H}px · ${bgLabel}`);
+  // Light smoothing so GPS altitude noise doesn't look jagged.
+  const sm = e.map((v, i) => (e[Math.max(0, i-2)] + e[Math.max(0, i-1)] + v + e[Math.min(N, i+1)] + e[Math.min(N, i+2)]) / 5);
+  return { e: sm, min: Math.min(...sm), max: Math.max(...sm) };
+}
+function profileEleAt(progress) {
+  const e = elevProfile.e, x = Math.max(0, Math.min(1, progress)) * (e.length-1);
+  const i = Math.floor(x), f = x - i;
+  return i >= e.length-1 ? e[e.length-1] : e[i] + (e[i+1]-e[i])*f;
+}
+function drawElevProfile(ctx, W, H, progress) {
+  if (!getProfileOn() || !elevProfile) return;
+  const s = W / (exportW / exportScale);           // 1 at 1080-wide, scales with output
+  const m = 32*s, h = Math.min(230*s, H*0.2), w = W - 2*m;
+  const above = overlayLayout === "banner" ? 140 * s * getOverlaySize() : 0;
+  const x0 = m, y1 = H - m - above, y0 = y1 - h;
+  const pad = 18*s, labelH = 44*s;
+  const cx0 = x0+pad, cx1 = x0+w-pad, cy0 = y0+pad+labelH, cy1 = y1-pad;
+  const { e, min, max } = elevProfile;
+  const range = Math.max(max - min, 1);
+  const X = i => cx0 + i/(e.length-1) * (cx1-cx0);
+  const Y = v => cy1 - (v - min)/range * (cy1-cy0);
+  const area = upto => {
+    const n = Math.round(upto * (e.length-1));
+    const p = new Path2D(); p.moveTo(X(0), cy1);
+    for (let i = 0; i <= n; i++) p.lineTo(X(i), Y(e[i]));
+    if (upto < 1) p.lineTo(cx0 + upto*(cx1-cx0), Y(profileEleAt(upto)));
+    p.lineTo(cx0 + upto*(cx1-cx0), cy1); p.closePath();
+    return p;
   };
-
-  recorder.start(100);
-  showProgress(true,`Recording ${label}…`);
-
-  const startTs=performance.now();
-  function frame() {
-    const elapsed=performance.now()-startTs;
-    if (elapsed>=totalMs){ recorder.stop(); return; }
-    const progress=Math.min(elapsed/durMs,1);
-    const loopFraction=elapsed/(durMs+pauseMs);
-    const bearing=loopBearing(loopFraction);
-    const inPause=elapsed>=durMs;
-    const reveal = inPause ? revealEase(elapsed-durMs, pauseMs) : 0;
-    const pulseMult=pulse&&inPause
-      ?1+0.55*Math.sin((elapsed-durMs)/Math.max(pauseMs,1)*Math.PI*4):1;
-    ctx.clearRect(0,0,W,H);
-    let dPts, dDists, extraFrames=[];
-    if (rotating) {
-      const jump = following ? followMapCamera(progress, bearing, reveal) : { bearing };
-      map.jumpTo(jump);
-      dPts = projectLatLonToCanvas(trimmedPts, dpr);
-      dDists = following ? trimmedLatLonDists : buildDists(dPts);
-      ctx.drawImage(map.getCanvas(),0,0,W,H);
-      extraFrames = extraTracks.filter(t=>t.visible && t.trimmedPts && t.trimmedPts.length).map(t=>{
-        const p = projectLatLonToCanvas(t.trimmedPts, dpr);
-        return { track:t, pts:p, dists: following ? t.trimmedLatLonDists : buildDists(p) };
-      });
-    } else if (mapSnap) {
-      dPts=mapSnap.pts; dDists=mapSnap.dists;
-      ctx.drawImage(mapSnap.snapshot,0,0,W,H);
-      extraFrames = mapSnap.extras || [];
-    } else {
-      if (!isTransparent) { ctx.fillStyle=bgFillColor; ctx.fillRect(0,0,W,H); }
-      if (following) {
-        const pivot = pointAtProgress(basePts, previewLatLonDists, progress);
-        const finalPivot = reveal>0 ? { x: pivot.x+(W/2-pivot.x)*reveal, y: pivot.y+(H/2-pivot.y)*reveal } : pivot;
-        const z = zoomLevel + (1-zoomLevel)*reveal;
-        dPts = getFollowPts(basePts, z, bearing, finalPivot, W, H);
-        dDists = previewLatLonDists;
-        extraFrames = extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
-          track:t, pts: getFollowPts(t.previewPts, z, bearing, finalPivot, W, H), dists: t.previewLatLonDists,
-        }));
-      } else {
-        dPts = getDisplayPts(basePts, zoomLevel, bearing);
-        dDists = buildDists(dPts);
-        extraFrames = extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>{
-          const p = getDisplayPts(t.previewPts, zoomLevel, bearing);
-          return { track:t, pts:p, dists: buildDists(p) };
-        });
-      }
-    }
-    drawRoute(ctx,dPts,dDists,progress,lw,{lc1:lc,lc2,gi,gc,taper,tipDot,pulseMult,gradient});
-    extraFrames.forEach(ef => drawRoute(ctx, ef.pts, ef.dists, progress, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult,gradient}));
-    drawOverlay(ctx, W, H, progress);
-    setProgress('Recording…',Math.round((elapsed/totalMs)*100));
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
+  ctx.save();
+  // Dark enough that busy map labels underneath don't fight the text.
+  ctx.fillStyle = "rgba(12,14,20,0.76)";
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0, y0, w, h, 14*s) : ctx.rect(x0, y0, w, h); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.lineWidth = 1*s; ctx.stroke();
+  // whole profile, faint
+  const full = area(1);
+  ctx.fillStyle = "rgba(255,255,255,0.16)"; ctx.fill(full);
+  ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 1.5*s; ctx.stroke(full);
+  // ridden part, in the route colors
+  const grad = ctx.createLinearGradient(cx0, 0, cx1, 0);
+  grad.addColorStop(0, toRgba(getLineC(), 0.85)); grad.addColorStop(1, toRgba(getGradient() ? getLineC2() : getLineC(), 0.85));
+  ctx.fillStyle = grad; ctx.fill(area(progress));
+  // current position
+  const px = cx0 + progress*(cx1-cx0), py = Y(profileEleAt(progress));
+  ctx.strokeStyle = "rgba(255,255,255,0.55)"; ctx.lineWidth = 1.5*s;
+  ctx.beginPath(); ctx.moveTo(px, cy0); ctx.lineTo(px, cy1); ctx.stroke();
+  ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(px, py, 5*s, 0, Math.PI*2); ctx.fill();
+  // labels
+  const fam = OVERLAY_FONTS[getOverlayFont()] || OVERLAY_FONTS.system;
+  ctx.fillStyle = getOverlayColor(); ctx.textBaseline = "alphabetic";
+  ctx.font = `700 ${Math.round(32*s)}px ${fam}`; ctx.textAlign = "left";
+  ctx.fillText(`${Math.round(profileEleAt(progress)).toLocaleString()} m`, cx0, y0 + pad + 30*s);
+  ctx.font = `500 ${Math.round(21*s)}px ${fam}`; ctx.textAlign = "right"; ctx.globalAlpha = 0.75;
+  ctx.fillText(`max ${Math.round(max).toLocaleString()} m`, cx1, y0 + pad + 28*s);
+  ctx.restore();
+}
+function drawOverlays(ctx, W, H, progress) {
+  drawElevProfile(ctx, W, H, progress);
+  drawOverlay(ctx, W, H, progress);
 }
 
-// ─── GIF Export ───────────────────────────────────────────────────────────────
-async function exportGIF() {
-  if (!normalizedPts.length) return;
-
-  if (!gifWorkerURL) {
-    try {
-      showProgress(true,"Loading GIF encoder…"); setProgress("Fetching worker…",5);
-      const r=await fetch("https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js");
-      const t=await r.text();
-      gifWorkerURL=URL.createObjectURL(new Blob([t],{type:"application/javascript"}));
-    } catch(e) { showProgress(false); showStatus("Could not load GIF encoder — check your connection"); return; }
+// ─── Frame composer (shared by MP4 + PNG export) ──────────────────────────────
+// Tracks in Transparent mode, laid out at the export resolution.
+function flatTracksAt(W, H) {
+  const list = [{ isPrimary:true, norm:normalizedPts, lld:previewLatLonDists, color1:getLineC(), color2:getLineC2() },
+    ...extraTracks.filter(t=>t.visible && t.normalizedPts && t.normalizedPts.length).map(t=>({
+      isPrimary:false, norm:t.normalizedPts, lld:t.previewLatLonDists, color1:t.color1, color2:t.color2,
+    }))];
+  return list.map(t => ({ ...t, base: toCanvas(t.norm, W, H) }));
+}
+// Tracks in Map mode, as lat/lon so they can be projected through the live camera.
+function mapTracks() {
+  return [{ isPrimary:true, ll:layerPts, lld:layerDists, color1:getLineC(), color2:getLineC2() },
+    ...extraTracks.filter(t=>t.visible && t.layerPts && t.layerPts.length).map(t=>({
+      isPrimary:false, ll:t.layerPts, lld:t.layerDists, color1:t.color1, color2:t.color2,
+    }))];
+}
+// Draws one complete frame for timeline state `tl`. In Map mode the map must
+// already be in export state (beginMapExport); the camera is moved, the map is
+// rendered to completion, and only then is the route projected on top, so the
+// route and the map always come from the same camera.
+async function composeFrame(ctx, W, H, tl, env) {
+  if (env.mapState) {
+    jumpCamera(mapCameraFor(tl));
+    await setRouteData(tl, true);
+    await settleMap();
+    // Behind the globe (intro) the map canvas is transparent: paint space.
+    ctx.fillStyle = "#0B1020"; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(map.getCanvas(), 0, 0, W, H);
+    drawOverlays(ctx, W, H, tl.progress);
+    return;
   }
-
-  // Half-res is intentional: full 1080px GIFs with 60+ frames exhaust RAM.
-  // For full-res transparent output use APNG or WebM.
-  const GIF_SCALE=0.5;
-  const GW=Math.round(exportW*GIF_SCALE), GH=Math.round(exportH*GIF_SCALE);
-  const FPS=12;
-  const durMs=getDurMs(), pauseMs=getPauseMs();
-  const drawFrames=Math.max(Math.round(durMs/1000*FPS),2);
-  const delayDraw=Math.round(1000/FPS);
-  const bgColor=matteColor==="white"?"#ffffff":"#000000";
-
-  const offC=document.createElement("canvas"); offC.width=GW; offC.height=GH;
-  const ctx=offC.getContext("2d");
-
-  const following = cameraMode === "follow";
-  const rotating = (autoRotate || following) && bgMode==="map" && !!map;
-  let mapSnap=null, mapResizePrev=null, basePts=null;
-  if (bgMode==="map" && map) {
-    setProgress("Rendering map background…", 2);
-    if (rotating) {
-      mapResizePrev = await resizeMapForExport(GW, GH);
-      if (following) {
-        setProgress("Pre-loading map tiles…", 2);
-        await prewarmFollowTiles(fittedZoom+Math.log2(zoomLevel), rotationDeg, pitchDeg, f=>setProgress("Pre-loading map tiles…", f*15));
-      }
-    } else mapSnap = await withMapSnapshot(GW, GH);
+  if (env.bgFill) { ctx.fillStyle = env.bgFill; ctx.fillRect(0, 0, W, H); }
+  else ctx.clearRect(0, 0, W, H);
+  let tracks;
+  if (cameraMode === "follow") {
+    const { pivot, z, rot } = followCanvasView(env.flat[0].base, env.flat[0].lld, tl, W, H);
+    tracks = env.flat.map(t => ({ t, pts: getFollowPts(t.base, z, rot, pivot, W, H), dists: t.lld }));
   } else {
-    basePts = toCanvas(normalizedPts, GW, GH);
+    tracks = env.flat.map(t => { const pts = getDisplayPts(t.base, zoomLevel, tl.bearing); return { t, pts, dists: buildDists(pts) }; });
   }
-  const lw=getLineW()*GIF_SCALE, lc=getLineC(), lc2=getLineC2();
-  const gi=getGlowI(), gc=getGlowC();
-  const taper=getTaper(), gradient=getGradient();
-
-  showProgress(true,"Rendering GIF…");
-  const gif=new GIF({workers:4,quality:3,width:GW,height:GH,workerScript:gifWorkerURL,background:bgColor});
-  const total=drawFrames+(pauseMs>0?1:0);
-
-  async function frameAt(loopFraction, progress, reveal) {
-    const bearing = loopBearing(loopFraction);
-    if (rotating) {
-      if (following) {
-        const fd = await captureMapFrame(followMapCamera(progress, bearing, reveal||0));
-        return { pts: fd.pts, dists: trimmedLatLonDists, snapshot: fd.snapshot,
-          extras: (fd.extras||[]).map(e=>({track:e.track, pts:e.pts, dists:e.track.trimmedLatLonDists})) };
-      }
-      return await captureMapFrame({ bearing });
-    }
-    if (mapSnap) return mapSnap;
-    if (following) {
-      const pivot = pointAtProgress(basePts, previewLatLonDists, progress);
-      const finalPivot = reveal>0 ? { x: pivot.x+(GW/2-pivot.x)*reveal, y: pivot.y+(GH/2-pivot.y)*reveal } : pivot;
-      const z = zoomLevel + (1-zoomLevel)*(reveal||0);
-      return {
-        pts: getFollowPts(basePts, z, bearing, finalPivot, GW, GH), dists: previewLatLonDists,
-        extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
-          track:t, pts: getFollowPts(t.previewPts, z, bearing, finalPivot, GW, GH), dists: t.previewLatLonDists,
-        })),
-      };
-    }
-    const p = getDisplayPts(basePts, zoomLevel, bearing);
-    return {
-      pts: p, dists: null,
-      extras: extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>{
-        const ep = getDisplayPts(t.previewPts, zoomLevel, bearing);
-        return { track:t, pts:ep, dists: buildDists(ep) };
-      }),
-    };
-  }
-
-  for (let i=0; i<drawFrames; i++) {
-    const progress=drawFrames>1?i/(drawFrames-1):1;
-    const fd = await frameAt(i/total, progress);
-    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
-    ctx.clearRect(0,0,GW,GH);
-    if (rotating) ctx.drawImage(map.getCanvas(),0,0,GW,GH);
-    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,GW,GH);
-    else { ctx.fillStyle=bgColor; ctx.fillRect(0,0,GW,GH); }
-    drawRoute(ctx, dPts, dDists, progress, lw, {lc1:lc,lc2,gi,gc,taper,tipDot:false,pulseMult:1,gradient});
-    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, progress, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:1,gradient}));
-    drawOverlay(ctx, GW, GH, progress);
-    gif.addFrame(offC,{copy:true,delay:delayDraw});
-    setProgress(`Frame ${i+1} / ${total}`, (i/total)*50);
-    if (i%4===0) await new Promise(r=>setTimeout(r,0));
-  }
-  if (pauseMs>0) {
-    const fd = await frameAt(drawFrames/total, 1, 1);
-    const dPts = fd.pts, dDists = fd.dists || buildDists(dPts);
-    ctx.clearRect(0,0,GW,GH);
-    if (rotating) ctx.drawImage(map.getCanvas(),0,0,GW,GH);
-    else if (fd.snapshot) ctx.drawImage(fd.snapshot,0,0,GW,GH);
-    else { ctx.fillStyle=bgColor; ctx.fillRect(0,0,GW,GH); }
-    drawRoute(ctx, dPts, dDists, 1, lw, {lc1:lc,lc2,gi,gc,taper,tipDot:false,pulseMult:1,gradient});
-    (fd.extras||[]).forEach(ef => drawRoute(ctx, ef.pts, ef.dists, 1, lw, {lc1:ef.track.color1,lc2:ef.track.color2,gi,gc,taper,tipDot:false,pulseMult:1,gradient}));
-    drawOverlay(ctx, GW, GH, 1);
-    gif.addFrame(offC,{copy:true,delay:Math.max(Math.round(pauseMs),20)});
-  }
-  if (mapResizePrev) restoreMapAfterExport(mapResizePrev);
-  setProgress("Encoding GIF…",55);
-  gif.on("progress", p=>setProgress("Encoding GIF…",55+p*43));
-  gif.on("finished", blob=>{
-    showProgress(false); download(blob,`${fileName}-overlay.gif`);
-    showStatus(`GIF downloaded — ${GW}×${GH}px`);
+  const tipDot = animMode === "animated" && getTipDot();
+  tracks.forEach(({ t, pts, dists }) => {
+    if (pts.length < 2) return;
+    drawRoute(ctx, pts, dists, tl.progress, scaledLW(W), {
+      lc1:t.color1, lc2:t.color2, gi:getGlowI(), gc:getGlowC(),
+      taper:getTaper(), tipDot: t.isPrimary && tipDot, pulseMult:tl.pulseMult, gradient:getGradient(),
+    });
   });
-  gif.render();
+  drawOverlays(ctx, W, H, tl.progress);
+}
+// Stops the live preview so nothing else moves the map camera mid-export.
+function pausePreviewForExport() {
+  exporting = true; exportCancelled = false;
+  if (animHandle) { cancelAnimationFrame(animHandle); animHandle = null; }
+}
+function cancelExport() {
+  exportCancelled = true;
+  $("prog-label").textContent = "Cancelling…";
+}
+
+// ─── MP4 Export ───────────────────────────────────────────────────────────────
+// Rendered offline, one frame at a time, and encoded with WebCodecs. Unlike a
+// screen recording, no frame can be dropped or rushed however slow the map is,
+// and the bitrate is ours to choose.
+let mediabunnyLoad = null;
+function loadMediabunny() {
+  return mediabunnyLoad ||= import("https://cdn.jsdelivr.net/npm/mediabunny@1.61.4/+esm");
+}
+const QUALITY_MBPS = { good: 10, high: 20, max: 35 }; // at 1080p30, scaled for size and fps
+function exportBitrate(W, H, fps) {
+  const px = (W*H) / (1920*1080);
+  const mbps = QUALITY_MBPS[exportQuality] * Math.pow(px, 0.75) * Math.pow(fps/30, 0.6);
+  return Math.round(Math.min(mbps, 120) * 1e6);
+}
+function exportFrameCount() {
+  return Math.max(2, Math.round(getLoopMs() / 1000 * exportFps));
+}
+function updateExportMeta() {
+  const el = $("export-meta"); if (!el) return;
+  const secs = getLoopMs() / 1000;
+  const maxMB = exportBitrate(exportW, exportH, exportFps) * secs / 8 / 1e6;
+  el.textContent = `${exportW}×${exportH} · ${exportFps} fps · ${secs.toFixed(1)} s · up to ~${Math.max(1, Math.round(maxMB))} MB`;
+}
+
+async function exportMP4() {
+  if (!normalizedPts.length || exporting) return;
+  if (typeof VideoEncoder === "undefined") {
+    showStatus("Video export needs a current Chrome, Edge, Safari or Firefox", 5000);
+    return;
+  }
+  const W = exportW, H = exportH, fps = exportFps;
+  const totalMs = getLoopMs();
+  const N = exportFrameCount();
+  const useMap = bgMode === "map" && !!map;
+
+  pausePreviewForExport();
+  showProgress(true, "Exporting MP4", true);
+  let mapState = null, output = null;
+  try {
+    setProgress("Loading video encoder…", 0);
+    const mb = await loadMediabunny();
+    const quality = new mb.Quality({ bitrate: exportBitrate(W, H, fps) });
+    const codec = await mb.getFirstEncodableVideoCodec(["avc", "hevc"], { width:W, height:H, quality, frameRate:fps });
+    if (!codec) throw new Error(`this browser can't encode ${W}×${H} video. Try 1080p.`);
+
+    const offC = document.createElement("canvas");
+    offC.width = W; offC.height = H;
+    const ctx = offC.getContext("2d", { alpha:false });
+    const env = { bgFill: videoBg, flat: useMap ? null : flatTracksAt(W, H) };
+
+    let base = 0;
+    if (useMap) {
+      setProgress("Preparing map…", 0);
+      mapState = env.mapState = await beginMapExport(W, H);
+      if (cameraMode === "follow" || autoRotate || getIntroMs() > 0) {
+        base = 15;
+        await prewarmTiles(totalMs, f => setProgress("Loading map tiles along the route…", f*base));
+      }
+    }
+    if (exportCancelled) { showStatus("Export cancelled"); return; }
+
+    output = new mb.Output({ format: new mb.Mp4OutputFormat({ fastStart: "in-memory" }), target: new mb.BufferTarget() });
+    const source = new mb.CanvasSource(offC, { codec, quality, keyFrameInterval: 2 });
+    output.addVideoTrack(source, { frameRate: fps });
+    await output.start();
+
+    const t0 = performance.now();
+    for (let i = 0; i < N; i++) {
+      if (exportCancelled) break;
+      // Spread frames so the last one lands exactly on the end of the loop
+      // (route complete, reveal settled).
+      await composeFrame(ctx, W, H, timelineAt(i/(N-1) * totalMs), env);
+      await source.add(i/fps, 1/fps);
+      const done = (i+1)/N, spent = performance.now()-t0;
+      setProgress(`Frame ${i+1} of ${N}`, base + done*(98-base), i > 4 ? `about ${fmtEta(spent/done - spent)} left` : "");
+    }
+    if (exportCancelled) { await output.cancel(); showStatus("Export cancelled"); return; }
+
+    setProgress("Finishing file…", 99);
+    await output.finalize();
+    const blob = new Blob([output.target.buffer], { type: "video/mp4" });
+    download(blob, `${fileName}-${W}x${H}-${fps}fps.mp4`);
+    showStatus(`MP4 saved: ${W}×${H} · ${fps} fps · ${codec === "hevc" ? "HEVC" : "H.264"} · ${(blob.size/1e6).toFixed(1)} MB`, 4500);
+  } catch (err) {
+    console.error(err);
+    if (output) { try { await output.cancel(); } catch (_) {} }
+    showStatus(`Export failed: ${err.message}`, 6000);
+  } finally {
+    if (mapState) endMapExport(mapState);
+    exporting = false;
+    showProgress(false);
+    startAnimation();
+  }
 }
 
 // ─── PNG Export (static finished frame) ────────────────────────────────────────
 async function exportPNG() {
-  if (!normalizedPts.length) return;
-  const W=exportW, H=exportH;
-
-  const offC=document.createElement("canvas"); offC.width=W; offC.height=H;
-  const ctx=offC.getContext("2d");
-
-  const following = cameraMode === "follow";
-  let mapSnap=null, dPts, dDists, extraFrames=[];
-  if (bgMode==="map" && map) {
-    showProgress(true,"Rendering map background…");
-    if (following) {
-      const prev = await resizeMapForExport(W, H);
-      const fd = await captureMapFrame(followMapCamera(1, rotationDeg, 1));
-      const snapshot = await createImageBitmap(map.getCanvas());
-      restoreMapAfterExport(prev);
-      mapSnap = { pts: fd.pts, dists: trimmedLatLonDists, snapshot };
-      extraFrames = fd.extras || [];
-    } else {
-      mapSnap = await withMapSnapshot(W, H);
-      extraFrames = mapSnap.extras || [];
+  if (!normalizedPts.length || exporting) return;
+  const W = exportW, H = exportH;
+  pausePreviewForExport();
+  let mapState = null;
+  try {
+    const offC = document.createElement("canvas");
+    offC.width = W; offC.height = H;
+    const ctx = offC.getContext("2d");
+    const useMap = bgMode === "map" && !!map;
+    const env = { bgFill: null, flat: useMap ? null : flatTracksAt(W, H) };
+    if (useMap) {
+      showProgress(true, "Rendering map");
+      mapState = env.mapState = await beginMapExport(W, H);
     }
-  }
-  if (mapSnap) { dPts=mapSnap.pts; dDists=mapSnap.dists; }
-  else {
-    const pts = toCanvas(normalizedPts, W, H);
-    if (following) {
-      const pivot = pointAtProgress(pts, previewLatLonDists, 1);
-      dPts = getFollowPts(pts, zoomLevel, rotationDeg, pivot, W, H);
-      dDists = previewLatLonDists;
-      extraFrames = extraTracks.filter(t=>t.visible && t.previewPts && t.previewPts.length).map(t=>({
-        track:t, pts: getFollowPts(toCanvas(t.normalizedPts,W,H), zoomLevel, rotationDeg, pivot, W, H), dists: t.previewLatLonDists,
-      }));
-    } else {
-      dPts  = getDisplayPts(pts, zoomLevel, rotationDeg);
-      dDists= buildDists(dPts);
-      extraFrames = extraTracks.filter(t=>t.visible && t.normalizedPts && t.normalizedPts.length).map(t=>{
-        const p = getDisplayPts(toCanvas(t.normalizedPts,W,H), zoomLevel, rotationDeg);
-        return { track:t, pts:p, dists: buildDists(p) };
-      });
-    }
-  }
-
-  ctx.clearRect(0,0,W,H);
-  if (mapSnap) ctx.drawImage(mapSnap.snapshot,0,0,W,H);
-  drawRoute(ctx, dPts, dDists, 1, getLineW(), {
-    lc1:getLineC(), lc2:getLineC2(), gi:getGlowI(), gc:getGlowC(),
-    taper:getTaper(), tipDot:false, pulseMult:1, gradient:getGradient(),
-  });
-  extraFrames.forEach(ef => {
-    drawRoute(ctx, ef.pts, ef.dists, 1, getLineW(), {
-      lc1: ef.track.color1, lc2: ef.track.color2, gi:getGlowI(), gc:getGlowC(),
-      taper:getTaper(), tipDot:false, pulseMult:1, gradient:getGradient(),
-    });
-  });
-  drawOverlay(ctx, W, H, 1);
-
-  offC.toBlob(blob => {
-    showProgress(false);
+    await composeFrame(ctx, W, H, { progress:1, loopFraction:0, reveal:1, pulseMult:1, intro:1, bearing:rotationDeg }, env);
+    const blob = await new Promise(r => offC.toBlob(r, "image/png"));
     download(blob, `${fileName}-overlay.png`);
-    showStatus(`PNG downloaded — ${W}×${H}px`);
-  }, "image/png");
+    showStatus(`PNG downloaded: ${W}×${H}px`);
+  } catch (err) {
+    console.error(err);
+    showStatus(`Export failed: ${err.message}`, 6000);
+  } finally {
+    if (mapState) endMapExport(mapState);
+    exporting = false;
+    showProgress(false);
+    startAnimation();
+  }
 }
 
 // ─── Event wiring ─────────────────────────────────────────────────────────────
@@ -2183,17 +2401,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   wireSlider("line-width",    "lw-num",  ()=>{});
   wireSlider("glow-intensity","gi-num",  ()=>{});
-  wireSlider("duration",      "dur-num", ()=>{ animStartTs=null; });
-  wireSlider("loop-pause",    "lp-num",  ()=>{ animStartTs=null; });
+  wireSlider("duration",      "dur-num", ()=>{ animStartTs=null; updateExportMeta(); });
+  wireSlider("loop-pause",    "lp-num",  ()=>{ animStartTs=null; updateExportMeta(); });
 
-  function onViewChange() {
-    if (bgMode==="map" && map) { applyMapCamera(); recenterOnRoute(getTrimmedPoints()); }
+  // Zoom keeps the current framing (including a hand-dragged one); rotation
+  // and tilt change what "whole route" means, so they re-fit it.
+  function onViewChange(refit=true) {
+    if (bgMode!=="map" || !map) return;
+    if (refit) fitMapToRoute(); else applyMapCamera();
   }
 
-  $("zoom").addEventListener("input",()=>{ zoomLevel=parseFloat($("zoom").value); $("zoom-num").value=$("zoom").value; onViewChange(); });
+
+  $("zoom").addEventListener("input",()=>{ zoomLevel=parseFloat($("zoom").value); $("zoom-num").value=$("zoom").value; onViewChange(false); });
   $("zoom-num").addEventListener("input",()=>{
     const v=parseFloat($("zoom-num").value); if(isNaN(v)) return;
-    zoomLevel=Math.min(4,Math.max(0.2,v)); $("zoom").value=zoomLevel; onViewChange();
+    zoomLevel=Math.min(4,Math.max(0.2,v)); $("zoom").value=zoomLevel; onViewChange(false);
   });
   $("zoom-num").addEventListener("blur",()=>{ $("zoom-num").value=$("zoom").value; });
 
@@ -2207,7 +2429,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("tilt").addEventListener("input",()=>{ pitchDeg=parseFloat($("tilt").value); $("tilt-num").value=$("tilt").value; onViewChange(); });
   $("tilt-num").addEventListener("input",()=>{
     const v=parseFloat($("tilt-num").value); if(isNaN(v)) return;
-    pitchDeg=Math.min(70,Math.max(0,v)); $("tilt").value=pitchDeg; onViewChange();
+    pitchDeg=Math.min(MAX_TILT,Math.max(0,v)); $("tilt").value=pitchDeg; onViewChange();
   });
   $("tilt-num").addEventListener("blur",()=>{ $("tilt-num").value=$("tilt").value; });
 
@@ -2224,6 +2446,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const c=$("preview-canvas");
       previewPts=toCanvas(normalizedPts,c.width,c.height);
       previewDists=buildDists(previewPts);
+      if (bgMode==="map" && map) fitMapToRoute();
     }
   });
 
@@ -2253,10 +2476,14 @@ document.addEventListener("DOMContentLoaded", () => {
   $("line-color-2").addEventListener("input",()=>{});
   $("glow-color").addEventListener("input",()=>{});
 
-  // Premium effect toggles — live, no restart needed
-  ["gradient-on","taper-on","tip-dot-on","pulse-on"].forEach(id=>{
-    $(id).addEventListener("change",()=>{});
+  // "All effects" switches the four effects together and shows on only
+  // while every one of them is on.
+  const EFFECT_IDS = ["gradient-on","taper-on","tip-dot-on","pulse-on"];
+  const syncEffectsAll = () => { $("effects-all").checked = EFFECT_IDS.every(id => $(id).checked); };
+  $("effects-all").addEventListener("change",()=>{
+    EFFECT_IDS.forEach(id => { $(id).checked = $("effects-all").checked; });
   });
+  EFFECT_IDS.forEach(id => $(id).addEventListener("change", syncEffectsAll));
 
   document.querySelectorAll(".asp-btn[data-asp]").forEach(btn=>{
     btn.addEventListener("click",()=>{
@@ -2288,6 +2515,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.toggle("mode-static", animMode==="static");
       document.body.classList.toggle("mode-animated", animMode==="animated");
       animStartTs = null;
+      applyProjection(); updateExportMeta();
     });
   });
 
@@ -2297,6 +2525,8 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("active");
       cameraMode = btn.dataset.camera;
       animStartTs = null;
+      if (cameraMode === "overview" && headingUp) document.querySelector('[data-rotate="off"]').click();
+      $("follow-opts").classList.toggle("collapsed", cameraMode!=="follow");
       if (cameraMode==="overview" && bgMode==="map" && map) { fitMapToRoute(); }
     });
   });
@@ -2318,10 +2548,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  $("auto-rotate-on").addEventListener("change",()=>{
-    autoRotate = $("auto-rotate-on").checked;
+  // One-of segmented control: marks the clicked button active and calls back.
+  function wireSeg(rowId, attr, onpick) {
+    document.querySelectorAll(`#${rowId} .seg-btn`).forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        document.querySelectorAll(`#${rowId} .seg-btn`).forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        onpick(btn.dataset[attr]);
+      });
+    });
+  }
+  wireSeg("rotate-btns", "rotate", v=>{
+    autoRotate = v==="orbit"; headingUp = v==="heading";
+    // Turning with the road only makes sense while chasing the tip.
+    if (headingUp && cameraMode !== "follow") document.querySelector('[data-camera="follow"]').click();
     $("rotate-speed-wrap").classList.toggle("collapsed", !autoRotate);
     animStartTs = null;
+    if (bgMode==="map" && map) fitMapToRoute();
+  });
+  wireSeg("steady-btns", "steady", v=>{ steadiness = v; });
+  wireSeg("look-btns", "look", v=>{ lookAhead = v; });
+  $("intro-on").addEventListener("change",()=>{ applyProjection(); animStartTs=null; updateExportMeta(); });
+
+  $("labels-on").addEventListener("change", applyLabels);
+  $("terrain-on").addEventListener("change",()=>{
+    terrainOn = $("terrain-on").checked;
+    $("terrain-height-row").style.display = terrainOn ? "" : "none";
+    if (map && !styleSwitching) { addTerrain(); fitMapToRoute(); }
+  });
+  wireSlider("terrain-height","terrain-height-num",v=>{
+    terrainHeight = parseFloat(v);
+    if (map && !styleSwitching && terrainOn) { addTerrain(); fitMapToRoute(); }
+  });
+
+  // Map buttons over the preview (not part of the export).
+  document.querySelectorAll("#map-nav button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const nav = btn.dataset.nav;
+      if (nav==="in" || nav==="out") {
+        zoomLevel = Math.min(4, Math.max(0.2, zoomLevel * (nav==="in" ? 1.25 : 0.8)));
+        syncViewSliders(); onViewChange(false);
+      } else if (nav==="north") {
+        rotationDeg = 0; syncViewSliders(); onViewChange();
+      } else {
+        zoomLevel = 1; syncViewSliders(); onViewChange();
+      }
+    });
   });
   wireSlider("rotate-speed","rotate-speed-num",()=>{});
   wireSlider("overlay-size","overlay-size-num",()=>{});
@@ -2349,20 +2621,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  $("matte-black").addEventListener("click",()=>{ matteColor="black"; $("matte-black").classList.add("active"); $("matte-white").classList.remove("active"); });
-  $("matte-white").addEventListener("click",()=>{ matteColor="white"; $("matte-white").classList.add("active"); $("matte-black").classList.remove("active"); });
-
-  const webmBgHints = { transparent:'transparent', '#00b140':'green screen — use chroma key', '#000000':'black — use Screen blend in Canva' };
-  document.querySelectorAll('[data-webmbg]').forEach(el=>{
+  const videoBgHints = { '#00b140':'green screen', '#000000':'black: use Screen blend' };
+  document.querySelectorAll('[data-videobg]').forEach(el=>{
     el.addEventListener('click',()=>{
-      document.querySelectorAll('[data-webmbg]').forEach(e=>e.classList.remove('active'));
+      document.querySelectorAll('[data-videobg]').forEach(e=>e.classList.remove('active'));
       el.classList.add('active');
-      $('webm-bg-hint').textContent = webmBgHints[el.dataset.webmbg] || el.dataset.webmbg;
+      videoBg = el.dataset.videobg;
+      $('video-bg-hint').textContent = videoBgHints[videoBg] || videoBg;
+    });
+  });
+  document.querySelectorAll("#fps-btns .seg-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#fps-btns .seg-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      exportFps = parseInt(btn.dataset.fps);
+      updateExportMeta();
+    });
+  });
+  document.querySelectorAll("#quality-btns .seg-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("#quality-btns .seg-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      exportQuality = btn.dataset.quality;
+      updateExportMeta();
     });
   });
 
   window.addEventListener("resize",()=>{ if(normalizedPts.length) layoutPreview(); });
   layoutPreview();
+  setBg(bgMode); // Map by default: loads the basemap even before a route is dropped
 });
 </script>
 </body>
