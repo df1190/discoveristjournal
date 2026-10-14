@@ -138,6 +138,8 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 .card-sub.collapsed{max-height:0!important;opacity:0;margin:0!important}
 
 .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.style-group{grid-column:1/-1;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lbl4);margin:6px 0 1px}
+.style-group:first-child{margin-top:0}
 .style-btn{padding:6px 2px;border-radius:7px;border:1.5px solid var(--sep);background:var(--fill);font-size:10.5px;font-weight:500;color:var(--lbl3);cursor:pointer;text-align:center;transition:all var(--t) var(--ease)}
 .style-btn.active,.style-btn:hover{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
 
@@ -172,6 +174,7 @@ body.bg-map #preview-canvas{pointer-events:none}
 body.bg-map #map-bg{cursor:grab}
 body.bg-map #map-bg:active{cursor:grabbing}
 body.bg-map #checker-wrap{background:#0B1020}
+body.bg-map #checker-bg{display:none}
 body:not(.bg-map) .map-only{display:none!important}
 #map-nav{position:absolute;top:10px;right:10px;z-index:4;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 2px 10px rgba(0,0,0,.18)}
 #map-nav[hidden]{display:none}
@@ -264,6 +267,33 @@ body.mode-animated .static-only{display:none!important}
       </div>
     </div>
 
+    <div class="section" data-section="templates">
+      <div class="section-header">
+        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+        <h2>Templates</h2>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="ctitle">My looks</div>
+          <select id="tpl-select" class="text-input" style="width:100%;padding:6px 8px;font-size:11.5px"></select>
+          <div class="btn-row">
+            <button class="btn btn-gold" id="tpl-apply">Apply</button>
+            <button class="btn btn-ghost" id="tpl-delete">Delete</button>
+          </div>
+          <div class="row" style="gap:6px">
+            <input type="text" id="tpl-name" class="text-input" placeholder="Name this look, e.g. Night pass">
+            <button class="btn btn-ghost" id="tpl-save" style="padding:7px 12px">Save</button>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost" id="tpl-export">Export file</button>
+            <button class="btn btn-ghost" id="tpl-import">Import file</button>
+          </div>
+          <input type="file" id="tpl-file" accept=".json,application/json" style="display:none">
+          <div class="hint">Saves the map, colors, effects, camera, overlays and export settings (not the route). Kept in this browser; export a file to back them up or move them to another computer.</div>
+        </div>
+      </div>
+    </div>
+
     <div class="section" data-section="style">
       <div class="section-header">
         <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
@@ -300,6 +330,7 @@ body.mode-animated .static-only{display:none!important}
         <label>Glow Color</label>
         <input type="color" id="glow-color" value="#FC4C02">
       </div>
+      <button class="btn btn-ghost" id="match-map-colors" style="font-size:11px;padding:6px" title="Route colors chosen to stand out on the selected map">Match map colors</button>
     </div>
 
     <div class="card">
@@ -423,18 +454,33 @@ body.mode-animated .static-only{display:none!important}
           </div>
           <div class="card-sub collapsed" id="map-style-wrap" style="margin-top:9px">
             <div class="style-grid" id="map-style-btns">
-              <button class="style-btn active" data-style="outdoor">Outdoor</button>
-              <button class="style-btn" data-style="satellite">Satellite</button>
-              <button class="style-btn" data-style="hybrid">Hybrid</button>
-              <button class="style-btn" data-style="streets">Streets</button>
+              <div class="style-group">Mountains &amp; passes</div>
+              <button class="style-btn active" data-style="landscape">Landscape</button>
               <button class="style-btn" data-style="topo">Topo</button>
+              <button class="style-btn" data-style="outdoor" title="Shows hiking and bike trails">Outdoor</button>
+              <button class="style-btn" data-style="relief" title="Terrain colored by altitude">Relief</button>
+              <button class="style-btn" data-style="pastel">Pastel</button>
               <button class="style-btn" data-style="winter">Winter</button>
-              <button class="style-btn" data-style="bright">Bright</button>
-              <button class="style-btn" data-style="basic">Basic</button>
-              <button class="style-btn" data-style="night">Night</button>
-              <button class="style-btn" data-style="clean">Clean</button>
-              <button class="style-btn" data-style="toner">Toner</button>
-              <button class="style-btn" data-style="ocean">Ocean</button>
+              <div class="style-group">Satellite</div>
+              <button class="style-btn" data-style="satellite">Satellite</button>
+              <button class="style-btn" data-style="hybrid">Sat + names</button>
+              <button class="style-btn" data-style="satdark">Sat night</button>
+              <div class="style-group">Dark &amp; cinematic</div>
+              <button class="style-btn" data-style="landdark">Landscape dark</button>
+              <button class="style-btn" data-style="outdark">Outdoor dark</button>
+              <button class="style-btn" data-style="nightrelief">Night relief</button>
+              <div class="style-group">Roads &amp; clean</div>
+              <button class="style-btn" data-style="streets">Streets</button>
+              <button class="style-btn" data-style="navy">Navy roads</button>
+              <button class="style-btn" data-style="vintage">Vintage</button>
+              <button class="style-btn" data-style="mono">Mono relief</button>
+            </div>
+            <div class="toggle-row" style="margin-top:9px">
+              <span class="toggle-label">Focus on my route<small style="display:block;font-size:10.5px;color:var(--lbl4)">Fades the map's own roads and trails</small></span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="focus-on">
+                <span class="toggle-knob"></span>
+              </label>
             </div>
             <div class="row" style="margin-top:9px">
               <label>Tilt (3D)</label>
@@ -554,6 +600,93 @@ body.mode-animated .static-only{display:none!important}
         </label>
       </div>
       <div class="hint" id="profile-hint"></div>
+      <div class="card-sub collapsed" id="profile-opts" style="margin-top:6px">
+        <div class="ctitle">Fill</div>
+        <div class="seg-row" id="pf-fill-btns">
+          <button class="seg-btn active" data-pffill="route">Route colors</button>
+          <button class="seg-btn" data-pffill="custom">Custom</button>
+        </div>
+        <div class="row" id="pf-custom-row" style="display:none">
+          <label>Colors</label>
+          <div class="color-pair">
+            <input type="color" id="pf-c1" value="#FF2D55" title="Start color">
+            <span class="color-arrow">→</span>
+            <input type="color" id="pf-c2" value="#FFCC00" title="End color">
+          </div>
+        </div>
+        <div class="row">
+          <label>Fill</label>
+          <input type="range" id="pf-fill-op" min="20" max="100" step="5" value="85">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="pf-fill-op-num" min="20" max="100" step="5" value="85">
+            <span class="num-unit">%</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>Background</label>
+          <input type="color" id="pf-bg" value="#0C0E14">
+        </div>
+        <div class="row">
+          <label>Bg opacity</label>
+          <input type="range" id="pf-bg-op" min="0" max="100" step="5" value="76">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="pf-bg-op-num" min="0" max="100" step="5" value="76">
+            <span class="num-unit">%</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>Text</label>
+          <input type="color" id="pf-text" value="#FFFFFF">
+        </div>
+        <div class="ctitle" style="margin-top:2px">Font</div>
+        <div class="seg-row" id="pf-font-btns">
+          <button class="seg-btn active" data-font="system">System</button>
+          <button class="seg-btn" data-font="serif">Serif</button>
+          <button class="seg-btn" data-font="mono">Mono</button>
+          <button class="seg-btn" data-font="condensed">Condensed</button>
+        </div>
+        <div class="row">
+          <label>Size</label>
+          <input type="range" id="pf-size" min="0.6" max="1.6" step="0.05" value="1">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="pf-size-num" min="0.6" max="1.6" step="0.05" value="1">
+            <span class="num-unit">×</span>
+          </div>
+        </div>
+        <div class="ctitle" style="margin-top:2px">Position</div>
+        <div class="seg-row" id="pf-pos-btns">
+          <button class="seg-btn active" data-pfpos="bottom">Bottom</button>
+          <button class="seg-btn" data-pfpos="top">Top</button>
+        </div>
+        <div class="ctitle" style="margin-top:2px">Corners</div>
+        <div class="seg-row" id="pf-corner-btns">
+          <button class="seg-btn" data-pfcorner="0">Square</button>
+          <button class="seg-btn active" data-pfcorner="14">Rounded</button>
+          <button class="seg-btn" data-pfcorner="40">Pill</button>
+        </div>
+        <div class="ctitle" style="margin-top:2px">Show</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Current altitude</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="pf-show-ele" checked>
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Max altitude</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="pf-show-max" checked>
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Distance ridden</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="pf-show-dist">
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+      </div>
       <div class="card-sub collapsed" id="overlay-opts" style="margin-top:9px">
         <div class="row">
           <label>Title</label>
@@ -725,7 +858,7 @@ let latLonDists   = [];
 let trimTargetId  = "primary"; // "primary" | extraTrack.id (as string)
 let animMode      = "animated"; // "animated" | "static"
 let bgMode         = "map"; // "transparent" | "map"
-let currentMapStyle = "outdoor";
+let currentMapStyle = "landscape";
 let map              = null;
 let fittedZoom        = 0;
 let fittedCenter      = null;
@@ -764,20 +897,47 @@ const TRACK_PALETTE = [
 ];
 
 const MAPTILER_KEY = 'pO4p3paZcjFsfdNEcYDM';
+const MT = id => `https://api.maptiler.com/maps/${id}/style.json?key=${MAPTILER_KEY}`;
+// Picked for ride videos after rendering every MapTiler style on a real
+// Alpine ride (2026-10): the ones with visible relief and a route that pops.
+// "relief" is Backdrop with altitude colors added on top (see addRelief).
 const MAP_STYLES = {
-  outdoor:   `https://api.maptiler.com/maps/outdoor-v4/style.json?key=${MAPTILER_KEY}`,
-  satellite: `https://api.maptiler.com/maps/satellite-v4/style.json?key=${MAPTILER_KEY}`,
-  hybrid:    `https://api.maptiler.com/maps/hybrid-v4/style.json?key=${MAPTILER_KEY}`,
-  streets:   `https://api.maptiler.com/maps/streets-v4/style.json?key=${MAPTILER_KEY}`,
-  topo:      `https://api.maptiler.com/maps/topo-v4/style.json?key=${MAPTILER_KEY}`,
-  winter:    `https://api.maptiler.com/maps/winter-v4/style.json?key=${MAPTILER_KEY}`,
-  bright:    `https://api.maptiler.com/maps/bright-v2/style.json?key=${MAPTILER_KEY}`,
-  basic:     `https://api.maptiler.com/maps/base-v4/style.json?key=${MAPTILER_KEY}`,
-  night:     `https://api.maptiler.com/maps/base-v4-dark/style.json?key=${MAPTILER_KEY}`,
-  clean:     `https://api.maptiler.com/maps/backdrop-v4/style.json?key=${MAPTILER_KEY}`,
-  toner:     `https://api.maptiler.com/maps/toner-v2/style.json?key=${MAPTILER_KEY}`,
-  ocean:     `https://api.maptiler.com/maps/ocean/style.json?key=${MAPTILER_KEY}`,
+  landscape:   MT("landscape-v4"),
+  topo:        MT("topo-v4"),
+  outdoor:     MT("outdoor-v4"),
+  relief:      MT("backdrop-v4"),
+  pastel:      MT("pastel"),
+  winter:      MT("winter-v4"),
+  satellite:   MT("satellite-v4"),
+  hybrid:      MT("hybrid-v4"),
+  satdark:     MT("satellite-v4-dark"),
+  landdark:    MT("landscape-v4-dark"),
+  outdark:     MT("outdoor-v4-dark"),
+  nightrelief: MT("backdrop-v4-dark"),
+  streets:     MT("streets-v4"),
+  navy:        MT("streets-v4-dark"),
+  vintage:     MT("ocean-v4"),
+  mono:        MT("backdrop-v4"),
 };
+// Route colors that stand out on each map, used until the colors are changed
+// by hand. Outdoor draws trails in orange, so the route goes blue there.
+const HOT = ["#FF2D55", "#FFCC00", "#FF2D55"];
+const ROUTE_PRESETS = {
+  landscape: HOT, topo: HOT, pastel: ["#FF2D55", "#FF9F0A", "#FF2D55"],
+  outdoor:   ["#2563EB", "#22D3EE", "#2563EB"],
+  relief:    ["#E5186B", "#FF7A59", "#E5186B"],
+  winter:    ["#E5186B", "#FF7A59", "#E5186B"],
+  satellite: ["#FC4C02", "#FFCC00", "#FF7A00"],
+  hybrid:    ["#FC4C02", "#FFCC00", "#FF7A00"],
+  satdark: HOT, landdark: HOT, outdark: HOT, nightrelief: HOT, navy: HOT,
+  streets:   ["#7C3AED", "#EC4899", "#7C3AED"],
+  vintage:   ["#B91C1C", "#F97316", "#B91C1C"],
+  mono:      ["#FC4C02", "#FFCC00", "#FC4C02"],
+};
+// Altitude colors for the Relief style: valley greens, alpine meadows, rock, snow.
+const RELIEF_RAMP = ["interpolate", ["linear"], ["elevation"],
+  -10, "#A9CBE6", 0, "#6A9A6B", 600, "#9FBF86", 1200, "#D6DBA4", 1800, "#EAD9A8",
+  2300, "#D4AD84", 2800, "#B38B6D", 3300, "#C9C3BD", 3900, "#FFFFFF"];
 
 // ─── Getters ──────────────────────────────────────────────────────────────────
 const $        = id => document.getElementById(id);
@@ -1058,6 +1218,10 @@ function ensureMap() {
     keyboard: false,
     boxZoom: false,
     maxPitch: MAX_TILT, // hand-tilting stops where the slider does
+    // Camera height comes from cameraElevation(), not the ground under the
+    // view center (which bounces over every ridge and reads 0 m wherever a
+    // terrain tile hasn't loaded yet).
+    centerClampedToGround: false,
     attributionControl: false,
     antialias: true,
     preserveDrawingBuffer: true,
@@ -1065,14 +1229,15 @@ function ensureMap() {
     // would capture them half-faded. Off everywhere so preview matches export.
     fadeDuration: 0,
   });
-  const setupStyle = () => { addTerrain(); addSky(); disableRasterFades(); applyProjection(); ensureRouteLayers(); captureLabelLayers(); applyLabels(); };
+  const setupStyle = () => { addTerrain(); addSky(); disableRasterFades(); applyProjection(); addRelief(); ensureRouteLayers(); captureLabelLayers(); applyLabels(); applyFocus(); };
   // "load" waits for every tile, so it can arrive late, even mid-export.
   // The route is already fitted on style.load.
   map.on("load", () => { setupStyle(); });
   // style.load fires for the first style too, well before every tile is in,
   // so camera work (fitting the route) can start right away.
   map.on("style.load", () => {
-    setupStyle(); styleSwitching = false;
+    styleSwitching = false; // before setupStyle: labels/focus skip while switching
+    setupStyle();
     if (!mapLoaded) { mapLoaded = true; if (routePoints.length) fitMapToRoute(); }
   });
   // Hand framing: while the person drags/zooms, the preview stops driving the
@@ -1147,6 +1312,66 @@ function applyLabels() {
     if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", on ? labelLayers[id] : "none");
   }
 }
+// Relief style: Backdrop plus a color-by-altitude layer under the water,
+// roads and labels, with a softer multidirectional hillshade on top.
+function addRelief() {
+  if (currentMapStyle !== "relief" || map.getLayer("relief")) return;
+  if (!map.getSource("relief-dem")) {
+    map.addSource("relief-dem", { type: "raster-dem", url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${MAPTILER_KEY}`, tileSize: 256, maxzoom: 12 });
+  }
+  const layers = map.getStyle().layers;
+  const above = layers.find(l => l.type !== "background");
+  map.addLayer({ id: "relief", type: "color-relief", source: "relief-dem",
+    paint: { "color-relief-color": RELIEF_RAMP, "color-relief-opacity": 0.92 } }, above && above.id);
+  layers.forEach(l => {
+    if (l.type === "hillshade") {
+      map.setPaintProperty(l.id, "hillshade-method", "multidirectional");
+      map.setPaintProperty(l.id, "hillshade-shadow-color", "rgba(45,35,25,0.55)");
+      map.setPaintProperty(l.id, "hillshade-highlight-color", "rgba(255,255,255,0.3)");
+    }
+    if (l.type === "fill" && /water/i.test(l.id)) map.setPaintProperty(l.id, "fill-color", "#A9CBE6");
+    if (l.type === "fill" && /forest|grass/i.test(l.id)) map.setPaintProperty(l.id, "fill-opacity", 0);
+  });
+}
+// "Focus on my route": fades the basemap's own lines (roads, trails, rivers,
+// borders) and mutes satellite imagery so the ride stands out. Original paint
+// values are kept per style so it switches back exactly.
+let focusOrig = {};
+function scaleOpacity(v, k) {
+  if (typeof v === "number") return v * k;
+  if (v && !Array.isArray(v) && Array.isArray(v.stops)) return { ...v, stops: v.stops.map(([z, x]) => [z, x * k]) };
+  if (Array.isArray(v) && (v[0] === "interpolate" || v[0] === "step")) {
+    // Zoom curves must stay top-level, so scale their outputs instead of wrapping.
+    const out = v.slice(), first = v[0] === "interpolate" ? 4 : 2;
+    for (let i = first; i < out.length; i += 2) out[i] = scaleOpacity(out[i], k);
+    return out;
+  }
+  return Array.isArray(v) ? ["*", v, k] : k;
+}
+function applyFocus() {
+  if (!map || styleSwitching) return;
+  const on = $("focus-on").checked;
+  map.getStyle().layers.forEach(l => {
+    if (l.id.startsWith("route-") || l.id === "relief") return;
+    const prop = l.type === "line" ? "line-opacity" : l.type === "raster" ? "raster-saturation" : null;
+    if (!prop) return;
+    if (!(l.id in focusOrig)) focusOrig[l.id] = map.getPaintProperty(l.id, prop) ?? (l.type === "line" ? 1 : 0);
+    try {
+      if (l.type === "line") map.setPaintProperty(l.id, prop, on ? scaleOpacity(focusOrig[l.id], 0.3) : focusOrig[l.id]);
+      else {
+        map.setPaintProperty(l.id, prop, on ? -0.45 : focusOrig[l.id]);
+        map.setPaintProperty(l.id, "raster-brightness-max", on ? 0.82 : 1);
+      }
+    } catch (_) {}
+  });
+}
+// Route colors follow the map style until the person picks their own.
+let routeColorsAuto = true;
+function applyRoutePreset(key) {
+  const p = ROUTE_PRESETS[key];
+  if (!p) return;
+  $("line-color").value = p[0]; $("line-color-2").value = p[1]; $("glow-color").value = p[2];
+}
 function disableRasterFades() {
   map.getStyle().layers.forEach(l => {
     if (l.type === "raster") map.setPaintProperty(l.id, "raster-fade-duration", 0);
@@ -1158,13 +1383,28 @@ function disableRasterFades() {
 // ends up inside the mountains (blank or fog-only frames). Passing the ground
 // height ourselves, looked up at the whole tile zoom, avoids that.
 function jumpCamera(cam) {
-  if (map.terrain && (cam.center != null || cam.zoom != null)) {
+  if (!map.terrain) cam = { ...cam, elevation: 0 };
+  else if (cam.elevation == null) {
+    // No route altitude to go by: ground under the center, at a whole tile zoom.
     const center = maplibregl.LngLat.convert(cam.center ?? map.getCenter());
-    const zoom = cam.zoom ?? map.getZoom();
-    const ground = map.terrain.getElevationForLngLatZoom(center, Math.floor(zoom));
+    const ground = map.terrain.getElevationForLngLatZoom(center, Math.floor(cam.zoom ?? map.getZoom()));
     cam = { ...cam, elevation: ground || map.transform.elevation };
   }
   map.jumpTo(cam);
+}
+// Height of the camera's look-at point, in the map's (exaggerated) meters.
+// Taken from the route's own smoothed altitude so the camera glides instead
+// of bouncing over ridges. null = unknown (jumpCamera falls back to terrain).
+function exaggeration() { return terrainOn ? terrainHeight : 0; }
+function routeElevationAt(p) {
+  if (!elevProfile) return null;
+  const N = 8, w = 0.04; let sum = 0;
+  for (let k = -N; k <= N; k++) sum += profileEleAt(Math.min(1, Math.max(0, p + k/N*w)));
+  return sum / (2*N+1) * exaggeration();
+}
+function overviewElevation() {
+  if (!elevProfile) return null;
+  return elevProfile.e.reduce((a, b) => a + b, 0) / elevProfile.e.length * exaggeration();
 }
 function fitMapToRoute() {
   if (!mapReady() || !routePoints.length || exporting) return;
@@ -1192,7 +1432,8 @@ function fitCameraToPoints(pts, padFrac) {
   const cam = map.cameraForBounds(bounds, { padding: { top: padY+frameCss.y, bottom: padY+frameCss.y, left: padX+frameCss.x, right: padX+frameCss.x }, bearing: rotationDeg })
     || map.cameraForBounds(bounds, { bearing: rotationDeg }); // padding too big for a tiny view
   if (!cam) return;
-  jumpCamera({ center: cam.center, zoom: cam.zoom, bearing: rotationDeg, pitch: pitchDeg });
+  const elevation = overviewElevation() ?? undefined;
+  jumpCamera({ center: cam.center, zoom: cam.zoom, bearing: rotationDeg, pitch: pitchDeg, elevation });
   const sample = pts.length > 400 ? pts.filter((_,i)=>i % Math.ceil(pts.length/400) === 0) : pts;
   for (let iter=0; iter<4; iter++) {
     map.redraw(); // refreshes the camera's ground elevation for the new center
@@ -1213,7 +1454,7 @@ function fitCameraToPoints(pts, padFrac) {
     const center = det ? [c.lng + (d*dx - b*dy)/det, c.lat + (a*dy - cc*dx)/det] : [c.lng, c.lat];
     const dz = Math.max(-2, Math.min(2, Math.log2(scale)));
     if (Math.abs(dx) < 1 && Math.abs(dy) < 1 && Math.abs(dz) < 0.01) break;
-    jumpCamera({ center, zoom: map.getZoom() + dz });
+    jumpCamera({ center, zoom: map.getZoom() + dz, elevation });
   }
 }
 function applyMapCamera() {
@@ -1224,8 +1465,14 @@ function setMapStyle(key) {
   currentMapStyle = key;
   if (!map) return;
   styleSwitching = true;
-  labelLayers = {};
-  map.setStyle(MAP_STYLES[key]);
+  labelLayers = {}; focusOrig = {};
+  // diff:false forces a full reload (and a style.load event) even when two
+  // entries share a base style, e.g. Relief and Backdrop. Terrain goes off
+  // for the swap: with the map tilted, MapLibre's own render loop otherwise
+  // draws the terrain depth pass before the new style has a projection and
+  // throws. setupStyle turns it back on at style.load.
+  map.setTerrain(null);
+  map.setStyle(MAP_STYLES[key], { diff: false });
 }
 function setBg(mode) {
   bgMode = mode;
@@ -1261,7 +1508,7 @@ async function settleMap(maxMs=6000) {
 // area, zoom and label sizes as the preview, just with more pixels.
 async function beginMapExport(W, H) {
   const bg = $("map-bg");
-  const saved = { center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch() };
+  const saved = { center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch(), elevation: map.transform.elevation };
   const prevStyle = bg.getAttribute("style") || "";
   // Shrink the map to just the export frame. The frame is centered and keeps
   // the stage's height, so the camera center and perspective are unchanged and
@@ -1363,28 +1610,36 @@ function followMapCamera(progress, liveBearing, eased) {
   const c = smoothLL(progress + LOOK_AHEAD[lookAhead]);
   const followZoom = fittedZoom + Math.log2(zoomLevel);
   const followBearing = headingUp ? (mapHeadingAt(progress) + rotationDeg) % 360 : liveBearing;
-  if (eased <= 0 || !fittedCenter) return { center:[c.lon,c.lat], zoom: followZoom, bearing: followBearing, pitch: pitchDeg };
+  const followElev = routeElevationAt(progress + LOOK_AHEAD[lookAhead]), overElev = overviewElevation();
+  if (eased <= 0 || !fittedCenter) return { center:[c.lon,c.lat], zoom: followZoom, bearing: followBearing, pitch: pitchDeg, elevation: followElev ?? undefined };
   return {
     center: [lerp(c.lon, fittedCenter.lng, eased), lerp(c.lat, fittedCenter.lat, eased)],
     zoom: lerp(followZoom, fittedZoom, eased),
     bearing: lerpAngle(followBearing, liveBearing, eased),
     pitch: pitchDeg,
+    elevation: followElev != null && overElev != null ? lerp(followElev, overElev, eased) : undefined,
   };
 }
 function overviewCamera(bearing) {
   if (!fittedCenter) return { bearing };
-  return { center:[fittedCenter.lng, fittedCenter.lat], zoom: fittedZoom + Math.log2(zoomLevel), bearing, pitch: pitchDeg };
+  return { center:[fittedCenter.lng, fittedCenter.lat], zoom: fittedZoom + Math.log2(zoomLevel), bearing, pitch: pitchDeg, elevation: overviewElevation() ?? undefined };
 }
 // Globe intro: start high above the planet, slightly turned away, and plunge
 // into the first camera of the route.
 function introCamera(end, f) {
-  const e = easeInOut(f), spin = Math.pow(1-f, 3);
+  const e = easeInOut(f);
   const [lng, lat] = Array.isArray(end.center) ? end.center : [end.center.lng, end.center.lat];
+  const zoom = lerp(1.6, end.zoom, e);
+  // The globe starts turned ~50° away; the offset shrinks with zoom (half per
+  // zoom level), so the sideways motion stays steady on screen and the camera
+  // is over the route well before it gets close to the ground.
+  const away = 50 * Math.pow(2, -(zoom - 1.6)) * (1 - f);
   return {
-    center: [lng - 50*spin, lat - 12*spin],
-    zoom: lerp(1.6, end.zoom, e),
+    center: [lng - away, lat - away*0.25],
+    zoom,
     bearing: lerpAngle(0, end.bearing, e),
     pitch: lerp(0, end.pitch, e*e),
+    elevation: end.elevation != null ? end.elevation * e : undefined,
   };
 }
 // Transparent mode equivalent of followMapCamera, in canvas pixels.
@@ -2129,13 +2384,35 @@ function profileEleAt(progress) {
   const i = Math.floor(x), f = x - i;
   return i >= e.length-1 ? e[e.length-1] : e[i] + (e[i+1]-e[i])*f;
 }
+// Profile look, all from the "Elevation profile" panel.
+function profileStyle() {
+  const seg = (row, attr, dflt) => document.querySelector(`#${row} .seg-btn.active`)?.dataset[attr] ?? dflt;
+  const custom = seg("pf-fill-btns", "pffill", "route") === "custom";
+  return {
+    c1: custom ? $("pf-c1").value : getLineC(),
+    c2: custom ? $("pf-c2").value : (getGradient() ? getLineC2() : getLineC()),
+    fillOp: parseFloat($("pf-fill-op").value) / 100,
+    bg: $("pf-bg").value, bgOp: parseFloat($("pf-bg-op").value) / 100,
+    text: $("pf-text").value,
+    font: OVERLAY_FONTS[seg("pf-font-btns", "font", "system")] || OVERLAY_FONTS.system,
+    size: parseFloat($("pf-size").value),
+    top: seg("pf-pos-btns", "pfpos", "bottom") === "top",
+    corner: parseFloat(seg("pf-corner-btns", "pfcorner", "14")),
+    showEle: $("pf-show-ele").checked, showMax: $("pf-show-max").checked, showDist: $("pf-show-dist").checked,
+  };
+}
 function drawElevProfile(ctx, W, H, progress) {
   if (!getProfileOn() || !elevProfile) return;
-  const s = W / (exportW / exportScale);           // 1 at 1080-wide, scales with output
-  const m = 32*s, h = Math.min(230*s, H*0.2), w = W - 2*m;
-  const above = overlayLayout === "banner" ? 140 * s * getOverlaySize() : 0;
-  const x0 = m, y1 = H - m - above, y0 = y1 - h;
-  const pad = 18*s, labelH = 44*s;
+  const st = profileStyle();
+  const s = W / (exportW / exportScale) * st.size;   // 1 at 1080-wide, scales with output and Size
+  const base = W / (exportW / exportScale);
+  const hasLabels = st.showEle || st.showMax || st.showDist;
+  const pad = 18*s, labelH = hasLabels ? 44*s : 0;
+  const m = 32*base, h = Math.min(186*s + labelH, H*0.3), w = W - 2*m;
+  // Keep clear of the title overlay at the same edge.
+  const gapBottom = overlayLayout === "banner" ? 140 * base * getOverlaySize() : 0;
+  const gapTop = overlayLayout === "center" ? H*0.12 + 50*base*getOverlaySize() : overlayLayout === "corner" ? 130*base*getOverlaySize() : 0;
+  const y0 = st.top ? m + gapTop : H - m - gapBottom - h, y1 = y0 + h, x0 = m;
   const cx0 = x0+pad, cx1 = x0+w-pad, cy0 = y0+pad+labelH, cy1 = y1-pad;
   const { e, min, max } = elevProfile;
   const range = Math.max(max - min, 1);
@@ -2150,30 +2427,40 @@ function drawElevProfile(ctx, W, H, progress) {
     return p;
   };
   ctx.save();
-  // Dark enough that busy map labels underneath don't fight the text.
-  ctx.fillStyle = "rgba(12,14,20,0.76)";
-  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0, y0, w, h, 14*s) : ctx.rect(x0, y0, w, h); ctx.fill();
-  ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.lineWidth = 1*s; ctx.stroke();
-  // whole profile, faint
+  // card
+  if (st.bgOp > 0) {
+    const r = Math.min(st.corner*s, h/2);
+    ctx.fillStyle = toRgba(st.bg, st.bgOp);
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0, y0, w, h, r) : ctx.rect(x0, y0, w, h); ctx.fill();
+    ctx.strokeStyle = toRgba(st.text, 0.12*st.bgOp); ctx.lineWidth = 1*base; ctx.stroke();
+  }
+  // whole profile, faint, in the text color so it works on light or dark cards
   const full = area(1);
-  ctx.fillStyle = "rgba(255,255,255,0.16)"; ctx.fill(full);
-  ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 1.5*s; ctx.stroke(full);
-  // ridden part, in the route colors
+  ctx.fillStyle = toRgba(st.text, 0.16); ctx.fill(full);
+  ctx.strokeStyle = toRgba(st.text, 0.35); ctx.lineWidth = 1.5*s; ctx.stroke(full);
+  // ridden part
   const grad = ctx.createLinearGradient(cx0, 0, cx1, 0);
-  grad.addColorStop(0, toRgba(getLineC(), 0.85)); grad.addColorStop(1, toRgba(getGradient() ? getLineC2() : getLineC(), 0.85));
+  grad.addColorStop(0, toRgba(st.c1, st.fillOp)); grad.addColorStop(1, toRgba(st.c2, st.fillOp));
   ctx.fillStyle = grad; ctx.fill(area(progress));
   // current position
   const px = cx0 + progress*(cx1-cx0), py = Y(profileEleAt(progress));
-  ctx.strokeStyle = "rgba(255,255,255,0.55)"; ctx.lineWidth = 1.5*s;
+  ctx.strokeStyle = toRgba(st.text, 0.55); ctx.lineWidth = 1.5*s;
   ctx.beginPath(); ctx.moveTo(px, cy0); ctx.lineTo(px, cy1); ctx.stroke();
-  ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(px, py, 5*s, 0, Math.PI*2); ctx.fill();
-  // labels
-  const fam = OVERLAY_FONTS[getOverlayFont()] || OVERLAY_FONTS.system;
-  ctx.fillStyle = getOverlayColor(); ctx.textBaseline = "alphabetic";
-  ctx.font = `700 ${Math.round(32*s)}px ${fam}`; ctx.textAlign = "left";
-  ctx.fillText(`${Math.round(profileEleAt(progress)).toLocaleString()} m`, cx0, y0 + pad + 30*s);
-  ctx.font = `500 ${Math.round(21*s)}px ${fam}`; ctx.textAlign = "right"; ctx.globalAlpha = 0.75;
-  ctx.fillText(`max ${Math.round(max).toLocaleString()} m`, cx1, y0 + pad + 28*s);
+  ctx.fillStyle = st.text; ctx.beginPath(); ctx.arc(px, py, 5*s, 0, Math.PI*2); ctx.fill();
+  // labels (with a soft shadow when there's little or no card behind them)
+  ctx.fillStyle = st.text; ctx.textBaseline = "alphabetic";
+  if (st.bgOp < 0.35) { ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = 8*s; }
+  const left = [];
+  if (st.showEle) left.push(`${Math.round(profileEleAt(progress)).toLocaleString()} m`);
+  if (st.showDist) left.push(`${(getShownTotalKm()*progress).toFixed(1)} km`);
+  if (left.length) {
+    ctx.font = `700 ${Math.round(32*s)}px ${st.font}`; ctx.textAlign = "left";
+    ctx.fillText(left.join("  ·  "), cx0, y0 + pad + 30*s);
+  }
+  if (st.showMax) {
+    ctx.font = `500 ${Math.round(21*s)}px ${st.font}`; ctx.textAlign = "right"; ctx.globalAlpha = 0.75;
+    ctx.fillText(`max ${Math.round(max).toLocaleString()} m`, cx1, y0 + pad + 28*s);
+  }
   ctx.restore();
 }
 function drawOverlays(ctx, W, H, progress) {
@@ -2367,6 +2654,58 @@ async function exportPNG() {
   }
 }
 
+// ─── Templates ────────────────────────────────────────────────────────────────
+// A template is a snapshot of the sidebar: every setting input plus the active
+// button in every button group. Applying replays it through the normal
+// controls (clicks and input events), so all the usual side effects run.
+const TPL_KEY = "routeOverlay.templates.v1";
+const TPL_SKIP = new Set(["file-input", "add-track-input", "tpl-file", "tpl-name", "tpl-select",
+  "trim-start", "trim-end", "trim-target", "overlay-title"]); // route-specific
+function loadTemplates() {
+  try { return JSON.parse(localStorage.getItem(TPL_KEY)) || []; } catch (_) { return []; }
+}
+function storeTemplates(list) {
+  try { localStorage.setItem(TPL_KEY, JSON.stringify(list)); return true; } catch (_) { return false; }
+}
+function captureTemplate() {
+  const inputs = {}, picks = [];
+  document.querySelectorAll("#sidebar input[id], #sidebar select[id]").forEach(el => {
+    if (TPL_SKIP.has(el.id) || el.type === "file" || el.id.endsWith("-num")) return;
+    inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
+  });
+  document.querySelectorAll("#sidebar .active").forEach(el => {
+    const attr = Object.keys(el.dataset)[0];
+    if (!attr) return;
+    picks.push({ group: el.parentElement.id || null, attr, value: el.dataset[attr] });
+  });
+  return { inputs, picks, routeColorsAuto };
+}
+function applyTemplate(t) {
+  const attrName = a => a.replace(/[A-Z]/g, c => "-" + c.toLowerCase());
+  t.picks.forEach(({ group, attr, value }) => {
+    const scope = group ? `#${group} ` : "#sidebar ";
+    const el = document.querySelector(`${scope}[data-${attrName(attr)}="${CSS.escape(value)}"]`);
+    if (el && !el.classList.contains("active")) el.click();
+  });
+  document.querySelectorAll("#sidebar input[id], #sidebar select[id]").forEach(el => {
+    if (!(el.id in t.inputs)) return;
+    if (el.type === "checkbox") { if (el.checked === t.inputs[el.id]) return; el.checked = t.inputs[el.id]; }
+    else { if (el.value === String(t.inputs[el.id])) return; el.value = t.inputs[el.id]; }
+    el.dispatchEvent(new Event("input"));
+    el.dispatchEvent(new Event("change"));
+  });
+  routeColorsAuto = !!t.routeColorsAuto;
+  animStartTs = null;
+}
+function renderTemplateList(selectName) {
+  const list = loadTemplates(), sel = $("tpl-select");
+  sel.innerHTML = list.length
+    ? list.map(t => `<option value="${escapeHtml(t.name)}">${escapeHtml(t.name)}</option>`).join("")
+    : `<option value="">No saved looks yet</option>`;
+  if (selectName) sel.value = selectName;
+  $("tpl-apply").disabled = $("tpl-delete").disabled = !list.length;
+}
+
 // ─── Event wiring ─────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -2472,9 +2811,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Colors — live update
-  $("line-color").addEventListener("input",()=>{});
-  $("line-color-2").addEventListener("input",()=>{});
-  $("glow-color").addEventListener("input",()=>{});
+  ["line-color","line-color-2","glow-color"].forEach(id => $(id).addEventListener("input",()=>{ routeColorsAuto = false; }));
+  $("match-map-colors").addEventListener("click",()=>{ routeColorsAuto = true; applyRoutePreset(currentMapStyle); });
+  $("focus-on").addEventListener("change", applyFocus);
 
   // "All effects" switches the four effects together and shows on only
   // while every one of them is on.
@@ -2571,6 +2910,56 @@ document.addEventListener("DOMContentLoaded", () => {
   $("intro-on").addEventListener("change",()=>{ applyProjection(); animStartTs=null; updateExportMeta(); });
 
   $("labels-on").addEventListener("change", applyLabels);
+  // Templates
+  renderTemplateList();
+  $("tpl-save").addEventListener("click",()=>{
+    const name = $("tpl-name").value.trim() || $("tpl-select").value || `Look ${loadTemplates().length + 1}`;
+    const list = loadTemplates().filter(t => t.name !== name);
+    const existed = list.length < loadTemplates().length;
+    list.push({ name, saved: new Date().toISOString(), ...captureTemplate() });
+    list.sort((a, b) => a.name.localeCompare(b.name));
+    if (!storeTemplates(list)) { showStatus("Couldn't save: this browser blocks local storage", 4000); return; }
+    $("tpl-name").value = ""; renderTemplateList(name);
+    showStatus(existed ? `Updated "${name}"` : `Saved "${name}"`);
+  });
+  $("tpl-apply").addEventListener("click",()=>{
+    const t = loadTemplates().find(t => t.name === $("tpl-select").value);
+    if (t) { applyTemplate(t); showStatus(`Applied "${t.name}"`); }
+  });
+  $("tpl-delete").addEventListener("click",()=>{
+    const name = $("tpl-select").value;
+    if (!name || !confirm(`Delete the look "${name}"?`)) return;
+    storeTemplates(loadTemplates().filter(t => t.name !== name)); renderTemplateList();
+    showStatus(`Deleted "${name}"`);
+  });
+  $("tpl-export").addEventListener("click",()=>{
+    const list = loadTemplates();
+    if (!list.length) { showStatus("No saved looks to export"); return; }
+    download(new Blob([JSON.stringify({ app: "route-overlay", version: 1, templates: list }, null, 2)], { type: "application/json" }), "route-overlay-looks.json");
+  });
+  $("tpl-import").addEventListener("click",()=> $("tpl-file").click());
+  $("tpl-file").addEventListener("change", async e => {
+    const f = e.target.files[0]; e.target.value = "";
+    if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      const incoming = (data.templates || []).filter(t => t && t.name && t.inputs && t.picks);
+      if (!incoming.length) throw new Error("no looks in this file");
+      const names = new Set(incoming.map(t => t.name));
+      const list = [...loadTemplates().filter(t => !names.has(t.name)), ...incoming].sort((a, b) => a.name.localeCompare(b.name));
+      storeTemplates(list); renderTemplateList(incoming[0].name);
+      showStatus(`Imported ${incoming.length} look${incoming.length > 1 ? "s" : ""}`);
+    } catch (err) { showStatus(`Import failed: ${err.message}`, 4000); }
+  });
+  // Elevation profile panel
+  $("profile-on").addEventListener("change",()=> $("profile-opts").classList.toggle("collapsed", !$("profile-on").checked));
+  wireSeg("pf-fill-btns", "pffill", v => { $("pf-custom-row").style.display = v === "custom" ? "" : "none"; });
+  wireSeg("pf-font-btns", "font", ()=>{});
+  wireSeg("pf-pos-btns", "pfpos", ()=>{});
+  wireSeg("pf-corner-btns", "pfcorner", ()=>{});
+  wireSlider("pf-fill-op","pf-fill-op-num",()=>{});
+  wireSlider("pf-bg-op","pf-bg-op-num",()=>{});
+  wireSlider("pf-size","pf-size-num",()=>{});
   $("terrain-on").addEventListener("change",()=>{
     terrainOn = $("terrain-on").checked;
     $("terrain-height-row").style.display = terrainOn ? "" : "none";
@@ -2618,6 +3007,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll("#map-style-btns .style-btn").forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
       setMapStyle(btn.dataset.style);
+      if (routeColorsAuto) applyRoutePreset(btn.dataset.style);
     });
   });
 
@@ -2650,6 +3040,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize",()=>{ if(normalizedPts.length) layoutPreview(); });
   layoutPreview();
   setBg(bgMode); // Map by default: loads the basemap even before a route is dropped
+  applyRoutePreset(currentMapStyle);
 });
 </script>
 </body>
