@@ -2191,7 +2191,7 @@ function onRouteLoaded(pts, name) {
   renderTrimTargetOptions();
   if (bgMode==="map" && map) fitMapToRoute();
   const totalKm = latLonDists[latLonDists.length-1];
-  showStatus(`${pts.length.toLocaleString()} points loaded — ${totalKm.toFixed(1)} km`);
+  showStatus(`${pts.length.toLocaleString()} points loaded · ${totalKm.toFixed(1)} km`);
   elevSource = hasElevation(pts) ? "file" : "none";
   updateProfileHint();
   if (elevSource === "none") {
@@ -2235,7 +2235,7 @@ async function addTrackFile(file) {
     if (!hasElevation(pts)) fillElevationFromTerrain(pts).then(ok => { if (ok) rebuildAllTracks(); });
     rebuildAllTracks(); layoutPreview(); renderTracksList(); renderTrimTargetOptions();
     if (bgMode==="map" && map) fitMapToRoute();
-    showStatus(`${name} added — ${pts.length.toLocaleString()} points`);
+    showStatus(`${name} added · ${pts.length.toLocaleString()} points`);
   } catch(err) { showStatus("Error: "+err.message); }
 }
 function removeTrack(id) {
