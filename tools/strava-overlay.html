@@ -201,6 +201,16 @@ select.text-input{padding-right:28px}
 #tl-time{font:500 12.5px var(--mono);color:var(--lbl2);font-variant-numeric:tabular-nums;min-width:92px;text-align:right}
 .tl-meta{margin:0;font-size:12px;white-space:nowrap}
 .is-hidden{display:none!important}
+.lbl-row{display:flex;align-items:center;gap:8px}
+.lbl-row .text-input{flex:1}
+.lbl-km{font:500 12px var(--mono);color:var(--lbl3);white-space:nowrap;min-width:58px;text-align:right}
+.lbl-del{flex-shrink:0;width:28px;height:28px;border:none;border-radius:8px;background:var(--fill);color:var(--lbl2);cursor:pointer;font-size:15px}
+.lbl-del:hover{background:var(--fill2);color:var(--lbl)}
+.day-row{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:.5px solid var(--sep)}
+.day-row:first-child{border-top:none;padding-top:0}
+.day-head{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--lbl)}
+.day-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.day-meta{margin-left:auto;font:500 12px var(--mono);color:var(--lbl3);white-space:nowrap}
 .vbg-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--lbl)}
 #checker-wrap{position:relative;box-shadow:var(--sh-lg);border-radius:3px;overflow:hidden;flex-shrink:0}
 #checker-bg{position:absolute;inset:0;z-index:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
@@ -284,9 +294,10 @@ body.mode-animated .static-only{display:none!important}
           <div class="ctitle">Route File</div>
           <div id="drop-zone" onclick="document.getElementById('file-input').click()">
             <strong id="drop-label">Drop GPX or KML here</strong>
+            <span style="display:block">One file, or one file per day for a trip</span>
             <span>or click to browse</span>
           </div>
-          <input type="file" id="file-input" accept=".gpx,.kml" style="display:none">
+          <input type="file" id="file-input" accept=".gpx,.kml" multiple style="display:none">
         </div>
 <div class="card" id="tracks-card" hidden>
           <div class="ctitle">Tracks</div>
@@ -295,6 +306,46 @@ body.mode-animated .static-only{display:none!important}
             + Add another track
           </div>
           <input type="file" id="add-track-input" accept=".gpx,.kml" style="display:none">
+        </div>
+        <div class="card" id="days-card" hidden>
+          <div class="ctitle" id="days-title">Days</div>
+          <div class="toggle-row">
+            <span class="toggle-label">Color each day</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="day-colors" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Day cards<small>Day number, distance, climb and your note</small></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="day-cards" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Overnight pins</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="day-pins" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Mark the parts of each day</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="day-parts" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="row">
+            <label>Overnight stop</label>
+            <input type="range" id="day-stop-s" min="0" max="6" step="0.5" value="2.5">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="day-stop-s-num" min="0" max="6" step="0.5" value="2.5">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          <div id="days-list"></div>
         </div>
 <div class="card" id="trim-card" hidden>
           <div class="ctitle">Trim Range</div>
@@ -357,6 +408,55 @@ body.mode-animated .static-only{display:none!important}
           </div>
           <span id="video-bg-hint" class="hint">green screen</span>
         </div>
+        </div>
+        <div class="card map-only" id="area-card">
+          <div class="ctitle">Highlight an area</div>
+          <div class="row" style="gap:6px">
+            <input type="text" id="area-q" class="text-input" placeholder="Country, region or town">
+            <button class="btn btn-ghost" id="area-add" style="padding:7px 12px">Add</button>
+          </div>
+          <div id="area-list"></div>
+          <div class="row">
+            <label>Color</label>
+            <input type="color" id="area-color" value="#FFD60A">
+          </div>
+          <div class="row">
+            <label>Fill</label>
+            <input type="range" id="area-fill" min="0" max="60" step="2" value="16">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="area-fill-num" min="0" max="60" step="2" value="16">
+              <span class="num-unit">%</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Glow</label>
+            <input type="range" id="area-glow" min="0" max="100" step="5" value="70">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="area-glow-num" min="0" max="100" step="5" value="70">
+              <span class="num-unit">%</span>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Show the name</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="area-name" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Open on the area<small>The video starts on the whole area, then flies to the start of the track</small></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="area-intro" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="ctitle">When</div>
+          <div class="seg-row" id="area-when-btns">
+            <button class="seg-btn active" data-areawhen="always">Whole video</button>
+            <button class="seg-btn" data-areawhen="start">At the start</button>
+            <button class="seg-btn" data-areawhen="end">At the end</button>
+          </div>
+          <div class="hint">Boundaries from OpenStreetMap. Works great with the globe intro.</div>
         </div>
         <div class="card map-only" id="map-style-card">
           <div class="ctitle">Map style</div>
@@ -696,6 +796,81 @@ body.mode-animated .static-only{display:none!important}
       </div>
     </div>
         <div class="card">
+          <div class="ctitle">Labels on the route</div>
+          <div class="seg-row" id="lbl-style-btns">
+            <button class="seg-btn active" data-lblstyle="callout">Callout<small>Pinned pill</small></button>
+            <button class="seg-btn" data-lblstyle="title">Title<small>Big, on the ground</small></button>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Start &amp; finish</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="lbl-startfinish">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Distance markers</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="lbl-km">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="seg-row card-sub collapsed" id="lbl-km-btns" style="flex-direction:row;gap:2px">
+            <button class="seg-btn" data-lblkm="1">Every 1 km</button>
+            <button class="seg-btn active" data-lblkm="5">5 km</button>
+            <button class="seg-btn" data-lblkm="10">10 km</button>
+            <button class="seg-btn" data-lblkm="25">25 km</button>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Waypoints from the file<small><span id="lbl-wpt-count">None in this file</span></small></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="lbl-wpts" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Callouts show km &amp; altitude</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="lbl-stats" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Stop at labels<small>The ride pauses so each label can be read</small></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="lbl-stop" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="row" id="lbl-stop-row">
+            <label>Stop for</label>
+            <input type="range" id="lbl-stop-s" min="0.5" max="6" step="0.5" value="2">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="lbl-stop-s-num" min="0.5" max="6" step="0.5" value="2">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Show for</label>
+            <input type="range" id="lbl-hold" min="1" max="10" step="0.5" value="3">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="lbl-hold-num" min="1" max="10" step="0.5" value="3">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Size</label>
+            <input type="range" id="lbl-size" min="0.6" max="1.8" step="0.05" value="1">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="lbl-size-num" min="0.6" max="1.8" step="0.05" value="1">
+              <span class="num-unit">×</span>
+            </div>
+          </div>
+          <div id="lbl-list"></div>
+          <button class="btn btn-ghost btn-sm" id="lbl-add">+ Add label here</button>
+          <div class="hint">Pause or scrub the timeline to the spot, then add a label; the place name is filled in for you. Labels pop up as the rider reaches them.</div>
+        </div>
+        <div class="card">
           <div class="ctitle">Elevation profile</div>
 <div class="toggle-row" style="margin-top:8px">
         <span class="toggle-label">Show on video</span>
@@ -1018,18 +1193,30 @@ function getAutoRotateDeg()   { return parseFloat($("rotate-speed").value); }
 function getEase()            { return $("ease-on").checked; }
 function getProfileOn()       { return $("profile-on").checked; }
 // The globe intro needs a real map and a timeline to live in.
-function getIntroMs()         { return $("intro-on").checked && bgMode==="map" && animMode==="animated" ? 2500 : 0; }
-function getLoopMs()          { return getIntroMs() + getDurMs() + getPauseMs(); }
+// The intro: optionally the globe fly-in, then (with a highlighted area) a
+// view of the whole area that flies down to the start of the track.
+function getGlobeIntroMs()    { return $("intro-on").checked && bgMode==="map" && animMode==="animated" ? 2500 : 0; }
+function areaIntroOn()        { return bgMode==="map" && animMode==="animated" && areas.length > 0 && $("area-intro").checked
+                                  && (document.querySelector("#area-when-btns .active")?.dataset.areawhen || "always") !== "end"; }
+const AREA_HOLD_MS = 1600, AREA_FLY_MS = 2800;
+function getIntroMs()         { return getGlobeIntroMs() + (areaIntroOn() ? AREA_HOLD_MS + AREA_FLY_MS : 0); }
+function getLoopMs()          { return getIntroMs() + getRideMs() + getPauseMs(); }
+// Riding time plus the time spent stopped (at labels; later at day ends).
+function getRideMs()          { return getDurMs() + getStops().reduce((t, st) => t + st.ms, 0); }
 // Line width is set in 1080p pixels and scales with the canvas, so 4K and the
 // preview look the same as 1080p, only sharper.
 function scaledLW(W)    { return getLineW() * W * exportScale / exportW; }
 
 // ─── Color utils ─────────────────────────────────────────────────────────────
-function lerpColor(hex1, hex2, t) {
-  if (hex1 === hex2 || t <= 0) return hex1;
-  if (t >= 1) return hex2;
-  const r1=parseInt(hex1.slice(1,3),16), g1=parseInt(hex1.slice(3,5),16), b1=parseInt(hex1.slice(5,7),16);
-  const r2=parseInt(hex2.slice(1,3),16), g2=parseInt(hex2.slice(3,5),16), b2=parseInt(hex2.slice(5,7),16);
+// Accepts "#rrggbb" or "rgb(r,g,b)" (its own output), returns "rgb(...)".
+function rgbOf(c) {
+  if (c.startsWith("rgb")) return c.match(/[\d.]+/g).slice(0, 3).map(Number);
+  return [parseInt(c.slice(1,3),16), parseInt(c.slice(3,5),16), parseInt(c.slice(5,7),16)];
+}
+function lerpColor(c1, c2, t) {
+  if (c1 === c2 || t <= 0) return c1;
+  if (t >= 1) return c2;
+  const [r1,g1,b1] = rgbOf(c1), [r2,g2,b2] = rgbOf(c2);
   return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
 }
 function toRgba(color, alpha) {
@@ -1280,7 +1467,7 @@ function ensureMap() {
     // would capture them half-faded. Off everywhere so preview matches export.
     fadeDuration: 0,
   });
-  const setupStyle = () => { addTerrain(); addSky(); disableRasterFades(); applyProjection(); addRelief(); ensureRouteLayers(); captureLabelLayers(); applyLabels(); applyFocus(); };
+  const setupStyle = () => { addTerrain(); addSky(); disableRasterFades(); applyProjection(); addRelief(); ensureRouteLayers(); ensureAreaLayers(); captureLabelLayers(); applyLabels(); applyFocus(); };
   // "load" waits for every tile, so it can arrive late, even mid-export.
   // The route is already fitted on style.load.
   map.on("load", () => { setupStyle(); });
@@ -1321,7 +1508,7 @@ function syncViewSliders() {
 function applyProjection() {
   if (!map) return;
   // Before the style has loaded this throws; the style.load handler applies it then.
-  try { map.setProjection({ type: getIntroMs() > 0 ? "globe" : "mercator" }); } catch (_) {}
+  try { map.setProjection({ type: getGlobeIntroMs() > 0 ? "globe" : "mercator" }); } catch (_) {}
 }
 function addTerrain() {
   if (!map.getSource("terrain")) {
@@ -1584,6 +1771,7 @@ async function settleMap(maxMs=6000) {
 // instead of enlarging the container, so the export shows exactly the same
 // area, zoom and label sizes as the preview, just with more pixels.
 async function beginMapExport(W, H) {
+  if (areaIntroOn()) areaCamera(); // cache the area view at preview size first
   const bg = $("map-bg");
   const saved = { center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch(), elevation: map.transform.elevation };
   const prevStyle = bg.getAttribute("style") || "";
@@ -1739,6 +1927,52 @@ function overviewCamera(bearing) {
 }
 // Globe intro: start high above the planet, slightly turned away, and plunge
 // into the first camera of the route.
+// Intro camera at t ms into the intro, ending exactly on `end` (the ride's first camera).
+function introCameraAt(end, t) {
+  const gMs = getGlobeIntroMs();
+  if (!areaIntroOn()) return introCamera(end, gMs ? t / gMs : 1);
+  const area = areaCamera();
+  if (t < gMs) return introCamera(area, t / gMs);           // globe → area
+  const ta = t - gMs;
+  const held = { ...area, zoom: area.zoom + 0.08 };
+  if (ta < AREA_HOLD_MS) return { ...area, zoom: area.zoom + 0.08 * easeInOut(ta / AREA_HOLD_MS) }; // slow push-in on the area
+  return flyBetween(held, end, (ta - AREA_HOLD_MS) / AREA_FLY_MS);                                    // area → start of the track
+}
+// Zoom-in flight that moves steadily on screen: the center travels a lot
+// while zoomed out and hardly at all near the end, so the landing is calm.
+function flyBetween(a, b, f) {
+  const e = easeInOut(Math.min(1, Math.max(0, f)));
+  const ca = Array.isArray(a.center) ? a.center : [a.center.lng, a.center.lat];
+  const cb = Array.isArray(b.center) ? b.center : [b.center.lng, b.center.lat];
+  const zoom = lerp(a.zoom, b.zoom, e);
+  const sa = Math.pow(2, -a.zoom), sb = Math.pow(2, -b.zoom), sz = Math.pow(2, -zoom);
+  const w = Math.abs(sa - sb) > 1e-12 ? (sz - sb) / (sa - sb) : 1 - e;
+  return {
+    center: [cb[0] + (ca[0] - cb[0]) * w, cb[1] + (ca[1] - cb[1]) * w],
+    zoom,
+    bearing: lerpAngle(a.bearing || 0, b.bearing || 0, e),
+    pitch: lerp(a.pitch || 0, b.pitch || 0, e),
+    elevation: lerp(a.elevation || 0, b.elevation != null ? b.elevation : 0, e),
+    padding: { top: (b.padding ? b.padding.top : 0) * e, bottom: 0, left: 0, right: 0 },
+  };
+}
+// Camera framing all highlighted areas inside the export frame, slightly tilted.
+let areaCamCache = { key: "", cam: null };
+function areaCamera() {
+  const key = areas.map(a => a.name).join("|") + `|${frameCss.w}x${frameCss.h}`;
+  if (areaCamCache.key === key) return areaCamCache.cam;
+  let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+  const walk = c => { if (typeof c[0] === "number") { minLon = Math.min(minLon, c[0]); maxLon = Math.max(maxLon, c[0]); minLat = Math.min(minLat, c[1]); maxLat = Math.max(maxLat, c[1]); } else c.forEach(walk); };
+  areas.forEach(a => walk(a.geometry.coordinates));
+  const ox = exporting ? 0 : frameCss.x, oy = exporting ? 0 : frameCss.y;
+  const padX = 0.08 * frameCss.w, padY = 0.12 * frameCss.h;
+  const fit = map.cameraForBounds([[minLon, minLat], [maxLon, maxLat]], { padding: { top: padY + oy, bottom: padY + oy, left: padX + ox, right: padX + ox } })
+    || map.cameraForBounds([[minLon, minLat], [maxLon, maxLat]]);
+  const c = fit.center;
+  const cam = { center: Array.isArray(c) ? c : [c.lng, c.lat], zoom: fit.zoom - 0.25, bearing: 0, pitch: Math.min(pitchDeg, 25), elevation: 0 };
+  if (!exporting) areaCamCache = { key, cam };
+  return cam;
+}
 function introCamera(end, f) {
   const e = easeInOut(f);
   const [lng, lat] = Array.isArray(end.center) ? end.center : [end.center.lng, end.center.lat];
@@ -1773,24 +2007,63 @@ function followCanvasView(basePts, lld, tl, W, H) {
 // Animation state as a pure function of time within one loop. The live
 // preview and the frame-by-frame export both call this, so a given moment
 // always looks identical in both.
+// Stops: points where the ride halts for a moment (so a label can be read).
+// The riding time is shared between the legs by distance and each leg eases
+// in and out, so the camera glides into a stop and away from it.
+let stopsCache = { key: null, list: [] };
+function getStops() {
+  if (animMode !== "animated" || !routePoints.length) return [];
+  const key = [$("lbl-stop").checked, $("lbl-stop-s").value, $("lbl-wpts").checked, waypointLabels.map(w => w.km).join(","),
+    customLabels.map(c => c.km + (c.text.trim() ? "" : "x")).join(","), trimStartFrac, trimEndFrac,
+    tripDays.map(d => d.iEnd).join(","), $("day-stop-s").value].join("|");
+  if (stopsCache.key === key) return stopsCache.list;
+  const cand = [];
+  if ($("lbl-stop").checked) {
+    const ms = parseFloat($("lbl-stop-s").value) * 1000;
+    labelList().filter(l => l.kind === "place").forEach(l => cand.push({ p: l.p, ms }));
+  }
+  const nightMs = parseFloat($("day-stop-s").value) * 1000;
+  if (tripDays.length > 1 && nightMs > 0) dayBreaks().slice(0, -1).forEach(b => cand.push({ p: b.p, ms: nightMs }));
+  const list = [];
+  cand.filter(c => c.p > 0.002 && c.p < 0.998).sort((x, y) => x.p - y.p)
+    .forEach(c => { const last = list[list.length-1]; if (last && c.p - last.p <= 0.002) last.ms = Math.max(last.ms, c.ms); else list.push({ ...c }); });
+  stopsCache = { key, list };
+  return list;
+}
+// Progress along the route e ms into the ride (0 → riding time incl. stops).
+function rideProgressAt(e) {
+  const stops = getStops(), dur = getDurMs(), ease = getEase() ? easeInOut : (x => x);
+  let from = 0, t = e;
+  for (let i = 0; i <= stops.length; i++) {
+    const to = i < stops.length ? stops[i].p : 1;
+    const legMs = dur * (to - from);
+    if (t < legMs) return from + (to - from) * ease(legMs > 0 ? t / legMs : 1);
+    t -= legMs;
+    if (i < stops.length) { if (t < stops[i].ms) return to; t -= stops[i].ms; }
+    from = to;
+  }
+  return 1;
+}
+// Animation state as a pure function of time within one loop. The live
+// preview and the frame-by-frame export both call this, so a given moment
+// always looks identical in both.
 function timelineAt(elapsedMs) {
   if (animMode !== "animated") {
     const loopFraction = autoRotate ? (elapsedMs % STATIC_ORBIT_MS) / STATIC_ORBIT_MS : 0;
-    return { progress:1, loopFraction, reveal:1, pulseMult:1, intro:1, bearing: loopBearing(loopFraction) };
+    return { progress:1, loopFraction, reveal:1, pulseMult:1, intro:1, bearing: loopBearing(loopFraction), elapsed: elapsedMs };
   }
-  const introMs = getIntroMs(), durMs = getDurMs(), pauseMs = getPauseMs();
-  const loopFraction = elapsedMs/(introMs+durMs+pauseMs);
+  const introMs = getIntroMs(), rideMs = getRideMs(), pauseMs = getPauseMs();
+  const loopFraction = elapsedMs/(introMs+rideMs+pauseMs);
   const bearing = loopBearing(loopFraction);
-  if (elapsedMs < introMs) return { progress:0, loopFraction, reveal:0, pulseMult:1, intro: elapsedMs/introMs, bearing };
+  if (elapsedMs < introMs) return { progress:0, loopFraction, reveal:0, pulseMult:1, intro: elapsedMs/introMs, introElapsed: elapsedMs, bearing, elapsed: elapsedMs };
   const e = elapsedMs - introMs;
-  const raw = Math.min(e/durMs, 1);
-  const progress = getEase() ? easeInOut(raw) : raw;
-  const inPause = pauseMs > 0 && e >= durMs;
-  const reveal = inPause ? revealEase(e-durMs, pauseMs) : 0;
+  const progress = rideProgressAt(Math.min(e, rideMs));
+  const inPause = pauseMs > 0 && e >= rideMs;
+  const reveal = inPause ? revealEase(e-rideMs, pauseMs) : 0;
   const pulseMult = getPulse() && inPause
-    ? 1 + 0.55 * Math.sin((e-durMs)/pauseMs * Math.PI * 4)
+    ? 1 + 0.55 * Math.sin((e-rideMs)/pauseMs * Math.PI * 4)
     : 1;
-  return { progress, loopFraction, reveal, pulseMult, intro:1, bearing };
+  return { progress, loopFraction, reveal, pulseMult, intro:1, bearing, elapsed: elapsedMs };
 }
 // Whether the map camera changes over time (otherwise the person can frame
 // the shot freely and nothing overrides it).
@@ -1801,7 +2074,7 @@ function mapCameraFor(tl) {
   const cam = cameraMode === "chase" ? chaseMapCamera(tl)
     : cameraMode === "follow" ? followMapCamera(tl.progress, tl.bearing, tl.reveal)
     : overviewCamera(tl.bearing);
-  return tl.intro < 1 ? introCamera(cam, tl.intro) : cam;
+  return tl.intro < 1 ? introCameraAt(cam, tl.introElapsed ?? tl.intro * getIntroMs()) : cam;
 }
 
 // ─── Tiny utils ───────────────────────────────────────────────────────────────
@@ -1833,6 +2106,36 @@ function enableExports() {
 }
 
 // ─── GPX / KML Parsers ───────────────────────────────────────────────────────
+// The parts of a file, in order: each GPX <trkseg> (or <rte>), each KML
+// LineString. Points carry their timestamp when the file has one.
+function parseSections(text, isKML) {
+  const doc = new DOMParser().parseFromString(text, "application/xml"), out = [];
+  const pt = (lat, lon, ele, time) => ({ lat, lon, ele: (ele != null && !isNaN(ele)) ? ele : null, time: time ? Date.parse(time) : null });
+  if (isKML) {
+    doc.querySelectorAll("Placemark").forEach(pm => {
+      pm.querySelectorAll("LineString coordinates").forEach(c => {
+        const pts = c.textContent.trim().split(/\s+/).map(t => t.split(",").map(parseFloat))
+          .filter(a => a.length >= 2 && !isNaN(a[0]) && !isNaN(a[1])).map(a => pt(a[1], a[0], a.length > 2 ? a[2] : null));
+        if (pts.length > 1) out.push({ name: pm.querySelector("name")?.textContent.trim() || "", pts });
+      });
+    });
+    return out;
+  }
+  doc.querySelectorAll("trk").forEach(trk => {
+    const name = trk.querySelector(":scope > name")?.textContent.trim() || "";
+    trk.querySelectorAll("trkseg").forEach(seg => {
+      const pts = [...seg.querySelectorAll("trkpt")].map(el => pt(parseFloat(el.getAttribute("lat")), parseFloat(el.getAttribute("lon")),
+        parseFloat(el.querySelector("ele")?.textContent), el.querySelector("time")?.textContent)).filter(p => !isNaN(p.lat) && !isNaN(p.lon));
+      if (pts.length > 1) out.push({ name, pts });
+    });
+  });
+  if (!out.length) doc.querySelectorAll("rte").forEach(rte => {
+    const pts = [...rte.querySelectorAll("rtept")].map(el => pt(parseFloat(el.getAttribute("lat")), parseFloat(el.getAttribute("lon")),
+      parseFloat(el.querySelector("ele")?.textContent))).filter(p => !isNaN(p.lat) && !isNaN(p.lon));
+    if (pts.length > 1) out.push({ name: rte.querySelector(":scope > name")?.textContent.trim() || "", pts });
+  });
+  return out;
+}
 function parseGPX(text) {
   const doc=new DOMParser().parseFromString(text,"application/xml");
   const pts=[];
@@ -2218,7 +2521,10 @@ function startAnimation() {
           if (!styleSwitching) map.redraw();
         }
       }
-      drawOverlays(ctx, W, H, progress);
+      updateAreaStyle(tl);
+      drawAreaNames(ctx, W, H, tl, mapPointProjector(W));
+      drawRouteLabels(ctx, W, H, tl, mapLabelAnchor(W));
+      drawOverlays(ctx, W, H, progress, tl);
       animHandle = requestAnimationFrame(frame);
       return;
     }
@@ -2232,9 +2538,11 @@ function startAnimation() {
       getTrackDPts = (track) => { const p = getDisplayPts(track.previewPts, zoomLevel, tl.bearing); return { pts:p, dists: buildDists(p) }; };
     }
 
+    let primaryPts = null, primaryDists = null;
     visibleTrackList().forEach(track => {
       if (!track.previewPts || !track.previewPts.length) return;
       const { pts: dPts, dists: dDists } = getTrackDPts(track);
+      if (track.isPrimary) { primaryPts = dPts; primaryDists = dDists; }
       if (!dPts || !dPts.length) return;
       drawRoute(ctx, dPts, dDists, progress, lw, {
         lc1: track.color1, lc2: track.color2,
@@ -2244,7 +2552,8 @@ function startAnimation() {
         pulseMult, gradient: getGradient(),
       });
     });
-    drawOverlays(ctx, W, H, progress);
+    if (primaryPts) drawRouteLabels(ctx, W, H, tl, p => pointAtProgress(primaryPts, primaryDists, p));
+    drawOverlays(ctx, W, H, progress, tl);
 
     animHandle = requestAnimationFrame(frame);
   }
@@ -2313,9 +2622,10 @@ function layoutPreview() {
 }
 
 // ─── File loading ─────────────────────────────────────────────────────────────
-function onRouteLoaded(pts, name) {
+function onRouteLoaded(pts, name, wpts = [], dayDefs = null) {
   fileName=name; routePoints=pts;
   latLonDists = buildLatLonDists(pts);
+  buildTripDays(pts, dayDefs);
   trimStartFrac=0; trimEndFrac=1;
   trimTargetId="primary";
   $("trim-start").value=0; $("trim-end").value=100;
@@ -2334,6 +2644,19 @@ function onRouteLoaded(pts, name) {
   showStatus(`${pts.length.toLocaleString()} points loaded · ${totalKm.toFixed(1)} km`);
   elevSource = hasElevation(pts) ? "file" : "none";
   updateProfileHint();
+  // Waypoints become labels at the nearest point of the route (within 1 km).
+  waypointLabels = wpts.map(w => {
+    let best = -1, bestD = Infinity;
+    for (let i = 0; i < pts.length; i += Math.max(1, Math.floor(pts.length / 4000))) {
+      const d = haversineKm(w.lat, w.lon, pts[i].lat, pts[i].lon);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return bestD <= 1 ? { km: latLonDists[best], text: w.name } : null;
+  }).filter(Boolean);
+  $("lbl-wpt-count").textContent = waypointLabels.length ? `${waypointLabels.length} in this file` : "None in this file";
+  customLabels = []; renderLabelList();
+  renderDaysCard();
+  if (tripDays.length > 1) nameOvernights();
   // Terrain altitude along the route, always: the camera aims at it (it's
   // the ground the route is drawn on), and it fills files with no altitude.
   fillElevationFromTerrain(pts, "demEle").then(ok => {
@@ -2345,23 +2668,54 @@ function onRouteLoaded(pts, name) {
   });
   $("hdr-hint").textContent = `${name} · ${totalKm.toFixed(1)} km`;
 }
+// Named points saved in the file (GPX <wpt>, KML point placemarks).
+function parseWaypoints(text, isKML) {
+  const doc = new DOMParser().parseFromString(text, "application/xml"), out = [];
+  if (isKML) {
+    doc.querySelectorAll("Placemark").forEach(pm => {
+      const c = pm.querySelector("Point coordinates"), n = pm.querySelector("name");
+      if (!c || !n) return;
+      const [lon, lat] = c.textContent.trim().split(",").map(parseFloat);
+      if (!isNaN(lat) && !isNaN(lon) && n.textContent.trim()) out.push({ lat, lon, name: n.textContent.trim() });
+    });
+  } else {
+    doc.querySelectorAll("wpt").forEach(w => {
+      const n = w.querySelector("name"), lat = parseFloat(w.getAttribute("lat")), lon = parseFloat(w.getAttribute("lon"));
+      if (n && n.textContent.trim() && !isNaN(lat) && !isNaN(lon)) out.push({ lat, lon, name: n.textContent.trim() });
+    });
+  }
+  return out;
+}
 function parseRouteFile(file) {
   return new Promise((resolve, reject) => {
     const isKML = file.name.toLowerCase().endsWith(".kml");
     const reader = new FileReader();
     reader.onload = ev => {
-      try { resolve({ pts: isKML ? parseKML(ev.target.result) : parseGPX(ev.target.result), name: file.name.replace(/\.(gpx|kml)$/i,"") }); }
+      try {
+        const sections = parseSections(ev.target.result, isKML);
+        const pts = sections.length ? sections.flatMap(sec => sec.pts) : (isKML ? parseKML(ev.target.result) : parseGPX(ev.target.result));
+        resolve({ pts, sections, name: file.name.replace(/\.(gpx|kml)$/i,""), wpts: parseWaypoints(ev.target.result, isKML) });
+      }
       catch(err) { reject(err); }
     };
     reader.onerror = () => reject(new Error("Could not read file"));
     reader.readAsText(file);
   });
 }
-function readFile(file) {
-  if (!file) return;
-  parseRouteFile(file).then(({pts,name}) => onRouteLoaded(pts, name))
-    .catch(err => showStatus("Error: "+err.message));
+// One file: a ride (its sections become parts of the day). Several files at
+// once: a multi-day trip, one file per day, in file-name order.
+async function readFiles(fileList) {
+  const files = [...fileList].filter(f => /\.(gpx|kml)$/i.test(f.name))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }));
+  if (!files.length) return;
+  try {
+    const parsed = await Promise.all(files.map(parseRouteFile));
+    const days = parsed.map(f => ({ name: f.name, parts: (f.sections.length ? f.sections : [{ pts: f.pts }]).map(sec => sec.pts.length) }));
+    const name = parsed.length > 1 ? `${parsed[0].name} +${parsed.length - 1} days` : parsed[0].name;
+    onRouteLoaded(parsed.flatMap(f => f.pts), name, parsed.flatMap(f => f.wpts), days);
+  } catch (err) { showStatus("Error: " + err.message); }
 }
+function readFile(file) { if (file) readFiles([file]); }
 async function addTrackFile(file) {
   if (!file || !routePoints.length) return;
   try {
@@ -2468,6 +2822,7 @@ function routeFeatures(tl) {
   const gi = getGlowI(), gc = getGlowC(), taper = getTaper(), gradient = getGradient();
   const tipOn = animMode === "animated" && getTipDot();
   mapTracks().forEach(t => {
+    if (t.isPrimary && tripDays.length > 1 && $("day-colors").checked) { dayColoredFeatures(t, tl, lw, feats); return; }
     const coords = drawnCoords(t.ll, t.lld, tl.progress);
     const K = coords.length;
     if (K < 2) return;
@@ -2490,6 +2845,51 @@ function routeFeatures(tl) {
   });
   return { type: "FeatureCollection", features: feats };
 }
+// Multi-day trips: the drawn route split exactly at each day's end, each day in
+// its own color (a slight gradient within the day), taper kept along the trip.
+function dayColoredFeatures(t, tl, lw, feats) {
+  const { ll, lld } = t, total = lld[lld.length-1] || 1, target = tl.progress * total;
+  if (target <= 0) return;
+  const ends = dayBreaks().map(b => b.p * total);
+  const gi = getGlowI(), taper = getTaper(), chunks = [];
+  let k = 0; while (k < ends.length - 1 && ends[k] <= 0) k++;
+  let cur = { k, d0: 0, coords: [[ll[0].lon, ll[0].lat]] };
+  for (let i = 1; i < ll.length; i++) {
+    const dPrev = lld[i-1], d = Math.min(lld[i], target);
+    while (k < ends.length - 1 && ends[k] > dPrev && ends[k] <= d) {      // a day ends inside this step
+      const q = lerpLatLon(ll[i-1], ll[i], (ends[k] - dPrev) / ((lld[i] - dPrev) || 1));
+      cur.coords.push([q.lon, q.lat]); cur.d1 = ends[k]; chunks.push(cur);
+      k++; cur = { k, d0: ends[k-1], coords: [[q.lon, q.lat]] };
+    }
+    if (lld[i] >= target) {
+      const q = lerpLatLon(ll[i-1], ll[i], (target - dPrev) / ((lld[i] - dPrev) || 1));
+      cur.coords.push([q.lon, q.lat]); break;
+    }
+    cur.coords.push([ll[i].lon, ll[i].lat]);
+  }
+  cur.d1 = target; chunks.push(cur);
+  chunks.forEach(ch => {
+    const K = ch.coords.length;
+    if (K < 2) return;
+    const c1 = dayColor(ch.k), c2 = lerpColor(c1, "#FFFFFF", 0.3);
+    if (gi > 0) feats.push({ type: "Feature", properties: { kind: "glow", color: c1, w: lw, a: (gi/100) * tl.pulseMult }, geometry: { type: "LineString", coordinates: ch.coords } });
+    const BANDS = Math.max(1, Math.min(8, K-1));
+    for (let b = 0; b < BANDS; b++) {
+      const iStart = Math.floor(b*(K-1)/BANDS), iEnd = Math.min(Math.floor((b+1)*(K-1)/BANDS)+1, K-1);
+      if (iStart >= iEnd) continue;
+      const local = (iStart + iEnd) / 2 / (K-1);
+      const global = (ch.d0 + local * (ch.d1 - ch.d0)) / target;
+      feats.push({ type: "Feature", geometry: { type: "LineString", coordinates: ch.coords.slice(iStart, iEnd+1) }, properties: {
+        kind: "band", color: lerpColor(c1, c2, local), w: lw * (taper ? 0.18 + 0.82 * Math.pow(global, 0.45) : 1) } });
+    }
+  });
+  const tipOn = animMode === "animated" && getTipDot();
+  if (tipOn && tl.progress < 1) {
+    const last = chunks[chunks.length-1], tip = last.coords[last.coords.length-1];
+    feats.push({ type: "Feature", geometry: { type: "Point", coordinates: tip }, properties: {
+      kind: "tip", r: lw*1.1, color: dayColor(last.k), a: gi > 0 ? Math.min((gi/100) * tl.pulseMult, 1) : 0 } });
+  }
+}
 // Sends the route for timeline state `tl` to the map. Returns a promise that
 // resolves once MapLibre has processed it (the export waits on it; the live
 // preview doesn't). Skips the update when nothing visible changed.
@@ -2498,7 +2898,7 @@ function setRouteData(tl, wait=false) {
   if (!src) return Promise.resolve();
   const key = [tl.progress.toFixed(5), tl.pulseMult.toFixed(3), getLineW(), getGlowI(), getGlowC(), getTaper(), getGradient(), getTipDot(),
     getLineC(), getLineC2(), extraTracks.map(t => t.visible + t.color1 + t.color2).join(), layerPts.length, layerDists[layerDists.length-1],
-    frameCss.w, exportScale, exportW].join("|");
+    frameCss.w, exportScale, exportW, $("day-colors").checked, tripDays.map(d => d.iEnd).join(",")].join("|");
   if (key === lastRouteKey) return Promise.resolve();
   lastRouteKey = key;
   const r = src.setData(routeFeatures(tl), wait);
@@ -2604,7 +3004,365 @@ function drawElevProfile(ctx, W, H, progress) {
   }
   ctx.restore();
 }
-function drawOverlays(ctx, W, H, progress) {
+// ─── Days (multi-day trips) ──────────────────────────────────────────────────
+// One file per day (sections inside a file are the parts of that day). The
+// days live inside the one combined route, as point index ranges, so the
+// camera, labels, profile and export all work across the whole trip.
+let tripDays = []; // { title, note, date, iStart, iEnd, parts: [{ iStart, iEnd }], endPlace }
+const DAY_COLORS = ["#FF2D55", "#FF9F0A", "#30D158", "#0A84FF", "#BF5AF2", "#FFD60A", "#64D2FF", "#FF6482"];
+function dayColor(d) { return DAY_COLORS[d % DAY_COLORS.length]; }
+function isTrip() { return tripDays.length > 1 || (tripDays.length === 1 && tripDays[0].parts.length > 1); }
+function buildTripDays(pts, dayDefs) {
+  tripDays = [];
+  if (!dayDefs) return;
+  let i = 0;
+  dayDefs.forEach((d, k) => {
+    const iStart = i, parts = d.parts.map(n => { const part = { iStart: i, iEnd: i + n - 1 }; i += n; return part; });
+    const t = pts[iStart].time;
+    tripDays.push({ title: dayDefs.length > 1 ? `Day ${k + 1}` : d.name, file: d.name, note: "", date: t ? new Date(t) : null,
+      iStart, iEnd: i - 1, parts, endPlace: "" });
+  });
+}
+const kmAtIndex = i => latLonDists[Math.min(i, latLonDists.length - 1)] || 0;
+function dayStats(day) {
+  const pts = routePoints.slice(day.iStart, day.iEnd + 1);
+  const eles = pts.map(p => p.ele ?? p.demEle).filter(e => e != null);
+  return { km: kmAtIndex(day.iEnd) - kmAtIndex(day.iStart), gain: calcElevGainM(pts), top: eles.length ? Math.max(...eles) : null };
+}
+// Day ends (not the last) and part starts, as route progress (respects trim).
+function dayBreaks() {
+  const L = getShownTotalKm(), km0 = trimStartKm(), prog = km => (km - km0) / (L || 1);
+  return tripDays.map((d, k) => ({ d, k, p: prog(kmAtIndex(d.iEnd)), pStart: prog(kmAtIndex(d.iStart)) }));
+}
+function renderDaysCard() {
+  $("days-card").hidden = !isTrip();
+  if (!isTrip()) return;
+  $("days-title").textContent = tripDays.length > 1 ? `${tripDays.length} days` : `${tripDays[0].parts.length} parts`;
+  $("days-list").innerHTML = tripDays.map((d, k) => {
+    const st = dayStats(d);
+    return `<div class="day-row">
+      <div class="day-head"><span class="day-dot" style="background:${dayColor(k)}"></span><strong>${tripDays.length > 1 ? `Day ${k + 1}` : "Ride"}</strong>
+        <span class="day-meta">${st.km.toFixed(1)} km · ↑${Math.round(st.gain).toLocaleString()} m${d.parts.length > 1 ? ` · ${d.parts.length} parts` : ""}</span></div>
+      <input type="text" class="text-input" data-day="${k}" data-f="title" value="${escapeHtml(d.title)}" placeholder="Title, e.g. Bormio to Livigno">
+      <input type="text" class="text-input" data-day="${k}" data-f="note" value="${escapeHtml(d.note)}" placeholder="Note for the card (optional)">
+    </div>`;
+  }).join("");
+  $("days-list").querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => { tripDays[+inp.dataset.day][inp.dataset.f] = inp.value; }));
+}
+// Name the overnight stops (end of each day but the last) from the map.
+async function nameOvernights() {
+  const days = tripDays;
+  for (let k = 0; k < days.length - 1; k++) {
+    const p = routePoints[days[k].iEnd];
+    days[k].endPlace = await suggestPlaceName(p.lat, p.lon);
+    if (days !== tripDays) return;
+  }
+}
+// Day card: top left, like a race checkpoint card. Shows as a day begins
+// (during the overnight stop before it) and for a few seconds into the day.
+function drawDayCard(ctx, W, H, tl) {
+  if (!isTrip() || !$("day-cards").checked || !routePoints.length) return;
+  const br = dayBreaks();
+  let k = 0;
+  br.forEach((b, i) => { if (tl.progress >= b.pStart - 1e-6) k = i; });
+  const stopMs = parseFloat($("day-stop-s").value) * 1000;
+  let a = 1;
+  if (animMode === "animated") {
+    const start = k === 0 ? getIntroMs() : reachTime(Math.max(0, br[k].pStart)) - stopMs;
+    const end = (k === 0 ? getIntroMs() : reachTime(Math.max(0, br[k].pStart))) + 3500;
+    const clamp = x => Math.min(1, Math.max(0, x));
+    a = clamp((tl.elapsed - start) / 400) * (1 - clamp((tl.elapsed - end) / 500));
+    // during the overnight stop, the card already shows the next day
+    const nb = br[k + 1];
+    if (nb && tl.progress >= nb.pStart - 1e-6) return;
+  }
+  if (tl.progress >= 1 && animMode === "animated" && tl.reveal > 0) a = 0;
+  if (a <= 0.01) return;
+  const day = tripDays[k], st = dayStats(day);
+  const s = Math.min(W, H) / 1080, fam = OVERLAY_FONTS[getOverlayFont()] || OVERLAY_FONTS.system;
+  const ink = getOverlayColor(), light = isDarkColor(ink);
+  const kicker = (tripDays.length > 1 ? `DAY ${k + 1} OF ${tripDays.length}` : "RIDE") + (day.date ? `  ·  ${day.date.toLocaleDateString(undefined, { day: "numeric", month: "short" }).toUpperCase()}` : "");
+  const lines = [`${st.km.toFixed(1)} km`, `↑ ${Math.round(st.gain).toLocaleString()} m climb`];
+  if (st.top != null) lines.push(`Top ${Math.round(st.top).toLocaleString()} m`);
+  if (day.parts.length > 1) lines.push(`${day.parts.length} parts`);
+  const x0 = 44*s, y0 = 44*s + (overlayLayout === "corner" ? 150*s : 0), padX = 26*s;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.font = `800 ${Math.round(46*s)}px ${fam}`;
+  const tw = Math.max(ctx.measureText(day.title || "").width, 260*s);
+  ctx.font = `500 ${Math.round(20*s)}px ${fam}`;
+  const nw = day.note ? ctx.measureText(day.note).width : 0;
+  const w = Math.min(Math.max(tw, nw) + padX*2 + 10*s, W - 2*x0);
+  const h = (24 + 54 + lines.length*30 + (day.note ? 36 : 0) + 26) * s;
+  ctx.fillStyle = light ? "rgba(255,255,255,0.88)" : "rgba(12,14,20,0.72)";
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0, y0, w, h, 18*s) : ctx.rect(x0, y0, w, h); ctx.fill();
+  ctx.fillStyle = dayColor(k); ctx.fillRect(x0, y0 + 18*s, 5*s, h - 36*s);
+  ctx.fillStyle = ink; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
+  let y = y0 + 40*s;
+  ctx.globalAlpha = a * 0.7; ctx.font = `700 ${Math.round(16*s)}px ${fam}`;
+  if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(2*s)}px`;
+  ctx.fillText(kicker, x0 + padX, y);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+  ctx.globalAlpha = a; y += 52*s; ctx.font = `800 ${Math.round(46*s)}px ${fam}`;
+  ctx.fillText(day.title || "", x0 + padX, y, w - padX*2);
+  ctx.font = `600 ${Math.round(22*s)}px ${fam}`; y += 6*s;
+  lines.forEach(l => { y += 30*s; ctx.fillText(l, x0 + padX, y); });
+  if (day.note) { y += 36*s; ctx.globalAlpha = a * 0.8; ctx.font = `italic 500 ${Math.round(20*s)}px ${fam}`; ctx.fillText(day.note, x0 + padX, y, w - padX*2); }
+  ctx.restore();
+}
+
+// ─── Highlight an area ────────────────────────────────────────────────────────
+// A country, region or town outlined with a glow and its name, like the
+// city highlights in MapDirector's films. Boundaries come from OpenStreetMap
+// (Nominatim, no login); drawn as map layers under the route.
+let areas = []; // { name, label, center: [lon, lat], geometry }
+const AREA_SRC = "areas-hl";
+let lastAreaKey = "";
+function ensureAreaLayers() {
+  if (!map || map.getSource(AREA_SRC)) return;
+  lastAreaKey = "";
+  map.addSource(AREA_SRC, { type: "geojson", data: EMPTY_FC });
+  const before = map.getLayer("route-glow-0") ? "route-glow-0" : undefined;
+  map.addLayer({ id: "area-fill", type: "fill", source: AREA_SRC, paint: { "fill-color": "#FFD60A", "fill-opacity": 0 } }, before);
+  map.addLayer({ id: "area-glow", type: "line", source: AREA_SRC, layout: { "line-join": "round" },
+    paint: { "line-color": "#FFD60A", "line-width": 16, "line-blur": 12, "line-opacity": 0 } }, before);
+  map.addLayer({ id: "area-line", type: "line", source: AREA_SRC, layout: { "line-join": "round" },
+    paint: { "line-color": "#FFD60A", "line-width": 2.2, "line-opacity": 0 } }, before);
+  map.getSource(AREA_SRC).setData({ type: "FeatureCollection", features: areas.map(a => ({ type: "Feature", properties: {}, geometry: a.geometry })) });
+}
+function syncAreaData() {
+  const src = map && map.getSource(AREA_SRC);
+  if (src) src.setData({ type: "FeatureCollection", features: areas.map(a => ({ type: "Feature", properties: {}, geometry: a.geometry })) });
+  lastAreaKey = "";
+}
+function areaAlpha(tl) {
+  if (!areas.length) return 0;
+  const when = document.querySelector("#area-when-btns .active")?.dataset.areawhen || "always";
+  if (animMode !== "animated" || when === "always") return 1;
+  const clamp = x => Math.min(1, Math.max(0, x));
+  if (when === "start") return 1 - clamp((tl.elapsed - getIntroMs() - 2500) / 1200);
+  // "At the end": fades in with the pull-back after the ride (or just appears with no pause)
+  return tl.progress >= 1 ? (getPauseMs() > 0 ? clamp(tl.reveal * 1.5) : 1) : 0;
+}
+// Map paint follows the settings and the timeline (only touched on change).
+function updateAreaStyle(tl) {
+  if (!map || !map.getLayer("area-fill")) return;
+  const a = areaAlpha(tl), color = $("area-color").value;
+  const fill = parseFloat($("area-fill").value) / 100, glow = parseFloat($("area-glow").value) / 100;
+  // The fill reads as a region from afar; once the camera is well inside the
+  // area (3+ zoom levels closer than the area view) only the outline remains.
+  const near = areas.length ? Math.min(1, Math.max(0, (map.getZoom() - areaCamera().zoom - 2.5) / 1.5)) : 0;
+  const key = [a.toFixed(3), color, fill, glow, near.toFixed(2)].join("|");
+  if (key === lastAreaKey) return;
+  lastAreaKey = key;
+  ["area-fill", "area-glow", "area-line"].forEach(id => map.setPaintProperty(id, id === "area-fill" ? "fill-color" : "line-color", color));
+  map.setPaintProperty("area-fill", "fill-opacity", fill * a * (1 - near));
+  map.setPaintProperty("area-glow", "line-opacity", glow * 0.85 * a);
+  map.setPaintProperty("area-line", "line-opacity", 0.95 * a);
+}
+// Area names on the canvas, big and lying on the ground like a title label.
+function drawAreaNames(ctx, W, H, tl, project) {
+  if (!areas.length || !$("area-name").checked) return;
+  const a = areaAlpha(tl);
+  if (a <= 0.01) return;
+  const s = Math.min(W, H) / 1080, pitch = map ? map.getPitch() : 0;
+  const ink = getOverlayColor(), glow = $("area-color").value;
+  const fam = OVERLAY_FONTS[getOverlayFont()] || OVERLAY_FONTS.system;
+  ctx.save(); ctx.globalAlpha = a;
+  areas.forEach(ar => {
+    const pt = project(ar.center);
+    if (!pt || !isFinite(pt.x) || pt.x < -W*0.2 || pt.x > W*1.2 || pt.y < -H*0.2 || pt.y > H*1.2) return;
+    ctx.save();
+    ctx.translate(pt.x, pt.y);
+    ctx.scale(1, 1 - 0.42 * Math.sin(pitch * Math.PI/180));
+    ctx.font = `800 ${Math.round(70*s)}px ${fam}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(6*s)}px`;
+    ctx.shadowColor = glow; ctx.shadowBlur = 26*s;
+    ctx.fillStyle = ink; ctx.fillText(ar.label.toUpperCase(), 0, 0);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+function mapPointProjector(W) {
+  const sc = W / frameCss.w;
+  return ([lon, lat]) => {
+    const pt = map.project([lon, lat]);
+    return exporting ? { x: pt.x * sc, y: pt.y * sc } : { x: (pt.x - frameCss.x) * sc, y: (pt.y - frameCss.y) * sc };
+  };
+}
+async function addArea(query) {
+  const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&polygon_threshold=0.002&limit=5&q=${encodeURIComponent(query)}`;
+  const res = await fetch(url, { headers: { "Accept-Language": navigator.language || "en" } });
+  if (!res.ok) throw new Error("search failed");
+  const hit = (await res.json()).find(r => r.geojson && /Polygon/.test(r.geojson.type));
+  if (!hit) throw new Error(`no boundary found for "${query}"`);
+  areas.push({ name: hit.display_name, label: hit.name || query, center: [parseFloat(hit.lon), parseFloat(hit.lat)], geometry: hit.geojson });
+  syncAreaData(); renderAreaList(); updateExportMeta(); animStartTs = null;
+  return hit;
+}
+function renderAreaList() {
+  $("area-list").innerHTML = areas.map((a, i) => `<div class="lbl-row">
+      <input type="text" class="text-input" data-i="${i}" value="${escapeHtml(a.label)}" title="${escapeHtml(a.name)}">
+      <button class="lbl-del" data-i="${i}" title="Remove">×</button></div>`).join("");
+  $("area-list").querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => { areas[+inp.dataset.i].label = inp.value; }));
+  $("area-list").querySelectorAll(".lbl-del").forEach(b => b.addEventListener("click", () => { areas.splice(+b.dataset.i, 1); syncAreaData(); renderAreaList(); updateExportMeta(); animStartTs = null; }));
+}
+
+// ─── Labels on the route ──────────────────────────────────────────────────────
+// Callouts (a pill pinned to the spot, Wahoo-film style) or titles (big text
+// lying on the ground, Brussels-film style). Each pops in as the rider
+// reaches it, holds, then fades. Positions are km from the route's start.
+let customLabels = [];   // { km, text }
+let waypointLabels = []; // { km, text } from the file
+function routeTotalKm() { return latLonDists[latLonDists.length-1] || 0; }
+function trimStartKm() { return trimStartFrac * routeTotalKm(); }
+function labelList() {
+  const L = getShownTotalKm(), out = [];
+  if (!L) return out;
+  const prog = km => (km - trimStartKm()) / L;
+  if ($("lbl-startfinish").checked) {
+    out.push({ p: 0, text: "Start", kind: "end" });
+    out.push({ p: 1, text: "Finish", kind: "end", stay: true });
+  }
+  if ($("lbl-km").checked) {
+    const every = parseFloat(document.querySelector("#lbl-km-btns .active")?.dataset.lblkm || 5);
+    for (let k = every; k < L - every*0.3; k += every) out.push({ p: k / L, text: `${+k.toFixed(1)} km`, kind: "marker" });
+  }
+  if ($("lbl-wpts").checked) waypointLabels.forEach(w => out.push({ p: prog(w.km), text: w.text, kind: "place" }));
+  if (tripDays.length > 1 && $("day-pins").checked) tripDays.slice(0, -1).forEach((d, k) =>
+    out.push({ p: prog(kmAtIndex(d.iEnd)), text: `Night ${k + 1}` + (d.endPlace && d.endPlace !== "Label" ? ` · ${d.endPlace}` : ""), kind: "night" }));
+  if (isTrip() && $("day-parts").checked) tripDays.forEach((d, k) => d.parts.slice(1).forEach((pt, j) =>
+    out.push({ p: prog(kmAtIndex(pt.iStart)), text: (tripDays.length > 1 ? `Day ${k + 1} · ` : "") + `Part ${j + 2}`, kind: "marker" })));
+  customLabels.forEach(c => { if (c.text.trim()) out.push({ p: prog(c.km), text: c.text.trim(), kind: "place" }); });
+  return out.filter(l => l.p >= -1e-6 && l.p <= 1 + 1e-6);
+}
+// When (ms into the loop) the rider reaches progress p. Progress is eased, so
+// invert timelineAt by bisection; cached until the timing settings change.
+let reachCache = { key: "", map: new Map() };
+function reachTime(p) {
+  const key = [getDurMs(), getIntroMs(), getPauseMs(), getEase(), animMode, getStops().map(s => s.p + ":" + s.ms).join(",")].join("|");
+  if (reachCache.key !== key) reachCache = { key, map: new Map() };
+  const k = p.toFixed(5);
+  if (reachCache.map.has(k)) return reachCache.map.get(k);
+  let lo = getIntroMs(), hi = getIntroMs() + getRideMs();
+  for (let i = 0; i < 26; i++) { const mid = (lo + hi) / 2; if (timelineAt(mid).progress < p) lo = mid; else hi = mid; }
+  reachCache.map.set(k, hi);
+  return hi;
+}
+function labelAlpha(l, tl) {
+  if (animMode !== "animated") return { a: 1, pop: 1 };
+  const t0 = reachTime(Math.min(1, Math.max(0, l.p))) - 300;
+  const fin = Math.min(1, Math.max(0, (tl.elapsed - t0) / 350));
+  const stop = (l.kind === "place" || l.kind === "night") ? getStops().find(st => Math.abs(st.p - l.p) < 0.002) : null;
+  const holdEnd = t0 + 300 + (stop ? stop.ms : 0) + parseFloat($("lbl-hold").value) * 1000;
+  const fout = l.stay ? 1 : 1 - Math.min(1, Math.max(0, (tl.elapsed - holdEnd) / 500));
+  return { a: fin * fout, pop: 1 - Math.pow(1 - fin, 3) };
+}
+// anchorAt(p) → {x, y} in canvas pixels, or null when off screen.
+function drawRouteLabels(ctx, W, H, tl, anchorAt) {
+  const labels = labelList();
+  if (!labels.length) return;
+  const style = document.querySelector("#lbl-style-btns .active")?.dataset.lblstyle || "callout";
+  // Sized by the frame's short side, so 16:9 and 9:16 get the same label size.
+  const s = Math.min(W, H) / 1080 * parseFloat($("lbl-size").value);
+  const stats = $("lbl-stats").checked;
+  const fam = OVERLAY_FONTS[getOverlayFont()] || OVERLAY_FONTS.system;
+  const accent = getLineC();
+  const pitch = bgMode === "map" && map ? map.getPitch() : 0;
+  ctx.save();
+  labels.forEach(l => {
+    const { a, pop } = labelAlpha(l, tl);
+    if (a <= 0.01) return;
+    const pt = anchorAt(Math.min(1, Math.max(0, l.p)));
+    if (!pt || !isFinite(pt.x) || !isFinite(pt.y) || pt.x < -W*0.2 || pt.x > W*1.2 || pt.y < -H*0.2 || pt.y > H*1.1) return;
+    ctx.globalAlpha = a;
+    const text = l.text.toUpperCase();
+    if (style === "title") {
+      // Big text lying on the ground: squashed vertically with the camera tilt.
+      const size = (l.kind === "marker" ? 38 : 64) * s;
+      const ink = getOverlayColor(), glow = isDarkColor(ink) ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.6)";
+      ctx.save();
+      ctx.translate(pt.x, pt.y - 18*s);
+      ctx.scale(0.85 + 0.15*pop, (0.85 + 0.15*pop) * (1 - 0.42 * Math.sin(pitch * Math.PI/180)));
+      ctx.font = `800 ${Math.round(size)}px ${fam}`; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+      ctx.shadowColor = glow; ctx.shadowBlur = 14*s;
+      ctx.fillStyle = ink; ctx.fillText(text, 0, 0);
+      ctx.restore();
+      return;
+    }
+    // Callout: dot on the route, a short stem, a white pill with an accent dot.
+    const rise = (l.kind === "marker" ? 26 : 38) * s * (0.6 + 0.4*pop);
+    ctx.fillStyle = "#fff"; ctx.strokeStyle = accent; ctx.lineWidth = 3*s;
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, 6*s, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 2*s;
+    ctx.beginPath(); ctx.moveTo(pt.x, pt.y - 6*s); ctx.lineTo(pt.x, pt.y - rise); ctx.stroke();
+    const fs = (l.kind === "marker" ? 20 : 26) * s;
+    ctx.font = `700 ${Math.round(fs)}px ${fam}`;
+    const tw = ctx.measureText(text).width, dot = l.kind === "marker" ? 0 : 16*s;
+    const ph = fs * 2, pw = tw + dot + 30*s, px = pt.x - pw/2, py = pt.y - rise - ph;
+    ctx.shadowColor = "rgba(0,0,0,0.28)"; ctx.shadowBlur = 12*s; ctx.shadowOffsetY = 3*s;
+    ctx.fillStyle = "rgba(255,255,255,0.97)";
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(px, py, pw, ph, ph/2) : ctx.rect(px, py, pw, ph); ctx.fill();
+    ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+    if (dot) { ctx.fillStyle = accent; ctx.beginPath(); ctx.arc(px + 15*s + 5*s, py + ph/2, 6*s, 0, Math.PI*2); ctx.fill(); }
+    ctx.fillStyle = "#1C1C1E"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.fillText(text, px + 15*s + dot, py + ph/2 + 1*s);
+    // Stats chip above the pill: distance and altitude at this spot.
+    if (stats && l.kind !== "marker") {
+      const pos = routeLL(Math.min(1, Math.max(0, l.p)));
+      const ele = pos.ele ?? pos.demEle;
+      const chip = `${(getShownTotalKm() * Math.min(1, Math.max(0, l.p))).toFixed(1)} km` + (ele != null ? `  ·  ${Math.round(ele).toLocaleString()} m` : "");
+      const cs = 18*s; ctx.font = `600 ${Math.round(cs)}px ${fam}`;
+      const cw = ctx.measureText(chip).width + 22*s, ch = cs * 1.9, cx = pt.x - cw/2, cy = py - ch - 6*s;
+      ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(cx, cy, cw, ch, ch/2) : ctx.rect(cx, cy, cw, ch); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.fillText(chip, pt.x, cy + ch/2 + 1*s);
+    }
+  });
+  ctx.restore();
+}
+// Anchor for Map mode: the route point (as drawn by the map layer) projected
+// into this canvas. During export the map is shrunk to exactly the frame.
+function mapLabelAnchor(W) {
+  const sc = W / frameCss.w;
+  return p => {
+    const ll = latLonAtProgress(layerPts, layerDists, p);
+    const pt = map.project([ll.lon, ll.lat]);
+    return exporting ? { x: pt.x * sc, y: pt.y * sc } : { x: (pt.x - frameCss.x) * sc, y: (pt.y - frameCss.y) * sc };
+  };
+}
+// Place-name suggestion for a new label: a pass, peak or viewpoint nearby if
+// there is one, otherwise the village or town. MapTiler geocoding, no login.
+async function suggestPlaceName(lat, lon) {
+  const url = t => `https://api.maptiler.com/geocoding/${lon},${lat}.json?key=${MAPTILER_KEY}&types=${t}&limit=5`;
+  try {
+    const poi = await (await fetch(url("poi"))).json();
+    const good = (poi.features || []).find(f => {
+      const tags = (f.properties && f.properties.feature_tags) || {};
+      return f.text && f.text !== "-" && (/^(peak|saddle|mountain_pass|volcano|glacier|ridge)$/.test(tags.natural) || tags.mountain_pass === "yes" || tags.tourism === "viewpoint"
+        || /\b(passo|pass|col|colle|joch|puerto|alto|sella|forcella|bocchetta|cima|piz|pic|monte|mont)\b/i.test(f.text));
+    });
+    if (good) return good.text;
+    for (const t of ["place", "municipality"]) {
+      const r = await (await fetch(url(t))).json();
+      const f = (r.features || []).find(f => f.text && f.text !== "-");
+      if (f) return f.text;
+    }
+  } catch (_) {}
+  return "Label";
+}
+function renderLabelList() {
+  const box = $("lbl-list");
+  box.innerHTML = customLabels.map((l, i) => `<div class="lbl-row">
+      <input type="text" class="text-input" data-i="${i}" value="${escapeHtml(l.text)}" placeholder="Label text">
+      <span class="lbl-km">${(l.km - trimStartKm()).toFixed(1)} km</span>
+      <button class="lbl-del" data-i="${i}" title="Remove">×</button></div>`).join("");
+  box.querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => { customLabels[+inp.dataset.i].text = inp.value; }));
+  box.querySelectorAll(".lbl-del").forEach(b => b.addEventListener("click", () => { customLabels.splice(+b.dataset.i, 1); renderLabelList(); }));
+  updateExportMeta();
+}
+
+function drawOverlays(ctx, W, H, progress, tl) {
+  if (tl) drawDayCard(ctx, W, H, tl);
   drawElevProfile(ctx, W, H, progress);
   drawOverlay(ctx, W, H, progress);
 }
@@ -2632,12 +3390,15 @@ function mapTracks() {
 async function composeFrame(ctx, W, H, tl, env) {
   if (env.mapState) {
     jumpCamera(mapCameraFor(tl));
+    updateAreaStyle(tl);
     await setRouteData(tl, true);
     await settleMap();
     // Behind the globe (intro) the map canvas is transparent: paint space.
     ctx.fillStyle = "#0B1020"; ctx.fillRect(0, 0, W, H);
     ctx.drawImage(map.getCanvas(), 0, 0, W, H);
-    drawOverlays(ctx, W, H, tl.progress);
+    drawAreaNames(ctx, W, H, tl, mapPointProjector(W));
+    drawRouteLabels(ctx, W, H, tl, mapLabelAnchor(W));
+    drawOverlays(ctx, W, H, tl.progress, tl);
     return;
   }
   if (env.bgFill) { ctx.fillStyle = env.bgFill; ctx.fillRect(0, 0, W, H); }
@@ -2657,7 +3418,9 @@ async function composeFrame(ctx, W, H, tl, env) {
       taper:getTaper(), tipDot: t.isPrimary && tipDot, pulseMult:tl.pulseMult, gradient:getGradient(),
     });
   });
-  drawOverlays(ctx, W, H, tl.progress);
+  const prim = tracks.find(x => x.t.isPrimary);
+  if (prim) drawRouteLabels(ctx, W, H, tl, p => pointAtProgress(prim.pts, prim.dists, p));
+  drawOverlays(ctx, W, H, tl.progress, tl);
 }
 // Stops the live preview so nothing else moves the map camera mid-export.
 function pausePreviewForExport() {
@@ -2780,7 +3543,7 @@ async function exportPNG() {
       showProgress(true, "Rendering map");
       mapState = env.mapState = await beginMapExport(W, H);
     }
-    await composeFrame(ctx, W, H, { progress:1, loopFraction:0, reveal:1, pulseMult:1, intro:1, bearing:rotationDeg }, env);
+    await composeFrame(ctx, W, H, { progress:1, loopFraction:0, reveal:1, pulseMult:1, intro:1, bearing:rotationDeg, elapsed: getLoopMs() }, env);
     const blob = await new Promise(r => offC.toBlob(r, "image/png"));
     download(blob, `${fileName}-overlay.png`);
     showStatus(`PNG downloaded: ${W}×${H}px`);
@@ -2855,11 +3618,11 @@ document.addEventListener("DOMContentLoaded", () => {
     h.addEventListener("click", ()=> h.closest(".section").classList.toggle("collapsed"));
   });
 
-  $("file-input").addEventListener("change", e=>readFile(e.target.files[0]));
+  $("file-input").addEventListener("change", e=>readFiles(e.target.files));
   const dz=$("drop-zone");
   dz.addEventListener("dragover", e=>{e.preventDefault();dz.classList.add("drag-over");});
   dz.addEventListener("dragleave",()=>dz.classList.remove("drag-over"));
-  dz.addEventListener("drop", e=>{e.preventDefault();dz.classList.remove("drag-over");readFile(e.dataTransfer.files[0]);});
+  dz.addEventListener("drop", e=>{e.preventDefault();dz.classList.remove("drag-over");readFiles(e.dataTransfer.files);});
 
   $("add-track-input").addEventListener("change", e=>{ addTrackFile(e.target.files[0]); e.target.value=""; });
   const atz=$("add-track-zone");
@@ -3077,7 +3840,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sec.scrollIntoView({ behavior: "smooth", block: "start" });
   }));
   const updateNav = () => {
-    const sb = $("sidebar"), line = sb.getBoundingClientRect().top + 80;
+    const sb = $("sidebar"), line = sb.getBoundingClientRect().top + 140; // just under the jump bar
     let cur = navSecs[0];
     navSecs.forEach(e => { if (e[1].getBoundingClientRect().top <= line) cur = e; });
     if (sb.scrollTop + sb.clientHeight >= sb.scrollHeight - 4) cur = navSecs[navSecs.length - 1];
@@ -3098,6 +3861,47 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", e => {
     if (e.code !== "Space" || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(e.target.tagName)) return;
     e.preventDefault(); setPreviewPaused(!previewPaused);
+  });
+
+  // Days
+  wireSlider("day-stop-s", "day-stop-s-num", () => updateExportMeta());
+
+  // Highlight an area
+  const doAddArea = async () => {
+    const q = $("area-q").value.trim();
+    if (!q) return;
+    $("area-add").disabled = true;
+    try { const hit = await addArea(q); $("area-q").value = ""; showStatus(`Highlighting ${hit.name}`); }
+    catch (err) { showStatus(`Couldn't add the area: ${err.message}`, 4000); }
+    $("area-add").disabled = false;
+  };
+  $("area-add").addEventListener("click", doAddArea);
+  $("area-q").addEventListener("keydown", e => { if (e.key === "Enter") doAddArea(); });
+  wireSeg("area-when-btns", "areawhen", () => { animStartTs = null; updateExportMeta(); });
+  $("area-intro").addEventListener("change", () => { animStartTs = null; updateExportMeta(); });
+  wireSlider("area-fill", "area-fill-num", ()=>{});
+  wireSlider("area-glow", "area-glow-num", ()=>{});
+
+  // Labels on the route
+  wireSeg("lbl-style-btns", "lblstyle", ()=>{});
+  wireSeg("lbl-km-btns", "lblkm", ()=>{});
+  $("lbl-km").addEventListener("change", () => $("lbl-km-btns").classList.toggle("collapsed", !$("lbl-km").checked));
+  wireSlider("lbl-hold", "lbl-hold-num", ()=>{});
+  wireSlider("lbl-stop-s", "lbl-stop-s-num", () => updateExportMeta());
+  $("lbl-stop").addEventListener("change", () => { $("lbl-stop-row").classList.toggle("is-hidden", !$("lbl-stop").checked); updateExportMeta(); });
+  wireSlider("lbl-size", "lbl-size-num", ()=>{});
+  $("lbl-add").addEventListener("click", async () => {
+    if (!routePoints.length) return;
+    const prog = timelineAt(lastPreviewElapsed).progress;
+    const km = trimStartKm() + prog * getShownTotalKm();
+    const pos = routeLL(prog);
+    customLabels.push({ km, text: "…" });
+    customLabels.sort((a, b) => a.km - b.km);
+    const label = customLabels.find(l => l.km === km);
+    renderLabelList();
+    label.text = await suggestPlaceName(pos.lat, pos.lon);
+    renderLabelList();
+    showStatus(`Label added at ${(km - trimStartKm()).toFixed(1)} km: ${label.text}`);
   });
 
   // Templates
