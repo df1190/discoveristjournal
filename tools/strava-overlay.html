@@ -47,42 +47,46 @@ button,input,select{font-family:inherit}
 
 #main{display:flex;flex:1;overflow:hidden}
 
-#sidebar{width:272px;flex-shrink:0;background:var(--bg);border-right:.5px solid var(--sep);overflow-y:auto;padding:12px 12px 28px;display:flex;flex-direction:column;gap:20px;scrollbar-width:thin;scrollbar-color:var(--sep) transparent}
-#sidebar::-webkit-scrollbar{width:4px}
+#sidebar{width:clamp(320px,25vw,372px);flex-shrink:0;background:var(--bg);border-right:.5px solid var(--sep);overflow-y:auto;padding:0 14px 40px;display:flex;flex-direction:column;gap:22px;scrollbar-width:thin;scrollbar-color:var(--fill2) transparent;scroll-padding-top:58px}
+#sidebar::-webkit-scrollbar{width:6px}
+/* room at the end so the jump bar can bring the last section to the top */
+#sidebar::after{content:"";flex:0 0 45vh}
 #sidebar::-webkit-scrollbar-thumb{background:var(--sep);border-radius:2px}
 
 /* Grouped-list ("Settings.app") card style: each section body is one rounded
    surface; individual .card blocks become flush rows separated by hairlines,
    not standalone boxes with their own shadow/radius. */
-.card{background:transparent;border-radius:0;padding:13px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:none}
-.ctitle{font-size:11px;font-weight:600;color:var(--lbl3);letter-spacing:.06em;text-transform:uppercase}
-.row{display:flex;align-items:center;justify-content:space-between;gap:6px}
-.row label{font-size:12px;color:var(--lbl2);flex-shrink:0;white-space:nowrap;width:64px}
-.hint{font-size:10.5px;color:var(--lbl4);line-height:1.55}
+.card{background:transparent;border-radius:0;padding:15px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:none}
+.ctitle{font-size:11.5px;font-weight:600;color:var(--lbl3);letter-spacing:.05em;text-transform:uppercase}
+.card-sub > .ctitle:not(:first-child),.card > .ctitle + .ctitle{margin-top:4px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:30px}
+.row label{font-size:13px;color:var(--lbl);flex-shrink:0;white-space:nowrap;min-width:86px}
+.hint{font-size:12px;color:var(--lbl3);line-height:1.5}
 .hint strong{color:var(--lbl3)}
 
 /* ── Sections (collapsible groups of cards) ─────────────────────────────── */
 .section{display:flex;flex-direction:column}
-.section-header{display:flex;align-items:center;gap:6px;padding:0 6px 7px;cursor:pointer;user-select:none;transition:opacity var(--t) var(--ease)}
+.section{scroll-margin-top:58px}
+.section-header{display:flex;align-items:center;gap:8px;padding:0 4px 9px;cursor:pointer;user-select:none;transition:opacity var(--t) var(--ease)}
 .section-header:hover{opacity:.65}
-.section-header .sec-chevron{width:8px;height:8px;flex-shrink:0;stroke:var(--lbl4);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--t) var(--ease)}
+.section-header .sec-chevron{width:10px;height:10px;flex-shrink:0;stroke:var(--lbl4);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--t) var(--ease)}
 .section.collapsed .sec-chevron{transform:rotate(-90deg)}
-.section-header h2{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--lbl3)}
+.section-header h2{font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--lbl)}
 .section-header .sec-count{margin-left:auto;font-size:10px;color:var(--lbl4);font-family:var(--mono)}
 .section-body{display:flex;flex-direction:column;background:var(--surf);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
 .section.collapsed .section-body{display:none}
 .card + .card{border-top:.5px solid var(--sep)}
 
-#drop-zone{border:1.5px dashed var(--sep);border-radius:var(--r-sm);padding:18px 14px;text-align:center;cursor:pointer;transition:all var(--t) var(--ease);color:var(--lbl3);font-size:12px;line-height:1.6}
+#drop-zone{border:1.5px dashed var(--fill2);border-radius:var(--r-sm);padding:20px 14px;text-align:center;cursor:pointer;transition:all var(--t) var(--ease);color:var(--lbl3);font-size:13px;line-height:1.6}
 #drop-zone:hover,#drop-zone.drag-over{border-color:var(--gold);background:var(--gold-f);color:var(--lbl2)}
-#drop-zone strong{display:block;font-size:13px;font-weight:600;color:var(--lbl2);margin-bottom:2px}
+#drop-zone strong{display:block;font-size:14px;font-weight:600;color:var(--lbl2);margin-bottom:2px}
 #drop-zone.has-file{border-color:var(--gold);background:var(--gold-f)}
 #drop-zone.has-file strong{color:var(--gold)}
 
-input[type=range]{-webkit-appearance:none;width:100%;height:3px;border-radius:2px;background:var(--fill2);outline:none;cursor:pointer;min-width:0;flex:1}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform var(--t) var(--spring)}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--fill2);outline:none;cursor:pointer;min-width:0;flex:1}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:transform var(--t) var(--spring)}
 input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
-input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(--sep);padding:2px;cursor:pointer;background:var(--surf)}
+input[type=color]{width:38px;height:28px;border-radius:7px;border:1px solid var(--sep);padding:2px;cursor:pointer;background:var(--surf)}
 
 #trim-slider{position:relative;height:20px;margin:2px 0}
 #trim-slider::before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;transform:translateY(-50%);border-radius:2px;background:var(--fill2)}
@@ -93,17 +97,18 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 #trim-slider input[type=range]::-moz-range-thumb{pointer-events:auto}
 
 .num-wrap{display:flex;align-items:center;gap:1px;flex-shrink:0}
-.num-input{width:44px;padding:3px 5px;border-radius:5px;border:1px solid var(--sep);background:var(--fill);color:var(--gold);font-family:var(--mono);font-size:11px;font-weight:500;text-align:right;outline:none;-moz-appearance:textfield}
+.num-input{width:54px;padding:4px 7px;border-radius:7px;border:1px solid var(--sep);background:var(--fill);color:var(--lbl);font-family:var(--mono);font-size:12px;font-weight:500;text-align:right;outline:none;-moz-appearance:textfield}
 .num-input::-webkit-outer-spin-button,.num-input::-webkit-inner-spin-button{-webkit-appearance:none}
 .num-input:focus{border-color:var(--gold);background:var(--surf)}
-.num-unit{font-size:10px;color:var(--lbl3);font-family:var(--mono)}
-.text-input{flex:1;min-width:0;padding:6px 9px;border-radius:7px;border:1px solid var(--sep);background:var(--fill);color:var(--lbl);font-family:var(--font);font-size:12px;outline:none}
+.num-unit{font-size:12px;color:var(--lbl3);font-family:var(--mono);min-width:14px}
+.text-input{flex:1;min-width:0;padding:8px 11px;border-radius:9px;border:1px solid var(--sep);background:var(--fill);color:var(--lbl);font-family:var(--font);font-size:13px;outline:none}
+select.text-input{padding-right:28px}
 .text-input:focus{border-color:var(--gold);background:var(--surf)}
 
 .track-row{display:flex;align-items:center;gap:7px;padding:6px 4px;border-bottom:1px solid var(--sep2)}
 .track-row:last-child{border-bottom:none}
 .track-row input[type=checkbox]{width:15px;height:15px;flex-shrink:0;accent-color:var(--gold);cursor:pointer}
-.track-row .track-name{flex:1;min-width:0;font-size:11.5px;color:var(--lbl2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-row .track-name{flex:1;min-width:0;font-size:13px;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track-row .track-colors{display:flex;gap:3px;flex-shrink:0}
 .track-row input[type=color]{width:20px;height:20px;padding:0;border:1px solid var(--sep);border-radius:4px;cursor:pointer;flex-shrink:0}
 .track-row .track-remove{flex-shrink:0;width:18px;height:18px;border:none;background:var(--fill);border-radius:5px;color:var(--lbl3);cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}
@@ -111,56 +116,91 @@ input[type=color]{width:32px;height:26px;border-radius:5px;border:1px solid var(
 #add-track-zone.drag-over{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
 
 /* Toggle switch */
-.toggle-row{display:flex;align-items:center;justify-content:space-between}
-.toggle-label{font-size:12px;color:var(--lbl2)}
-.toggle-switch{position:relative;width:34px;height:20px;cursor:pointer;flex-shrink:0}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:32px}
+.toggle-label{font-size:13px;color:var(--lbl);line-height:1.35}
+.toggle-label small{display:block;font-size:12px;color:var(--lbl3);margin-top:1px}
+.toggle-switch{position:relative;width:42px;height:25px;cursor:pointer;flex-shrink:0}
 .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
-.toggle-knob{position:absolute;inset:0;border-radius:10px;background:var(--fill2);transition:background var(--t) var(--ease)}
-.toggle-knob::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:2px;transition:transform var(--t) var(--spring);box-shadow:0 1px 3px rgba(0,0,0,.22)}
+.toggle-knob{position:absolute;inset:0;border-radius:13px;background:var(--fill2);transition:background var(--t) var(--ease)}
+.toggle-knob::after{content:"";position:absolute;width:21px;height:21px;border-radius:50%;background:white;top:2px;left:2px;transition:transform var(--t) var(--spring);box-shadow:0 1px 3px rgba(0,0,0,.22)}
 .toggle-switch input:checked + .toggle-knob{background:var(--gold)}
-.toggle-switch input:checked + .toggle-knob::after{transform:translateX(14px)}
+.toggle-switch input:checked + .toggle-knob::after{transform:translateX(17px)}
 
 /* Color pair row */
-.color-pair{display:flex;align-items:center;gap:4px}
+.color-pair{display:flex;align-items:center;gap:6px}
 .color-pair label{font-size:11px;color:var(--lbl3);white-space:nowrap}
-.color-arrow{font-size:10px;color:var(--lbl4)}
+.color-arrow{font-size:12px;color:var(--lbl3)}
 
-.asp-row{display:flex;gap:5px}
-.asp-btn{flex:1;padding:7px 4px;border-radius:7px;border:1.5px solid var(--sep);background:var(--fill);font-size:11px;font-weight:500;color:var(--lbl3);cursor:pointer;text-align:center;transition:all var(--t) var(--ease);line-height:1.3}
-.asp-btn small{display:block;font-size:9.5px;opacity:.7}
+.asp-row{display:flex;gap:6px}
+.asp-btn{flex:1;min-width:0;padding:8px 4px;border-radius:9px;border:1.5px solid transparent;background:var(--fill);font-size:13px;font-weight:600;color:var(--lbl2);cursor:pointer;text-align:center;transition:all var(--t) var(--ease);line-height:1.3}
+.asp-btn small{display:block;font-size:11.5px;font-weight:500;opacity:.75;margin-top:1px}
 .asp-btn.active,.asp-btn:hover{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
 
-.seg-row{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
-.seg-btn{flex:1;padding:6px 3px;font-size:10.5px;font-weight:500;font-family:var(--font);color:var(--lbl3);background:transparent;border:none;border-radius:7px;cursor:pointer;text-align:center;white-space:nowrap;transition:background var(--t) var(--ease),color var(--t) var(--ease),box-shadow var(--t) var(--ease)}
+.seg-row{display:flex;background:var(--fill);border-radius:10px;padding:2px;gap:2px}
+.seg-btn{flex:1;min-width:0;padding:7px 4px;font-size:12.5px;font-weight:500;font-family:var(--font);color:var(--lbl2);overflow:hidden;text-overflow:ellipsis;background:transparent;border:none;border-radius:7px;cursor:pointer;text-align:center;white-space:nowrap;transition:background var(--t) var(--ease),color var(--t) var(--ease),box-shadow var(--t) var(--ease)}
 .seg-btn.active{background:var(--surf);color:var(--lbl);box-shadow:var(--sh)}
-.seg-btn small{display:block;font-size:9px;opacity:.65}
-.card-sub{overflow:hidden;max-height:420px;transition:max-height var(--ts) var(--ease),opacity var(--ts) var(--ease),margin var(--ts) var(--ease)}
-.card-sub.collapsed{max-height:0!important;opacity:0;margin:0!important}
+.seg-btn small{display:block;font-size:11px;opacity:.7;overflow:hidden;text-overflow:ellipsis}
+.card-sub{display:flex;flex-direction:column;gap:12px}
+.card-sub.collapsed{display:none!important}
 
-.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.style-group{grid-column:1/-1;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lbl4);margin:6px 0 1px}
+.style-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.style-group{grid-column:1/-1;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--lbl3);margin:8px 0 0}
 .style-group:first-child{margin-top:0}
-.style-btn{padding:6px 2px;border-radius:7px;border:1.5px solid var(--sep);background:var(--fill);font-size:10.5px;font-weight:500;color:var(--lbl3);cursor:pointer;text-align:center;transition:all var(--t) var(--ease)}
+.style-btn{min-width:0;padding:8px 2px;border-radius:9px;border:1.5px solid transparent;background:var(--fill);font-size:12.5px;font-weight:500;color:var(--lbl2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;text-align:center;transition:all var(--t) var(--ease)}
 .style-btn.active,.style-btn:hover{border-color:var(--gold);background:var(--gold-f);color:var(--gold)}
 
-.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:var(--r-sm);border:none;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t) var(--ease);letter-spacing:.02em}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:var(--r-sm);border:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--t) var(--ease);letter-spacing:.02em}
 .btn-gold{background:var(--gold);color:white;box-shadow:0 2px 6px rgba(168,138,58,.32)}
 .btn-gold:hover:not(:disabled){background:var(--gold-hi)}
-.btn-ghost{background:var(--fill);color:var(--lbl2)}
+.btn-ghost{background:var(--fill);color:var(--lbl)}
 .btn-ghost:hover:not(:disabled){background:var(--fill2)}
 .btn:disabled{opacity:.38;cursor:not-allowed}
 .btn:active:not(:disabled),.asp-btn:active,.seg-btn:active,.style-btn:active{transform:scale(.96)}
 .matte-sw:active,.track-remove:active{transform:scale(.92)}
 .btn-row{display:flex;gap:6px}
-.btn-row .btn{flex:1;font-size:11.5px;padding:9px 6px}
+.btn-row .btn{flex:1;font-size:13px;padding:9px 8px}
+.btn-sm{font-size:12.5px;padding:8px 10px}
 .btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .btn-grid .btn{font-size:11.5px;padding:9px 6px}
 
 .matte-swatches{display:flex;gap:6px;align-items:center}
-.matte-sw{width:22px;height:22px;border-radius:5px;border:2px solid var(--sep);cursor:pointer;transition:border-color var(--t) var(--ease)}
+.matte-sw{width:28px;height:28px;border-radius:7px;border:2px solid var(--sep);cursor:pointer;transition:border-color var(--t) var(--ease)}
 .matte-sw.active{border-color:var(--gold)}
 
-#prev{flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;overflow:hidden;position:relative}
+#prev{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;position:relative}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:18px 20px;position:relative}
+
+/* Sticky jump bar at the top of the settings column (still one column) */
+#side-nav{position:sticky;top:0;z-index:6;display:flex;gap:2px;margin:0 -14px;padding:10px 14px;background:rgba(242,242,247,.86);backdrop-filter:saturate(1.8) blur(18px);-webkit-backdrop-filter:saturate(1.8) blur(18px);border-bottom:.5px solid var(--sep)}
+#side-nav button{flex:1 1 auto;min-width:0;padding:7px 4px;border:none;border-radius:8px;background:transparent;font:600 12px/1 var(--font);color:var(--lbl2);cursor:pointer;white-space:nowrap;transition:background var(--t) var(--ease),color var(--t) var(--ease)}
+#side-nav button:hover{background:var(--fill)}
+#side-nav button.active{background:var(--surf);color:var(--lbl);box-shadow:var(--sh)}
+
+/* Toolbar above the preview: what the video will be, and the export buttons */
+#toolbar{display:flex;align-items:flex-end;flex-wrap:wrap;gap:10px 14px;padding:12px 18px;background:rgba(255,255,255,.72);backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);border-bottom:.5px solid var(--sep)}
+.tb-item{display:flex;flex-direction:column;gap:5px}
+.tb-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lbl3)}
+.tb-seg{display:flex;gap:2px;background:var(--fill);border-radius:10px;padding:2px}
+.tb-seg .asp-btn,.tb-seg .seg-btn{flex:none;padding:6px 11px;border:none;border-radius:8px;background:transparent;font-size:12.5px;font-weight:600;color:var(--lbl2);line-height:1.2}
+.tb-seg .asp-btn small,.tb-seg .seg-btn small{display:block;font-size:10.5px;font-weight:500;opacity:.7}
+#res-btns small{display:none}
+.tb-seg .asp-btn.active,.tb-seg .seg-btn.active{background:var(--surf);color:var(--lbl);box-shadow:var(--sh)}
+.tb-seg .asp-btn:hover:not(.active){background:rgba(120,120,128,.08);color:var(--lbl)}
+.tb-actions{display:flex;gap:8px;margin-left:auto;align-items:center}
+.tb-actions .btn{padding:10px 16px;font-size:13.5px}
+.tb-actions .export-main{width:auto;padding:10px 22px}
+
+/* Timeline under the preview */
+#timeline{display:flex;align-items:center;gap:12px;padding:10px 20px 14px}
+.tl-btn{width:34px;height:34px;flex-shrink:0;border:none;border-radius:50%;background:var(--surf);box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--lbl)}
+.tl-btn svg{width:16px;height:16px;fill:currentColor}
+.tl-btn .ic-play{display:none}
+.tl-btn.paused .ic-play{display:block}
+.tl-btn.paused .ic-pause{display:none}
+#tl-scrub{flex:1}
+#tl-time{font:500 12.5px var(--mono);color:var(--lbl2);font-variant-numeric:tabular-nums;min-width:92px;text-align:right}
+.tl-meta{margin:0;font-size:12px;white-space:nowrap}
+.vbg-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--lbl)}
 #checker-wrap{position:relative;box-shadow:var(--sh-lg);border-radius:3px;overflow:hidden;flex-shrink:0}
 #checker-bg{position:absolute;inset:0;z-index:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
 #map-bg{position:absolute;inset:0;z-index:1;display:none}
@@ -197,7 +237,7 @@ body.bg-map #empty-state svg{stroke:var(--lbl3)}
 body.mode-static .anim-only{display:none!important}
 body.mode-animated .static-only{display:none!important}
 
-#status{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(28,28,30,.82);backdrop-filter:blur(12px);color:white;font-size:11.5px;padding:7px 14px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;z-index:10}
+#status{position:absolute;bottom:72px;left:50%;transform:translateX(-50%);background:rgba(28,28,30,.82);backdrop-filter:blur(12px);color:white;font-size:11.5px;padding:7px 14px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;z-index:10}
 #status.show{opacity:1}
 
 #prog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center}
@@ -209,8 +249,8 @@ body.mode-animated .static-only{display:none!important}
 #prog-bar{height:100%;background:var(--gold);border-radius:3px;transition:width .08s linear;width:0%}
 #prog-eta{font-size:11px;color:var(--lbl4);font-family:var(--mono);font-variant-numeric:tabular-nums;min-height:14px}
 #prog-cancel{align-self:center;padding:7px 18px}
-.export-main{width:100%;padding:11px 14px;font-size:13px;font-weight:600}
-.export-meta{font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-top:7px;font-variant-numeric:tabular-nums}
+.export-main{font-weight:600}
+.export-meta{font-size:12px;color:var(--lbl3);line-height:1.5;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body class="mode-animated">
@@ -224,16 +264,22 @@ body.mode-animated .static-only{display:none!important}
 </div>
 
 <div id="main">
-  <div id="sidebar">
-
-    <div class="section" data-section="route">
+  <div id="sidebar" class="tpl-scope">
+    <nav id="side-nav" aria-label="Sections">
+      <button data-go="route">Route</button>
+      <button data-go="templates">Looks</button>
+      <button data-go="map">Map</button>
+      <button data-go="scene">Camera</button>
+      <button data-go="style">Line</button>
+      <button data-go="overlay">Overlay</button>
+    </nav>
+    <div class="section" data-section="route" id="sec-route">
       <div class="section-header">
         <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
         <h2>Route</h2>
       </div>
       <div class="section-body">
-
-        <div class="card">
+<div class="card">
           <div class="ctitle">Route File</div>
           <div id="drop-zone" onclick="document.getElementById('file-input').click()">
             <strong id="drop-label">Drop GPX or KML here</strong>
@@ -241,47 +287,43 @@ body.mode-animated .static-only{display:none!important}
           </div>
           <input type="file" id="file-input" accept=".gpx,.kml" style="display:none">
         </div>
-
-        <div class="card" id="tracks-card" hidden>
+<div class="card" id="tracks-card" hidden>
           <div class="ctitle">Tracks</div>
           <div id="tracks-list"></div>
-          <div id="add-track-zone" style="border:1.5px dashed var(--sep);border-radius:8px;padding:10px 14px;text-align:center;cursor:pointer;font-size:11.5px;color:var(--lbl3);margin-top:6px">
+          <div id="add-track-zone" style="border:1.5px dashed var(--fill2);border-radius:9px;padding:11px 14px;text-align:center;cursor:pointer;font-size:13px;color:var(--lbl2)">
             + Add another track
           </div>
           <input type="file" id="add-track-input" accept=".gpx,.kml" style="display:none">
         </div>
-
-        <div class="card" id="trim-card" hidden>
+<div class="card" id="trim-card" hidden>
           <div class="ctitle">Trim Range</div>
-          <select id="trim-target" class="text-input" style="margin-bottom:8px;width:100%;padding:6px 8px;font-size:11.5px">
+          <select id="trim-target" class="text-input" style="width:100%">
             <option value="primary">Primary track</option>
           </select>
           <div id="trim-slider">
             <input type="range" id="trim-start" min="0" max="100" step="0.1" value="0">
             <input type="range" id="trim-end" min="0" max="100" step="0.1" value="100">
           </div>
-          <div id="trim-readout" style="font-size:11px;color:var(--lbl3);font-family:var(--mono)"></div>
-          <button class="btn btn-ghost" style="font-size:11px;padding:6px" onclick="resetTrim()">Reset trim</button>
+          <div id="trim-readout" class="hint" style="font-variant-numeric:tabular-nums"></div>
+          <button class="btn btn-ghost btn-sm" onclick="resetTrim()">Reset trim</button>
         </div>
-
       </div>
     </div>
-
-    <div class="section" data-section="templates">
+    <div class="section" data-section="templates" id="sec-templates">
       <div class="section-header">
         <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
-        <h2>Templates</h2>
+        <h2>My looks</h2>
       </div>
       <div class="section-body">
-        <div class="card">
-          <div class="ctitle">My looks</div>
-          <select id="tpl-select" class="text-input" style="width:100%;padding:6px 8px;font-size:11.5px"></select>
+<div class="card">
+          <div class="ctitle">Saved looks</div>
+          <select id="tpl-select" class="text-input" style="width:100%"></select>
           <div class="btn-row">
             <button class="btn btn-gold" id="tpl-apply">Apply</button>
             <button class="btn btn-ghost" id="tpl-delete">Delete</button>
           </div>
           <div class="row" style="gap:6px">
-            <input type="text" id="tpl-name" class="text-input" placeholder="Name this look, e.g. Night pass">
+            <input type="text" id="tpl-name" class="text-input" placeholder="Name this look">
             <button class="btn btn-ghost" id="tpl-save" style="padding:7px 12px">Save</button>
           </div>
           <div class="btn-row">
@@ -293,15 +335,215 @@ body.mode-animated .static-only{display:none!important}
         </div>
       </div>
     </div>
-
-    <div class="section" data-section="style">
+    <div class="section" data-section="map" id="sec-map">
       <div class="section-header">
         <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
-        <h2>Style</h2>
+        <h2>Map</h2>
       </div>
       <div class="section-body">
-
-        <div class="card">
+<div class="card">
+          <div class="ctitle">Background</div>
+          <div class="asp-row" id="bg-btns">
+            <button class="asp-btn" data-bg="transparent">Transparent<small>For overlays</small></button>
+            <button class="asp-btn active" data-bg="map">Map<small>Real basemap</small></button>
+          </div>
+          
+        <div id="video-bg-wrap" class="vbg-row">
+          <span style="white-space:nowrap">Video background</span>
+          <div class="matte-swatches">
+            <div class="matte-sw active" data-videobg="#00b140" title="Green screen: chroma key it out in DaVinci, CapCut, Premiere" style="background:#00b140"></div>
+            <div class="matte-sw" data-videobg="#000000" title="Black: use Screen / Add blend mode" style="background:#000"></div>
+          </div>
+          <span id="video-bg-hint" class="hint">green screen</span>
+        </div>
+        </div>
+        <div class="card map-only" id="map-style-card">
+          <div class="ctitle">Map style</div>
+<div class="card-sub" id="map-style-wrap">
+            <div class="style-grid" id="map-style-btns">
+              <div class="style-group">Mountains &amp; passes</div>
+              <button class="style-btn active" data-style="landscape">Landscape</button>
+              <button class="style-btn" data-style="topo">Topo</button>
+              <button class="style-btn" data-style="outdoor" title="Shows hiking and bike trails">Outdoor</button>
+              <button class="style-btn" data-style="relief" title="Terrain colored by altitude">Relief</button>
+              <button class="style-btn" data-style="pastel">Pastel</button>
+              <button class="style-btn" data-style="winter">Winter</button>
+              <div class="style-group">Satellite</div>
+              <button class="style-btn" data-style="satellite">Satellite</button>
+              <button class="style-btn" data-style="hybrid">Sat + names</button>
+              <button class="style-btn" data-style="satdark">Sat night</button>
+              <div class="style-group">Dark &amp; cinematic</div>
+              <button class="style-btn" data-style="landdark" title="Landscape, dark">Landscape</button>
+              <button class="style-btn" data-style="outdark" title="Outdoor, dark">Outdoor</button>
+              <button class="style-btn" data-style="nightrelief" title="Shaded relief, dark">Shaded</button>
+              <div class="style-group">Roads &amp; clean</div>
+              <button class="style-btn" data-style="streets">Streets</button>
+              <button class="style-btn" data-style="navy">Navy roads</button>
+              <button class="style-btn" data-style="vintage">Vintage</button>
+              <button class="style-btn" data-style="mono">Mono relief</button>
+            </div>
+            <div class="toggle-row" style="margin-top:9px">
+              <span class="toggle-label">Focus on my route<small>Fades the map's own roads and trails</small></span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="focus-on">
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="row" style="margin-top:9px">
+              <label>Tilt (3D)</label>
+              <input type="range" id="tilt" min="0" max="65" step="1" value="0">
+              <div class="num-wrap">
+                <input type="number" class="num-input" id="tilt-num" min="0" max="65" step="1" value="0">
+                <span class="num-unit">°</span>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">3D terrain</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="terrain-on" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Names &amp; labels<small>Cities, countries, peaks, roads</small></span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="labels-on" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="row" id="terrain-height-row">
+              <label>Terrain height</label>
+              <input type="range" id="terrain-height" min="1" max="3" step="0.1" value="1.4">
+              <div class="num-wrap">
+                <input type="number" class="num-input" id="terrain-height-num" min="1" max="3" step="0.1" value="1.4">
+                <span class="num-unit">×</span>
+              </div>
+            </div>
+            <div class="hint">Drag the map to frame your shot: drag to move, right-drag to rotate and tilt, scroll to zoom.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section" data-section="scene" id="sec-scene">
+      <div class="section-header">
+        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+        <h2>Camera</h2>
+      </div>
+      <div class="section-body">
+<div class="card">
+          <div class="ctitle">Mode</div>
+          <div class="asp-row" id="mode-btns">
+            <button class="asp-btn active" data-mode="animated">Animated<small>Draw-on</small></button>
+            <button class="asp-btn" data-mode="static">Static<small>Full route</small></button>
+          </div>
+        </div>
+<div class="card anim-only" id="animation-card">
+          <div class="ctitle">Animation</div>
+          <div class="row">
+            <label>Duration</label>
+            <input type="range" id="duration" min="1" max="12" step="0.5" value="4">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="dur-num" min="1" max="12" step="0.5" value="4">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Loop pause</label>
+            <input type="range" id="loop-pause" min="0" max="4" step="0.5" value="1">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="lp-num" min="0" max="4" step="0.5" value="1">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+        </div>
+<div class="card">
+          <div class="ctitle">Camera</div>
+          <div class="asp-row" id="camera-btns">
+            <button class="asp-btn active" data-camera="overview">Overview<small>Whole route</small></button>
+            <button class="asp-btn" data-camera="follow">Follow<small>Chase the tip</small></button>
+          </div>
+          <div class="card-sub collapsed" id="follow-opts" style="margin-top:9px">
+            <div class="ctitle">Steadiness</div>
+            <div class="seg-row" id="steady-btns" style="margin-top:5px">
+              <button class="seg-btn" data-steady="tight">Tight</button>
+              <button class="seg-btn active" data-steady="smooth">Smooth</button>
+              <button class="seg-btn" data-steady="very">Very smooth</button>
+            </div>
+            <div class="ctitle" style="margin-top:9px">Look ahead</div>
+            <div class="seg-row" id="look-btns" style="margin-top:5px">
+              <button class="seg-btn" data-look="none">Centered</button>
+              <button class="seg-btn active" data-look="little">A little</button>
+              <button class="seg-btn" data-look="more">More</button>
+            </div>
+          </div>
+          <div class="toggle-row anim-only" style="margin-top:6px">
+            <span class="toggle-label">Smooth start &amp; stop</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="ease-on" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="toggle-row anim-only map-only">
+            <span class="toggle-label">Globe intro (fly in from space)</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="intro-on">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+        </div>
+<div class="card">
+          <div class="ctitle">View</div>
+          <div class="row">
+            <label>Zoom</label>
+            <input type="range" id="zoom" min="0.2" max="4" step="0.05" value="1">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="zoom-num" min="0.2" max="4" step="0.05" value="1">
+              <span class="num-unit">×</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Rotate</label>
+            <input type="range" id="rotation" min="0" max="359" step="1" value="0">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="rot-num" min="0" max="359" step="1" value="0">
+              <span class="num-unit">°</span>
+            </div>
+          </div>
+          <div class="ctitle" style="margin-top:2px">Rotation while playing</div>
+          <div class="seg-row" id="rotate-btns">
+            <button class="seg-btn active" data-rotate="off">Off</button>
+            <button class="seg-btn" data-rotate="orbit">Orbit<small>Spin around</small></button>
+            <button class="seg-btn" data-rotate="heading">Follow road<small>Turns with it</small></button>
+          </div>
+          <div class="card-sub collapsed" id="rotate-speed-wrap">
+            <div class="row">
+              <label>Spin speed</label>
+              <input type="range" id="rotate-speed" min="15" max="720" step="15" value="120">
+              <div class="num-wrap">
+                <input type="number" class="num-input" id="rotate-speed-num" min="15" max="720" step="15" value="120">
+                <span class="num-unit">°/loop</span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+        <label>Padding</label>
+        <input type="range" id="padding" min="0" max="30" step="1" value="0">
+        <div class="num-wrap">
+          <input type="number" class="num-input" id="pad-num" min="0" max="30" step="1" value="0">
+          <span class="num-unit">%</span>
+        </div>
+      </div>
+          <button class="btn btn-ghost btn-sm" onclick="resetView()">Reset view</button>
+        </div>
+      </div>
+    </div>
+    <div class="section" data-section="style" id="sec-style">
+      <div class="section-header">
+        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
+        <h2>Line</h2>
+      </div>
+      <div class="section-body">
+<div class="card">
           <div class="ctitle">Line Style</div>
       <div class="row">
         <label>Colors</label>
@@ -312,7 +554,7 @@ body.mode-animated .static-only{display:none!important}
         </div>
       </div>
       <div class="row">
-        <label>Line Width</label>
+        <label>Line width</label>
         <input type="range" id="line-width" min="1" max="20" step="0.5" value="6">
         <div class="num-wrap">
           <input type="number" class="num-input" id="lw-num" min="1" max="20" step="0.5" value="6">
@@ -327,13 +569,12 @@ body.mode-animated .static-only{display:none!important}
         </div>
       </div>
       <div class="row">
-        <label>Glow Color</label>
+        <label>Glow color</label>
         <input type="color" id="glow-color" value="#FC4C02">
       </div>
-      <button class="btn btn-ghost" id="match-map-colors" style="font-size:11px;padding:6px" title="Route colors chosen to stand out on the selected map">Match map colors</button>
+      <button class="btn btn-ghost btn-sm" id="match-map-colors" title="Route, title and profile colors chosen for the selected map">Match map colors</button>
     </div>
-
-    <div class="card">
+<div class="card">
       <div class="ctitle">Premium Effects</div>
       <div class="toggle-row" style="border-bottom:1px solid var(--sep);padding-bottom:8px;margin-bottom:2px">
         <span class="toggle-label" style="font-weight:600;color:var(--lbl)">All effects</span>
@@ -371,322 +612,25 @@ body.mode-animated .static-only{display:none!important}
         </label>
       </div>
     </div>
-
       </div>
     </div>
-
-    <div class="section" data-section="scene">
+    <div class="section" data-section="overlay" id="sec-overlay">
       <div class="section-header">
         <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
-        <h2>Camera &amp; Scene</h2>
+        <h2>Overlay</h2>
       </div>
       <div class="section-body">
-
-        <div class="card">
-          <div class="ctitle">Mode</div>
-          <div class="asp-row" id="mode-btns">
-            <button class="asp-btn active" data-mode="animated">Animated<small>Draw-on</small></button>
-            <button class="asp-btn" data-mode="static">Static<small>Full route</small></button>
-          </div>
-        </div>
-
-        <div class="card anim-only" id="animation-card">
-          <div class="ctitle">Animation</div>
-          <div class="row">
-            <label>Duration</label>
-            <input type="range" id="duration" min="1" max="12" step="0.5" value="4">
-            <div class="num-wrap">
-              <input type="number" class="num-input" id="dur-num" min="1" max="12" step="0.5" value="4">
-              <span class="num-unit">s</span>
-            </div>
-          </div>
-          <div class="row">
-            <label>Loop pause</label>
-            <input type="range" id="loop-pause" min="0" max="4" step="0.5" value="1">
-            <div class="num-wrap">
-              <input type="number" class="num-input" id="lp-num" min="0" max="4" step="0.5" value="1">
-              <span class="num-unit">s</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="ctitle">Camera</div>
-          <div class="asp-row" id="camera-btns">
-            <button class="asp-btn active" data-camera="overview">Overview<small>Whole route</small></button>
-            <button class="asp-btn" data-camera="follow">Follow<small>Chase the tip</small></button>
-          </div>
-          <div class="card-sub collapsed" id="follow-opts" style="margin-top:9px">
-            <div class="ctitle">Steadiness</div>
-            <div class="seg-row" id="steady-btns" style="margin-top:5px">
-              <button class="seg-btn" data-steady="tight">Tight</button>
-              <button class="seg-btn active" data-steady="smooth">Smooth</button>
-              <button class="seg-btn" data-steady="very">Very smooth</button>
-            </div>
-            <div class="ctitle" style="margin-top:9px">Look ahead</div>
-            <div class="seg-row" id="look-btns" style="margin-top:5px">
-              <button class="seg-btn" data-look="none">Centered</button>
-              <button class="seg-btn active" data-look="little">A little</button>
-              <button class="seg-btn" data-look="more">More</button>
-            </div>
-          </div>
-          <div class="toggle-row anim-only" style="margin-top:6px">
-            <span class="toggle-label">Smooth start &amp; stop</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="ease-on" checked>
-              <span class="toggle-knob"></span>
-            </label>
-          </div>
-          <div class="toggle-row anim-only map-only">
-            <span class="toggle-label">Globe intro (fly in from space)</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="intro-on">
-              <span class="toggle-knob"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="ctitle">Background</div>
-          <div class="asp-row" id="bg-btns">
-            <button class="asp-btn" data-bg="transparent">Transparent<small>For overlays</small></button>
-            <button class="asp-btn active" data-bg="map">Map<small>Real basemap</small></button>
-          </div>
-          <div class="card-sub collapsed" id="map-style-wrap" style="margin-top:9px">
-            <div class="style-grid" id="map-style-btns">
-              <div class="style-group">Mountains &amp; passes</div>
-              <button class="style-btn active" data-style="landscape">Landscape</button>
-              <button class="style-btn" data-style="topo">Topo</button>
-              <button class="style-btn" data-style="outdoor" title="Shows hiking and bike trails">Outdoor</button>
-              <button class="style-btn" data-style="relief" title="Terrain colored by altitude">Relief</button>
-              <button class="style-btn" data-style="pastel">Pastel</button>
-              <button class="style-btn" data-style="winter">Winter</button>
-              <div class="style-group">Satellite</div>
-              <button class="style-btn" data-style="satellite">Satellite</button>
-              <button class="style-btn" data-style="hybrid">Sat + names</button>
-              <button class="style-btn" data-style="satdark">Sat night</button>
-              <div class="style-group">Dark &amp; cinematic</div>
-              <button class="style-btn" data-style="landdark">Landscape dark</button>
-              <button class="style-btn" data-style="outdark">Outdoor dark</button>
-              <button class="style-btn" data-style="nightrelief">Night relief</button>
-              <div class="style-group">Roads &amp; clean</div>
-              <button class="style-btn" data-style="streets">Streets</button>
-              <button class="style-btn" data-style="navy">Navy roads</button>
-              <button class="style-btn" data-style="vintage">Vintage</button>
-              <button class="style-btn" data-style="mono">Mono relief</button>
-            </div>
-            <div class="toggle-row" style="margin-top:9px">
-              <span class="toggle-label">Focus on my route<small style="display:block;font-size:10.5px;color:var(--lbl4)">Fades the map's own roads and trails</small></span>
-              <label class="toggle-switch">
-                <input type="checkbox" id="focus-on">
-                <span class="toggle-knob"></span>
-              </label>
-            </div>
-            <div class="row" style="margin-top:9px">
-              <label>Tilt (3D)</label>
-              <input type="range" id="tilt" min="0" max="65" step="1" value="0">
-              <div class="num-wrap">
-                <input type="number" class="num-input" id="tilt-num" min="0" max="65" step="1" value="0">
-                <span class="num-unit">°</span>
-              </div>
-            </div>
-            <div class="toggle-row">
-              <span class="toggle-label">3D terrain</span>
-              <label class="toggle-switch">
-                <input type="checkbox" id="terrain-on" checked>
-                <span class="toggle-knob"></span>
-              </label>
-            </div>
-            <div class="toggle-row">
-              <span class="toggle-label">Names &amp; labels<small style="display:block;font-size:10.5px;color:var(--lbl4)">Cities, countries, peaks, roads</small></span>
-              <label class="toggle-switch">
-                <input type="checkbox" id="labels-on" checked>
-                <span class="toggle-knob"></span>
-              </label>
-            </div>
-            <div class="row" id="terrain-height-row">
-              <label>Height</label>
-              <input type="range" id="terrain-height" min="1" max="3" step="0.1" value="1.4">
-              <div class="num-wrap">
-                <input type="number" class="num-input" id="terrain-height-num" min="1" max="3" step="0.1" value="1.4">
-                <span class="num-unit">×</span>
-              </div>
-            </div>
-            <div class="hint">Drag the map to frame your shot: drag to move, right-drag to rotate and tilt, scroll to zoom.</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="ctitle">View</div>
-          <div class="row">
-            <label>Zoom</label>
-            <input type="range" id="zoom" min="0.2" max="4" step="0.05" value="1">
-            <div class="num-wrap">
-              <input type="number" class="num-input" id="zoom-num" min="0.2" max="4" step="0.05" value="1">
-              <span class="num-unit">×</span>
-            </div>
-          </div>
-          <div class="row">
-            <label>Rotate</label>
-            <input type="range" id="rotation" min="0" max="359" step="1" value="0">
-            <div class="num-wrap">
-              <input type="number" class="num-input" id="rot-num" min="0" max="359" step="1" value="0">
-              <span class="num-unit">°</span>
-            </div>
-          </div>
-          <div class="ctitle" style="margin-top:2px">Rotation while playing</div>
-          <div class="seg-row" id="rotate-btns">
-            <button class="seg-btn active" data-rotate="off">Off</button>
-            <button class="seg-btn" data-rotate="orbit">Orbit<small>Spin around</small></button>
-            <button class="seg-btn" data-rotate="heading">Follow road<small>Turns with it</small></button>
-          </div>
-          <div class="card-sub collapsed" id="rotate-speed-wrap">
-            <div class="row">
-              <label>Spin speed</label>
-              <input type="range" id="rotate-speed" min="15" max="720" step="15" value="120">
-              <div class="num-wrap">
-                <input type="number" class="num-input" id="rotate-speed-num" min="15" max="720" step="15" value="120">
-                <span class="num-unit">°/loop</span>
-              </div>
-            </div>
-          </div>
-          <button class="btn btn-ghost" style="font-size:11px;padding:6px" onclick="resetView()">Reset view</button>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="section" data-section="output">
-      <div class="section-header">
-        <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
-        <h2>Output</h2>
-      </div>
-      <div class="section-body">
-
-        <div class="card">
-          <div class="ctitle">Canvas</div>
-      <div class="asp-row">
-        <button class="asp-btn active" data-asp="9:16">9:16<small>Stories</small></button>
-        <button class="asp-btn" data-asp="16:9">16:9<small>YouTube</small></button>
-        <button class="asp-btn" data-asp="1:1">1:1<small>Square</small></button>
-      </div>
-      <div class="asp-row" id="res-btns" style="margin-top:6px">
-        <button class="asp-btn active" data-res="1">1080p<small id="res-dims-1">1080×1920</small></button>
-        <button class="asp-btn" data-res="2">4K<small id="res-dims-2">2160×3840</small></button>
-      </div>
-      <div class="row">
-        <label>Padding</label>
-        <input type="range" id="padding" min="0" max="30" step="1" value="0">
-        <div class="num-wrap">
-          <input type="number" class="num-input" id="pad-num" min="0" max="30" step="1" value="0">
-          <span class="num-unit">%</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="ctitle">Overlay</div>
+<div class="card">
+      <div class="ctitle">Title &amp; stats</div>
       <div class="asp-row" id="layout-btns">
         <button class="asp-btn active" data-layout="none">None</button>
         <button class="asp-btn" data-layout="banner">Banner</button>
         <button class="asp-btn" data-layout="corner">Corner</button>
         <button class="asp-btn" data-layout="center">Center</button>
       </div>
-      <div class="toggle-row" style="margin-top:8px">
-        <span class="toggle-label">Elevation profile</span>
-        <label class="toggle-switch">
-          <input type="checkbox" id="profile-on">
-          <span class="toggle-knob"></span>
-        </label>
-      </div>
-      <div class="hint" id="profile-hint"></div>
-      <div class="card-sub collapsed" id="profile-opts" style="margin-top:6px">
-        <div class="ctitle">Fill</div>
-        <div class="seg-row" id="pf-fill-btns">
-          <button class="seg-btn active" data-pffill="route">Route colors</button>
-          <button class="seg-btn" data-pffill="custom">Custom</button>
-        </div>
-        <div class="row" id="pf-custom-row" style="display:none">
-          <label>Colors</label>
-          <div class="color-pair">
-            <input type="color" id="pf-c1" value="#FF2D55" title="Start color">
-            <span class="color-arrow">→</span>
-            <input type="color" id="pf-c2" value="#FFCC00" title="End color">
-          </div>
-        </div>
-        <div class="row">
-          <label>Fill</label>
-          <input type="range" id="pf-fill-op" min="20" max="100" step="5" value="85">
-          <div class="num-wrap">
-            <input type="number" class="num-input" id="pf-fill-op-num" min="20" max="100" step="5" value="85">
-            <span class="num-unit">%</span>
-          </div>
-        </div>
-        <div class="row">
-          <label>Background</label>
-          <input type="color" id="pf-bg" value="#0C0E14">
-        </div>
-        <div class="row">
-          <label>Bg opacity</label>
-          <input type="range" id="pf-bg-op" min="0" max="100" step="5" value="76">
-          <div class="num-wrap">
-            <input type="number" class="num-input" id="pf-bg-op-num" min="0" max="100" step="5" value="76">
-            <span class="num-unit">%</span>
-          </div>
-        </div>
-        <div class="row">
-          <label>Text</label>
-          <input type="color" id="pf-text" value="#FFFFFF">
-        </div>
-        <div class="ctitle" style="margin-top:2px">Font</div>
-        <div class="seg-row" id="pf-font-btns">
-          <button class="seg-btn active" data-font="system">System</button>
-          <button class="seg-btn" data-font="serif">Serif</button>
-          <button class="seg-btn" data-font="mono">Mono</button>
-          <button class="seg-btn" data-font="condensed">Condensed</button>
-        </div>
-        <div class="row">
-          <label>Size</label>
-          <input type="range" id="pf-size" min="0.6" max="1.6" step="0.05" value="1">
-          <div class="num-wrap">
-            <input type="number" class="num-input" id="pf-size-num" min="0.6" max="1.6" step="0.05" value="1">
-            <span class="num-unit">×</span>
-          </div>
-        </div>
-        <div class="ctitle" style="margin-top:2px">Position</div>
-        <div class="seg-row" id="pf-pos-btns">
-          <button class="seg-btn active" data-pfpos="bottom">Bottom</button>
-          <button class="seg-btn" data-pfpos="top">Top</button>
-        </div>
-        <div class="ctitle" style="margin-top:2px">Corners</div>
-        <div class="seg-row" id="pf-corner-btns">
-          <button class="seg-btn" data-pfcorner="0">Square</button>
-          <button class="seg-btn active" data-pfcorner="14">Rounded</button>
-          <button class="seg-btn" data-pfcorner="40">Pill</button>
-        </div>
-        <div class="ctitle" style="margin-top:2px">Show</div>
-        <div class="toggle-row">
-          <span class="toggle-label">Current altitude</span>
-          <label class="toggle-switch">
-            <input type="checkbox" id="pf-show-ele" checked>
-            <span class="toggle-knob"></span>
-          </label>
-        </div>
-        <div class="toggle-row">
-          <span class="toggle-label">Max altitude</span>
-          <label class="toggle-switch">
-            <input type="checkbox" id="pf-show-max" checked>
-            <span class="toggle-knob"></span>
-          </label>
-        </div>
-        <div class="toggle-row">
-          <span class="toggle-label">Distance ridden</span>
-          <label class="toggle-switch">
-            <input type="checkbox" id="pf-show-dist">
-            <span class="toggle-knob"></span>
-          </label>
-        </div>
-      </div>
+      
+      
+      
       <div class="card-sub collapsed" id="overlay-opts" style="margin-top:9px">
         <div class="row">
           <label>Title</label>
@@ -739,7 +683,7 @@ body.mode-animated .static-only{display:none!important}
           <button class="seg-btn active" data-font="system">System</button>
           <button class="seg-btn" data-font="serif">Serif</button>
           <button class="seg-btn" data-font="mono">Mono</button>
-          <button class="seg-btn" data-font="condensed">Condensed</button>
+          <button class="seg-btn" data-font="condensed">Narrow</button>
         </div>
         <div class="seg-row" id="overlay-weight-btns" style="margin-top:5px">
           <button class="seg-btn" data-weight="400">Regular</button>
@@ -748,48 +692,135 @@ body.mode-animated .static-only{display:none!important}
         </div>
       </div>
     </div>
-
-    <div class="card">
-      <div class="ctitle">Export</div>
-
-      <div class="anim-only">
-        <div class="seg-row" id="fps-btns">
-          <button class="seg-btn" data-fps="24">24 fps<small>Cinematic</small></button>
-          <button class="seg-btn active" data-fps="30">30 fps<small>Standard</small></button>
-          <button class="seg-btn" data-fps="60">60 fps<small>Smoothest</small></button>
+        <div class="card">
+          <div class="ctitle">Elevation profile</div>
+<div class="toggle-row" style="margin-top:8px">
+        <span class="toggle-label">Show on video</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="profile-on">
+          <span class="toggle-knob"></span>
+        </label>
+      </div>
+<div class="hint" id="profile-hint"></div>
+<div class="card-sub collapsed" id="profile-opts">
+        <div class="ctitle">Fill</div>
+        <div class="seg-row" id="pf-fill-btns">
+          <button class="seg-btn active" data-pffill="route">Route colors</button>
+          <button class="seg-btn" data-pffill="custom">Custom</button>
         </div>
-        <div class="seg-row" id="quality-btns" style="margin-top:5px">
-          <button class="seg-btn" data-quality="good">Good<small>Smaller file</small></button>
-          <button class="seg-btn active" data-quality="high">High<small>Recommended</small></button>
-          <button class="seg-btn" data-quality="max">Max<small>Largest file</small></button>
-        </div>
-        <div id="video-bg-wrap" style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <span style="font-size:10.5px;color:var(--lbl4);white-space:nowrap">Background</span>
-          <div class="matte-swatches">
-            <div class="matte-sw active" data-videobg="#00b140" title="Green screen: chroma key it out in DaVinci, CapCut, Premiere" style="background:#00b140"></div>
-            <div class="matte-sw" data-videobg="#000000" title="Black: use Screen / Add blend mode" style="background:#000"></div>
+        <div class="row" id="pf-custom-row" style="display:none">
+          <label>Colors</label>
+          <div class="color-pair">
+            <input type="color" id="pf-c1" value="#FF2D55" title="Start color">
+            <span class="color-arrow">→</span>
+            <input type="color" id="pf-c2" value="#FFCC00" title="End color">
           </div>
-          <span id="video-bg-hint" style="font-size:10px;color:var(--lbl4)">green screen</span>
         </div>
-        <button class="btn btn-gold export-main" id="btn-mp4" disabled onclick="exportMP4()" style="margin-top:9px">Export MP4</button>
-        <div class="export-meta" id="export-meta"></div>
+        <div class="row">
+          <label>Fill</label>
+          <input type="range" id="pf-fill-op" min="20" max="100" step="5" value="85">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="pf-fill-op-num" min="20" max="100" step="5" value="85">
+            <span class="num-unit">%</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>Background</label>
+          <input type="color" id="pf-bg" value="#0C0E14">
+        </div>
+        <div class="row">
+          <label>Bg opacity</label>
+          <input type="range" id="pf-bg-op" min="0" max="100" step="5" value="76">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="pf-bg-op-num" min="0" max="100" step="5" value="76">
+            <span class="num-unit">%</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>Text</label>
+          <input type="color" id="pf-text" value="#FFFFFF">
+        </div>
+        <div class="ctitle" style="margin-top:2px">Font</div>
+        <div class="seg-row" id="pf-font-btns">
+          <button class="seg-btn active" data-font="system">System</button>
+          <button class="seg-btn" data-font="serif">Serif</button>
+          <button class="seg-btn" data-font="mono">Mono</button>
+          <button class="seg-btn" data-font="condensed">Narrow</button>
+        </div>
+        <div class="row">
+          <label>Size</label>
+          <input type="range" id="pf-size" min="0.6" max="1.6" step="0.05" value="1">
+          <div class="num-wrap">
+            <input type="number" class="num-input" id="pf-size-num" min="0.6" max="1.6" step="0.05" value="1">
+            <span class="num-unit">×</span>
+          </div>
+        </div>
+        <div class="ctitle" style="margin-top:2px">Position</div>
+        <div class="seg-row" id="pf-pos-btns">
+          <button class="seg-btn active" data-pfpos="bottom">Bottom</button>
+          <button class="seg-btn" data-pfpos="top">Top</button>
+        </div>
+        <div class="ctitle" style="margin-top:2px">Corners</div>
+        <div class="seg-row" id="pf-corner-btns">
+          <button class="seg-btn" data-pfcorner="0">Square</button>
+          <button class="seg-btn active" data-pfcorner="14">Rounded</button>
+          <button class="seg-btn" data-pfcorner="40">Pill</button>
+        </div>
+        <div class="ctitle" style="margin-top:2px">Show</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Current altitude</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="pf-show-ele" checked>
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Max altitude</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="pf-show-max" checked>
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Distance ridden</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="pf-show-dist">
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
       </div>
-
-      <div class="static-only" style="font-size:10.5px;color:var(--lbl4);line-height:1.55;margin-bottom:7px">
-        Static mode exports a single finished frame.
-      </div>
-
-      <div class="btn-row" style="margin-top:6px">
-        <button class="btn btn-ghost" id="btn-png" disabled onclick="exportPNG()">PNG still</button>
+        </div>
       </div>
     </div>
-
-      </div>
-    </div>
-
   </div>
 
   <div id="prev">
+    <div id="toolbar" class="tpl-scope">
+      <div class="tb-item"><span class="tb-label">Format</span><div class="asp-row tb-seg" id="asp-btns">
+        <button class="asp-btn active" data-asp="9:16">9:16<small>Reels</small></button>
+        <button class="asp-btn" data-asp="16:9">16:9<small>YouTube</small></button>
+        <button class="asp-btn" data-asp="1:1">1:1<small>Square</small></button>
+      </div></div>
+      <div class="tb-item"><span class="tb-label">Size</span><div class="asp-row tb-seg" id="res-btns">
+        <button class="asp-btn active" data-res="1">1080p<small id="res-dims-1">1080×1920</small></button>
+        <button class="asp-btn" data-res="2">4K<small id="res-dims-2">2160×3840</small></button>
+      </div></div>
+      <div class="tb-item anim-only"><span class="tb-label">FPS</span><div class="seg-row tb-seg" id="fps-btns">
+          <button class="seg-btn" data-fps="24" title="Cinematic">24</button>
+          <button class="seg-btn active" data-fps="30" title="Standard">30</button>
+          <button class="seg-btn" data-fps="60" title="Smoothest">60</button>
+        </div></div>
+      <div class="tb-item anim-only"><span class="tb-label">Quality</span><div class="seg-row tb-seg" id="quality-btns">
+          <button class="seg-btn" data-quality="good" title="Smaller file">Good</button>
+          <button class="seg-btn active" data-quality="high" title="Recommended">High</button>
+          <button class="seg-btn" data-quality="max" title="Largest file">Max</button>
+        </div></div>
+      <div class="tb-actions">
+        <button class="btn btn-ghost" id="btn-png" disabled onclick="exportPNG()">PNG</button>
+        <button class="btn btn-gold export-main" id="btn-mp4" disabled onclick="exportMP4()">Export MP4</button>
+      </div>
+    </div>
+    <div id="stage">
     <div id="checker-wrap">
       <div id="checker-bg"></div>
       <div id="map-bg"></div>
@@ -805,6 +836,13 @@ body.mode-animated .static-only{display:none!important}
         <svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
         <span>Drop a GPX or KML file to preview your route</span>
       </div>
+    </div>
+    </div>
+    <div id="timeline">
+      <button id="tl-play" class="tl-btn" title="Play / pause (space)" aria-label="Play or pause"><svg viewBox="0 0 24 24" class="ic-pause"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg viewBox="0 0 24 24" class="ic-play"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+      <input type="range" id="tl-scrub" min="0" max="1000" step="1" value="0" aria-label="Timeline">
+      <span id="tl-time">0.0 s</span>
+      <div class="export-meta tl-meta" id="export-meta"></div>
     </div>
     <div id="status"></div>
   </div>
@@ -830,6 +868,7 @@ function updateExportDims() {
     const s = parseInt(btn.dataset.res);
     const small = btn.querySelector("small");
     if (small) small.textContent = `${w*s}×${h*s}`;
+    btn.title = `${w*s}×${h*s} px`;
   });
   updateExportMeta();
 }
@@ -933,6 +972,13 @@ const ROUTE_PRESETS = {
   streets:   ["#7C3AED", "#EC4899", "#7C3AED"],
   vintage:   ["#B91C1C", "#F97316", "#B91C1C"],
   mono:      ["#FC4C02", "#FFCC00", "#FC4C02"],
+};
+// Light maps get dark overlay text on a light fade; dark and satellite maps
+// keep white text on a dark fade. Used until overlay colors are picked by hand.
+const MAP_THEME = {
+  landscape: "light", topo: "light", outdoor: "light", relief: "light", pastel: "light", winter: "light",
+  streets: "light", vintage: "light", mono: "light",
+  satellite: "dark", hybrid: "dark", satdark: "dark", landdark: "dark", outdark: "dark", nightrelief: "dark", navy: "dark",
 };
 // Altitude colors for the Relief style: valley greens, alpine meadows, rock, snow.
 const RELIEF_RAMP = ["interpolate", ["linear"], ["elevation"],
@@ -1367,6 +1413,21 @@ function applyFocus() {
 }
 // Route colors follow the map style until the person picks their own.
 let routeColorsAuto = true;
+let overlayColorsAuto = true;
+function isDarkColor(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return (0.299*(n >> 16) + 0.587*(n >> 8 & 255) + 0.114*(n & 255)) < 140;
+}
+// Title/stats text and the elevation profile card in the map's theme.
+// Transparent mode is for overlaying on footage, so it always uses white text.
+function applyOverlayTheme() {
+  const light = bgMode === "map" && MAP_THEME[currentMapStyle] === "light";
+  $("overlay-color").value = light ? "#1C1C1E" : "#FFFFFF";
+  $("pf-text").value = light ? "#1C1C1E" : "#FFFFFF";
+  $("pf-bg").value = light ? "#FFFFFF" : "#0C0E14";
+  const op = light ? 82 : 76;
+  $("pf-bg-op").value = op; $("pf-bg-op-num").value = op;
+}
 function applyRoutePreset(key) {
   const p = ROUTE_PRESETS[key];
   if (!p) return;
@@ -1996,6 +2057,7 @@ const OVERLAY_FONTS = {
 function drawOverlay(ctx, W, H, progress) {
   if (overlayLayout === "none" || !normalizedPts.length) return;
   const color = getOverlayColor();
+  const back = isDarkColor(color) ? "255,255,255" : "0,0,0"; // backdrop opposite to the text
   const title = getOverlayTitle();
   const stats = formatStats(progress);
   const scale = (W / 1080) * getOverlaySize();
@@ -2011,7 +2073,7 @@ function drawOverlay(ctx, W, H, progress) {
   if (overlayLayout === "banner") {
     const barH = 130*scale;
     const grad = ctx.createLinearGradient(0, H-barH, 0, H);
-    grad.addColorStop(0, "rgba(0,0,0,0)"); grad.addColorStop(1, "rgba(0,0,0,0.55)");
+    grad.addColorStop(0, `rgba(${back},0)`); grad.addColorStop(1, `rgba(${back},0.6)`);
     ctx.fillStyle = grad;
     ctx.fillRect(-px, H-barH, W, barH+Math.abs(py)+40);
     ctx.fillStyle = color;
@@ -2032,7 +2094,7 @@ function drawOverlay(ctx, W, H, progress) {
     const statW = stats ? ctx.measureText(stats).width : 0;
     const boxW = Math.max(titleW, statW) + padX*2;
     const boxH = padY*2 + titleSize + (stats ? statSize+10*scale : 0);
-    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.fillStyle = `rgba(${back},0.5)`;
     const r = 12*scale;
     ctx.beginPath();
     ctx.roundRect ? ctx.roundRect(20*scale, 20*scale, boxW, boxH, r) : ctx.rect(20*scale,20*scale,boxW,boxH);
@@ -2050,7 +2112,7 @@ function drawOverlay(ctx, W, H, progress) {
   } else if (overlayLayout === "center") {
     ctx.textAlign = "center";
     ctx.font = `${weight} ${Math.round(34*scale)}px ${family}`;
-    ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 10*scale;
+    ctx.shadowColor = `rgba(${back},0.55)`; ctx.shadowBlur = 10*scale;
     ctx.fillText(title, W/2, H*0.12);
     if (stats) {
       ctx.font = `500 ${Math.round(20*scale)}px "SF Mono",Menlo,monospace`;
@@ -2070,7 +2132,10 @@ function startAnimation() {
 
   function frame(ts) {
     if (!animStartTs) animStartTs = ts;
-    const elapsed = animMode === "animated" ? (ts-animStartTs) % getLoopMs() : ts-animStartTs;
+    const loopMs = animMode === "animated" ? getLoopMs() : STATIC_ORBIT_MS;
+    const elapsed = previewPaused ? Math.min(pausedAt, loopMs) : (ts-animStartTs) % loopMs;
+    lastPreviewElapsed = elapsed;
+    updateTimelineUI(elapsed, loopMs);
     const tl = timelineAt(elapsed);
     const { progress, pulseMult } = tl;
 
@@ -2087,9 +2152,14 @@ function startAnimation() {
       if (!cameraMoves(tl)) lastBearingOffset = 0;
       else if (!userDriving) {
         const cam = mapCameraFor(tl);
-        jumpCamera(cam);
         lastBearingOffset = cam.bearing - rotationDeg;
-        if (!styleSwitching) map.redraw();
+        // Paused on one frame: don't re-render an unchanged camera 60× a second.
+        const key = JSON.stringify(cam);
+        if (key !== lastCamKey) {
+          lastCamKey = key;
+          jumpCamera(cam);
+          if (!styleSwitching) map.redraw();
+        }
       }
       drawOverlays(ctx, W, H, progress);
       animHandle = requestAnimationFrame(frame);
@@ -2124,6 +2194,19 @@ function startAnimation() {
   animHandle = requestAnimationFrame(frame);
 }
 
+// ─── Timeline (play / pause / scrub) ──────────────────────────────────────────
+let previewPaused = false, pausedAt = 0, lastPreviewElapsed = 0, scrubbing = false, lastCamKey = "";
+function setPreviewPaused(paused) {
+  if (paused) pausedAt = lastPreviewElapsed;
+  else animStartTs = performance.now() - pausedAt; // resume from the same moment
+  previewPaused = paused;
+  $("tl-play").classList.toggle("paused", paused);
+}
+function updateTimelineUI(elapsed, loopMs) {
+  if (!scrubbing) $("tl-scrub").value = Math.round(elapsed / loopMs * 1000);
+  $("tl-time").textContent = `${(elapsed/1000).toFixed(1)} / ${(loopMs/1000).toFixed(1)} s`;
+}
+
 // ─── Layout ───────────────────────────────────────────────────────────────────
 // The preview stage is always a wide 16:9 view. The export frame (9:16, 1:1
 // or 16:9) sits in its middle at full stage height and everything outside it
@@ -2134,8 +2217,8 @@ const STAGE_ASPECT = 16/9;
 let frameCss = { x: 0, y: 0, w: 0, h: 0 }; // export frame inside the stage, CSS px
 function layoutPreview() {
   if (exporting) return;
-  const area = $("prev");
-  const aw = area.clientWidth-40, ah = area.clientHeight-40;
+  const area = $("stage");
+  const aw = area.clientWidth-40, ah = area.clientHeight-36;
   let sw, sh;
   if (aw/ah < STAGE_ASPECT) { sw=aw; sh=aw/STAGE_ASPECT; } else { sh=ah; sw=ah*STAGE_ASPECT; }
   sw=Math.round(sw); sh=Math.round(sh);
@@ -2449,7 +2532,7 @@ function drawElevProfile(ctx, W, H, progress) {
   ctx.fillStyle = st.text; ctx.beginPath(); ctx.arc(px, py, 5*s, 0, Math.PI*2); ctx.fill();
   // labels (with a soft shadow when there's little or no card behind them)
   ctx.fillStyle = st.text; ctx.textBaseline = "alphabetic";
-  if (st.bgOp < 0.35) { ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = 8*s; }
+  if (st.bgOp < 0.35) { ctx.shadowColor = isDarkColor(st.text) ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)"; ctx.shadowBlur = 8*s; }
   const left = [];
   if (st.showEle) left.push(`${Math.round(profileEleAt(progress)).toLocaleString()} m`);
   if (st.showDist) left.push(`${(getShownTotalKm()*progress).toFixed(1)} km`);
@@ -2669,25 +2752,25 @@ function storeTemplates(list) {
 }
 function captureTemplate() {
   const inputs = {}, picks = [];
-  document.querySelectorAll("#sidebar input[id], #sidebar select[id]").forEach(el => {
+  document.querySelectorAll(".tpl-scope input[id], .tpl-scope select[id]").forEach(el => {
     if (TPL_SKIP.has(el.id) || el.type === "file" || el.id.endsWith("-num")) return;
     inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
   });
-  document.querySelectorAll("#sidebar .active").forEach(el => {
+  document.querySelectorAll(".tpl-scope .active").forEach(el => {
     const attr = Object.keys(el.dataset)[0];
     if (!attr) return;
     picks.push({ group: el.parentElement.id || null, attr, value: el.dataset[attr] });
   });
-  return { inputs, picks, routeColorsAuto };
+  return { inputs, picks, routeColorsAuto, overlayColorsAuto };
 }
 function applyTemplate(t) {
   const attrName = a => a.replace(/[A-Z]/g, c => "-" + c.toLowerCase());
   t.picks.forEach(({ group, attr, value }) => {
-    const scope = group ? `#${group} ` : "#sidebar ";
+    const scope = group ? `#${group} ` : ".tpl-scope ";
     const el = document.querySelector(`${scope}[data-${attrName(attr)}="${CSS.escape(value)}"]`);
     if (el && !el.classList.contains("active")) el.click();
   });
-  document.querySelectorAll("#sidebar input[id], #sidebar select[id]").forEach(el => {
+  document.querySelectorAll(".tpl-scope input[id], .tpl-scope select[id]").forEach(el => {
     if (!(el.id in t.inputs)) return;
     if (el.type === "checkbox") { if (el.checked === t.inputs[el.id]) return; el.checked = t.inputs[el.id]; }
     else { if (el.value === String(t.inputs[el.id])) return; el.value = t.inputs[el.id]; }
@@ -2695,6 +2778,7 @@ function applyTemplate(t) {
     el.dispatchEvent(new Event("change"));
   });
   routeColorsAuto = !!t.routeColorsAuto;
+  overlayColorsAuto = t.overlayColorsAuto !== false;
   animStartTs = null;
 }
 function renderTemplateList(selectName) {
@@ -2812,7 +2896,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Colors — live update
   ["line-color","line-color-2","glow-color"].forEach(id => $(id).addEventListener("input",()=>{ routeColorsAuto = false; }));
-  $("match-map-colors").addEventListener("click",()=>{ routeColorsAuto = true; applyRoutePreset(currentMapStyle); });
+  $("match-map-colors").addEventListener("click",()=>{
+    routeColorsAuto = overlayColorsAuto = true;
+    applyRoutePreset(currentMapStyle); applyOverlayTheme();
+  });
+  ["overlay-color","pf-text","pf-bg","pf-bg-op"].forEach(id => $(id).addEventListener("input",()=>{ overlayColorsAuto = false; }));
   $("focus-on").addEventListener("change", applyFocus);
 
   // "All effects" switches the four effects together and shows on only
@@ -2875,6 +2963,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll("#bg-btns .asp-btn").forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
       setBg(btn.dataset.bg);
+      if (overlayColorsAuto) applyOverlayTheme();
     });
   });
 
@@ -2910,6 +2999,36 @@ document.addEventListener("DOMContentLoaded", () => {
   $("intro-on").addEventListener("change",()=>{ applyProjection(); animStartTs=null; updateExportMeta(); });
 
   $("labels-on").addEventListener("change", applyLabels);
+  // Jump bar: scroll to a section (opening it) and highlight the one in view.
+  const navSecs = [...document.querySelectorAll("#side-nav button")].map(b => [b, $("sec-" + b.dataset.go)]);
+  navSecs.forEach(([b, sec]) => b.addEventListener("click", () => {
+    sec.classList.remove("collapsed");
+    sec.scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
+  const updateNav = () => {
+    const sb = $("sidebar"), line = sb.getBoundingClientRect().top + 80;
+    let cur = navSecs[0];
+    navSecs.forEach(e => { if (e[1].getBoundingClientRect().top <= line) cur = e; });
+    if (sb.scrollTop + sb.clientHeight >= sb.scrollHeight - 4) cur = navSecs[navSecs.length - 1];
+    navSecs.forEach(e => e[0].classList.toggle("active", e === cur));
+  };
+  $("sidebar").addEventListener("scroll", updateNav, { passive: true });
+  updateNav();
+
+  // Timeline
+  const loopNow = () => animMode === "animated" ? getLoopMs() : STATIC_ORBIT_MS;
+  $("tl-play").addEventListener("click", () => setPreviewPaused(!previewPaused));
+  $("tl-scrub").addEventListener("input", () => {
+    scrubbing = true;
+    if (!previewPaused) setPreviewPaused(true);
+    pausedAt = $("tl-scrub").value / 1000 * loopNow();
+  });
+  $("tl-scrub").addEventListener("change", () => { scrubbing = false; });
+  document.addEventListener("keydown", e => {
+    if (e.code !== "Space" || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(e.target.tagName)) return;
+    e.preventDefault(); setPreviewPaused(!previewPaused);
+  });
+
   // Templates
   renderTemplateList();
   $("tpl-save").addEventListener("click",()=>{
@@ -3008,6 +3127,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("active");
       setMapStyle(btn.dataset.style);
       if (routeColorsAuto) applyRoutePreset(btn.dataset.style);
+      if (overlayColorsAuto) applyOverlayTheme();
     });
   });
 
@@ -3041,6 +3161,7 @@ document.addEventListener("DOMContentLoaded", () => {
   layoutPreview();
   setBg(bgMode); // Map by default: loads the basemap even before a route is dropped
   applyRoutePreset(currentMapStyle);
+  applyOverlayTheme();
 });
 </script>
 </body>
