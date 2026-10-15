@@ -200,6 +200,7 @@ select.text-input{padding-right:28px}
 #tl-scrub{flex:1}
 #tl-time{font:500 12.5px var(--mono);color:var(--lbl2);font-variant-numeric:tabular-nums;min-width:92px;text-align:right}
 .tl-meta{margin:0;font-size:12px;white-space:nowrap}
+.is-hidden{display:none!important}
 .vbg-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--lbl)}
 #checker-wrap{position:relative;box-shadow:var(--sh-lg);border-radius:3px;overflow:hidden;flex-shrink:0}
 #checker-bg{position:absolute;inset:0;z-index:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
@@ -441,9 +442,9 @@ body.mode-animated .static-only{display:none!important}
           <div class="ctitle">Animation</div>
           <div class="row">
             <label>Duration</label>
-            <input type="range" id="duration" min="1" max="12" step="0.5" value="4">
+            <input type="range" id="duration" min="1" max="60" step="0.5" value="4">
             <div class="num-wrap">
-              <input type="number" class="num-input" id="dur-num" min="1" max="12" step="0.5" value="4">
+              <input type="number" class="num-input" id="dur-num" min="1" max="60" step="0.5" value="4">
               <span class="num-unit">s</span>
             </div>
           </div>
@@ -460,7 +461,8 @@ body.mode-animated .static-only{display:none!important}
           <div class="ctitle">Camera</div>
           <div class="asp-row" id="camera-btns">
             <button class="asp-btn active" data-camera="overview">Overview<small>Whole route</small></button>
-            <button class="asp-btn" data-camera="follow">Follow<small>Chase the tip</small></button>
+            <button class="asp-btn" data-camera="follow">Follow<small>Tip centered</small></button>
+            <button class="asp-btn" data-camera="chase" title="3D follow: behind the rider, turning with the road">Chase<small>3D, behind</small></button>
           </div>
           <div class="card-sub collapsed" id="follow-opts" style="margin-top:9px">
             <div class="ctitle">Steadiness</div>
@@ -469,8 +471,8 @@ body.mode-animated .static-only{display:none!important}
               <button class="seg-btn active" data-steady="smooth">Smooth</button>
               <button class="seg-btn" data-steady="very">Very smooth</button>
             </div>
-            <div class="ctitle" style="margin-top:9px">Look ahead</div>
-            <div class="seg-row" id="look-btns" style="margin-top:5px">
+            <div class="ctitle" id="look-title">Look ahead</div>
+            <div class="seg-row" id="look-btns">
               <button class="seg-btn" data-look="none">Centered</button>
               <button class="seg-btn active" data-look="little">A little</button>
               <button class="seg-btn" data-look="more">More</button>
@@ -509,7 +511,8 @@ body.mode-animated .static-only{display:none!important}
               <span class="num-unit">°</span>
             </div>
           </div>
-          <div class="ctitle" style="margin-top:2px">Rotation while playing</div>
+          <div class="ctitle" id="rotate-title">Rotation while playing</div>
+          <div class="hint" id="chase-rotate-note" style="display:none">Chase always turns with the road. Use Rotate above to angle the view.</div>
           <div class="seg-row" id="rotate-btns">
             <button class="seg-btn active" data-rotate="off">Off</button>
             <button class="seg-btn" data-rotate="orbit">Orbit<small>Spin around</small></button>
@@ -924,7 +927,9 @@ let layerPts          = [];    // primary track for the map route layer
 let layerDists        = [];  // { d: [0..1], e: [m], min, max } for the primary track
 const STATIC_ORBIT_MS = 8000;
 const MAX_TILT        = 65; // steeper looks mostly at the horizon
-let cameraMode        = "overview"; // "overview" | "follow"
+let cameraMode        = "overview"; // "overview" | "follow" | "chase"
+// Follow and Chase both track the tip; Chase is the 3D one behind the rider.
+function followLike() { return cameraMode === "follow" || cameraMode === "chase"; }
 let trimmedPts        = [];
 let trimmedLatLonDists = [];
 let previewLatLonDists = [];
@@ -1076,8 +1081,8 @@ function trimPoints(pts, dists, startFrac, endFrac) {
 }
 function getTrimmedPoints() { return trimPoints(routePoints, latLonDists, trimStartFrac, trimEndFrac); }
 function lerpLatLon(a,b,t) {
-  const ele = (a.ele!=null && b.ele!=null) ? a.ele+(b.ele-a.ele)*t : (a.ele!=null?a.ele:b.ele);
-  return { lat:a.lat+(b.lat-a.lat)*t, lon:a.lon+(b.lon-a.lon)*t, ele };
+  const mix = k => (a[k]!=null && b[k]!=null) ? a[k]+(b[k]-a[k])*t : (a[k]!=null?a[k]:b[k]);
+  return { lat:a.lat+(b.lat-a.lat)*t, lon:a.lon+(b.lon-a.lon)*t, ele: mix("ele"), demEle: mix("demEle") };
 }
 function calcElevGainM(pts) {
   let gain=0, prev=null;
@@ -1302,7 +1307,8 @@ function commitUserCamera() {
   if (!fittedCenter) return;
   pitchDeg = Math.min(MAX_TILT, Math.round(map.getPitch()));
   rotationDeg = Math.round(((map.getBearing() - lastBearingOffset) % 360 + 360) % 360);
-  zoomLevel = Math.min(4, Math.max(0.2, Math.pow(2, map.getZoom() - fittedZoom)));
+  const baseZoom = cameraMode === "chase" ? chaseBaseZoom() : fittedZoom;
+  zoomLevel = Math.min(4, Math.max(0.2, Math.pow(2, map.getZoom() - baseZoom)));
   if (cameraMode === "overview") fittedCenter = map.getCenter();
   syncViewSliders();
 }
@@ -1444,6 +1450,7 @@ function disableRasterFades() {
 // ends up inside the mountains (blank or fog-only frames). Passing the ground
 // height ourselves, looked up at the whole tile zoom, avoids that.
 function jumpCamera(cam) {
+  if (!cam.padding) cam = { ...cam, padding: { top: 0, bottom: 0, left: 0, right: 0 } };
   if (!map.terrain) cam = { ...cam, elevation: 0 };
   else if (cam.elevation == null) {
     // No route altitude to go by: ground under the center, at a whole tile zoom.
@@ -1457,10 +1464,19 @@ function jumpCamera(cam) {
 // Taken from the route's own smoothed altitude so the camera glides instead
 // of bouncing over ridges. null = unknown (jumpCamera falls back to terrain).
 function exaggeration() { return terrainOn ? terrainHeight : 0; }
-function routeElevationAt(p) {
+// Prefers the terrain model's altitude along the route (exactly the ground
+// the route is drawn on, so the rider stays put on screen); falls back to the
+// file's altitude. w = smoothing window as a share of the route.
+function routeElevationAt(p, w = 0.04) {
+  const N = 8, clamp = q => Math.min(1, Math.max(0, q));
+  if (trimmedPts.length && trimmedPts[0].demEle != null) {
+    let sum = 0;
+    for (let k = -N; k <= N; k++) sum += routeLL(clamp(p + k/N*w)).demEle;
+    return sum / (2*N+1) * exaggeration();
+  }
   if (!elevProfile) return null;
-  const N = 8, w = 0.04; let sum = 0;
-  for (let k = -N; k <= N; k++) sum += profileEleAt(Math.min(1, Math.max(0, p + k/N*w)));
+  let sum = 0;
+  for (let k = -N; k <= N; k++) sum += profileEleAt(clamp(p + k/N*w));
   return sum / (2*N+1) * exaggeration();
 }
 function overviewElevation() {
@@ -1681,6 +1697,42 @@ function followMapCamera(progress, liveBearing, eased) {
     elevation: followElev != null && overElev != null ? lerp(followElev, overElev, eased) : undefined,
   };
 }
+// Chase ("3D follow"): behind and above the rider, turning with the road, the
+// rider in the lower third of the frame (via top padding). The distance is
+// fixed in meters (2 km at Zoom 1×), so it looks the same on a 5 km climb or
+// a 300 km tour. Center smoothing is in meters too.
+const CHASE_BASE_M = 2000;
+const CHASE_STEADY_M = { tight: 60, smooth: 200, very: 500 };
+const CHASE_LOWER = 0.36; // top padding share of the frame height → rider sits low
+function chaseZoom(lat, distM) {
+  const H = frameCss.h || map.getContainer().clientHeight;
+  const camToCenterPx = 0.5 * H / Math.tan(36.8699/2 * Math.PI/180); // MapLibre's default vertical FOV
+  return Math.log2(camToCenterPx * 40075016.686 * Math.cos(lat*Math.PI/180) / (512 * distM));
+}
+function chaseBaseZoom() { return chaseZoom(map.getCenter().lat, CHASE_BASE_M); }
+function chaseMapCamera(tl) {
+  const totalM = (trimmedLatLonDists[trimmedLatLonDists.length-1] || 1) * 1000;
+  const c = windowAvg(routeLL, tl.progress, CHASE_STEADY_M[steadiness] / totalM, "lon", "lat");
+  const near = {
+    center: [c.lon, c.lat],
+    zoom: chaseZoom(c.lat, CHASE_BASE_M / zoomLevel),
+    bearing: (mapHeadingAt(tl.progress) + rotationDeg) % 360,
+    pitch: pitchDeg,
+    elevation: routeElevationAt(tl.progress, 150 / totalM) ?? undefined,
+    padding: { top: CHASE_LOWER * frameCss.h, bottom: 0, left: 0, right: 0 },
+  };
+  const e = tl.reveal;
+  if (e <= 0 || !fittedCenter) return near;
+  const overElev = overviewElevation();
+  return {
+    center: [lerp(near.center[0], fittedCenter.lng, e), lerp(near.center[1], fittedCenter.lat, e)],
+    zoom: lerp(near.zoom, fittedZoom, e),
+    bearing: lerpAngle(near.bearing, tl.bearing, e),
+    pitch: pitchDeg,
+    elevation: near.elevation != null && overElev != null ? lerp(near.elevation, overElev, e) : undefined,
+    padding: { top: near.padding.top * (1 - e), bottom: 0, left: 0, right: 0 },
+  };
+}
 function overviewCamera(bearing) {
   if (!fittedCenter) return { bearing };
   return { center:[fittedCenter.lng, fittedCenter.lat], zoom: fittedZoom + Math.log2(zoomLevel), bearing, pitch: pitchDeg, elevation: overviewElevation() ?? undefined };
@@ -1701,6 +1753,7 @@ function introCamera(end, f) {
     bearing: lerpAngle(0, end.bearing, e),
     pitch: lerp(0, end.pitch, e*e),
     elevation: end.elevation != null ? end.elevation * e : undefined,
+    padding: { top: (end.padding ? end.padding.top : 0) * e, bottom: 0, left: 0, right: 0 },
   };
 }
 // Transparent mode equivalent of followMapCamera, in canvas pixels.
@@ -1710,7 +1763,7 @@ function followCanvasView(basePts, lld, tl, W, H) {
   const c = smooth(tl.progress + LOOK_AHEAD[lookAhead]);
   let rot = tl.bearing;
   // Canvas points are Mercator with north up, so the map heading applies directly.
-  if (headingUp) rot = rotationDeg - mapHeadingAt(tl.progress);
+  if (headingUp || cameraMode === "chase") rot = rotationDeg - mapHeadingAt(tl.progress);
   return {
     pivot: { x: lerp(c.x, W/2, tl.reveal), y: lerp(c.y, H/2, tl.reveal) },
     z: lerp(zoomLevel, 1, tl.reveal),
@@ -1742,10 +1795,12 @@ function timelineAt(elapsedMs) {
 // Whether the map camera changes over time (otherwise the person can frame
 // the shot freely and nothing overrides it).
 function cameraMoves(tl) {
-  return cameraMode === "follow" || autoRotate || tl.intro < 1;
+  return followLike() || autoRotate || tl.intro < 1;
 }
 function mapCameraFor(tl) {
-  const cam = cameraMode === "follow" ? followMapCamera(tl.progress, tl.bearing, tl.reveal) : overviewCamera(tl.bearing);
+  const cam = cameraMode === "chase" ? chaseMapCamera(tl)
+    : cameraMode === "follow" ? followMapCamera(tl.progress, tl.bearing, tl.reveal)
+    : overviewCamera(tl.bearing);
   return tl.intro < 1 ? introCamera(cam, tl.intro) : cam;
 }
 
@@ -1834,7 +1889,9 @@ function hasElevation(pts) {
   for (const p of pts) if (p.ele != null) { n++; if (p.ele < mn) mn = p.ele; if (p.ele > mx) mx = p.ele; }
   return n >= 2 && mx - mn >= 1;
 }
-async function fillElevationFromTerrain(pts) {
+// field: "ele" (fill a file that has no altitude) or "demEle" (the terrain
+// model's altitude, which is what the 3D map draws the route on).
+async function fillElevationFromTerrain(pts, field = "ele") {
   const step = Math.max(1, Math.ceil(pts.length / 1500));
   const idx = [];
   for (let i = 0; i < pts.length; i += step) idx.push(i);
@@ -1879,7 +1936,7 @@ async function fillElevationFromTerrain(pts) {
   for (let k = 0; k < idx.length-1; k++) {
     const a = idx[k], b = idx[k+1], ea = sampled[k], eb = sampled[k+1];
     if (ea == null || eb == null) continue;
-    for (let i = a; i <= b; i++) pts[i].ele = ea + (eb-ea) * (i-a) / ((b-a) || 1);
+    for (let i = a; i <= b; i++) pts[i][field] = ea + (eb-ea) * (i-a) / ((b-a) || 1);
   }
   return true;
 }
@@ -2168,7 +2225,7 @@ function startAnimation() {
 
     const lw = scaledLW(W);
     let getTrackDPts;
-    if (cameraMode === "follow") {
+    if (followLike()) {
       const { pivot, z, rot } = followCanvasView(previewPts, previewLatLonDists, tl, W, H);
       getTrackDPts = (track) => ({ pts: getFollowPts(track.previewPts, z, rot, pivot, W, H), dists: track.previewLatLonDists });
     } else {
@@ -2277,14 +2334,15 @@ function onRouteLoaded(pts, name) {
   showStatus(`${pts.length.toLocaleString()} points loaded · ${totalKm.toFixed(1)} km`);
   elevSource = hasElevation(pts) ? "file" : "none";
   updateProfileHint();
-  if (elevSource === "none") {
-    fillElevationFromTerrain(pts).then(ok => {
-      if (!ok || routePoints !== pts) return;
-      elevSource = "terrain";
-      rebuildFromRoute(); updateProfileHint();
-      showStatus("Elevation looked up from terrain data");
-    });
-  }
+  // Terrain altitude along the route, always: the camera aims at it (it's
+  // the ground the route is drawn on), and it fills files with no altitude.
+  fillElevationFromTerrain(pts, "demEle").then(ok => {
+    if (!ok || routePoints !== pts || elevSource !== "none") return;
+    pts.forEach(p => { p.ele = p.demEle; });
+    elevSource = "terrain";
+    rebuildFromRoute(); updateProfileHint();
+    showStatus("Elevation looked up from terrain data");
+  });
   $("hdr-hint").textContent = `${name} · ${totalKm.toFixed(1)} km`;
 }
 function parseRouteFile(file) {
@@ -2585,7 +2643,7 @@ async function composeFrame(ctx, W, H, tl, env) {
   if (env.bgFill) { ctx.fillStyle = env.bgFill; ctx.fillRect(0, 0, W, H); }
   else ctx.clearRect(0, 0, W, H);
   let tracks;
-  if (cameraMode === "follow") {
+  if (followLike()) {
     const { pivot, z, rot } = followCanvasView(env.flat[0].base, env.flat[0].lld, tl, W, H);
     tracks = env.flat.map(t => ({ t, pts: getFollowPts(t.base, z, rot, pivot, W, H), dists: t.lld }));
   } else {
@@ -2665,7 +2723,7 @@ async function exportMP4() {
     if (useMap) {
       setProgress("Preparing map…", 0);
       mapState = env.mapState = await beginMapExport(W, H);
-      if (cameraMode === "follow" || autoRotate || getIntroMs() > 0) {
+      if (followLike() || autoRotate || getIntroMs() > 0) {
         base = 15;
         await prewarmTiles(totalMs, f => setProgress("Loading map tiles along the route…", f*base));
       }
@@ -2953,7 +3011,20 @@ document.addEventListener("DOMContentLoaded", () => {
       cameraMode = btn.dataset.camera;
       animStartTs = null;
       if (cameraMode === "overview" && headingUp) document.querySelector('[data-rotate="off"]').click();
-      $("follow-opts").classList.toggle("collapsed", cameraMode!=="follow");
+      $("follow-opts").classList.toggle("collapsed", !followLike());
+      const chase = cameraMode === "chase";
+      // Chase: no look-ahead (the rider sits low in frame instead), always turns with the road
+      ["look-title", "look-btns"].forEach(id => $(id).classList.toggle("is-hidden", chase));
+      ["rotate-title", "rotate-btns", "rotate-speed-wrap"].forEach(id => $(id).classList.toggle("is-hidden", chase));
+      $("chase-rotate-note").style.display = chase ? "" : "none";
+      if (chase) {
+        if (autoRotate || headingUp) document.querySelector('[data-rotate="off"]').click();
+        if (pitchDeg < 50) { const t = $("tilt"); t.value = 60; t.dispatchEvent(new Event("input")); }
+        if (getDurMs() < 10000 && animMode === "animated") {
+          const d = $("duration"); d.value = 15; d.dispatchEvent(new Event("input"));
+          showStatus("Chase looks best on a longer clip: duration set to 15 s", 3500);
+        }
+      }
       if (cameraMode==="overview" && bgMode==="map" && map) { fitMapToRoute(); }
     });
   });
@@ -2989,7 +3060,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireSeg("rotate-btns", "rotate", v=>{
     autoRotate = v==="orbit"; headingUp = v==="heading";
     // Turning with the road only makes sense while chasing the tip.
-    if (headingUp && cameraMode !== "follow") document.querySelector('[data-camera="follow"]').click();
+    if (headingUp && cameraMode === "overview") document.querySelector('[data-camera="follow"]').click();
     $("rotate-speed-wrap").classList.toggle("collapsed", !autoRotate);
     animStartTs = null;
     if (bgMode==="map" && map) fitMapToRoute();
