@@ -450,11 +450,52 @@ body.mode-animated .static-only{display:none!important}
               <span class="toggle-knob"></span>
             </label>
           </div>
+          <div class="card-sub" id="area-intro-opts">
+          <div class="row">
+            <label>Area shot</label>
+            <input type="range" id="area-hold-s" min="0.5" max="6" step="0.1" value="1.6">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="area-hold-s-num" min="0.5" max="6" step="0.1" value="1.6">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Fly to start</label>
+            <input type="range" id="area-fly-s" min="1" max="8" step="0.1" value="2.8">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="area-fly-s-num" min="1" max="8" step="0.1" value="2.8">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          </div>
           <div class="ctitle">When</div>
           <div class="seg-row" id="area-when-btns">
             <button class="seg-btn active" data-areawhen="always">Whole video</button>
             <button class="seg-btn" data-areawhen="start">At the start</button>
             <button class="seg-btn" data-areawhen="end">At the end</button>
+          </div>
+          <div class="row" id="area-keep-row">
+            <label>Keep after start</label>
+            <input type="range" id="area-keep-s" min="0" max="15" step="0.5" value="2.5">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="area-keep-s-num" min="0" max="15" step="0.5" value="2.5">
+              <span class="num-unit">s</span>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Heartbeat pulse<small>The glow beats like a heart</small></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="area-beat" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="row" id="area-beat-row">
+            <label>Beat every</label>
+            <input type="range" id="area-beat-s" min="0.6" max="3" step="0.1" value="1.2">
+            <div class="num-wrap">
+              <input type="number" class="num-input" id="area-beat-s-num" min="0.6" max="3" step="0.1" value="1.2">
+              <span class="num-unit">s</span>
+            </div>
           </div>
           <div class="hint">Boundaries from OpenStreetMap. Works great with the globe intro.</div>
         </div>
@@ -1198,8 +1239,9 @@ function getProfileOn()       { return $("profile-on").checked; }
 function getGlobeIntroMs()    { return $("intro-on").checked && bgMode==="map" && animMode==="animated" ? 2500 : 0; }
 function areaIntroOn()        { return bgMode==="map" && animMode==="animated" && areas.length > 0 && $("area-intro").checked
                                   && (document.querySelector("#area-when-btns .active")?.dataset.areawhen || "always") !== "end"; }
-const AREA_HOLD_MS = 1600, AREA_FLY_MS = 2800;
-function getIntroMs()         { return getGlobeIntroMs() + (areaIntroOn() ? AREA_HOLD_MS + AREA_FLY_MS : 0); }
+function areaHoldMs()         { return parseFloat($("area-hold-s").value) * 1000; }
+function areaFlyMs()          { return parseFloat($("area-fly-s").value) * 1000; }
+function getIntroMs()         { return getGlobeIntroMs() + (areaIntroOn() ? areaHoldMs() + areaFlyMs() : 0); }
 function getLoopMs()          { return getIntroMs() + getRideMs() + getPauseMs(); }
 // Riding time plus the time spent stopped (at labels; later at day ends).
 function getRideMs()          { return getDurMs() + getStops().reduce((t, st) => t + st.ms, 0); }
@@ -1935,8 +1977,8 @@ function introCameraAt(end, t) {
   if (t < gMs) return introCamera(area, t / gMs);           // globe → area
   const ta = t - gMs;
   const held = { ...area, zoom: area.zoom + 0.08 };
-  if (ta < AREA_HOLD_MS) return { ...area, zoom: area.zoom + 0.08 * easeInOut(ta / AREA_HOLD_MS) }; // slow push-in on the area
-  return flyBetween(held, end, (ta - AREA_HOLD_MS) / AREA_FLY_MS);                                    // area → start of the track
+  if (ta < areaHoldMs()) return { ...area, zoom: area.zoom + 0.08 * easeInOut(ta / areaHoldMs()) }; // slow push-in on the area
+  return flyBetween(held, end, (ta - areaHoldMs()) / areaFlyMs());                                    // area → start of the track
 }
 // Zoom-in flight that moves steadily on screen: the center travels a lot
 // while zoomed out and hardly at all near the end, so the landing is calm.
@@ -3139,9 +3181,17 @@ function areaAlpha(tl) {
   const when = document.querySelector("#area-when-btns .active")?.dataset.areawhen || "always";
   if (animMode !== "animated" || when === "always") return 1;
   const clamp = x => Math.min(1, Math.max(0, x));
-  if (when === "start") return 1 - clamp((tl.elapsed - getIntroMs() - 2500) / 1200);
+  if (when === "start") return 1 - clamp((tl.elapsed - getIntroMs() - parseFloat($("area-keep-s").value) * 1000) / 1200);
   // "At the end": fades in with the pull-back after the ride (or just appears with no pause)
   return tl.progress >= 1 ? (getPauseMs() > 0 ? clamp(tl.reveal * 1.5) : 1) : 0;
+}
+// Heartbeat: 0..1, a strong pulse then a softer one ("lub-dub"), then rest.
+function areaBeat(tl) {
+  if (!$("area-beat").checked) return 0;
+  const period = parseFloat($("area-beat-s").value) * 1000;
+  const ph = (((tl.elapsed || 0) % period) + period) % period / period;
+  const g = (c, w) => Math.exp(-Math.pow((ph - c) / w, 2));
+  return Math.min(1, g(0.08, 0.06) + 0.6 * g(0.3, 0.07));
 }
 // Map paint follows the settings and the timeline (only touched on change).
 function updateAreaStyle(tl) {
@@ -3151,13 +3201,16 @@ function updateAreaStyle(tl) {
   // The fill reads as a region from afar; once the camera is well inside the
   // area (3+ zoom levels closer than the area view) only the outline remains.
   const near = areas.length ? Math.min(1, Math.max(0, (map.getZoom() - areaCamera().zoom - 2.5) / 1.5)) : 0;
-  const key = [a.toFixed(3), color, fill, glow, near.toFixed(2)].join("|");
+  const beat = areaBeat(tl);
+  const key = [a.toFixed(3), color, fill, glow, near.toFixed(2), beat.toFixed(3)].join("|");
   if (key === lastAreaKey) return;
   lastAreaKey = key;
   ["area-fill", "area-glow", "area-line"].forEach(id => map.setPaintProperty(id, id === "area-fill" ? "fill-color" : "line-color", color));
-  map.setPaintProperty("area-fill", "fill-opacity", fill * a * (1 - near));
-  map.setPaintProperty("area-glow", "line-opacity", glow * 0.85 * a);
+  map.setPaintProperty("area-fill", "fill-opacity", Math.min(1, fill * a * (1 - near) * (1 + 0.6 * beat)));
+  map.setPaintProperty("area-glow", "line-opacity", Math.min(1, glow * a * (0.6 + 0.4 * beat)));
+  map.setPaintProperty("area-glow", "line-width", 16 * (1 + 0.5 * beat));
   map.setPaintProperty("area-line", "line-opacity", 0.95 * a);
+  map.setPaintProperty("area-line", "line-width", 2.2 * (1 + 0.45 * beat));
 }
 // Area names on the canvas, big and lying on the ground like a title label.
 function drawAreaNames(ctx, W, H, tl, project) {
@@ -3176,7 +3229,7 @@ function drawAreaNames(ctx, W, H, tl, project) {
     ctx.scale(1, 1 - 0.42 * Math.sin(pitch * Math.PI/180));
     ctx.font = `800 ${Math.round(70*s)}px ${fam}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
     if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(6*s)}px`;
-    ctx.shadowColor = glow; ctx.shadowBlur = 26*s;
+    ctx.shadowColor = glow; ctx.shadowBlur = 26*s * (1 + 0.8 * areaBeat(tl));
     ctx.fillStyle = ink; ctx.fillText(ar.label.toUpperCase(), 0, 0);
     ctx.restore();
   });
@@ -3878,7 +3931,19 @@ document.addEventListener("DOMContentLoaded", () => {
   $("area-add").addEventListener("click", doAddArea);
   $("area-q").addEventListener("keydown", e => { if (e.key === "Enter") doAddArea(); });
   wireSeg("area-when-btns", "areawhen", () => { animStartTs = null; updateExportMeta(); });
-  $("area-intro").addEventListener("change", () => { animStartTs = null; updateExportMeta(); });
+  const areaRows = () => {
+    const when = document.querySelector("#area-when-btns .active")?.dataset.areawhen || "always";
+    $("area-intro-opts").classList.toggle("collapsed", !$("area-intro").checked || when === "end");
+    $("area-keep-row").classList.toggle("is-hidden", when !== "start");
+    $("area-beat-row").classList.toggle("is-hidden", !$("area-beat").checked);
+  };
+  $("area-intro").addEventListener("change", () => { animStartTs = null; updateExportMeta(); areaRows(); });
+  $("area-beat").addEventListener("change", areaRows);
+  document.querySelectorAll("#area-when-btns .seg-btn").forEach(b => b.addEventListener("click", areaRows));
+  ["area-hold-s", "area-fly-s"].forEach(id => wireSlider(id, id + "-num", () => { animStartTs = null; updateExportMeta(); }));
+  wireSlider("area-keep-s", "area-keep-s-num", () => {});
+  wireSlider("area-beat-s", "area-beat-s-num", () => {});
+  areaRows();
   wireSlider("area-fill", "area-fill-num", ()=>{});
   wireSlider("area-glow", "area-glow-num", ()=>{});
 
