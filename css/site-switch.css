@@ -1,0 +1,15 @@
+/* Journal | Moto switcher next to the logo, on every page with the main nav.
+   A small light pill with its own backdrop, so it reads the same over a
+   photo hero, a light page or a dark one. */
+.site-brand{display:flex;align-items:center;gap:14px;min-width:0}
+.site-switch{display:inline-flex;align-items:center;flex:none;padding:3px;border-radius:999px;background:rgba(255,255,255,.9);box-shadow:0 0 0 1px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.10);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.site-switch a{font:600 10.5px/1 -apple-system,BlinkMacSystemFont,"Inter","Helvetica Neue",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#3a3a3c;text-decoration:none;padding:6px 11px;border-radius:999px;transition:background .2s,color .2s}
+.site-switch a:hover{color:#000;background:rgba(0,0,0,.06)}
+.site-switch a[aria-current="page"]{background:#1c1c1e;color:#fff}
+.site-switch a.is-moto[aria-current="page"]{background:#d64230}
+/* The other section, at the bottom of the mobile menu */
+.mobile-menu a.mobile-switch,.nav-drawer a.mobile-switch{margin-top:1.2rem;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;opacity:.65}
+@media (max-width:480px){
+  .site-brand{gap:8px}
+  .site-switch a{padding:5px 8px;font-size:9.5px;letter-spacing:.08em}
+}

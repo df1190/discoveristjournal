@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KTM Adventure Rally — MOTO×TRAVEL</title>
+  <title>KTM Adventure Rally | Discoverist Moto</title>
   <meta name="description" content="KTM Adventure rally trips across Europe — Bosnia, France, Norway, Romania, Italy. On-board video, photography and route notes.">
   <link rel="canonical" href="https://discoveristjournal.com/moto/ktm-rally"/>
   <meta property="og:site_name" content="The Discoverist Journal">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="KTM Adventure Rally — MOTO×TRAVEL">
+  <meta property="og:title" content="KTM Adventure Rally | Discoverist Moto">
   <meta property="og:description" content="KTM Adventure rally trips across Europe — Bosnia, France, Norway, Romania, Italy. On-board video, photography and route notes.">
   <meta property="og:url" content="https://discoveristjournal.com/moto/ktm-rally">
   <meta property="og:image" content="https://discoveristjournal.com/Media/Moto/ktm-adventure-alpine-summit-valley-panorama.jpg">
@@ -279,6 +279,7 @@
   gtag('js', new Date());
   gtag('config', 'G-KQMYMPEGLT');
 </script>
+  <link rel="stylesheet" href="/css/site-switch.css?v=1">
 </head>
 <body>
 
@@ -288,22 +289,21 @@
 <!-- NAV -->
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-close" onclick="closeMobile()">✕</button>
-  <a href="/" onclick="closeMobile()">Home</a>
-  <a href="/hotels" onclick="closeMobile()">Hotels</a>
-  <a href="/journeys" onclick="closeMobile()">Journeys</a>
-  <a href="/moto" onclick="closeMobile()">Moto</a>
-  <a href="/blog/" onclick="closeMobile()">Journal</a>
-  <a href="/about" onclick="closeMobile()">About</a>
+  <a href="/moto/" onclick="closeMobile()">Moto Home</a>
+  <a href="/moto/alpine-passes" onclick="closeMobile()">Routes &amp; Passes</a>
+  <a href="/moto/ktm-rally" onclick="closeMobile()">KTM Rallies</a>
+  <a href="/moto/tools" onclick="closeMobile()">Tools</a>
+  <a href="/moto/about" onclick="closeMobile()">About</a>
+  <a href="/" class="mobile-switch" onclick="closeMobile()">The Discoverist Journal &rarr;</a>
 </div>
 
 <nav id="mainNav">
-  <a href="/" class="nav-logo">The Discoverist</a>
+  <div class="site-brand"><a href="/moto/" class="nav-logo">The Discoverist</a><div class="site-switch" aria-label="Sections"><a href="/">Journal</a><a href="/moto/" class="is-moto" aria-current="page">Moto</a></div></div>
   <ul class="nav-links">
-    <li><a href="/hotels">Hotel Reviews</a></li>
-    <li><a href="/journeys">Trips &amp; Journeys</a></li>
-    <li><a href="/moto" class="active">Moto</a></li>
-    <li><a href="/blog/">Journal</a></li>
-    <li><a href="/about">About</a></li>
+    <li><a href="/moto/alpine-passes">Routes &amp; Passes</a></li>
+    <li><a href="/moto/ktm-rally" class="active">KTM Rallies</a></li>
+    <li><a href="/moto/tools">Tools</a></li>
+    <li><a href="/moto/about">About</a></li>
   </ul>
   <a href="/#newsletter" class="nav-cta">Subscribe</a>
   <div class="nav-burger" onclick="openMobile()"><span></span><span></span><span></span></div>
