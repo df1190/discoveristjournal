@@ -17,6 +17,7 @@
 .site-brand .brand-parent{font-size:1.1rem;opacity:.6}
 .site-brand .brand-sep{opacity:.3;font-size:1.1rem;margin:0 -4px}
 .site-brand .brand-moto span{color:#d64230}
-@media (max-width:600px){
+@media (max-width:1200px){
   .site-brand .brand-parent,.site-brand .brand-sep{display:none}
 }
+.site-brand ~ .nav-links a{white-space:nowrap}

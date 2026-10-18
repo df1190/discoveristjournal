@@ -464,80 +464,83 @@
   }
 
   /* ── VIDEO SECTION ── */
+  /* A featured player with a playlist beside it (below it on phones). */
   .video-section {
     background: var(--sand);
     padding: 7rem 3rem;
   }
   .video-section-header {
     display: flex; justify-content: space-between; align-items: flex-end;
-    margin-bottom: 3.5rem;
+    margin-bottom: 2rem;
   }
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+  .vg-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.6rem; }
+  .vg-chip {
+    font: 500 0.72rem/1 'DM Sans', sans-serif; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 0.6rem 1rem; border-radius: 100px; cursor: pointer;
+    border: 1px solid rgba(26,26,24,0.18); background: transparent; color: var(--charcoal);
+    transition: background 0.25s, color 0.25s, border-color 0.25s;
   }
-  .video-card {
-    border-radius: 14px;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    opacity: 0;
-    transform: translateY(50px) scale(0.96);
-    transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.3s;
+  .vg-chip:hover { border-color: var(--charcoal); }
+  .vg-chip.active { background: var(--charcoal); border-color: var(--charcoal); color: var(--cream); }
+  .vg {
+    display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+    gap: 1.6rem; align-items: start;
   }
-  .video-card.visible { opacity: 1; transform: translateY(0) scale(1); }
-  /* Row 1: 3-wide hero + 1-wide */
-  .video-card:nth-child(1) { grid-column: span 3; }
-  .video-card:nth-child(2) { grid-column: span 1; }
-  /* Row 2: 1-wide + 1-wide + 2-wide */
-  .video-card:nth-child(3) { grid-column: span 1; }
-  .video-card:nth-child(4) { grid-column: span 1; }
-  .video-card:nth-child(5) { grid-column: span 2; }
-  /* Row 3: full width */
-  .video-card:nth-child(6) { grid-column: span 4; }
-  .video-thumb {
-    width: 100%; aspect-ratio: 16/9;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  .vg-feature { min-width: 0; }
+  .vg-player {
+    position: relative; aspect-ratio: 16/9; border-radius: 14px; overflow: hidden;
+    background: #111; cursor: pointer; box-shadow: 0 18px 40px rgba(26,26,24,0.18);
   }
-  .video-card:hover .video-thumb { transform: scale(1.04); }
-  .video-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+  .vg-player img, .vg-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; display: block; }
+  .vg-player img { transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .vg-player:hover img { transform: scale(1.03); }
+  .vg-player::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 45%);
+  }
+  .vg-player.playing::after { display: none; }
+  .vg-play {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 1;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.6);
     display: flex; align-items: center; justify-content: center;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s;
   }
-  .play-btn {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255,255,255,0.5);
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.3s, transform 0.3s;
+  .vg-player:hover .vg-play { background: var(--moto-red); border-color: var(--moto-red); transform: translate(-50%,-50%) scale(1.08); }
+  .vg-play svg { fill: #fff; margin-left: 4px; }
+  .vg-player.playing .vg-play { display: none; }
+  .vg-caption { padding: 1.1rem 0.2rem 0; }
+  .vg-tag { font-size: 0.66rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--moto-red); }
+  .vg-caption h3 {
+    font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    letter-spacing: 0.04em; line-height: 1.05; color: var(--charcoal); margin-top: 0.35rem;
   }
-  .video-card:hover .play-btn {
-    background: var(--moto-red);
-    border-color: var(--moto-red);
-    transform: scale(1.1);
+  .vg-caption p { font-size: 0.88rem; color: rgba(26,26,24,0.62); margin-top: 0.35rem; }
+  .vg-list {
+    display: flex; flex-direction: column; gap: 0.35rem;
   }
-  .play-btn svg { fill: #fff; margin-left: 4px; }
-  .video-meta {
-    position: absolute; bottom: 1.2rem; left: 1.4rem; right: 1.4rem;
-    color: #fff;
+  .vg-item {
+    display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: 0.9rem; align-items: center;
+    padding: 0.55rem; border-radius: 12px; border: 0; background: transparent; text-align: left;
+    font: inherit; color: inherit; cursor: pointer; position: relative;
+    transition: background 0.25s;
   }
-  .video-meta h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.06em; }
-  .video-meta span { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
-  .video-duration {
-    position: absolute; top: 1rem; right: 1rem;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(6px);
-    color: #fff;
-    font-size: 0.7rem;
-    padding: 0.25rem 0.6rem;
-    border-radius: 6px;
-    font-variant-numeric: tabular-nums;
+  .vg-item:hover { background: rgba(255,255,255,0.45); }
+  .vg-item.active { background: rgba(255,255,255,0.75); box-shadow: inset 3px 0 0 var(--moto-red); }
+  .vg-item[hidden] { display: none; }
+  .vg-thumb { position: relative; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: #222; }
+  .vg-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vg-thumb::after {
+    content: ""; position: absolute; right: 6px; bottom: 6px; width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(0,0,0,0.55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='9,7 18,12 9,17' fill='white'/%3E%3C/svg%3E") center/16px no-repeat;
+  }
+  .vg-item.active .vg-thumb::after { background-color: var(--moto-red); }
+  .vg-item-text { min-width: 0; }
+  .vg-item-text .vg-tag { font-size: 0.6rem; letter-spacing: 0.16em; }
+  .vg-item-text b {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font-weight: 500; font-size: 0.92rem; line-height: 1.3; color: var(--charcoal); margin-top: 0.2rem;
   }
 
   /* ── MASONRY MOTO SECTION ── */
@@ -816,14 +819,20 @@
     .gallery-scroll-col { padding-bottom: 3rem; }
     .sticky-section-header { margin-bottom: 2rem; }
 
-    /* Video grid — single column */
+    /* Videos: player on top, playlist as a swipeable row */
     .video-section { padding: 4rem 1.4rem; }
-    .video-section-header { flex-direction: column; align-items: flex-start; gap: 1.2rem; margin-bottom: 2rem; }
-    .video-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-    .video-card:nth-child(1) { grid-column: span 2; }
-    .video-card:nth-child(2), .video-card:nth-child(3), .video-card:nth-child(4) { grid-column: span 1; }
-    .video-card:nth-child(5) { grid-column: span 2; }
-    .video-card:nth-child(6) { grid-column: span 2; }
+    .video-section-header { flex-direction: column; align-items: flex-start; gap: 1.2rem; margin-bottom: 1.6rem; }
+    .vg-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -1.4rem 1.2rem; padding: 0 1.4rem; }
+    .vg-filters::-webkit-scrollbar { display: none; }
+    .vg-chip { flex: none; }
+    .vg { grid-template-columns: 1fr; gap: 1.2rem; }
+    .vg-play { width: 58px; height: 58px; }
+    .vg-list {
+      flex-direction: row; max-height: none; overflow-x: auto; overflow-y: hidden; gap: 0.8rem;
+      margin: 0 -1.4rem; padding: 0.2rem 1.4rem 0.6rem; scroll-snap-type: x mandatory; scrollbar-width: none;
+    }
+    .vg-list::-webkit-scrollbar { display: none; }
+    .vg-item { grid-template-columns: 1fr; width: 64vw; max-width: 260px; flex: none; scroll-snap-align: start; padding: 0.45rem; gap: 0.55rem; align-items: start; }
 
     /* Masonry — 1 column */
     .moto-section { padding: 4rem 1.4rem; }
@@ -855,7 +864,6 @@
   @media (max-width: 480px) {
     .hero-title { font-size: clamp(3.2rem, 20vw, 5.5rem); }
     .about-ktm svg { width: 130px; }
-    .play-btn { width: 52px; height: 52px; }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
@@ -865,13 +873,8 @@
     .video-section { padding: 5rem 2rem; }
     .moto-section { padding: 5rem 2rem; }
     .masonry-grid { columns: 2; }
-    .video-grid { grid-template-columns: repeat(4, 1fr); }
-    .video-card:nth-child(1) { grid-column: span 2; }
-    .video-card:nth-child(2) { grid-column: span 2; }
-    .video-card:nth-child(3) { grid-column: span 1; }
-    .video-card:nth-child(4) { grid-column: span 1; }
-    .video-card:nth-child(5) { grid-column: span 2; }
-    .video-card:nth-child(6) { grid-column: span 4; }
+    .vg { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1.2rem; }
+    .vg-item { grid-template-columns: 120px minmax(0, 1fr); }
     .routes-banner { padding: 5rem 2rem; gap: 3rem; }
     footer { padding: 4rem 2rem 2.5rem; }
   }
@@ -905,7 +908,7 @@
   gtag('js', new Date());
   gtag('config', 'G-KQMYMPEGLT');
 </script>
-  <link rel="stylesheet" href="/css/site-switch.css?v=2">
+  <link rel="stylesheet" href="/css/site-switch.css?v=3">
 </head>
 <body>
 
@@ -1091,42 +1094,49 @@
     </div>
     <a href="https://www.youtube.com/@df1190?sub_confirmation=1" target="_blank" rel="noopener" class="btn-outline">All Videos</a>
   </div>
-  <div class="video-grid">
-    <div class="video-card" data-video="ps5gb7RLPuI">
-      <img class="video-thumb" src="https://img.youtube.com/vi/ps5gb7RLPuI/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/ps5gb7RLPuI/mqdefault.jpg'" alt="Video" />
-      <div class="video-overlay">
-        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+  <div class="vg-filters" role="toolbar" aria-label="Filter videos">
+    <button class="vg-chip active" type="button" data-filter="all">All</button>
+    <button class="vg-chip" type="button" data-filter="rally">Rallies</button>
+    <button class="vg-chip" type="button" data-filter="offroad">Off-road</button>
+    <button class="vg-chip" type="button" data-filter="bikes">Bikes</button>
+  </div>
+  <div class="vg">
+    <div class="vg-feature">
+      <div class="vg-player" id="vgPlayer" role="button" tabindex="0" aria-label="Play video" data-video="ps5gb7RLPuI">
+        <img id="vgPoster" src="https://img.youtube.com/vi/ps5gb7RLPuI/maxresdefault.jpg" alt="KTM Adventure Rally Norway" width="1280" height="720">
+        <span class="vg-play"><svg width="24" height="24" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></span>
+      </div>
+      <div class="vg-caption">
+        <span class="vg-tag" id="vgTag">Rally · Norway 2023</span>
+        <h3 id="vgTitle">KTM Adventure Rally Norway</h3>
+        <p id="vgLine">My week at the rally around Lillehammer</p>
       </div>
     </div>
-    <div class="video-card" data-video="x2KLwC7-3G4">
-      <img class="video-thumb" src="https://img.youtube.com/vi/x2KLwC7-3G4/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/x2KLwC7-3G4/mqdefault.jpg'" alt="Video" />
-      <div class="video-overlay">
-        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
-      </div>
-    </div>
-    <div class="video-card" data-video="E0-0tRUSUC8">
-      <img class="video-thumb" src="https://img.youtube.com/vi/E0-0tRUSUC8/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/E0-0tRUSUC8/mqdefault.jpg'" alt="Video" />
-      <div class="video-overlay">
-        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
-      </div>
-    </div>
-    <div class="video-card" data-video="dU4x7GdjvSU">
-      <img class="video-thumb" src="https://img.youtube.com/vi/dU4x7GdjvSU/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/dU4x7GdjvSU/mqdefault.jpg'" alt="Video" />
-      <div class="video-overlay">
-        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
-      </div>
-    </div>
-    <div class="video-card" data-video="tcBhYpxsRw8">
-      <img class="video-thumb" src="https://img.youtube.com/vi/tcBhYpxsRw8/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/tcBhYpxsRw8/mqdefault.jpg'" alt="Video" />
-      <div class="video-overlay">
-        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
-      </div>
-    </div>
-    <div class="video-card" data-video="zTuqDcds_pw">
-      <img class="video-thumb" src="https://img.youtube.com/vi/zTuqDcds_pw/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/zTuqDcds_pw/mqdefault.jpg'" alt="Video" />
-      <div class="video-overlay">
-        <div class="play-btn"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
-      </div>
+    <div class="vg-list" id="vgList">
+      <button class="vg-item active" type="button" data-video="ps5gb7RLPuI" data-cat="rally" data-tag="Rally · Norway 2023" data-title="KTM Adventure Rally Norway" data-line="My week at the rally around Lillehammer">
+        <span class="vg-thumb"><img src="https://img.youtube.com/vi/ps5gb7RLPuI/mqdefault.jpg" alt="" loading="lazy" width="320" height="180"></span>
+        <span class="vg-item-text"><span class="vg-tag">Rally · Norway 2023</span><b>KTM Adventure Rally Norway</b></span>
+      </button>
+      <button class="vg-item" type="button" data-video="zTuqDcds_pw" data-cat="rally offroad" data-tag="Rally · France 2022" data-title="Off-road section, Quillan" data-line="1290 Super Adventure R and 890R in the Pyrenees, 4K">
+        <span class="vg-thumb"><img src="https://img.youtube.com/vi/zTuqDcds_pw/mqdefault.jpg" alt="" loading="lazy" width="320" height="180"></span>
+        <span class="vg-item-text"><span class="vg-tag">Rally · France 2022</span><b>Off-road section, Quillan</b></span>
+      </button>
+      <button class="vg-item" type="button" data-video="x2KLwC7-3G4" data-cat="rally" data-tag="Rally · France 2022" data-title="Day 1 on board" data-line="Highlights on the 1290 Super Adventure R">
+        <span class="vg-thumb"><img src="https://img.youtube.com/vi/x2KLwC7-3G4/mqdefault.jpg" alt="" loading="lazy" width="320" height="180"></span>
+        <span class="vg-item-text"><span class="vg-tag">Rally · France 2022</span><b>Day 1 on board</b></span>
+      </button>
+      <button class="vg-item" type="button" data-video="tcBhYpxsRw8" data-cat="offroad" data-tag="Off-road" data-title="1290 Super Adventure R on an MX track" data-line="GoPro POV, 4K">
+        <span class="vg-thumb"><img src="https://img.youtube.com/vi/tcBhYpxsRw8/mqdefault.jpg" alt="" loading="lazy" width="320" height="180"></span>
+        <span class="vg-item-text"><span class="vg-tag">Off-road</span><b>1290 Super Adventure R on an MX track</b></span>
+      </button>
+      <button class="vg-item" type="button" data-video="E0-0tRUSUC8" data-cat="offroad" data-tag="Off-road · Snow" data-title="Honda CRF450R snowbike, raw" data-line="Riding a snowbike, no music">
+        <span class="vg-thumb"><img src="https://img.youtube.com/vi/E0-0tRUSUC8/mqdefault.jpg" alt="" loading="lazy" width="320" height="180"></span>
+        <span class="vg-item-text"><span class="vg-tag">Off-road · Snow</span><b>Honda CRF450R snowbike, raw</b></span>
+      </button>
+      <button class="vg-item" type="button" data-video="dU4x7GdjvSU" data-cat="bikes" data-tag="Bikes" data-title="KTM 1390 Super Adventure R" data-line="Walkaround and sound">
+        <span class="vg-thumb"><img src="https://img.youtube.com/vi/dU4x7GdjvSU/mqdefault.jpg" alt="" loading="lazy" width="320" height="180"></span>
+        <span class="vg-item-text"><span class="vg-tag">Bikes</span><b>KTM 1390 Super Adventure R</b></span>
+      </button>
     </div>
   </div>
 </section>
@@ -1282,11 +1292,6 @@
   <img id="lightboxImg" src="" alt="" />
 </div>
 
-<!-- VIDEO LIGHTBOX -->
-<div class="lightbox video-lightbox" id="videoLightbox">
-  <button class="lightbox-close" id="videoLightboxClose">✕</button>
-  <iframe id="videoFrame" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width:90vw;max-width:1100px;aspect-ratio:16/9;border-radius:10px;"></iframe>
-</div>
 
 <script>
 // ── Hamburger menu
@@ -1315,7 +1320,7 @@ document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; dot.st
   ring.style.left=rx+'px'; ring.style.top=ry+'px';
   requestAnimationFrame(animRing);
 })();
-document.querySelectorAll('a,button,.gallery-card,.masonry-item,.video-card').forEach(el => {
+document.querySelectorAll('a,button,.gallery-card,.masonry-item,.vg-player').forEach(el => {
   el.addEventListener('mouseenter', () => { ring.style.width='56px'; ring.style.height='56px'; });
   el.addEventListener('mouseleave', () => { ring.style.width='36px'; ring.style.height='36px'; });
 });
@@ -1354,7 +1359,7 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.15 });
 
-document.querySelectorAll('.gallery-card, .video-card, .masonry-item').forEach((el, i) => {
+document.querySelectorAll('.gallery-card, .masonry-item').forEach((el, i) => {
   el.dataset.delay = i % 4;
   observer.observe(el);
 });
@@ -1400,18 +1405,48 @@ document.querySelectorAll('.gallery-card[data-img], .masonry-item[data-img]').fo
 document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
 lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
 
-// ── Video lightbox
-const videoLightbox = document.getElementById('videoLightbox');
-const videoFrame = document.getElementById('videoFrame');
-document.querySelectorAll('.video-card[data-video]').forEach(el => {
-  el.addEventListener('click', () => {
-    videoFrame.src = `https://www.youtube.com/embed/${el.dataset.video}?autoplay=1&rel=0`;
-    videoLightbox.classList.add('open');
-  });
-});
-document.getElementById('videoLightboxClose').addEventListener('click', () => { videoLightbox.classList.remove('open'); videoFrame.src = ''; });
-videoLightbox.addEventListener('click', e => { if (e.target === videoLightbox) { videoLightbox.classList.remove('open'); videoFrame.src = ''; } });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { lightbox.classList.remove('open'); videoLightbox.classList.remove('open'); videoFrame.src = ''; } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
+
+// ── Video gallery: featured player + playlist + filters
+const vgPlayer = document.getElementById('vgPlayer');
+const vgItems = [...document.querySelectorAll('.vg-item')];
+function vgPlay() {
+  if (vgPlayer.classList.contains('playing')) return;
+  vgPlayer.classList.add('playing');
+  const f = document.createElement('iframe');
+  f.src = `https://www.youtube-nocookie.com/embed/${vgPlayer.dataset.video}?autoplay=1&rel=0&modestbranding=1`;
+  f.title = document.getElementById('vgTitle').textContent;
+  f.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
+  f.allowFullscreen = true;
+  vgPlayer.appendChild(f);
+}
+function vgShow(item, play) {
+  vgItems.forEach(i => i.classList.toggle('active', i === item));
+  vgPlayer.querySelector('iframe')?.remove();
+  vgPlayer.classList.remove('playing');
+  vgPlayer.dataset.video = item.dataset.video;
+  const poster = document.getElementById('vgPoster');
+  poster.src = `https://img.youtube.com/vi/${item.dataset.video}/maxresdefault.jpg`;
+  poster.alt = item.dataset.title;
+  document.getElementById('vgTag').textContent = item.dataset.tag;
+  document.getElementById('vgTitle').textContent = item.dataset.title;
+  document.getElementById('vgLine').textContent = item.dataset.line;
+  if (!play) return;
+  vgPlay();
+  // On phones the player sits above the row: bring it into view
+  const r = vgPlayer.getBoundingClientRect();
+  if (r.top < 0 || r.bottom > innerHeight) vgPlayer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+vgPlayer.addEventListener('click', vgPlay);
+vgPlayer.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); vgPlay(); } });
+vgItems.forEach(item => item.addEventListener('click', () => vgShow(item, true)));
+document.querySelectorAll('.vg-chip').forEach(chip => chip.addEventListener('click', () => {
+  document.querySelectorAll('.vg-chip').forEach(c => c.classList.toggle('active', c === chip));
+  const f = chip.dataset.filter;
+  vgItems.forEach(i => { i.hidden = f !== 'all' && !i.dataset.cat.split(' ').includes(f); });
+  const firstShown = vgItems.find(i => !i.hidden);
+  if (firstShown && !firstShown.classList.contains('active')) vgShow(firstShown, false);
+}));
 </script>
 </body>
 </html>
