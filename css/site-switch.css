@@ -13,3 +13,10 @@
   .site-brand{gap:8px}
   .site-switch a{padding:5px 8px;font-size:9.5px;letter-spacing:.08em}
 }
+/* Moto pages: "The Discoverist — MOTO×TRAVEL", with the red cross */
+.site-brand .brand-parent{font-size:1.1rem;opacity:.6}
+.site-brand .brand-sep{opacity:.3;font-size:1.1rem;margin:0 -4px}
+.site-brand .brand-moto span{color:#d64230}
+@media (max-width:600px){
+  .site-brand .brand-parent,.site-brand .brand-sep{display:none}
+}
