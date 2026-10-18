@@ -12,9 +12,11 @@ Redirect 301 /moto/moto-ktm-romania /moto/ktm-romania
 Redirect 301 /moto/moto-ktm-italy /moto/ktm-italy
 Redirect 301 /moto/moto-alpine-passes /moto/alpine-passes
 Redirect 301 /moto/moto-tools /moto/tools
-# Route video tool was /tools/strava-overlay (Strava is a trademark)
-Redirect 301 /tools/strava-overlay.html /tools/route-video
-Redirect 301 /tools/strava-overlay /tools/route-video
+# Route video tool was /tools/strava-overlay (Strava is a trademark).
+# /route-video is the short address printed in the videos' corner credit.
+# RewriteRules (not Redirect) so they run before the .html rule below.
+RewriteRule ^tools/strava-overlay(\.html)?$ /tools/route-video [R=301,L]
+RewriteRule ^route-video/?$ /tools/route-video [R=301,L]
 
 # Legacy URL previously linked from the homepage (may still be indexed)
 Redirect 301 /weekend-in-the-middle-of-italian-alps /blog/lana-italy/
@@ -38,6 +40,7 @@ RewriteRule ^ /%1 [NC,L,R=301]
 # Default charset + MIME types
 AddDefaultCharset UTF-8
 AddType text/html .html
+AddType application/gpx+xml .gpx
 
 # Cache static assets
 <IfModule mod_expires.c>

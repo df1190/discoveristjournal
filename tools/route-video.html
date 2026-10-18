@@ -297,7 +297,9 @@ select.text-input{padding-right:28px}
 /* Greys out the stage outside the export frame */
 #frame-mask{position:absolute;z-index:3;pointer-events:none;box-shadow:0 0 0 9999px rgba(18,20,26,.52);outline:1.5px solid rgba(255,255,255,.85)}
 #frame-mask[hidden]{display:none}
-#credits{position:absolute;z-index:4;bottom:6px;right:8px;max-width:calc(100% - 16px);font-size:10px;line-height:1.35;color:rgba(28,28,30,.75);background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:2px 7px;border-radius:6px;text-align:right}
+#credits{position:absolute;z-index:4;bottom:5px;right:8px;max-width:calc(100% - 16px);font-size:9px;line-height:1.35;color:rgba(255,255,255,.75);text-shadow:0 0 3px rgba(0,0,0,.55);text-align:right}
+/* With a route loaded the preview canvas draws the same credit line as the video */
+body.has-route #credits{display:none}
 #credits a{color:inherit;text-decoration:none}
 #credits a:hover{text-decoration:underline}
 /* In Map mode the map underneath takes the mouse, so the shot can be framed by dragging */
@@ -341,6 +343,36 @@ body.mode-animated .static-only{display:none!important}
 #prog-eta{font-size:11px;color:var(--lbl4);font-family:var(--mono);font-variant-numeric:tabular-nums;min-height:14px}
 #prog-cancel{align-self:center;padding:7px 18px}
 .export-main{font-weight:600}
+/* Sample ride + preset looks */
+.link-btn{background:none;border:none;padding:0;font:inherit;font-size:12.5px;font-weight:600;color:#7A5F17;cursor:pointer;text-align:center}
+#done-share[hidden]{display:none}
+.link-btn:hover{text-decoration:underline}
+#empty-state .btn{pointer-events:auto;margin-top:2px}
+#empty-state small{font-size:11.5px;color:var(--lbl3)}
+.look-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.look-card{display:flex;flex-direction:column;gap:0;padding:0;border:1.5px solid transparent;border-radius:11px;background:var(--fill);overflow:hidden;cursor:pointer;text-align:left;font-family:var(--font);transition:all var(--t) var(--ease)}
+.look-card:hover{border-color:var(--fill2)}
+.look-card.active{border-color:var(--gold)}
+.look-card:active{transform:scale(.97)}
+.look-card img{display:block;width:100%;aspect-ratio:4/5;height:auto;object-fit:cover;background:#dfe3e8}
+.look-card b{display:block;padding:7px 9px 0;font-size:12.5px;font-weight:600;color:var(--lbl)}
+.look-card span{display:block;padding:1px 9px 8px;font-size:11.5px;color:var(--lbl3)}
+/* Finish screen after an export */
+#done-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:210;display:none;align-items:center;justify-content:center;padding:16px}
+#done-overlay.show{display:flex}
+#done-box{position:relative;background:var(--surf);border-radius:18px;padding:22px;display:flex;gap:22px;max-width:760px;width:100%;max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#done-video{flex:0 0 auto;width:min(260px,38%);max-height:70dvh;object-fit:contain;border-radius:12px;background:#0B1020;align-self:flex-start}
+#done-video.wide{width:min(340px,48%)}
+.done-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.done-side h3{margin:0;font-size:19px;font-weight:700;color:var(--lbl);letter-spacing:-.01em}
+#done-caption{width:100%;min-height:136px;resize:vertical;font-family:var(--font);font-size:13px;line-height:1.45}
+#done-close{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:none;background:var(--fill);color:var(--lbl2);font-size:18px;line-height:1;cursor:pointer}
+#done-close:hover{background:var(--fill2)}
+.done-note{font-size:12.5px;color:var(--lbl2);line-height:1.5;background:var(--fill);border-radius:10px;padding:9px 11px}
+@media (max-width: 620px) {
+  #done-box{flex-direction:column;padding:18px 16px;gap:14px}
+  #done-video,#done-video.wide{width:100%;max-height:46dvh;align-self:center}
+}
 .export-meta{font-size:12px;color:var(--lbl3);line-height:1.5;font-variant-numeric:tabular-nums}
 </style>
 </head>
@@ -378,6 +410,7 @@ body.mode-animated .static-only{display:none!important}
             <span>or click to browse</span>
           </div>
           <input type="file" id="file-input" accept=".gpx,.kml,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml" multiple style="display:none">
+          <button class="link-btn" id="try-sample-side" type="button">No GPX handy? Try the Stelvio Pass sample</button>
         </div>
 <div class="card" id="tracks-card" hidden>
           <div class="ctitle">Tracks</div>
@@ -444,11 +477,16 @@ body.mode-animated .static-only{display:none!important}
     <div class="section" data-section="templates" id="sec-templates">
       <div class="section-header">
         <svg class="sec-chevron" viewBox="0 0 12 12"><polyline points="2,4 6,8 10,4"/></svg>
-        <h2>My looks</h2>
+        <h2>Looks</h2>
       </div>
       <div class="section-body">
 <div class="card">
-          <div class="ctitle">Saved looks</div>
+          <div class="ctitle">Start from a look</div>
+          <div class="look-grid" id="look-grid"></div>
+          <div class="hint">Sets the map, camera, colors and overlays in one click. Change anything after.</div>
+        </div>
+<div class="card">
+          <div class="ctitle">My saved looks</div>
           <select id="tpl-select" class="text-input" style="width:100%"></select>
           <div class="btn-row">
             <button class="btn btn-gold" id="tpl-apply">Apply</button>
@@ -1089,6 +1127,16 @@ body.mode-animated .static-only{display:none!important}
         </div>
       </div>
         </div>
+<div class="card">
+          <div class="toggle-row">
+            <span class="toggle-label">Tool credit<small>Small discoveristjournal.com/route-video in the corner</small></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="wm-on" checked>
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="hint">You can switch it off. Leaving it on helps other riders find this free tool.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1135,6 +1183,8 @@ body.mode-animated .static-only{display:none!important}
       <div id="empty-state">
         <svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
         <span>Drop a GPX or KML file to preview your route</span>
+        <button class="btn btn-gold" id="try-sample" type="button">Try a sample ride</button>
+        <small>Stelvio Pass, Italy</small>
       </div>
     </div>
     </div>
@@ -1145,6 +1195,28 @@ body.mode-animated .static-only{display:none!important}
       <div class="export-meta tl-meta" id="export-meta"></div>
     </div>
     <div id="status"></div>
+  </div>
+</div>
+
+<div id="done-overlay" role="dialog" aria-modal="true" aria-labelledby="done-title">
+  <div id="done-box">
+    <button id="done-close" type="button" aria-label="Close">&times;</button>
+    <video id="done-video" muted loop playsinline autoplay></video>
+    <div class="done-side">
+      <h3 id="done-title">Your video is ready</h3>
+      <div class="hint" id="done-meta"></div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="done-share" type="button">Share</button>
+        <button class="btn btn-ghost" id="done-download" type="button">Download again</button>
+      </div>
+      <div class="ctitle" style="margin-top:4px">Caption</div>
+      <textarea id="done-caption" class="text-input" spellcheck="false"></textarea>
+      <button class="btn btn-ghost" id="done-copy-caption" type="button">Copy caption</button>
+      <div class="ctitle" style="margin-top:4px">Share this look</div>
+      <div class="hint">A link that opens this tool with your map, colors, camera and overlays. Your route stays private.</div>
+      <button class="btn btn-ghost" id="done-copy-look" type="button">Copy link to this look</button>
+      <div class="done-note" id="done-note"></div>
+    </div>
   </div>
 </div>
 
@@ -1609,6 +1681,7 @@ function ensureMap() {
   // so camera work (fitting the route) can start right away.
   map.on("style.load", () => {
     styleSwitching = false; // before setupStyle: labels/focus skip while switching
+    lastCamKey = "";        // a paused preview puts its camera on the new style
     setupStyle();
     if (!mapLoaded) { mapLoaded = true; if (routePoints.length) fitMapToRoute(); }
   });
@@ -1908,7 +1981,7 @@ function setMapStyle(key) {
   // for the swap: with the map tilted, MapLibre's own render loop otherwise
   // draws the terrain depth pass before the new style has a projection and
   // throws. setupStyle turns it back on at style.load.
-  map.setTerrain(null);
+  try { map.setTerrain(null); } catch (_) {} // throws while the first style is still loading
   if (usingFallbackMap) { showStatus("Map styles are paused until MapTiler is available again", 4000); styleSwitching = false; return; }
   map.setStyle(MAP_STYLES[key], { diff: false, transformStyle: useOpenTerrain });
 }
@@ -2470,7 +2543,7 @@ function buildDists(pts) {
 // opts: { lc1, lc2, gi, gc, taper, tipDot, pulseMult, gradient }
 function drawRoute(ctx, pts, dists, progress, lw, opts) {
   if (pts.length < 2 || progress <= 0) return;
-  const { lc1, lc2, gi, gc, taper, tipDot, pulseMult=1, gradient=true } = opts;
+  const { lc1, lc2, gi, gc, taper, tipDot, pulseMult=1, gradient=true, taperRange=null } = opts;
 
   const totalD  = dists[dists.length-1];
   const targetD = progress * totalD;
@@ -2525,8 +2598,10 @@ function drawRoute(ctx, pts, dists, progress, lw, opts) {
     path.moveTo(drawnPts[iStart].x, drawnPts[iStart].y);
     for (let i=iStart+1; i<=iEnd; i++) path.lineTo(drawnPts[i].x, drawnPts[i].y);
 
-    // Taper: starts at 18% width, reaches 100% at tip
-    const taperFactor = taper ? (0.18 + 0.82 * Math.pow(tMid, 0.45)) : 1;
+    // Taper: starts at 18% width, reaches 100% at tip. A piece of a longer
+    // route (one day of a trip) tapers by its place along the whole route.
+    const tAlong = taperRange ? (taperRange[0] + tMid * progress * (taperRange[1] - taperRange[0])) / Math.max(1e-6, taperRange[2]) : tMid;
+    const taperFactor = taper ? (0.18 + 0.82 * Math.pow(tAlong, 0.45)) : 1;
     const bandLW = lw * taperFactor;
 
     // Gradient color
@@ -2570,6 +2645,30 @@ function drawRoute(ctx, pts, dists, progress, lw, opts) {
   }
 
   ctx.globalAlpha = 1;
+}
+
+// Transparent mode: the primary track of a multi-day trip in one color per
+// day, like the map layer (dayColoredFeatures). Each day is drawn as its own
+// piece; the taper keeps running along the whole trip.
+function drawTrack(ctx, pts, dists, progress, lw, opts, isPrimary) {
+  if (!(isPrimary && tripDays.length > 1 && $("day-colors").checked)) { drawRoute(ctx, pts, dists, progress, lw, opts); return; }
+  const total = dists[dists.length-1] || 1;
+  const cut = d => {   // point at distance d along the drawn track
+    const i = Math.max(0, Math.min(dists.length - 2, segIndex(dists, d)));
+    const seg = dists[i+1] - dists[i], t = seg > 0 ? Math.min(1, Math.max(0, (d - dists[i]) / seg)) : 0;
+    return { i, pt: { x: pts[i].x + t*(pts[i+1].x - pts[i].x), y: pts[i].y + t*(pts[i+1].y - pts[i].y) } };
+  };
+  dayBreaks().forEach(({ k, p, pStart }) => {
+    const a = Math.max(0, pStart), b = Math.min(1, k === tripDays.length - 1 ? 1 : p);
+    if (b <= a || progress <= a) return;
+    const A = cut(a * total), B = cut(b * total);
+    const sub = [A.pt, ...pts.slice(A.i + 1, B.i + 1), B.pt];
+    if (sub.length < 2) return;
+    const subD = buildDists(sub), c1 = dayColor(k);
+    const local = Math.min(1, (progress - a) / (b - a));
+    drawRoute(ctx, sub, subD, local, lw, { ...opts, lc1: c1, lc2: lerpColor(c1, "#FFFFFF", 0.3), gc: c1,
+      tipDot: opts.tipDot && progress < b, taperRange: [a, b, Math.min(1, progress)] });
+  });
 }
 
 // ─── Overlay (title / stats) ───────────────────────────────────────────────────
@@ -2689,16 +2788,19 @@ function startAnimation() {
         lastBearingOffset = cam.bearing - rotationDeg;
         // Paused on one frame: don't re-render an unchanged camera 60× a second.
         const key = JSON.stringify(cam);
-        if (key !== lastCamKey) {
+        // (Not mid style switch: the new style needs the camera again once
+        // it has loaded, which the style.load handler arranges.)
+        if (key !== lastCamKey && !styleSwitching) {
           lastCamKey = key;
           jumpCamera(cam);
-          if (!styleSwitching) map.redraw();
+          map.redraw();
         }
       }
       updateAreaStyle(tl);
       drawAreaNames(ctx, W, H, tl, mapPointProjector(W));
       drawRouteLabels(ctx, W, H, tl, mapLabelAnchor(W));
       drawOverlays(ctx, W, H, progress, tl);
+      drawCredits(ctx, W, H, true);
       animHandle = requestAnimationFrame(frame);
       return;
     }
@@ -2718,16 +2820,17 @@ function startAnimation() {
       const { pts: dPts, dists: dDists } = getTrackDPts(track);
       if (track.isPrimary) { primaryPts = dPts; primaryDists = dDists; }
       if (!dPts || !dPts.length) return;
-      drawRoute(ctx, dPts, dDists, progress, lw, {
+      drawTrack(ctx, dPts, dDists, progress, lw, {
         lc1: track.color1, lc2: track.color2,
         gi: getGlowI(), gc: getGlowC(),
         taper: getTaper(),
         tipDot: track.isPrimary && animMode==="animated" && getTipDot(),
         pulseMult, gradient: getGradient(),
-      });
+      }, track.isPrimary);
     });
     if (primaryPts) drawRouteLabels(ctx, W, H, tl, p => pointAtProgress(primaryPts, primaryDists, p));
     drawOverlays(ctx, W, H, progress, tl);
+    drawCredits(ctx, W, H, false);
 
     animHandle = requestAnimationFrame(frame);
   }
@@ -2804,7 +2907,7 @@ function layoutPreview() {
 
 // ─── File loading ─────────────────────────────────────────────────────────────
 function onRouteLoaded(pts, name, wpts = [], dayDefs = null) {
-  fileName=name; routePoints=pts;
+  fileName=name; routePoints=pts; isSampleRide=false;
   latLonDists = buildLatLonDists(pts);
   buildTripDays(pts, dayDefs);
   trimStartFrac=0; trimEndFrac=1;
@@ -2817,6 +2920,7 @@ function onRouteLoaded(pts, name, wpts = [], dayDefs = null) {
   $("drop-label").textContent=name;
   $("drop-zone").classList.add("has-file");
   $("empty-state").classList.add("hidden");
+  document.body.classList.add("has-route");
   enableExports(); layoutPreview();
   renderTracksList();
   renderTrimTargetOptions();
@@ -3463,11 +3567,17 @@ function drawRouteLabels(ctx, W, H, tl, anchorAt) {
   const accent = getLineC();
   const pitch = bgMode === "map" && map ? map.getPitch() : 0;
   ctx.save();
-  labels.forEach(l => {
+  // Static mode shows every label at once, so labels near each other are
+  // stacked higher on longer stems, and km markers that still collide are
+  // left out. (Animated labels come and go one at a time.)
+  const lift = animMode === "animated" ? null : stackLabels(ctx, labels, W, H, anchorAt, style, s, stats, fam);
+  labels.forEach((l, li) => {
     const { a, pop } = labelAlpha(l, tl);
     if (a <= 0.01) return;
+    if (lift && lift[li] < 0) return;
     const pt = anchorAt(Math.min(1, Math.max(0, l.p)));
     if (!pt || !isFinite(pt.x) || !isFinite(pt.y) || pt.x < -W*0.2 || pt.x > W*1.2 || pt.y < -H*0.2 || pt.y > H*1.1) return;
+    const up = lift ? lift[li] : 0;
     ctx.globalAlpha = a;
     const text = l.text.toUpperCase();
     if (style === "title") {
@@ -3475,7 +3585,7 @@ function drawRouteLabels(ctx, W, H, tl, anchorAt) {
       const size = (l.kind === "marker" ? 38 : 64) * s;
       const ink = getOverlayColor(), glow = isDarkColor(ink) ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.6)";
       ctx.save();
-      ctx.translate(pt.x, pt.y - 18*s);
+      ctx.translate(pt.x, pt.y - 18*s - up);
       ctx.scale(0.85 + 0.15*pop, (0.85 + 0.15*pop) * (1 - 0.42 * Math.sin(pitch * Math.PI/180)));
       ctx.font = `800 ${Math.round(size)}px ${fam}`; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
       ctx.shadowColor = glow; ctx.shadowBlur = 14*s;
@@ -3484,7 +3594,7 @@ function drawRouteLabels(ctx, W, H, tl, anchorAt) {
       return;
     }
     // Callout: dot on the route, a short stem, a white pill with an accent dot.
-    const rise = (l.kind === "marker" ? 26 : 38) * s * (0.6 + 0.4*pop);
+    const rise = (l.kind === "marker" ? 26 : 38) * s * (0.6 + 0.4*pop) + up;
     ctx.fillStyle = "#fff"; ctx.strokeStyle = accent; ctx.lineWidth = 3*s;
     ctx.beginPath(); ctx.arc(pt.x, pt.y, 6*s, 0, Math.PI*2); ctx.fill(); ctx.stroke();
     ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 2*s;
@@ -3513,6 +3623,45 @@ function drawRouteLabels(ctx, W, H, tl, anchorAt) {
     }
   });
   ctx.restore();
+}
+// Extra height (px) for each label so none overlap, or -1 to leave it out.
+// Places the important labels first (start/finish, places, nights), then km
+// markers, each at the lowest height where it clears everything placed.
+function stackLabels(ctx, labels, W, H, anchorAt, style, s, stats, fam) {
+  const lift = labels.map(() => 0), placed = [];
+  const rank = k => k === "end" ? 0 : k === "marker" ? 2 : 1;
+  const order = labels.map((l, i) => i).sort((a, b) => rank(labels[a].kind) - rank(labels[b].kind) || labels[a].p - labels[b].p);
+  const hits = r => placed.some(q => r.x0 < q.x1 && r.x1 > q.x0 && r.y0 < q.y1 && r.y1 > q.y0);
+  order.forEach(i => {
+    const l = labels[i], pt = anchorAt(Math.min(1, Math.max(0, l.p)));
+    if (!pt || !isFinite(pt.x) || !isFinite(pt.y)) return;
+    const text = l.text.toUpperCase(), gap = 6*s;
+    let box;
+    if (style === "title") {
+      const size = (l.kind === "marker" ? 38 : 64) * s;
+      ctx.font = `800 ${Math.round(size)}px ${fam}`;
+      const w = ctx.measureText(text).width;
+      box = up => ({ x0: pt.x - w/2 - gap, x1: pt.x + w/2 + gap, y0: pt.y - 18*s - up - size*0.8, y1: pt.y - 18*s - up + size*0.2 });
+    } else {
+      const fs = (l.kind === "marker" ? 20 : 26) * s;
+      ctx.font = `700 ${Math.round(fs)}px ${fam}`;
+      const pw = ctx.measureText(text).width + (l.kind === "marker" ? 0 : 16*s) + 30*s, ph = fs * 2;
+      const rise = (l.kind === "marker" ? 26 : 38) * s, chipH = stats && l.kind !== "marker" ? 18*s*1.9 + 6*s : 0;
+      box = up => ({ x0: pt.x - pw/2 - gap, x1: pt.x + pw/2 + gap, y0: pt.y - rise - up - ph - chipH - gap, y1: pt.y - rise - up + gap });
+    }
+    const step = (box(0).y1 - box(0).y0) * 0.9;
+    let up = 0;
+    for (let tries = 0; tries < 5 && hits(box(up)); tries++) up += step;
+    if (hits(box(up))) {
+      if (l.kind === "marker") { lift[i] = -1; return; }
+      up = 0; // nowhere free: keep it at its own spot rather than far away
+    }
+    lift[i] = up;
+    placed.push(box(up));
+    // The dot on the route stays clear too.
+    placed.push({ x0: pt.x - 8*s, x1: pt.x + 8*s, y0: pt.y - 8*s, y1: pt.y + 8*s });
+  });
+  return lift;
 }
 // Anchor for Map mode: the route point (as drawn by the map layer) projected
 // into this canvas. During export the map is shrunk to exactly the frame.
@@ -3561,21 +3710,38 @@ function renderLabelList() {
   updateExportMeta();
 }
 
-// Map data credit in the exported frame (required by the map and data licences).
-function drawMapCredit(ctx, W, H) {
-  const s = Math.min(W, H) / 1080, text = mapCredit() + (areas.length ? " · Nominatim" : "");
-  ctx.save();
-  ctx.font = `500 ${Math.round(14*s)}px ${OVERLAY_FONTS.system}`; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
-  const ink = getOverlayColor();
-  ctx.fillStyle = isDarkColor(ink) ? "rgba(28,28,30,0.7)" : "rgba(255,255,255,0.75)";
-  ctx.shadowColor = isDarkColor(ink) ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.6)"; ctx.shadowBlur = 4*s;
-  ctx.fillText(text, W - 14*s, H - 10*s);
-  ctx.restore();
-}
 function drawOverlays(ctx, W, H, progress, tl) {
   if (tl) drawDayCard(ctx, W, H, tl);
   drawElevProfile(ctx, W, H, progress);
   drawOverlay(ctx, W, H, progress);
+}
+// The credit line, bottom right, small and with no backdrop: the tool's short
+// address ("Tool credit", on by default, so a shared video says where it was
+// made) and, over a map, the map data credit its licences require.
+const TOOL_URL_SHORT = "discoveristjournal.com/route-video";
+function drawCredits(ctx, W, H, withMap) {
+  const tool = $("wm-on").checked ? TOOL_URL_SHORT : "";
+  const data = withMap ? mapCredit() + (areas.length ? " · Nominatim" : "") : "";
+  if (!tool && !data) return;
+  const s = Math.min(W, H) / 1080, ink = getOverlayColor(), dark = isDarkColor(ink);
+  const fs = Math.round(11.5*s), gap = 10*s;
+  let x = W - 12*s;
+  const y = H - 8*s;
+  ctx.save();
+  ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+  ctx.shadowColor = dark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.45)"; ctx.shadowBlur = 3*s;
+  if (data) {
+    ctx.font = `400 ${fs}px ${OVERLAY_FONTS.system}`;
+    ctx.fillStyle = dark ? "rgba(28,28,30,0.55)" : "rgba(255,255,255,0.62)";
+    ctx.fillText(data, x, y);
+    x -= ctx.measureText(data).width + gap;
+  }
+  if (tool) {
+    ctx.font = `600 ${fs}px ${OVERLAY_FONTS.system}`;
+    ctx.fillStyle = dark ? "rgba(28,28,30,0.72)" : "rgba(255,255,255,0.8)";
+    ctx.fillText(tool, x, y);
+  }
+  ctx.restore();
 }
 
 // ─── Frame composer (shared by MP4 + PNG export) ──────────────────────────────
@@ -3610,7 +3776,7 @@ async function composeFrame(ctx, W, H, tl, env) {
     drawAreaNames(ctx, W, H, tl, mapPointProjector(W));
     drawRouteLabels(ctx, W, H, tl, mapLabelAnchor(W));
     drawOverlays(ctx, W, H, tl.progress, tl);
-    drawMapCredit(ctx, W, H);
+    drawCredits(ctx, W, H, true);
     return;
   }
   if (env.bgFill) { ctx.fillStyle = env.bgFill; ctx.fillRect(0, 0, W, H); }
@@ -3625,14 +3791,15 @@ async function composeFrame(ctx, W, H, tl, env) {
   const tipDot = animMode === "animated" && getTipDot();
   tracks.forEach(({ t, pts, dists }) => {
     if (pts.length < 2) return;
-    drawRoute(ctx, pts, dists, tl.progress, scaledLW(W), {
+    drawTrack(ctx, pts, dists, tl.progress, scaledLW(W), {
       lc1:t.color1, lc2:t.color2, gi:getGlowI(), gc:getGlowC(),
       taper:getTaper(), tipDot: t.isPrimary && tipDot, pulseMult:tl.pulseMult, gradient:getGradient(),
-    });
+    }, t.isPrimary);
   });
   const prim = tracks.find(x => x.t.isPrimary);
   if (prim) drawRouteLabels(ctx, W, H, tl, p => pointAtProgress(prim.pts, prim.dists, p));
   drawOverlays(ctx, W, H, tl.progress, tl);
+  drawCredits(ctx, W, H, false);
 }
 // Stops the live preview so nothing else moves the map camera mid-export.
 function pausePreviewForExport() {
@@ -3728,9 +3895,10 @@ async function exportMP4() {
     setProgress("Finishing file…", 99);
     await output.finalize();
     const blob = new Blob([output.target.buffer], { type: "video/mp4" });
-    download(blob, `${fileName}-${W}x${H}-${fps}fps.mp4`);
+    const name = `${fileName}-${W}x${H}-${fps}fps.mp4`;
+    download(blob, name);
     track("export_complete", { ...trackInfo, size_mb: +(blob.size / 1e6).toFixed(1), render_s: Math.round((performance.now() - exportT0) / 1000) });
-    showStatus(`MP4 saved: ${W}×${H} · ${fps} fps · ${codec === "hevc" ? "HEVC" : "H.264"} · ${(blob.size/1e6).toFixed(1)} MB`, 4500);
+    showFinish(blob, name, `${W}×${H} · ${fps} fps · ${codec === "hevc" ? "HEVC" : "H.264"} · ${(blob.size/1e6).toFixed(1)} MB`, W, H);
   } catch (err) {
     console.error(err);
     if (output) { try { await output.cancel(); } catch (_) {} }
@@ -3827,6 +3995,147 @@ function renderTemplateList(selectName) {
     : `<option value="">No saved looks yet</option>`;
   if (selectName) sel.value = selectName;
   $("tpl-apply").disabled = $("tpl-delete").disabled = !list.length;
+}
+
+// ─── Sample ride ──────────────────────────────────────────────────────────────
+// For visitors without a GPX file at hand: a real ride over the Stelvio Pass
+// (built from OpenStreetMap roads), with its two waypoints as labels.
+const SAMPLE_RIDE = { url: "samples/stelvio-pass.gpx", name: "Stelvio Pass" };
+let isSampleRide = false, sampleLoading = null;
+function loadSampleRide(source = "button") {
+  if (sampleLoading) return sampleLoading;
+  showStatus("Loading the Stelvio Pass sample ride…");
+  sampleLoading = (async () => {
+    try {
+      const r = await fetch(SAMPLE_RIDE.url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      await readFiles([new File([await r.text()], SAMPLE_RIDE.name + ".gpx", { type: "application/gpx+xml" })]);
+      isSampleRide = true;
+      track("sample_loaded", { source });
+    } catch (err) {
+      console.error(err);
+      showStatus("Couldn't load the sample ride. Drop your own GPX instead.", 4000);
+    } finally { sampleLoading = null; }
+  })();
+  return sampleLoading;
+}
+
+// ─── Preset looks and look links ──────────────────────────────────────────────
+// A look is stored as its difference from the page defaults: { i: inputs,
+// p: { "group|attr": value } }. Route colors follow the map unless rc is 0,
+// overlay colors unless oc is 0. Presets and shared links use this format.
+let DEFAULT_LOOK = null; // captureTemplate() of the untouched page
+const LOOK_SKIP_GROUPS = new Set(["side-nav"]);
+const EXPORT_GROUPS = new Set(["asp-btns", "res-btns", "fps-btns", "quality-btns"]);
+const ROUTE_COLOR_IDS = ["line-color", "line-color-2", "glow-color"];
+const OVERLAY_COLOR_IDS = ["overlay-color", "pf-text", "pf-bg", "pf-bg-op"];
+const pickMap = picks => Object.fromEntries(picks.map(q => [`${q.group || ""}|${q.attr}`, q.value]));
+const PRESET_LOOKS = [
+  { id: "alpine-classic", name: "Alpine classic", sub: "Landscape · orbit",
+    p: { "map-style-btns|style": "landscape", "rotate-btns|rotate": "orbit", "layout-btns|layout": "banner" },
+    i: { tilt: "50", duration: "10", "profile-on": true, "lbl-startfinish": true } },
+  { id: "satellite-chase", name: "Satellite chase", sub: "3D, behind the rider",
+    p: { "map-style-btns|style": "satellite", "camera-btns|camera": "chase", "layout-btns|layout": "corner" },
+    i: { tilt: "60", duration: "20", "profile-on": true } },
+  { id: "night-glow", name: "Night glow", sub: "Dark map · neon line",
+    p: { "map-style-btns|style": "landdark", "camera-btns|camera": "follow", "rotate-btns|rotate": "heading", "layout-btns|layout": "banner" },
+    i: { tilt: "45", duration: "14", "line-color": "#00E5FF", "line-color-2": "#FF2D95", "glow-color": "#00E5FF", "glow-intensity": "90" }, rc: 0 },
+  { id: "globe-fly-in", name: "Globe fly-in", sub: "From space to the road",
+    p: { "map-style-btns|style": "hybrid", "rotate-btns|rotate": "orbit", "layout-btns|layout": "center" },
+    i: { "intro-on": true, tilt: "55", duration: "10" } },
+  { id: "topo-top-down", name: "Topo top-down", sub: "Flat map, peaks named",
+    p: { "map-style-btns|style": "topo", "layout-btns|layout": "corner" },
+    i: { tilt: "0", duration: "8", "lbl-startfinish": true } },
+  { id: "postcard", name: "Postcard", sub: "Pastel · big titles",
+    p: { "map-style-btns|style": "pastel", "camera-btns|camera": "follow", "layout-btns|layout": "banner",
+         "overlay-font-btns|font": "serif", "lbl-style-btns|lblstyle": "title" },
+    i: { tilt: "40", duration: "12" } },
+];
+function currentLookDiff() {
+  const cur = captureTemplate(), d = { i: {}, p: {} };
+  for (const [k, v] of Object.entries(cur.inputs)) if (DEFAULT_LOOK.inputs[k] !== v) d.i[k] = v;
+  const def = pickMap(DEFAULT_LOOK.picks);
+  for (const [k, v] of Object.entries(pickMap(cur.picks))) if (def[k] !== v && !LOOK_SKIP_GROUPS.has(k.split("|")[0])) d.p[k] = v;
+  if (cur.routeColorsAuto) ROUTE_COLOR_IDS.forEach(id => delete d.i[id]); else d.rc = 0;
+  if (cur.overlayColorsAuto) OVERLAY_COLOR_IDS.forEach(id => delete d.i[id]); else d.oc = 0;
+  return d;
+}
+// Applies a look on top of the page defaults. keepExport leaves the format,
+// size, fps and quality as they are.
+function applyLook(d, { keepExport = false } = {}) {
+  const rc = d.rc !== 0, oc = d.oc !== 0;
+  const inputs = { ...DEFAULT_LOOK.inputs };
+  if (rc) ROUTE_COLOR_IDS.forEach(id => delete inputs[id]);
+  if (oc) OVERLAY_COLOR_IDS.forEach(id => delete inputs[id]);
+  Object.assign(inputs, d.i || {});
+  const picks = Object.entries({ ...pickMap(DEFAULT_LOOK.picks), ...(d.p || {}) })
+    .filter(([k]) => { const g = k.split("|")[0]; return !LOOK_SKIP_GROUPS.has(g) && !(keepExport && EXPORT_GROUPS.has(g)); })
+    .map(([k, value]) => { const [group, attr] = k.split("|"); return { group: group || null, attr, value }; });
+  routeColorsAuto = rc; overlayColorsAuto = oc; // so a style change brings its colors
+  applyTemplate({ inputs, picks, routeColorsAuto: rc, overlayColorsAuto: oc });
+  if (rc) applyRoutePreset(currentMapStyle);
+  if (oc) applyOverlayTheme();
+}
+// Look links: #look=<base64url JSON>, short because only changes are kept.
+function encodeLook(d) {
+  const bytes = new TextEncoder().encode(JSON.stringify(d));
+  let bin = ""; bytes.forEach(b => { bin += String.fromCharCode(b); });
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function decodeLook(str) {
+  const bin = atob(str.replace(/-/g, "+").replace(/_/g, "/"));
+  const d = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+  if (!d || typeof d !== "object" || typeof (d.i || {}) !== "object" || typeof (d.p || {}) !== "object") throw new Error("bad look");
+  return d;
+}
+function lookLink() {
+  const base = /discoveristjournal\.com$/.test(location.hostname) ? "https://discoveristjournal.com/tools/route-video" : location.origin + location.pathname;
+  return `${base}#look=${encodeLook(currentLookDiff())}`;
+}
+function renderLookGrid() {
+  $("look-grid").innerHTML = PRESET_LOOKS.map(l => `<button class="look-card" type="button" data-look-id="${l.id}">
+      <img src="../Media/tools/looks/route-video-look-${l.id}.jpg" alt="${escapeHtml(l.name)} look: ${escapeHtml(l.sub)}" width="280" height="350" loading="lazy">
+      <b>${escapeHtml(l.name)}</b><span>${escapeHtml(l.sub)}</span></button>`).join("");
+  $("look-grid").querySelectorAll(".look-card").forEach(card => card.addEventListener("click", async () => {
+    const look = PRESET_LOOKS.find(l => l.id === card.dataset.lookId);
+    applyLook(look, { keepExport: true });
+    $("look-grid").querySelectorAll(".look-card").forEach(c => c.classList.toggle("active", c === card));
+    track("look_preset", { look: look.id });
+    if (!routePoints.length) await loadSampleRide("look");
+    showStatus(`"${look.name}" applied`);
+  }));
+}
+
+// ─── Finish screen ────────────────────────────────────────────────────────────
+let lastExport = null; // { blob, name, url }
+function finishCaption() {
+  const title = getOverlayTitle(), km = getShownTotalKm(), gain = getShownElevGainM();
+  const stats = [`${km.toFixed(km < 100 ? 1 : 0)} km`, gain > 0 ? `${Math.round(gain).toLocaleString("en-US")} m of climbing` : ""].filter(Boolean).join(", ");
+  const days = tripDays.length > 1 ? ` over ${tripDays.length} days` : "";
+  return `${title}: ${stats}${days}.\n\nRoute video made with discoveristjournal.com/route-video (free, no sign-up)\n\n#DiscoveristRoutes #RouteVideo #RoadTrip #MotoTravel #RideMap`;
+}
+function showFinish(blob, name, meta, W, H) {
+  if (lastExport) URL.revokeObjectURL(lastExport.url);
+  lastExport = { blob, name, url: URL.createObjectURL(blob) };
+  const v = $("done-video");
+  v.src = lastExport.url; v.classList.toggle("wide", W > H);
+  v.play().catch(() => {});
+  $("done-meta").textContent = `${meta} · saved to your downloads`;
+  $("done-caption").value = finishCaption();
+  const file = new File([blob], name, { type: "video/mp4" });
+  $("done-share").hidden = !(navigator.canShare && navigator.canShare({ files: [file] }));
+  $("done-note").innerHTML = isSampleRide
+    ? "That was the sample ride. <b>Drop your own GPX</b> to make a video of your ride, with the same look."
+    : "Post it with <b>#DiscoveristRoutes</b> and tag <b>@fmancillag</b> on Instagram so we can see your ride.";
+  $("done-overlay").classList.add("show");
+}
+function hideFinish() {
+  $("done-overlay").classList.remove("show");
+  $("done-video").pause();
+}
+async function copyText(text, okMsg) {
+  try { await navigator.clipboard.writeText(text); showStatus(okMsg); return true; }
+  catch (_) { window.prompt("Copy this:", text); return false; }
 }
 
 // ─── Event wiring ─────────────────────────────────────────────────────────────
@@ -4270,6 +4579,39 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCredits();
   applyRoutePreset(currentMapStyle);
   applyOverlayTheme();
+
+  // Sample ride, preset looks, finish screen
+  DEFAULT_LOOK = captureTemplate();
+  renderLookGrid();
+  $("try-sample").addEventListener("click", () => loadSampleRide("empty_state"));
+  $("try-sample-side").addEventListener("click", () => loadSampleRide("sidebar"));
+  $("done-close").addEventListener("click", hideFinish);
+  $("done-overlay").addEventListener("click", e => { if (e.target === $("done-overlay")) hideFinish(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && $("done-overlay").classList.contains("show")) hideFinish(); });
+  $("done-download").addEventListener("click", () => { if (lastExport) download(lastExport.blob, lastExport.name); });
+  $("done-share").addEventListener("click", async () => {
+    if (!lastExport) return;
+    const file = new File([lastExport.blob], lastExport.name, { type: "video/mp4" });
+    try {
+      await navigator.share({ files: [file], text: $("done-caption").value });
+      track("video_shared");
+    } catch (err) { if (err.name !== "AbortError") showStatus("Sharing didn't work here. Use the downloaded file.", 4000); }
+  });
+  $("done-copy-caption").addEventListener("click", () => copyText($("done-caption").value, "Caption copied").then(() => track("caption_copied")));
+  $("done-copy-look").addEventListener("click", () => copyText(lookLink(), "Link copied: it opens the tool with this look").then(() => track("look_link_copied")));
+
+  // Opened from a look link (#look=…) or a "try it" link (#sample): apply the
+  // look and show it on the sample ride straight away.
+  const hash = new URLSearchParams(location.hash.slice(1));
+  if (hash.has("look")) {
+    try {
+      applyLook(decodeLook(hash.get("look")));
+      track("look_link_opened");
+      loadSampleRide("look_link").then(() => showStatus("Look applied. Drop your GPX to use it on your ride.", 5000));
+    } catch (_) { showStatus("This look link is broken, so the default look is used.", 4000); }
+  } else if (hash.has("sample") || new URLSearchParams(location.search).has("sample")) {
+    loadSampleRide("link");
+  }
 });
 </script>
 </body>
