@@ -3,7 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Route Overlay — Discoverist</title>
+<title>GPX to 3D Route Video Maker (Free) | Discoverist</title>
+<meta name="description" content="Turn a GPX or KML ride into a 3D route video for Reels, Shorts and YouTube. Chase camera, multi-day trips, labels, elevation profile and 4K MP4 export. Free, no sign-up.">
+<link rel="canonical" href="https://discoveristjournal.com/tools/route-video">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Discoverist Journal">
+<meta property="og:title" content="GPX to 3D Route Video Maker (Free)">
+<meta property="og:description" content="Turn a GPX or KML ride into a 3D route video for Reels, Shorts and YouTube. Chase camera, multi-day trips, labels, elevation profile and 4K MP4 export. Free, no sign-up.">
+<meta property="og:url" content="https://discoveristjournal.com/tools/route-video">
+<meta property="og:image" content="https://discoveristjournal.com/Media/tools/route-video-maker-3d-gpx-flyover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="3D route video of the Stelvio Pass ride with a chase camera, day card and route labels">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GPX to 3D Route Video Maker (Free)">
+<meta name="twitter:description" content="Turn a GPX or KML ride into a 3D route video for Reels, Shorts and YouTube. Chase camera, multi-day trips, labels, elevation profile and 4K MP4 export. Free, no sign-up.">
+<meta name="twitter:image" content="https://discoveristjournal.com/Media/tools/route-video-maker-3d-gpx-flyover.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Route Video Maker",
+      "url": "https://discoveristjournal.com/tools/route-video",
+      "image": "https://discoveristjournal.com/Media/tools/route-video-maker-3d-gpx-flyover.jpg",
+      "description": "Turn a GPX or KML ride into a 3D route video for Reels, Shorts and YouTube. Chase camera, multi-day trips, labels, elevation profile and 4K MP4 export. Free, no sign-up.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any (runs in the web browser)",
+      "browserRequirements": "Requires a recent Chrome, Edge, Safari or Firefox",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": ["GPX and KML import", "3D terrain and satellite maps", "Chase camera (3D follow)", "Multi-day trips with day cards", "Route labels and area highlights", "Elevation profile overlay", "MP4 export up to 4K at 60 fps"],
+      "publisher": { "@type": "Organization", "name": "The Discoverist Journal", "url": "https://discoveristjournal.com" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://discoveristjournal.com" },
+        { "@type": "ListItem", "position": 2, "name": "Moto Tools", "item": "https://discoveristjournal.com/moto/tools" },
+        { "@type": "ListItem", "position": 3, "name": "Route Video Maker", "item": "https://discoveristjournal.com/tools/route-video" }
+      ]
+    }
+  ]
+}
+</script>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KQMYMPEGLT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KQMYMPEGLT');
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
@@ -211,6 +263,31 @@ select.text-input{padding-right:28px}
 .day-head{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--lbl)}
 .day-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .day-meta{margin-left:auto;font:500 12px var(--mono);color:var(--lbl3);white-space:nowrap}
+/* ── Phones and narrow windows: preview on top, settings scroll below ───── */
+@media (max-width: 820px) {
+  body{height:100vh;height:100dvh}
+  #hdr{height:46px;padding:0 12px}
+  #hdr h1{font-size:15px}
+  #hdr-hint{display:none}
+  #main{flex-direction:column}
+  #prev{order:1;flex:0 0 auto;height:58vh;height:58dvh;min-height:300px;border-bottom:.5px solid var(--sep)}
+  #sidebar{order:2;width:100%;flex:1;min-height:0;border-right:none;padding:0 12px 40px}
+  #side-nav{margin:0 -12px;padding:8px 12px}
+  #toolbar{flex-wrap:nowrap;overflow-x:auto;gap:12px;padding:8px 12px;scrollbar-width:none;align-items:flex-end}
+  #toolbar::-webkit-scrollbar{display:none}
+  .tb-item{flex:none}
+  .tb-label{font-size:10px}
+  .tb-actions{position:sticky;right:0;margin-left:0;padding-left:14px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.96) 22%)}
+  .tb-actions .btn{padding:9px 12px;font-size:13px}
+  .tb-actions .export-main{padding:9px 14px}
+  #stage{padding:6px 8px}
+  #timeline{padding:4px 12px 8px;gap:8px}
+  .tl-meta{display:none}
+  #tl-time{min-width:74px;font-size:11.5px}
+  #status{bottom:52px;white-space:normal;max-width:92%;text-align:center}
+  #map-nav{top:6px;right:6px}
+  #map-nav button{width:34px;height:34px}
+}
 .vbg-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--lbl)}
 #checker-wrap{position:relative;box-shadow:var(--sh-lg);border-radius:3px;overflow:hidden;flex-shrink:0}
 #checker-bg{position:absolute;inset:0;z-index:0;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d4d4d4}
@@ -220,6 +297,9 @@ select.text-input{padding-right:28px}
 /* Greys out the stage outside the export frame */
 #frame-mask{position:absolute;z-index:3;pointer-events:none;box-shadow:0 0 0 9999px rgba(18,20,26,.52);outline:1.5px solid rgba(255,255,255,.85)}
 #frame-mask[hidden]{display:none}
+#credits{position:absolute;z-index:4;bottom:6px;right:8px;max-width:calc(100% - 16px);font-size:10px;line-height:1.35;color:rgba(28,28,30,.75);background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:2px 7px;border-radius:6px;text-align:right}
+#credits a{color:inherit;text-decoration:none}
+#credits a:hover{text-decoration:underline}
 /* In Map mode the map underneath takes the mouse, so the shot can be framed by dragging */
 body.bg-map #preview-canvas{pointer-events:none}
 body.bg-map #map-bg{cursor:grab}
@@ -270,8 +350,8 @@ body.mode-animated .static-only{display:none!important}
   <div class="hdr-icon">
     <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
   </div>
-  <h1>Route Overlay</h1>
-  <span id="hdr-hint">GPX / KML → animated route overlay for social media</span>
+  <h1>Route Video Maker</h1>
+  <span id="hdr-hint">GPX / KML → 3D route video for Reels, Shorts and YouTube</span>
 </div>
 
 <div id="main">
@@ -297,7 +377,7 @@ body.mode-animated .static-only{display:none!important}
             <span style="display:block">One file, or one file per day for a trip</span>
             <span>or click to browse</span>
           </div>
-          <input type="file" id="file-input" accept=".gpx,.kml" multiple style="display:none">
+          <input type="file" id="file-input" accept=".gpx,.kml,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml" multiple style="display:none">
         </div>
 <div class="card" id="tracks-card" hidden>
           <div class="ctitle">Tracks</div>
@@ -1045,6 +1125,7 @@ body.mode-animated .static-only{display:none!important}
       <div id="map-bg"></div>
       <canvas id="preview-canvas"></canvas>
       <div id="frame-mask" hidden></div>
+      <div id="credits" class="map-only"></div>
       <div id="map-nav" hidden>
         <button data-nav="in" title="Zoom in">+</button>
         <button data-nav="out" title="Zoom out">&minus;</button>
@@ -1078,6 +1159,12 @@ body.mode-animated .static-only{display:none!important}
 </div>
 
 <script>
+// ─── Analytics ────────────────────────────────────────────────────────────────
+// GA4 events for the funnel: route loaded → export started → export finished.
+function track(name, params = {}) {
+  try { if (typeof gtag === "function") gtag("event", name, params); } catch (_) {}
+}
+
 // ─── State ───────────────────────────────────────────────────────────────────
 const ASPECTS = { "9:16": [1080, 1920], "16:9": [1920, 1080], "1:1": [1080, 1080] };
 function updateExportDims() {
@@ -1488,7 +1575,7 @@ function ensureMap() {
   if (map) return;
   map = new maplibregl.Map({
     container: "map-bg",
-    style: MAP_STYLES[currentMapStyle],
+    // style is set right after, through useOpenTerrain
     center: [10, 46], zoom: 3,
     // Draggable so the shot can be framed by hand. Double-click and keyboard
     // zoom are off: they animate with easeTo, which (MapLibre 4–5) leaves the
@@ -1513,6 +1600,11 @@ function ensureMap() {
   // "load" waits for every tile, so it can arrive late, even mid-export.
   // The route is already fitted on style.load.
   map.on("load", () => { setupStyle(); });
+  map.setStyle(MAP_STYLES[currentMapStyle], { diff: false, transformStyle: useOpenTerrain });
+  map.on("error", e => {
+    const err = e && e.error, url = (err && err.url) || "";
+    if (err && [401, 403, 429].includes(err.status) && /api\.maptiler\.com/.test(url)) switchToFallbackMap();
+  });
   // style.load fires for the first style too, well before every tile is in,
   // so camera work (fitting the route) can start right away.
   map.on("style.load", () => {
@@ -1552,13 +1644,52 @@ function applyProjection() {
   // Before the style has loaded this throws; the style.load handler applies it then.
   try { map.setProjection({ type: getGlobeIntroMs() > 0 ? "globe" : "mercator" }); } catch (_) {}
 }
+// Terrain comes from Mapterhorn (open data, no key, no quota) rather than
+// MapTiler: it's about half of all map traffic, and MapTiler's free plan
+// stops serving when its monthly quota runs out.
+const TERRAIN_DEM = { type: "raster-dem", tiles: ["https://tiles.mapterhorn.com/{z}/{x}/{y}.webp"],
+  encoding: "terrarium", tileSize: 512, maxzoom: 15, attribution: "© Mapterhorn" };
+// Applied to every style as it loads: its own hill-shading terrain (MapTiler)
+// is swapped for Mapterhorn too.
+function useOpenTerrain(prev, next) {
+  for (const [id, src] of Object.entries(next.sources || {})) {
+    if (src.type === "raster-dem" && /maptiler/.test(src.url || (src.tiles || []).join(" "))) next.sources[id] = { ...TERRAIN_DEM };
+  }
+  return next;
+}
+// If MapTiler refuses (quota used up, key blocked), switch to OpenFreeMap,
+// a free basemap with no key, instead of showing a blank map.
+const FALLBACK_STYLE = "https://tiles.openfreemap.org/styles/liberty";
+let usingFallbackMap = false;
+function switchToFallbackMap() {
+  if (usingFallbackMap || !map) return;
+  usingFallbackMap = true;
+  styleSwitching = true; labelLayers = {}; focusOrig = {};
+  try { map.setTerrain(null); } catch (_) {} // throws when the refused style never loaded
+  // Fetch and transform the style here and pass the finished object: with a
+  // transformStyle option MapLibre first waits for the previous style to
+  // load, and the refused MapTiler style never does.
+  fetch(FALLBACK_STYLE).then(r => r.json())
+    .then(style => map.setStyle(useOpenTerrain(null, style), { diff: false }))
+    .catch(() => showStatus("No map available right now; Transparent mode still works.", 8000));
+  updateCredits();
+  showStatus("The MapTiler map isn't available right now, so a free OpenFreeMap style is used instead.", 8000);
+}
+function mapCredit() {
+  return (usingFallbackMap ? "© OpenFreeMap © OpenMapTiles © OpenStreetMap" : "© MapTiler © OpenStreetMap") + " · Terrain © Mapterhorn";
+}
+function updateCredits() {
+  const el = $("credits"); if (!el) return;
+  el.innerHTML = (usingFallbackMap
+      ? '<a href="https://openfreemap.org" target="_blank" rel="noopener">© OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a>'
+      : '<a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">© MapTiler</a>')
+    + ' <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>'
+    + ' · Terrain <a href="https://mapterhorn.com/attribution" target="_blank" rel="noopener">© Mapterhorn</a>'
+    + (areas.length ? ' · Boundaries <a href="https://nominatim.org/" target="_blank" rel="noopener">Nominatim</a>' : "");
+}
 function addTerrain() {
   if (!map.getSource("terrain")) {
-    map.addSource("terrain", {
-      type: "raster-dem",
-      url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${MAPTILER_KEY}`,
-      tileSize: 256, maxzoom: 14,
-    });
+    map.addSource("terrain", { ...TERRAIN_DEM });
   }
   map.setTerrain(terrainOn ? { source: "terrain", exaggeration: terrainHeight } : null);
 }
@@ -1598,7 +1729,7 @@ function applyLabels() {
 function addRelief() {
   if (currentMapStyle !== "relief" || map.getLayer("relief")) return;
   if (!map.getSource("relief-dem")) {
-    map.addSource("relief-dem", { type: "raster-dem", url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${MAPTILER_KEY}`, tileSize: 256, maxzoom: 12 });
+    map.addSource("relief-dem", { ...TERRAIN_DEM, maxzoom: 12 });
   }
   const layers = map.getStyle().layers;
   const above = layers.find(l => l.type !== "background");
@@ -1778,7 +1909,8 @@ function setMapStyle(key) {
   // draws the terrain depth pass before the new style has a projection and
   // throws. setupStyle turns it back on at style.load.
   map.setTerrain(null);
-  map.setStyle(MAP_STYLES[key], { diff: false });
+  if (usingFallbackMap) { showStatus("Map styles are paused until MapTiler is available again", 4000); styleSwitching = false; return; }
+  map.setStyle(MAP_STYLES[key], { diff: false, transformStyle: useOpenTerrain });
 }
 function setBg(mode) {
   bgMode = mode;
@@ -2253,7 +2385,7 @@ async function fillElevationFromTerrain(pts, field = "ele") {
   await Promise.all([...new Set(idx.map(i => keyAt(pts[i], z)))].map(async key => {
     try {
       const [x, y] = key.split("/");
-      const res = await fetch(`https://api.maptiler.com/tiles/terrain-rgb-v2/${z}/${x}/${y}.webp?key=${MAPTILER_KEY}`);
+      const res = await fetch(`https://tiles.mapterhorn.com/${z}/${x}/${y}.webp`);
       if (!res.ok) return;
       const bmp = await createImageBitmap(await res.blob(), { colorSpaceConversion: "none", premultiplyAlpha: "none" });
       const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height;
@@ -2267,7 +2399,7 @@ async function fillElevationFromTerrain(pts, field = "ele") {
     const px = Math.min(t.size-1, Math.floor((x - Math.floor(x)) * t.size));
     const py = Math.min(t.size-1, Math.floor((y - Math.floor(y)) * t.size));
     const o = (py * t.size + px) * 4;
-    return -10000 + (t.data[o]*65536 + t.data[o+1]*256 + t.data[o+2]) * 0.1; // terrain-RGB
+    return t.data[o]*256 + t.data[o+1] + t.data[o+2]/256 - 32768; // terrarium
   });
   if (sampled.filter(v => v != null).length < 2) return false;
   // Terrain pixels next to a road on a steep slope are noisy, which would
@@ -2626,11 +2758,16 @@ let frameCss = { x: 0, y: 0, w: 0, h: 0 }; // export frame inside the stage, CSS
 function layoutPreview() {
   if (exporting) return;
   const area = $("stage");
-  const aw = area.clientWidth-40, ah = area.clientHeight-36;
-  let sw, sh;
-  if (aw/ah < STAGE_ASPECT) { sw=aw; sh=aw/STAGE_ASPECT; } else { sh=ah; sw=ah*STAGE_ASPECT; }
-  sw=Math.round(sw); sh=Math.round(sh);
+  const narrow = window.innerWidth <= 820;
+  const aw = area.clientWidth - (narrow ? 16 : 40), ah = area.clientHeight - (narrow ? 12 : 36);
   const aspect = exportW/exportH;
+  // Desktop: a wide 16:9 stage. Narrow screens: use the space there is. The
+  // stage is never narrower than the frame, so the frame always gets the
+  // stage's full height and the export's perspective matches the preview.
+  const stageAspect = Math.max(aspect, window.innerWidth <= 820 ? aw/ah : STAGE_ASPECT);
+  let sw, sh;
+  if (aw/ah < stageAspect) { sw=aw; sh=aw/stageAspect; } else { sh=ah; sw=ah*stageAspect; }
+  sw=Math.round(sw); sh=Math.round(sh);
   let pw, ph;
   if (aspect >= STAGE_ASPECT) { pw=sw; ph=Math.round(sw/aspect); } else { ph=sh; pw=Math.round(sh*aspect); }
   frameCss = { x: Math.round((sw-pw)/2), y: Math.round((sh-ph)/2), w: pw, h: ph };
@@ -2640,6 +2777,8 @@ function layoutPreview() {
   const mask = $("frame-mask");
   Object.assign(mask.style, { left: frameCss.x+"px", top: frameCss.y+"px", width: pw+"px", height: ph+"px" });
   mask.hidden = pw === sw && ph === sh;
+  $("credits").style.right = (sw - frameCss.x - pw + 8) + "px";
+  $("credits").style.maxWidth = (pw - 16) + "px";
 
   const canvas = $("preview-canvas");
   const dpr = window.devicePixelRatio||1;
@@ -2684,6 +2823,7 @@ function onRouteLoaded(pts, name, wpts = [], dayDefs = null) {
   if (bgMode==="map" && map) fitMapToRoute();
   const totalKm = latLonDists[latLonDists.length-1];
   showStatus(`${pts.length.toLocaleString()} points loaded · ${totalKm.toFixed(1)} km`);
+  track("route_loaded", { days: Math.max(1, (dayDefs || []).length), km: Math.round(totalKm), points: pts.length });
   elevSource = hasElevation(pts) ? "file" : "none";
   updateProfileHint();
   // Waypoints become labels at the nearest point of the route (within 1 km).
@@ -3172,6 +3312,7 @@ function ensureAreaLayers() {
   map.getSource(AREA_SRC).setData({ type: "FeatureCollection", features: areas.map(a => ({ type: "Feature", properties: {}, geometry: a.geometry })) });
 }
 function syncAreaData() {
+  updateCredits();
   const src = map && map.getSource(AREA_SRC);
   if (src) src.setData({ type: "FeatureCollection", features: areas.map(a => ({ type: "Feature", properties: {}, geometry: a.geometry })) });
   lastAreaKey = "";
@@ -3401,6 +3542,12 @@ async function suggestPlaceName(lat, lon) {
       if (f) return f.text;
     }
   } catch (_) {}
+  try {
+    const r = await (await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&lat=${lat}&lon=${lon}`)).json();
+    const a = r.address || {};
+    const name = r.name || a.village || a.town || a.city || a.hamlet || a.municipality;
+    if (name) return name;
+  } catch (_) {}
   return "Label";
 }
 function renderLabelList() {
@@ -3414,6 +3561,17 @@ function renderLabelList() {
   updateExportMeta();
 }
 
+// Map data credit in the exported frame (required by the map and data licences).
+function drawMapCredit(ctx, W, H) {
+  const s = Math.min(W, H) / 1080, text = mapCredit() + (areas.length ? " · Nominatim" : "");
+  ctx.save();
+  ctx.font = `500 ${Math.round(14*s)}px ${OVERLAY_FONTS.system}`; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+  const ink = getOverlayColor();
+  ctx.fillStyle = isDarkColor(ink) ? "rgba(28,28,30,0.7)" : "rgba(255,255,255,0.75)";
+  ctx.shadowColor = isDarkColor(ink) ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.6)"; ctx.shadowBlur = 4*s;
+  ctx.fillText(text, W - 14*s, H - 10*s);
+  ctx.restore();
+}
 function drawOverlays(ctx, W, H, progress, tl) {
   if (tl) drawDayCard(ctx, W, H, tl);
   drawElevProfile(ctx, W, H, progress);
@@ -3452,6 +3610,7 @@ async function composeFrame(ctx, W, H, tl, env) {
     drawAreaNames(ctx, W, H, tl, mapPointProjector(W));
     drawRouteLabels(ctx, W, H, tl, mapLabelAnchor(W));
     drawOverlays(ctx, W, H, tl.progress, tl);
+    drawMapCredit(ctx, W, H);
     return;
   }
   if (env.bgFill) { ctx.fillStyle = env.bgFill; ctx.fillRect(0, 0, W, H); }
@@ -3520,6 +3679,9 @@ async function exportMP4() {
   const N = exportFrameCount();
   const useMap = bgMode === "map" && !!map;
 
+  const trackInfo = { format: "mp4", width: W, height: H, fps, camera: cameraMode, map: useMap ? currentMapStyle : "transparent", seconds: Math.round(totalMs / 1000) };
+  track("export_start", trackInfo);
+  const exportT0 = performance.now();
   pausePreviewForExport();
   showProgress(true, "Exporting MP4", true);
   let mapState = null, output = null;
@@ -3561,17 +3723,19 @@ async function exportMP4() {
       const done = (i+1)/N, spent = performance.now()-t0;
       setProgress(`Frame ${i+1} of ${N}`, base + done*(98-base), i > 4 ? `about ${fmtEta(spent/done - spent)} left` : "");
     }
-    if (exportCancelled) { await output.cancel(); showStatus("Export cancelled"); return; }
+    if (exportCancelled) { await output.cancel(); showStatus("Export cancelled"); track("export_cancelled", trackInfo); return; }
 
     setProgress("Finishing file…", 99);
     await output.finalize();
     const blob = new Blob([output.target.buffer], { type: "video/mp4" });
     download(blob, `${fileName}-${W}x${H}-${fps}fps.mp4`);
+    track("export_complete", { ...trackInfo, size_mb: +(blob.size / 1e6).toFixed(1), render_s: Math.round((performance.now() - exportT0) / 1000) });
     showStatus(`MP4 saved: ${W}×${H} · ${fps} fps · ${codec === "hevc" ? "HEVC" : "H.264"} · ${(blob.size/1e6).toFixed(1)} MB`, 4500);
   } catch (err) {
     console.error(err);
     if (output) { try { await output.cancel(); } catch (_) {} }
     showStatus(`Export failed: ${err.message}`, 6000);
+    track("export_failed", { ...trackInfo, error: String(err.message).slice(0, 90) });
   } finally {
     if (mapState) endMapExport(mapState);
     exporting = false;
@@ -3600,6 +3764,7 @@ async function exportPNG() {
     const blob = await new Promise(r => offC.toBlob(r, "image/png"));
     download(blob, `${fileName}-overlay.png`);
     showStatus(`PNG downloaded: ${W}×${H}px`);
+    track("export_complete", { format: "png", width: W, height: H, map: bgMode === "map" ? currentMapStyle : "transparent" });
   } catch (err) {
     console.error(err);
     showStatus(`Export failed: ${err.message}`, 6000);
@@ -3924,7 +4089,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const q = $("area-q").value.trim();
     if (!q) return;
     $("area-add").disabled = true;
-    try { const hit = await addArea(q); $("area-q").value = ""; showStatus(`Highlighting ${hit.name}`); }
+    try { const hit = await addArea(q); $("area-q").value = ""; showStatus(`Highlighting ${hit.name}`); track("area_added"); }
     catch (err) { showStatus(`Couldn't add the area: ${err.message}`, 4000); }
     $("area-add").disabled = false;
   };
@@ -3967,6 +4132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     label.text = await suggestPlaceName(pos.lat, pos.lon);
     renderLabelList();
     showStatus(`Label added at ${(km - trimStartKm()).toFixed(1)} km: ${label.text}`);
+    track("label_added");
   });
 
   // Templates
@@ -3980,6 +4146,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!storeTemplates(list)) { showStatus("Couldn't save: this browser blocks local storage", 4000); return; }
     $("tpl-name").value = ""; renderTemplateList(name);
     showStatus(existed ? `Updated "${name}"` : `Saved "${name}"`);
+    track("look_saved");
   });
   $("tpl-apply").addEventListener("click",()=>{
     const t = loadTemplates().find(t => t.name === $("tpl-select").value);
@@ -4100,6 +4267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize",()=>{ if(normalizedPts.length) layoutPreview(); });
   layoutPreview();
   setBg(bgMode); // Map by default: loads the basemap even before a route is dropped
+  updateCredits();
   applyRoutePreset(currentMapStyle);
   applyOverlayTheme();
 });
