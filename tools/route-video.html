@@ -1476,13 +1476,17 @@ function lerpLatLon(a,b,t) {
   const mix = k => (a[k]!=null && b[k]!=null) ? a[k]+(b[k]-a[k])*t : (a[k]!=null?a[k]:b[k]);
   return { lat:a.lat+(b.lat-a.lat)*t, lon:a.lon+(b.lon-a.lon)*t, ele: mix("ele"), demEle: mix("demEle") };
 }
+// Climbing as GPS watches count it. Recorded tracks (one point a second)
+// wobble by a metre or so all the time; adding up every rise overstates the
+// climb by 5-10%. A rise only counts once it passes 2 m from the last
+// turning point, which matches Garmin Connect within about 2%.
+const GAIN_STEP_M = 2;
 function calcElevGainM(pts) {
-  let gain=0, prev=null;
+  let gain = 0, ref = null;
   for (const p of pts) {
-    if (prev!=null && p.ele!=null && prev.ele!=null) {
-      const d=p.ele-prev.ele; if (d>0) gain+=d;
-    }
-    if (p.ele!=null) prev=p;
+    if (p.ele == null) continue;
+    if (ref == null || p.ele < ref - GAIN_STEP_M) ref = p.ele;
+    else if (p.ele > ref + GAIN_STEP_M) { gain += p.ele - ref; ref = p.ele; }
   }
   return gain;
 }
@@ -3199,7 +3203,7 @@ function setRouteData(tl, wait=false) {
 function buildElevProfile(pts, dists) {
   const total = dists[dists.length-1];
   if (!total || pts.filter(p => p.ele != null).length < 2) return null;
-  const N = 240, e = [];
+  const N = 480, e = [];
   let last = pts.find(p => p.ele != null).ele;
   for (let i = 0; i <= N; i++) {
     const p = latLonAtProgress(pts, dists, i/N);
@@ -3207,8 +3211,10 @@ function buildElevProfile(pts, dists) {
     e.push(last);
   }
   // Light smoothing so GPS altitude noise doesn't look jagged.
-  const sm = e.map((v, i) => (e[Math.max(0, i-2)] + e[Math.max(0, i-1)] + v + e[Math.min(N, i+1)] + e[Math.min(N, i+2)]) / 5);
-  return { e: sm, min: Math.min(...sm), max: Math.max(...sm) };
+  const sm = e.map((v, i) => (e[Math.max(0, i-1)] + v + e[Math.min(N, i+1)]) / 3);
+  // The "max" label shows the real highest point; smoothing shaves summits.
+  const peak = pts.reduce((m, p) => p.ele != null && p.ele > m ? p.ele : m, -Infinity);
+  return { e: sm, min: Math.min(...sm), max: Math.max(...sm), peak };
 }
 function profileEleAt(progress) {
   const e = elevProfile.e, x = Math.max(0, Math.min(1, progress)) * (e.length-1);
@@ -3245,7 +3251,7 @@ function drawElevProfile(ctx, W, H, progress) {
   const gapTop = overlayLayout === "center" ? H*0.12 + 50*base*getOverlaySize() : overlayLayout === "corner" ? 130*base*getOverlaySize() : 0;
   const y0 = st.top ? m + gapTop : H - m - gapBottom - h, y1 = y0 + h, x0 = m;
   const cx0 = x0+pad, cx1 = x0+w-pad, cy0 = y0+pad+labelH, cy1 = y1-pad;
-  const { e, min, max } = elevProfile;
+  const { e, min, max, peak } = elevProfile;
   const range = Math.max(max - min, 1);
   const X = i => cx0 + i/(e.length-1) * (cx1-cx0);
   const Y = v => cy1 - (v - min)/range * (cy1-cy0);
@@ -3290,7 +3296,7 @@ function drawElevProfile(ctx, W, H, progress) {
   }
   if (st.showMax) {
     ctx.font = `500 ${Math.round(21*s)}px ${st.font}`; ctx.textAlign = "right"; ctx.globalAlpha = 0.75;
-    ctx.fillText(`max ${Math.round(max).toLocaleString()} m`, cx1, y0 + pad + 28*s);
+    ctx.fillText(`max ${Math.round(peak).toLocaleString()} m`, cx1, y0 + pad + 28*s);
   }
   ctx.restore();
 }
