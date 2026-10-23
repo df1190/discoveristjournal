@@ -133,8 +133,30 @@
 .follow-btn:hover { transform: translateY(-2px); }
 .follow-btn svg { width: 34px; height: 34px; }
 
+/* ── Day cards: dark header with an orange day number, stats as pills ── */
+.day-card {
+  background: #fff; border: 1px solid rgba(26, 26, 24, 0.07); border-radius: 22px; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(26, 26, 24, 0.04), 0 12px 32px rgba(26, 26, 24, 0.07);
+}
+.day-header {
+  position: relative; border-left: 0; padding: 26px 30px; gap: 22px;
+  background: radial-gradient(120% 140% at 0% 0%, rgba(249, 101, 0, 0.16) 0%, rgba(249, 101, 0, 0) 45%), linear-gradient(135deg, #22211e 0%, #121210 100%);
+}
+.day-num {
+  font-size: 58px; line-height: 0.9; min-width: 0; color: var(--ktm-orange);
+  padding-right: 22px; border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+.day-label { color: rgba(255, 255, 255, 0.6); letter-spacing: 0.22em; margin-bottom: 6px; }
+.day-title { font-size: 26px; letter-spacing: 0.03em; }
+.day-meta-row { background: transparent; padding: 20px 30px 0; gap: 8px; }
+.day-spec {
+  background: var(--cream); color: #5c4630; border-radius: 999px; padding: 6px 13px 6px 11px;
+  font-size: 12px; font-weight: 500; line-height: 1.3; gap: 7px;
+}
+.day-spec .meta-dot { width: 5px; height: 5px; }
+.day-body { padding: 20px 30px 30px; }
+
 /* ── The rest of the page, rounded to match ── */
-.day-card { border-radius: 18px; }
 .verdict { border-radius: 20px; border-top: 0; overflow: hidden; box-shadow: inset 0 3px 0 var(--ktm-orange); }
 .post-quote { border-radius: 0 14px 14px 0; }
 .video-wrap, .reel-frame { border-radius: 14px; }
@@ -148,4 +170,9 @@
   .pn-item { min-height: 150px; }
   .pn-item.right { align-items: flex-start; text-align: left; }
   .gear-used, .incl-box { padding: 22px 18px; }
+  .day-header { padding: 22px 20px; gap: 16px; }
+  .day-num { font-size: 46px; padding-right: 16px; }
+  .day-title { font-size: 21px; }
+  .day-meta-row { padding: 16px 20px 0; }
+  .day-body { padding: 16px 20px 24px; }
 }
