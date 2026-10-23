@@ -1,0 +1,151 @@
+/* Cards on the moto ride and rally reports (sidebar, gear, inclusions,
+   next/previous, follow): white, rounded, soft shadows, photo thumbnails.
+   Loaded after each page's own <style>, so these rules win. */
+
+/* ── Shared surfaces ── */
+.sidebar .sw,
+.incl-box,
+.gear-used {
+  background: #fff;
+  border: 1px solid rgba(26, 26, 24, 0.07);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(26, 26, 24, 0.04), 0 10px 28px rgba(26, 26, 24, 0.06);
+}
+.sidebar .sw { padding: 22px 22px 18px; margin-bottom: 18px; }
+.sidebar .sw-title,
+.gear-title {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 16px; letter-spacing: 0.1em;
+  border-bottom: 0; padding-bottom: 0; margin-bottom: 14px;
+}
+.sidebar .sw-title::before,
+.gear-title::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ktm-orange); flex: none;
+}
+
+/* ── Rally facts: one tray, no boxes inside boxes ── */
+.quick-stat-grid {
+  gap: 0; border-radius: 14px; overflow: hidden; background: var(--cream);
+}
+.quick-stat-grid .qs {
+  background: transparent !important; border: 0 !important; border-radius: 0;
+  padding: 14px 14px 12px; text-align: left;
+}
+.quick-stat-grid .qs:nth-child(odd) { border-right: 1px solid rgba(26, 26, 24, 0.07) !important; }
+.quick-stat-grid .qs:nth-child(n+3) { border-top: 1px solid rgba(26, 26, 24, 0.07) !important; }
+.quick-stat-grid .qs-val { font-size: 30px; }
+.quick-stat-grid .qs-lbl { font-size: 9.5px; letter-spacing: 0.14em; margin-top: 3px; }
+
+/* ── In this report: numbered, with a highlight that follows the scroll ── */
+.sidebar .toc-list { counter-reset: toc; gap: 2px; }
+.sidebar .toc-list li a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 10px; margin: 0 -10px; border: 0; border-radius: 10px;
+  font-size: 13px; color: var(--ink); line-height: 1.35;
+  transition: background 0.2s, color 0.2s;
+}
+.sidebar .toc-list li a::before {
+  counter-increment: toc; content: counter(toc, decimal-leading-zero);
+  font: 500 10.5px/1 'DM Sans', sans-serif; letter-spacing: 0.06em; color: #b3a28a; min-width: 18px;
+}
+.sidebar .toc-list li a:hover,
+.sidebar .toc-list li a.active { background: var(--cream); color: var(--charcoal); padding-left: 10px; }
+.sidebar .toc-list li a.active { color: var(--ktm-orange); }
+.sidebar .toc-list li a.active::before { color: var(--ktm-orange); }
+
+/* ── Other editions / related: photo thumbnails ── */
+.rel-list { gap: 4px; }
+.rel-item {
+  align-items: center; gap: 12px; padding: 8px; margin: 0 -8px; border-radius: 14px;
+  transition: background 0.2s;
+}
+.rel-item:hover { background: var(--cream); }
+.rel-thumb {
+  width: 64px; height: 48px; flex: none; border-radius: 10px; overflow: hidden; background: var(--sand);
+}
+.rel-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+.rel-item:hover .rel-thumb img { transform: scale(1.08); }
+.rel-item > div { min-width: 0; }
+.rel-item::after {
+  content: "→"; margin-left: auto; padding-left: 6px; color: #c2b39e; font-size: 14px;
+  transition: transform 0.2s, color 0.2s;
+}
+.rel-item:hover::after { transform: translateX(3px); color: var(--ktm-orange); }
+.rel-name { font-size: 13px; }
+
+/* ── Package inclusions ── */
+.incl-box { border-left: 1px solid rgba(26, 26, 24, 0.07); padding: 24px 26px; }
+.incl-grid { gap: 10px 24px; }
+.incl-item { font-size: 14px; gap: 10px; }
+.incl-item::before {
+  content: ""; width: 20px; height: 20px; border-radius: 50%; flex: none;
+  background: rgba(249, 101, 0, 0.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23f96500' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat;
+}
+
+/* ── Gear ── */
+.gear-used { border-top: 1px solid rgba(26, 26, 24, 0.07); padding: 28px; }
+.gear-grid { gap: 10px; }
+.gear-item {
+  position: relative; background: var(--cream); border: 1px solid transparent; border-radius: 14px;
+  padding: 16px 16px 14px; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+.gear-item:hover {
+  transform: translateY(-2px); background: #fff; border-color: rgba(249, 101, 0, 0.35);
+  box-shadow: 0 12px 26px rgba(26, 26, 24, 0.08);
+}
+.gear-name { font-size: 14px; margin-top: 2px; }
+.gear-cta { margin-top: 10px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ktm-orange); }
+.gear-cta::after { content: " →"; display: inline-block; transition: transform 0.2s; }
+.gear-item:hover .gear-cta::after { transform: translateX(3px); }
+
+/* ── Previous / next: photo cards ── */
+.post-nav { background: var(--white); border-top: 0; padding-top: 24px; }
+.post-nav-inner { gap: 16px; }
+.pn-item {
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: 190px; padding: 28px; border: 0; border-radius: 22px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: var(--charcoal) center / cover no-repeat;
+  box-shadow: 0 10px 30px rgba(26, 26, 24, 0.12);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.pn-item::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(to top, rgba(10, 10, 9, 0.88) 0%, rgba(10, 10, 9, 0.35) 60%, rgba(10, 10, 9, 0.15) 100%);
+  transition: opacity 0.3s;
+}
+.pn-item:hover { transform: translateY(-3px); box-shadow: 0 20px 44px rgba(26, 26, 24, 0.2); border: 0; }
+.pn-item:hover::before { opacity: 0.85; }
+.pn-dir { color: rgba(255, 255, 255, 0.78) !important; }
+.pn-title { color: #fff !important; font-size: 26px; }
+.pn-item:hover .pn-title { color: #fff !important; }
+.pn-item.right { align-items: flex-end; }
+
+/* ── Follow ── */
+.follow-bar { background: var(--white); border-top: 0; }
+.follow-links { gap: 12px; }
+.follow-btn {
+  border-radius: 18px; border: 1px solid rgba(26, 26, 24, 0.08); background: #fff; padding: 16px 28px 16px 20px;
+  box-shadow: 0 1px 2px rgba(26, 26, 24, 0.04), 0 8px 22px rgba(26, 26, 24, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.follow-btn:hover { transform: translateY(-2px); }
+.follow-btn svg { width: 34px; height: 34px; }
+
+/* ── The rest of the page, rounded to match ── */
+.day-card { border-radius: 18px; }
+.verdict { border-radius: 20px; border-top: 0; overflow: hidden; box-shadow: inset 0 3px 0 var(--ktm-orange); }
+.post-quote { border-radius: 0 14px 14px 0; }
+.video-wrap, .reel-frame { border-radius: 14px; }
+.gallery { border-radius: 14px; overflow: hidden; }
+.route-option { border-radius: 14px; }
+.overnight-box { border-radius: 16px; }
+.subscribe-section { border-radius: 20px; }
+.p-tag { border-radius: 999px; padding: 6px 12px; }
+
+@media (max-width: 768px) {
+  .pn-item { min-height: 150px; }
+  .pn-item.right { align-items: flex-start; text-align: left; }
+  .gear-used, .incl-box { padding: 22px 18px; }
+}
