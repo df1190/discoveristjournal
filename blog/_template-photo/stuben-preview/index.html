@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 
   <style>
     /* ─── TOKENS ────────────────────────────────────────────── */
@@ -88,7 +88,7 @@
     .page-header-inner { position:relative; z-index:2; max-width:900px; margin:0 auto; }
     .page-eyebrow { font-size:0.65rem; font-weight:500; letter-spacing:0.28em; text-transform:uppercase; color:var(--moto-red); margin-bottom:1rem; animation:headerFadeUp 0.9s ease both 0.1s; }
     .page-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,8vw,96px); line-height:0.92; letter-spacing:0.03em; color:var(--white); margin-bottom:1.5rem; animation:headerFadeUp 0.9s ease both 0.2s; }
-    .page-title em { font-family:'Playfair Display',serif; font-style:italic; font-size:0.88em; color:var(--clay); letter-spacing:0; }
+    .page-title em { font-family:inherit; font-style:normal; font-size:0.88em; color:var(--clay); letter-spacing:0; }
     .page-meta { display:flex; gap:1.5rem; flex-wrap:wrap; animation:headerFadeUp 0.9s ease both 0.35s; }
     .page-meta-item { font-size:0.72rem; color:rgba(201,180,154,0.8); display:flex; align-items:center; gap:6px; }
     .meta-dot { width:3px; height:3px; background:var(--moto-red); border-radius:50%; flex-shrink:0; }
@@ -103,10 +103,10 @@
     .post-intro { font-size:1.08rem; font-weight:400; color:var(--ink); line-height:1.9; margin-bottom:48px; padding-bottom:48px; border-bottom:1px solid var(--sand); }
     .post-intro strong { color:var(--charcoal); font-weight:500; }
     h2.post-h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,3vw,38px); letter-spacing:0.04em; color:var(--charcoal); line-height:1; margin-bottom:20px; margin-top:56px; }
-    h2.post-h2 em { font-family:'Playfair Display',serif; font-style:italic; font-size:0.9em; color:var(--moto-red); letter-spacing:0; }
+    h2.post-h2 em { font-family:inherit; font-style:normal; font-size:0.9em; color:var(--moto-red); letter-spacing:0; }
     p.post-p { font-size:0.96rem; color:var(--ink); line-height:1.9; margin-bottom:20px; }
     .post-quote { border-left:3px solid var(--moto-red); padding:20px 28px; margin:32px 0; background:var(--cream); }
-    .post-quote p { font-family:'Playfair Display',serif; font-size:1.15rem; font-style:italic; color:var(--charcoal); line-height:1.5; margin:0; }
+    .post-quote p { font-family:inherit; font-size:1.15rem; font-style:normal; color:var(--charcoal); line-height:1.5; margin:0; }
 
     /* ─── QUICK FACTS ───────────────────────────────────────── */
     .quick-facts { background:var(--cream); border:1px solid var(--sand); border-top:3px solid var(--moto-red); padding:28px; margin:40px 0; }
@@ -292,7 +292,7 @@
     .cta-inner { max-width:700px; margin:0 auto; text-align:center; }
     .cta-eyebrow { font-size:0.6rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--moto-red); margin-bottom:16px; }
     .cta-headline { font-family:'Bebas Neue',sans-serif; font-size:clamp(32px,4vw,52px); letter-spacing:0.04em; color:var(--white); line-height:1; margin-bottom:16px; }
-    .cta-headline em { font-family:'Playfair Display',serif; font-style:italic; color:var(--clay); }
+    .cta-headline em { font-family:inherit; font-style:normal; color:var(--clay); }
     .cta-text { font-size:0.9rem; color:rgba(201,180,154,0.75); line-height:1.8; margin-bottom:32px; }
     .cta-buttons { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
     .cta-btn { font-size:0.68rem; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; padding:13px 28px; transition:background 0.2s,color 0.2s,transform 0.2s; }

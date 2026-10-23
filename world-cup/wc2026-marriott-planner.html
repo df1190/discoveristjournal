@@ -10,7 +10,7 @@
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* ── Reset & Base ─────────────────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -79,7 +79,7 @@
     text-transform: uppercase;
   }
   .hero h1 {
-    font-family: 'Playfair Display', serif;
+    font-family:inherit;
     font-size: clamp(32px, 6vw, 60px);
     font-weight: 900;
     line-height: 1.1;
@@ -166,7 +166,7 @@
 
   /* ── Section Titles ───────────────────────────────────────────────────── */
   .section-title {
-    font-family: 'Playfair Display', serif;
+    font-family:inherit;
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 6px;
@@ -314,7 +314,7 @@
   }
   .result-box.visible { display: block; }
   .result-box h3 {
-    font-family: 'Playfair Display', serif;
+    font-family:inherit;
     font-size: 22px;
     margin-bottom: 6px;
   }
@@ -364,7 +364,7 @@
   }
   .points-display.visible { display: block; animation: fadeUp 0.4s ease; }
   .points-number {
-    font-family: 'Playfair Display', serif;
+    font-family:inherit;
     font-size: 56px;
     font-weight: 900;
     color: var(--gold);
@@ -774,7 +774,7 @@
     </div>
 
     <div class="itinerary" id="itinerary-result">
-      <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:6px;">Your World Cup Journey</h3>
+      <h3 style="font-family:inherit;font-size:22px;margin-bottom:6px;">Your World Cup Journey</h3>
       <p style="color:#6B7280;font-size:14px;margin-bottom:24px;">Recommended Marriott for each stop. Book directly to earn Bonvoy points.</p>
       <div id="itinerary-stops"></div>
       <div class="disclaimer" style="margin-top:20px;">
@@ -1257,15 +1257,15 @@ function buildItinerary() {
       <div class="card-title">📊 Your Trip at a Glance</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
         <div>
-          <div style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">${selected.length}</div>
+          <div style="font-size:28px;font-weight:700;font-family:inherit;">${selected.length}</div>
           <div style="font-size:12px;color:#6B7280;">Host Cities</div>
         </div>
         <div>
-          <div style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">${selected.length * 3}+</div>
+          <div style="font-size:28px;font-weight:700;font-family:inherit;">${selected.length * 3}+</div>
           <div style="font-size:12px;color:#6B7280;">Nights Est.</div>
         </div>
         <div>
-          <div style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">${selected.filter(k => CITIES[k].isFinal).length > 0 ? '🏆' : '⚽'}</div>
+          <div style="font-size:28px;font-weight:700;font-family:inherit;">${selected.filter(k => CITIES[k].isFinal).length > 0 ? '🏆' : '⚽'}</div>
           <div style="font-size:12px;color:#6B7280;">${selected.filter(k => CITIES[k].isFinal).length > 0 ? 'Includes the Final' : 'Group Stage'}</div>
         </div>
       </div>

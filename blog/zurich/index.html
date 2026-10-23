@@ -25,7 +25,7 @@
   {"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://discoveristjournal.com/blog/zurich#article","headline":"Zurich: The City That Works","description":"A city of extraordinary precision, lakeside calm, and a cultural scene that punches above its size.","image":"https://discoveristjournal.com/wp-content/uploads/2026/02/Swiss_018-768x1024.jpg","datePublished":"2026-04-01","author":{"@type":"Person","name":"The Discoverist"},"publisher":{"@type":"Organization","name":"The Discoverist Journal","url":"https://discoveristjournal.com"},"url":"https://discoveristjournal.com/blog/zurich"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://discoveristjournal.com"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://discoveristjournal.com/blog"},{"@type":"ListItem","position":3,"name":"Zurich","item":"https://discoveristjournal.com/blog/zurich"}]}]}
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root { --white:#fdfcfb; --cream:#f5f0ea; --sand:#e8ddd0; --clay:#c9b49a; --ink:#2c2c2a; --charcoal:#1a1a18; --moto-red:#d64230; --sage:#8a9e8a; }
@@ -55,7 +55,7 @@
     .post-cats { display:flex; gap:8px; margin-bottom:16px; }
     .post-cat-tag { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--clay); border:1px solid rgba(201,180,154,0.3); padding:5px 12px; }
     .post-hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,6vw,72px); line-height:0.95; letter-spacing:0.03em; color:var(--white); margin-bottom:20px; }
-    .post-hero-title em { font-family:'Playfair Display',serif; font-style:italic; font-size:0.88em; color:var(--clay); letter-spacing:0; }
+    .post-hero-title em { font-family:inherit; font-style:normal; font-size:0.88em; color:var(--clay); letter-spacing:0; }
     .post-meta { display:flex; gap:24px; flex-wrap:wrap; }
     .post-meta-item { font-size:0.72rem; color:rgba(201,180,154,0.7); display:flex; align-items:center; gap:6px; }
     .meta-dot { width:3px; height:3px; background:var(--moto-red); border-radius:50%; display:inline-block; }
@@ -66,10 +66,10 @@
     .post-intro { font-size:1.1rem; font-weight:400; color:var(--ink); line-height:1.85; margin-bottom:48px; padding-bottom:48px; border-bottom:1px solid var(--sand); }
     .post-intro strong { color:var(--charcoal); font-weight:500; }
     h2.post-h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,3vw,38px); letter-spacing:0.04em; color:var(--charcoal); line-height:1.0; margin-bottom:20px; margin-top:56px; }
-    h2.post-h2 em { font-family:'Playfair Display',serif; font-style:italic; font-size:0.9em; color:var(--moto-red); letter-spacing:0; }
+    h2.post-h2 em { font-family:inherit; font-style:normal; font-size:0.9em; color:var(--moto-red); letter-spacing:0; }
     p.post-p { font-size:0.95rem; color:var(--clay); line-height:1.9; margin-bottom:20px; }
     .post-quote { border-left:3px solid var(--moto-red); padding:24px 32px; margin:40px 0; background:rgba(214,66,48,0.03); }
-    .post-quote p { font-family:'Playfair Display',serif; font-size:1.2rem; font-style:italic; color:var(--charcoal); line-height:1.45; margin:0; }
+    .post-quote p { font-family:inherit; font-size:1.2rem; font-style:normal; color:var(--charcoal); line-height:1.45; margin:0; }
     .quick-facts { background:var(--cream); padding:32px; margin:40px 0; border:1px solid var(--sand); border-top:2px solid var(--moto-red); }
     .qf-title { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:0.1em; color:var(--moto-red); margin-bottom:20px; }
     .qf-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
