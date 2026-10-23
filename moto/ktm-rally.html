@@ -214,7 +214,7 @@
   }
   .rally-gallery-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 1.25rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -258,6 +258,11 @@
   .rally-gallery-label a:hover {
     color: #ff6600;
     border-color: #ff6600;
+  }
+  @media (max-width: 1024px) {
+    .rally-gallery-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
   @media (max-width: 768px) {
     .rally-gallery-grid {
@@ -371,6 +376,18 @@
   </div>
   <div class="trips-grid">
 
+    <!-- ITALY (latest edition first) -->
+    <a href="/moto/ktm-italy" class="trip-card">
+      <img src="/Media/Moto/KTM-Italy/ktm-adventure-rally-italy-2026-hero-rider-dust-forest-trail.jpg" alt="KTM Adventure Rally Italy 2026, rider in the dust on a forest trail in Umbria" loading="lazy">
+      <div class="trip-overlay"></div>
+      <div class="trip-info">
+        <p class="trip-country">Italy · 2026</p>
+        <h2 class="trip-name">Italy</h2>
+        <p class="trip-desc">White gravel, olive groves and the Apennines</p>
+      </div>
+      <span class="trip-tag">Reels + Photos</span>
+    </a>
+
     <!-- BOSNIA -->
     <a href="/moto/ktm-bosnia" class="trip-card">
       <img src="../Media/Moto/KTM-Bosnia/ktm-adventure-rally-bosnia-2019-bikes-mountain-plateau-clouds.jpg" alt="KTM Adventure Rally Bosnia 2019 — bikes on mountain plateau with clouds" loading="lazy">
@@ -419,18 +436,6 @@
       <span class="trip-tag">Video + Photos</span>
     </a>
 
-    <!-- ITALY -->
-    <a href="/moto/ktm-italy" class="trip-card">
-      <img src="../Media/Moto/KTM-adventure-rally-europe-italy-2026.png" alt="KTM Adventure Rally Italy 2026" loading="lazy" style="object-fit:contain;background:#0d0d0b;padding:1.5rem">
-      <div class="trip-overlay"></div>
-      <div class="trip-info">
-        <p class="trip-country">Italy</p>
-        <h2 class="trip-name">Italy</h2>
-        <p class="trip-desc">Dolomites, alpine passes and the long way south</p>
-      </div>
-      <span class="trip-tag">Coming Soon 2026</span>
-    </a>
-
   </div>
 </section>
 
@@ -439,6 +444,13 @@
   <div class="section-label" style="text-align:center;margin-bottom:0.5rem;color:#111;opacity:1">The Machines</div>
   <h2 class="section-title" style="text-align:center;margin-bottom:2rem;color:#111!important">Bikes &amp; Numbers</h2>
   <div class="rally-gallery-grid">
+
+    <div class="rally-gallery-card">
+      <div class="rally-gallery-img-wrap">
+        <img src="/Media/Moto/KTM-Italy/ktm-adventure-rally-italy-2026-bikes-and-number-58-ktm.jpg" alt="KTM Adventure Rally Italy 2026, my bike with race number 58" loading="lazy">
+      </div>
+      <div class="rally-gallery-label"><a href="/moto/ktm-italy">Italy</a></div>
+    </div>
 
     <div class="rally-gallery-card">
       <div class="rally-gallery-img-wrap">
