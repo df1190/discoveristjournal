@@ -155,6 +155,9 @@
     .hotel-img.placeholder::after{content:'Photo · Coming Soon';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.13);font-family:'DM Sans',sans-serif;white-space:nowrap}
     .hotel-badge{position:absolute;top:12px;left:12px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;font-family:'DM Sans',sans-serif}
     .badge-pick{background:rgba(214,66,48,0.9);color:var(--white)}
+    .hotel-card--new{border:2px solid var(--moto-red);box-shadow:0 0 0 5px rgba(214,66,48,0.1),0 12px 36px rgba(214,66,48,0.18)}
+    .hotel-card--new:hover{border-color:var(--moto-red)}
+    .hotel-new-badge{position:absolute;top:12px;right:12px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;padding:4px 10px;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--moto-red);background:var(--white);box-shadow:0 2px 10px rgba(0,0,0,0.15)}
     .badge-new{background:rgba(26,26,24,0.85);color:var(--white)}
     .badge-eco{background:rgba(138,158,138,0.9);color:var(--white)}
     .hotel-body{padding:22px 24px;flex:1;display:flex;flex-direction:column}
@@ -454,6 +457,59 @@
 <div class="hotels-main">
   <div class="hotels-grid" id="hotelsGrid">
 
+    <!-- ── NEW: EUROPE / SWEDEN (Sept 2026) ── -->
+    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-country="sweden">
+      <div class="hotel-img">
+        <span class="hotel-new-badge">New Hotel</span>
+        <img src="Media/Hotels/hagastrand-stockholm/cover.jpg" alt="Hagastrand, Autograph Collection hotel facade at dusk, Stockholm Sweden" loading="lazy">
+        <span class="hotel-badge badge-pick">Discoverist Pick</span>
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇸🇪 Solna, Stockholm, Sweden</p>
+        <h3 class="hotel-name">Hagastrand, Autograph Collection</h3>
+        <div class="hotel-tags"><span class="h-tag">Spa &amp; Pool</span><span class="h-tag">Haga Park</span><span class="h-tag">Design Hotel</span></div>
+        <p class="hotel-desc">Scandinavia's first Autograph Collection, on Brunnsviken in the Royal Haga Park. Wingårdhs interiors, a glass-roofed atrium, and a 2,500 sqm spa with snow room and underwater music.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">9.3</span><span class="score-max">/10</span></div><!-- DRAFT score -->
+          <a href="https://prf.hn/l/QL208Ed/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-country="sweden">
+      <div class="hotel-img">
+        <span class="hotel-new-badge">New Hotel</span>
+        <img src="Media/Hotels/stallmastaregarden-stockholm/cover.jpg" alt="Stallmästaregården historic yellow inn and courtyard, Stockholm Sweden" loading="lazy">
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇸🇪 Stockholm, Sweden</p>
+        <h3 class="hotel-name">Stallmästaregården</h3>
+        <div class="hotel-tags"><span class="h-tag">Historic Inn</span><span class="h-tag">Waterfront</span><span class="h-tag">Design Hotels</span></div>
+        <p class="hotel-desc">An inn since the 1600s on the shore of Brunnsviken, at the edge of the Royal Haga Park. A yellow main house, a gravel courtyard, and a restaurant under old wooden beams.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">8.9</span><span class="score-max">/10</span></div><!-- DRAFT score -->
+          <a href="https://prf.hn/l/jXGDlX0/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-country="sweden">
+      <div class="hotel-img">
+        <span class="hotel-new-badge">New Hotel</span>
+        <img src="Media/Hotels/ac-stockholm/cover.jpg" alt="AC Hotel Stockholm Ulriksdal guest room with king bed and window seating, Sweden" loading="lazy">
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇸🇪 Solna, Stockholm, Sweden</p>
+        <h3 class="hotel-name">AC Hotel Stockholm Ulriksdal</h3>
+        <div class="hotel-tags"><span class="h-tag">Train to City</span><span class="h-tag">Arena &amp; Mall</span><span class="h-tag">24h Gym</span></div>
+        <p class="hotel-desc">Steps from Ulriksdal station, with commuter trains to Stockholm City in about 10 to 15 minutes. Five minutes by car to Strawberry Arena and Mall of Scandinavia.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">8.4</span><span class="score-max">/10</span></div><!-- DRAFT score -->
+          <a href="https://prf.hn/l/eOlm0D8/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
     <!-- ── EUROPE / ITALY ── -->
     <div class="hotel-card reveal" data-continent="europe" data-country="italy">
       <div class="hotel-img">
@@ -537,56 +593,6 @@
         <div class="hotel-footer">
           <div class="hotel-score"><span class="score-num">9.2</span><span class="score-max">/10</span></div>
           <a href="https://prf.hn/l/mA5BoXq/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── EUROPE / SWEDEN ── -->
-    <div class="hotel-card reveal" data-continent="europe" data-country="sweden">
-      <div class="hotel-img">
-        <img src="Media/Hotels/hagastrand-stockholm/cover.jpg" alt="Hagastrand, Autograph Collection hotel facade at dusk, Stockholm Sweden" loading="lazy">
-        <span class="hotel-badge badge-pick">Discoverist Pick</span>
-      </div>
-      <div class="hotel-body">
-        <p class="hotel-country">🇸🇪 Solna, Stockholm, Sweden</p>
-        <h3 class="hotel-name">Hagastrand, Autograph Collection</h3>
-        <div class="hotel-tags"><span class="h-tag">Spa &amp; Pool</span><span class="h-tag">Haga Park</span><span class="h-tag">Design Hotel</span></div>
-        <p class="hotel-desc">Scandinavia's first Autograph Collection, on Brunnsviken in the Royal Haga Park. Wingårdhs interiors, a glass-roofed atrium, and a 2,500 sqm spa with snow room and underwater music.</p>
-        <div class="hotel-footer">
-          <div class="hotel-score"><span class="score-num">9.3</span><span class="score-max">/10</span></div><!-- DRAFT score -->
-          <a href="https://prf.hn/l/QL208Ed/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="hotel-card reveal" data-continent="europe" data-country="sweden">
-      <div class="hotel-img">
-        <img src="Media/Hotels/stallmastaregarden-stockholm/cover.jpg" alt="Stallmästaregården historic yellow inn and courtyard, Stockholm Sweden" loading="lazy">
-      </div>
-      <div class="hotel-body">
-        <p class="hotel-country">🇸🇪 Stockholm, Sweden</p>
-        <h3 class="hotel-name">Stallmästaregården</h3>
-        <div class="hotel-tags"><span class="h-tag">Historic Inn</span><span class="h-tag">Waterfront</span><span class="h-tag">Design Hotels</span></div>
-        <p class="hotel-desc">An inn since the 1600s on the shore of Brunnsviken, at the edge of the Royal Haga Park. A yellow main house, a gravel courtyard, and a restaurant under old wooden beams.</p>
-        <div class="hotel-footer">
-          <div class="hotel-score"><span class="score-num">8.9</span><span class="score-max">/10</span></div><!-- DRAFT score -->
-          <a href="https://prf.hn/l/jXGDlX0/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="hotel-card reveal" data-continent="europe" data-country="sweden">
-      <div class="hotel-img">
-        <img src="Media/Hotels/ac-stockholm/cover.jpg" alt="AC Hotel Stockholm Ulriksdal guest room with king bed and window seating, Sweden" loading="lazy">
-      </div>
-      <div class="hotel-body">
-        <p class="hotel-country">🇸🇪 Solna, Stockholm, Sweden</p>
-        <h3 class="hotel-name">AC Hotel Stockholm Ulriksdal</h3>
-        <div class="hotel-tags"><span class="h-tag">Train to City</span><span class="h-tag">Arena &amp; Mall</span><span class="h-tag">24h Gym</span></div>
-        <p class="hotel-desc">Steps from Ulriksdal station, with commuter trains to Stockholm City in about 10 to 15 minutes. Five minutes by car to Strawberry Arena and Mall of Scandinavia.</p>
-        <div class="hotel-footer">
-          <div class="hotel-score"><span class="score-num">8.4</span><span class="score-max">/10</span></div><!-- DRAFT score -->
-          <a href="https://prf.hn/l/eOlm0D8/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
         </div>
       </div>
     </div>
@@ -963,15 +969,15 @@
   const PANO_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|)$/.test(location.hostname);
   const panoUrl = path => (PANO_LOCAL ? '' : PANO_REMOTE) + path;
 
-  /* One set per hotel: dir + [file name without .jpg, label]. Thumbs live in <dir>360-thumbs/<file>-thumb.jpg */
+  /* One set per hotel: dir + [file name without .jpg, label, optional starting yaw in degrees]. Thumbs live in <dir>360-thumbs/<file>-thumb.jpg */
   const PANO_SETS = {
     'hagastrand': {name:'Hagastrand', flag:'🇸🇪', dir:'Media/Hotels/hagastrand-stockholm/', items:[
-      ['hagastrand-stockholm-360-panorama-private-terrace','Suite · Private Terrace'],
-      ['hagastrand-stockholm-360-panorama-suite-living-room','Suite · Living Room'],
-      ['hagastrand-stockholm-360-panorama-bedroom-window-day','Suite · Bedroom'],
+      ['hagastrand-stockholm-360-panorama-bedroom-window-day','Suite · Bedroom', 105],
       ['hagastrand-stockholm-360-panorama-bedroom-wardrobe','Suite · Bedroom & Wardrobe'],
+      ['hagastrand-stockholm-360-panorama-suite-living-room','Suite · Living Room'],
       ['hagastrand-stockholm-360-panorama-bathroom-terrazzo','Suite · Terrazzo Bathroom'],
       ['hagastrand-stockholm-360-panorama-suite-entrance-hall','Suite · Entrance Hall'],
+      ['hagastrand-stockholm-360-panorama-private-terrace','Suite · Private Terrace'],
       ['hagastrand-stockholm-360-panorama-bedroom-dusk','Suite · Bedroom at Dusk'],
       ['hagastrand-stockholm-360-panorama-bedroom-evening','Suite · Bedroom in the Evening']
     ]},
@@ -989,9 +995,9 @@
     ]}
   };
   /* 360s as modal media entries for a hotel */
-  const panoMedia = slug => PANO_SETS[slug].items.map(([f, label]) => ({
+  const panoMedia = slug => PANO_SETS[slug].items.map(([f, label, yaw = 0]) => ({
     type:'pano', src:panoUrl(PANO_SETS[slug].dir + f + '.jpg'),
-    thumb:PANO_SETS[slug].dir + '360-thumbs/' + f + '-thumb.jpg', label
+    thumb:PANO_SETS[slug].dir + '360-thumbs/' + f + '-thumb.jpg', label, yaw
   }));
 
   let _panoSet = Object.keys(PANO_SETS)[0], _panoIdx = 0, _panoInst = null;
@@ -999,11 +1005,12 @@
   function loadPano(idx) {
     const set = PANO_SETS[_panoSet];
     _panoIdx = (idx + set.items.length) % set.items.length;
-    const [file, label] = set.items[_panoIdx];
+    const [file, label, yaw = 0] = set.items[_panoIdx];
     if (_panoInst) { _panoInst.destroy(); _panoInst = null; }
     _panoInst = pannellum.viewer('panoViewer', {
       type: 'equirectangular',
       panorama: panoUrl(set.dir + file + '.jpg'),
+      yaw,
       autoLoad: true,
       compass: false,
       showZoomCtrl: true,
@@ -1635,7 +1642,7 @@
     if (m.type === 'pano') {
       viewer.innerHTML = `<div class="hm-pano" id="hmPano"></div><span class="hm-pano-label">360° · ${m.label} · Drag to look around</span>`;
       _hmPanoInst = pannellum.viewer('hmPano', {
-        type: 'equirectangular', panorama: m.src, autoLoad: true,
+        type: 'equirectangular', panorama: m.src, yaw: m.yaw, autoLoad: true,
         compass: false, showZoomCtrl: true, keyboardZoom: false, hfov: 100
       });
     } else if (m.type === 'video') {
