@@ -57,86 +57,65 @@
 
     /* PAGE HEADER */
     .page-header{padding:140px 3rem 72px;position:relative;overflow:hidden}
-    .page-header-bg{position:absolute;inset:0;background-image:url('Media/Hero/colombian-mountains.jpg');background-size:cover;background-position:center 50%;z-index:0}
-    .page-header-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(26,26,24,0.2) 0%,rgba(26,26,24,0.6) 100%)}
-    .page-header::after{content:'HOTELS';font-family:'Bebas Neue',sans-serif;font-size:clamp(140px,20vw,280px);letter-spacing:0.04em;color:rgba(255,255,255,0.04);position:absolute;right:-20px;bottom:-20px;line-height:0.8;pointer-events:none;z-index:1}
+    .page-header-bg{position:absolute;inset:0;background-image:url('Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-atrium-lounge-evening.jpg');background-size:cover;background-position:center 40%;z-index:0}
+    .page-header-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,20,18,0.82) 0%,rgba(20,20,18,0.55) 45%,rgba(20,20,18,0.2) 100%)}
     .header-eyebrow,.header-title,.header-sub{position:relative;z-index:2}
-    .page-header::after{content:'HOTELS';font-family:'Bebas Neue',sans-serif;font-size:clamp(140px,20vw,280px);letter-spacing:0.04em;color:rgba(255,255,255,0.03);position:absolute;right:-20px;bottom:-20px;line-height:0.8;pointer-events:none}
-    .header-eyebrow{font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:var(--moto-red);margin-bottom:12px}
+    .header-eyebrow{font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(253,252,251,0.85);margin-bottom:14px;font-weight:500}
     .header-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,8vw,100px);letter-spacing:0.04em;color:var(--white);line-height:0.9;margin-bottom:16px}
     .header-title em{font-family:inherit;font-style:normal;color:var(--clay);font-size:0.6em;display:block;letter-spacing:0.01em;line-height:1.3}
-    .header-sub{font-size:14px;font-weight:300;color:var(--clay);max-width:520px;line-height:1.7}
+    .header-sub{font-size:15px;font-weight:400;color:rgba(253,252,251,0.88);max-width:520px;line-height:1.7}
 
     /* 360 FEATURE */
-    .pano-feature{max-width:1200px;margin:64px auto 0;padding:0 3rem}
+    .pano-feature{max-width:1200px;margin:0 auto;padding:24px 3rem 100px}
     .pano-feature-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
-    .pano-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--moto-red);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-    .pano-eyebrow::before{content:'';width:16px;height:1px;background:var(--moto-red)}
+    .pano-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink);opacity:0.6;margin-bottom:10px;display:flex;align-items:center;gap:8px;font-weight:500}
+    .pano-eyebrow::before{content:'';width:16px;height:1px;background:var(--ink)}
     .pano-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.6vw,42px);letter-spacing:0.03em;color:var(--charcoal);line-height:1}
     .pano-title em{font-family:inherit;font-style:normal;color:var(--moto-red);font-size:0.85em}
-    .pano-sub{font-size:13px;font-weight:300;color:var(--clay);max-width:440px;line-height:1.6}
+    .pano-sub{font-size:14px;font-weight:400;color:var(--ink);opacity:0.75;max-width:440px;line-height:1.6}
     .pano-frame{position:relative;border:1px solid var(--sand);border-radius:4px;overflow:hidden;box-shadow:0 16px 56px rgba(44,44,42,0.14);background:#111110}
     .pano-viewer{width:100%;height:460px}
-    .pano-badge{position:absolute;top:16px;left:16px;z-index:5;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--white);background:rgba(214,66,48,0.92);padding:5px 12px;font-family:'DM Sans',sans-serif;font-weight:600;pointer-events:none}
-    .pano-hint{position:absolute;bottom:16px;left:16px;z-index:5;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);background:rgba(26,26,24,0.55);padding:6px 12px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);pointer-events:none}
+    .pano-badge{position:absolute;top:16px;left:16px;z-index:5;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--white);background:rgba(26,26,24,0.8);padding:5px 12px;font-family:'DM Sans',sans-serif;font-weight:600;pointer-events:none}
+    .pano-hint{position:absolute;bottom:16px;left:16px;z-index:5;font-size:12px;letter-spacing:0.02em;color:rgba(255,255,255,0.7);background:rgba(26,26,24,0.55);padding:6px 12px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);pointer-events:none}
     .pano-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:rgba(255,255,255,0.75);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background 0.2s,color 0.2s;z-index:6}
     .pano-nav:hover{background:rgba(0,0,0,0.7);color:var(--white)}
     .pano-nav-prev{left:16px}
     .pano-nav-next{right:16px}
     .pano-counter{position:absolute;bottom:16px;right:16px;z-index:5;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);background:rgba(26,26,24,0.55);padding:6px 12px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);pointer-events:none}
-    .pano-caption{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--clay);margin-top:12px}
+    .pano-caption{font-size:13px;color:var(--ink);opacity:0.7;margin-top:12px}
     .pano-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
     .pano-frame .pnlm-controls-container{top:48px}
-    .pano-tab{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:8px 18px;border:1px solid var(--sand);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.72;transition:opacity 0.25s,border-color 0.25s,background 0.25s,box-shadow 0.25s;white-space:nowrap}
-    .pano-tab:hover{opacity:1;box-shadow:inset 0 -2px 0 rgba(214,66,48,0.4)}
-    .pano-tab.active{border-color:var(--moto-red);color:var(--charcoal);background:rgba(214,66,48,0.1);opacity:1;font-weight:600;box-shadow:inset 0 -3px 0 var(--moto-red)}
-    @media(max-width:768px){ .pano-viewer{height:320px} .pano-tab{padding:7px 12px;font-size:10px} }
+    .pano-tab{font-size:13px;padding:8px 16px;border:1px solid var(--sand);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.72;transition:opacity 0.25s,border-color 0.25s,background 0.25s,box-shadow 0.25s;white-space:nowrap}
+    .pano-tab:hover{opacity:1;border-color:var(--clay)}
+    .pano-tab.active{border-color:var(--charcoal);color:var(--white);background:var(--charcoal);opacity:1}
+    @media(max-width:768px){ .pano-viewer{height:320px} .pano-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -1.25rem 14px;padding:0 1.25rem} .pano-tabs::-webkit-scrollbar{display:none} .pano-tab{padding:7px 12px;font-size:12px;flex-shrink:0} .pano-feature{padding:8px 1.25rem 72px} }
 
-    /* FEATURED HOTEL */
-    .featured{max-width:1200px;margin:72px auto 0;padding:0 3rem}
-    .featured-strip-head{margin-bottom:20px}
-    .featured-picks-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px}
-    .featured-pick{position:relative;border:1px solid var(--sand);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow 0.3s,transform 0.2s}
-    .featured-pick:hover{box-shadow:0 12px 48px rgba(44,44,42,0.14);transform:translateY(-2px)}
-    .featured-pick--new{border:2px solid var(--moto-red);box-shadow:0 0 0 6px rgba(214,66,48,0.1),0 16px 44px rgba(214,66,48,0.22)}
-    .featured-new-badge{position:absolute;top:14px;left:14px;z-index:5;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:5px 12px;font-family:'DM Sans',sans-serif;font-weight:600}
-    .featured-img{overflow:hidden;height:320px}
-    .featured-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.8s ease}
-    .featured-pick:hover .featured-img img{transform:scale(1.04)}
-    .featured-body{padding:36px 40px;background:var(--cream);display:flex;flex-direction:column;flex:1}
-    .featured-badge{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:3px 10px;display:inline-block;margin-bottom:20px;align-self:flex-start}
-    .featured-country{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:10px}
-    .featured-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4vw,52px);letter-spacing:0.04em;color:var(--charcoal);line-height:0.95;margin-bottom:16px}
-    .featured-name em{font-family:inherit;font-style:normal;color:var(--clay);font-size:0.65em;letter-spacing:0.01em}
-    .featured-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-    .feat-tag{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 13px;background:var(--charcoal);color:var(--white);font-weight:500}
-    .featured-desc{font-size:14px;font-weight:300;color:var(--ink);line-height:1.8;margin-bottom:28px}
-    .featured-score-row{display:flex;gap:24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--sand)}
-    .f-score{text-align:center}
-    .f-score-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--charcoal);letter-spacing:0.04em;line-height:1}
-    .f-score-lbl{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);margin-top:2px}
-    .btn-book{display:inline-block;background:var(--moto-red);color:var(--white);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;padding:14px 32px;text-decoration:none;transition:background 0.3s,transform 0.2s,box-shadow 0.3s;font-family:'DM Sans',sans-serif;font-weight:600;align-self:flex-start;position:relative;overflow:hidden}
-    .btn-book::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.18) 50%,transparent 100%);transform:translateX(-120%);transition:transform 0.5s ease;pointer-events:none}
-    .btn-book:hover{background:var(--charcoal);transform:translateY(-2px);box-shadow:0 6px 24px rgba(26,26,24,0.28)}
-    .btn-book:hover::before{transform:translateX(120%)}
 
     /* FILTER BAR */
     .filter-bar{position:sticky;top:64px;z-index:50;background:var(--white);border-bottom:1px solid var(--sand);padding:0 3rem}
     .filter-row-1{display:flex;align-items:center;gap:0;padding:14px 0;border-bottom:1px solid transparent;transition:border-color 0.2s}
     .filter-row-1.has-chips{border-bottom-color:var(--sand)}
     .filter-lbl{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink);opacity:0.5;margin-right:16px;white-space:nowrap;font-weight:500}
-    .continent-tabs{display:flex;gap:4px;flex:1}
-    .c-tab{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:9px 22px;border:1px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.72;transition:opacity 0.25s,color 0.25s,border-color 0.25s,background 0.25s,box-shadow 0.25s,transform 0.25s;white-space:nowrap;position:relative}
-    .c-tab:hover{color:var(--charcoal);opacity:1;border-color:var(--sand);box-shadow:inset 0 -2px 0 rgba(214,66,48,0.4);transform:translateY(-1px)}
-    .c-tab.active{border-color:var(--moto-red);color:var(--charcoal);background:rgba(214,66,48,0.1);opacity:1;font-weight:600;box-shadow:inset 0 -3px 0 var(--moto-red);transform:translateY(-1px)}
-    .filter-count{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;color:var(--moto-red);white-space:nowrap;line-height:1}
+    .continent-tabs{display:flex;gap:4px;flex-shrink:0}
+    .c-tab{font-size:13px;padding:8px 16px;border:1px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.72;transition:opacity 0.25s,color 0.25s,border-color 0.25s,background 0.25s,box-shadow 0.25s,transform 0.25s;white-space:nowrap;position:relative}
+    .c-tab:hover{color:var(--charcoal);opacity:1;border-color:var(--sand)}
+    .c-tab.active{border-color:var(--charcoal);color:var(--white);background:var(--charcoal);opacity:1}
+    .filter-count{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;color:var(--charcoal);margin-left:16px;white-space:nowrap;line-height:1}
     .filter-count span{font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink);opacity:0.45;margin-left:6px;vertical-align:middle;font-weight:500}
     .country-chips{display:none;gap:6px;padding:12px 0;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
     .country-chips::-webkit-scrollbar{display:none}
     .country-chips.active{display:flex}
-    .c-chip{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 16px;border:1.5px solid var(--clay);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--charcoal);opacity:0.78;white-space:nowrap;transition:opacity 0.25s,color 0.25s,border-color 0.25s,background 0.25s,transform 0.25s,box-shadow 0.25s;flex-shrink:0}
-    .c-chip:hover{border-color:var(--moto-red);color:var(--charcoal);opacity:1;transform:translateY(-2px);box-shadow:0 4px 12px rgba(214,66,48,0.15)}
-    .c-chip.active{border-color:var(--moto-red);color:var(--white);background:var(--moto-red);opacity:1;font-weight:600;box-shadow:0 4px 14px rgba(214,66,48,0.28)}
+    .c-chip{font-size:13px;padding:6px 14px;border:1px solid var(--clay);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--charcoal);opacity:0.78;white-space:nowrap;transition:opacity 0.25s,color 0.25s,border-color 0.25s,background 0.25s,transform 0.25s,box-shadow 0.25s;flex-shrink:0}
+    .c-chip:hover{border-color:var(--charcoal);color:var(--charcoal);opacity:1}
+    .c-chip.active{border-color:var(--charcoal);color:var(--white);background:var(--charcoal);opacity:1}
+    .filter-sep{width:1px;height:22px;background:var(--sand);margin:0 14px;flex-shrink:0}
+    .feature-chips{display:flex;gap:6px;flex-shrink:0}
+    .f-chip{font-size:13px;padding:6px 12px;border:1px solid var(--sand);cursor:pointer;font-family:'DM Sans',sans-serif;background:none;color:var(--ink);white-space:nowrap;transition:border-color 0.2s,background 0.2s,color 0.2s}
+    .f-chip:hover{border-color:var(--clay)}
+    .f-chip[aria-pressed="true"]{border-color:var(--charcoal);background:var(--charcoal);color:var(--white)}
+    .sort-wrap{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);white-space:nowrap;flex-shrink:0}
+    .sort-wrap select{font:inherit;color:var(--charcoal);background:transparent;border:1px solid var(--sand);padding:6px 28px 6px 10px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+    .grid-note{font-size:13px;color:var(--ink);opacity:0.7;margin-bottom:18px}
 
     /* HOTELS GRID */
     .hotels-main{max-width:1200px;margin:0 auto;padding:56px 3rem 100px}
@@ -146,30 +125,29 @@
 
     /* HOTEL CARD */
     .hotel-card{background:var(--cream);border:1px solid var(--sand);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow 0.3s,transform 0.2s,opacity 0.22s,border-color 0.3s}
-    .hotel-card:hover{box-shadow:0 10px 40px rgba(44,44,42,0.12);transform:translateY(-3px);border-color:rgba(214,66,48,0.35)}
+    .hotel-card:hover{box-shadow:0 10px 40px rgba(44,44,42,0.12);transform:translateY(-3px);border-color:var(--clay)}
     .hotel-card.fading{opacity:0;transform:scale(0.97)!important;pointer-events:none}
     .hotel-img{aspect-ratio:4/3;overflow:hidden;position:relative}
     .hotel-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.7s ease}
     .hotel-card:hover .hotel-img img{transform:scale(1.06)}
     .hotel-img.placeholder{background:linear-gradient(135deg,#1e1e1c 0%,#2a2a26 100%)}
     .hotel-img.placeholder::after{content:'Photo · Coming Soon';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.13);font-family:'DM Sans',sans-serif;white-space:nowrap}
-    .hotel-badge{position:absolute;top:12px;left:12px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;font-family:'DM Sans',sans-serif}
-    .badge-pick{background:rgba(214,66,48,0.9);color:var(--white)}
-    .hotel-card--new{border:2px solid var(--moto-red);box-shadow:0 0 0 5px rgba(214,66,48,0.1),0 12px 36px rgba(214,66,48,0.18)}
-    .hotel-card--new:hover{border-color:var(--moto-red)}
-    .hotel-new-badge{position:absolute;top:12px;right:12px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;padding:4px 10px;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--moto-red);background:var(--white);box-shadow:0 2px 10px rgba(0,0,0,0.15)}
+    .hotel-badge{position:absolute;z-index:2;top:12px;left:12px;font-size:12px;padding:4px 10px;font-family:'DM Sans',sans-serif;font-weight:500}
+    .badge-pick{background:rgba(26,26,24,0.85);color:var(--white)}
+        .hotel-new-badge{position:absolute;z-index:2;top:12px;right:12px;font-size:12px;padding:4px 10px;font-family:'DM Sans',sans-serif;font-weight:500;color:var(--charcoal);background:var(--white)}
     .badge-new{background:rgba(26,26,24,0.85);color:var(--white)}
     .badge-eco{background:rgba(138,158,138,0.9);color:var(--white)}
     .hotel-body{padding:22px 24px;flex:1;display:flex;flex-direction:column}
-    .hotel-country{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:6px}
+    .hotel-country{font-size:13px;color:var(--ink);opacity:0.7;margin-bottom:4px}
     .hotel-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;color:var(--charcoal);margin-bottom:10px;line-height:1.05}
     .hotel-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
-    .h-tag{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;background:var(--sand);color:var(--clay)}
-    .hotel-desc{font-size:12px;font-weight:300;color:var(--clay);line-height:1.7;flex:1;margin-bottom:16px}
+    .h-tag{font-size:12px;padding:2px 8px;background:var(--sand);color:var(--ink)}
+    .hotel-desc{font-size:14px;font-weight:400;color:var(--ink);opacity:0.85;line-height:1.6;flex:1;margin-bottom:16px}
     .hotel-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--sand)}
     .hotel-score{display:flex;align-items:baseline;gap:4px}
     .score-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--charcoal);letter-spacing:0.04em;line-height:1}
-    .score-max{font-size:11px;color:var(--clay)}
+    .score-max{font-size:12px;color:var(--ink);opacity:0.55}
+    .score-subs{font-size:12px;color:var(--ink);opacity:0.65;margin-left:10px;align-self:center;line-height:1.3}
     .hotel-book{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;background:var(--moto-red);color:var(--white);padding:10px 18px;text-decoration:none;transition:background 0.25s,transform 0.2s,box-shadow 0.25s;font-family:'DM Sans',sans-serif;font-weight:600;display:inline-block;position:relative;overflow:hidden}
     .hotel-book::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.18) 50%,transparent 100%);transform:translateX(-120%);transition:transform 0.5s ease;pointer-events:none}
     .hotel-book:hover{background:var(--charcoal);transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,26,24,0.22)}
@@ -178,11 +156,13 @@
     /* ── HOTEL MODAL ── */
     .hm-overlay{position:fixed;inset:0;z-index:300;background:rgba(26,26,24,0.78);opacity:0;pointer-events:none;transition:opacity 0.35s ease;backdrop-filter:blur(6px)}
     .hm-overlay.open{opacity:1;pointer-events:all}
-    .hm-panel{position:fixed;bottom:0;left:0;right:0;height:82vh;z-index:301;background:var(--white);display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.48s cubic-bezier(0.16,1,0.3,1);border-radius:10px 10px 0 0;overflow:hidden;border-top:3px solid var(--moto-red);box-shadow:0 -6px 60px rgba(214,66,48,0.18),0 -2px 24px rgba(26,26,24,0.18)}
+    .hm-panel{position:fixed;bottom:0;left:0;right:0;height:82vh;z-index:301;background:var(--white);display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.48s cubic-bezier(0.16,1,0.3,1);border-radius:10px 10px 0 0;overflow:hidden;box-shadow:0 -2px 24px rgba(26,26,24,0.18)}
     .hm-panel.open{transform:translateY(0)}
     .hm-handle{width:36px;height:3px;background:var(--sand);border-radius:2px;margin:12px auto 0;flex-shrink:0}
     .hm-close{position:absolute;top:16px;right:20px;z-index:10;background:rgba(253,252,251,0.92);border:1px solid var(--sand);cursor:pointer;font-size:13px;color:var(--clay);width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:color 0.2s,border-color 0.2s;border-radius:50%;backdrop-filter:blur(4px)}
     .hm-close:hover{color:var(--charcoal);border-color:var(--clay)}
+    .hm-close:focus{outline:none}
+    .hm-close:focus-visible{outline:2px solid var(--charcoal);outline-offset:2px}
     .hm-inner{display:flex;flex:1;overflow:hidden;min-height:0}
     /* gallery */
     .hm-gallery{flex:0 0 52%;display:flex;flex-direction:column;background:#111110;overflow:hidden;min-height:0;position:relative}
@@ -196,31 +176,36 @@
     .hm-nav.hidden{display:none}
     .hm-media-counter{position:absolute;bottom:96px;right:12px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif}
     .hm-no-media{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:10px;color:rgba(255,255,255,0.12);font-size:9px;letter-spacing:0.3em;text-transform:uppercase;font-family:'DM Sans',sans-serif}
+    .hm-gtabs{display:flex;gap:2px;padding:6px 6px 3px;background:#0e0e0d;flex-shrink:0}
+    .hm-gtab{font:500 12px 'DM Sans',sans-serif;color:rgba(255,255,255,0.6);background:none;border:1px solid transparent;padding:4px 10px;cursor:pointer}
+    .hm-gtab:hover{color:var(--white)}
+    .hm-gtab.active{color:var(--white);border-color:rgba(255,255,255,0.35)}
     .hm-thumbs{flex:0 0 88px;display:flex;gap:3px;padding:3px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:#0e0e0d}
     .hm-thumbs::-webkit-scrollbar{display:none}
     .hm-thumb{flex-shrink:0;height:82px;width:auto;min-width:60px;max-width:130px;cursor:pointer;object-fit:cover;opacity:0.5;transition:opacity 0.18s;border:2px solid transparent}
     .hm-thumb:hover{opacity:0.8}
-    .hm-thumb.active{opacity:1;border-color:var(--moto-red)}
+    .hm-thumb.active{opacity:1;border-color:var(--white)}
     .hm-thumb-wrap{position:relative;flex-shrink:0;height:82px;min-width:60px;cursor:pointer;overflow:hidden;border:2px solid transparent;opacity:0.5;transition:opacity 0.18s;background:#1a1a18}
     .hm-thumb-wrap:hover{opacity:0.8}
-    .hm-thumb-wrap.active{opacity:1;border-color:var(--moto-red)}
+    .hm-thumb-wrap.active{opacity:1;border-color:var(--white)}
     .hm-thumb-wrap img{width:100%;height:100%;object-fit:cover}
     .hm-thumb-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:13px;background:rgba(0,0,0,0.32)}
     .hm-thumb-wrap.is-pano{width:120px}
-    .hm-thumb-360{position:absolute;left:4px;bottom:4px;font-size:8px;letter-spacing:0.15em;color:var(--white);background:rgba(214,66,48,0.92);padding:2px 6px;font-family:'DM Sans',sans-serif;font-weight:600}
+    .hm-thumb-360{position:absolute;left:4px;bottom:4px;font-size:8px;letter-spacing:0.15em;color:var(--charcoal);background:rgba(253,252,251,0.92);padding:2px 6px;font-family:'DM Sans',sans-serif;font-weight:600}
     .hm-pano{width:100%;height:100%}
-    .hm-pano-label{position:absolute;left:12px;bottom:12px;z-index:3;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.8);background:rgba(26,26,24,0.55);padding:5px 10px;font-family:'DM Sans',sans-serif;pointer-events:none}
+    .hm-pano-label{position:absolute;left:12px;bottom:12px;z-index:3;font-size:12px;color:rgba(255,255,255,0.8);background:rgba(26,26,24,0.55);padding:5px 10px;font-family:'DM Sans',sans-serif;pointer-events:none}
     /* content */
-    .hm-content{flex:1;overflow-y:auto;padding:32px 40px 48px;display:flex;flex-direction:column;gap:0;min-width:0}
-    .hm-badge-lbl{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:4px 12px;display:inline-block;margin-bottom:16px;align-self:flex-start}
-    .hm-loc{font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--moto-red);margin-bottom:8px;font-weight:500}
+    .hm-content{flex:1;overflow-y:auto;padding:32px 40px 0;display:flex;flex-direction:column;gap:0;min-width:0}
+    .hm-badge-lbl{font-size:12px;color:var(--white);background:var(--charcoal);padding:3px 10px;display:inline-block;margin-bottom:16px;align-self:flex-start}
+    .hm-loc{font-size:14px;color:var(--ink);opacity:0.75;margin-bottom:6px}
+    .hm-stayed{font-size:13px;color:var(--ink);opacity:0.65;margin:-6px 0 16px}
     .hm-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,3.5vw,58px);letter-spacing:0.04em;color:var(--charcoal);line-height:0.95;margin-bottom:16px}
     .hm-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px}
-    .hm-tag{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;background:var(--sand);color:var(--ink);opacity:0.7;font-weight:500}
+    .hm-tag{font-size:13px;padding:3px 10px;background:var(--sand);color:var(--ink)}
     .hm-scores{display:flex;gap:20px;padding:16px 0;border-top:1px solid var(--sand);border-bottom:1px solid var(--sand);margin-bottom:24px;flex-wrap:wrap}
     .hm-score{text-align:center;min-width:56px}
     .hm-score-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--charcoal);letter-spacing:0.04em;line-height:1}
-    .hm-score-lbl{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink);opacity:0.5;margin-top:3px;font-weight:500}
+    .hm-score-lbl{font-size:12px;color:var(--ink);opacity:0.6;margin-top:3px}
     .hm-review{font-size:15px;font-weight:300;color:var(--ink);line-height:1.85;margin-bottom:24px}
     .hm-section-title{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink);opacity:0.5;margin-bottom:10px;font-weight:600}
     .hm-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
@@ -228,7 +213,7 @@
     .hm-list li::before{position:absolute;left:0;font-size:12px;top:2px}
     .hm-list.hl li::before{content:'✓';color:var(--sage)}
     .hm-list.cx li::before{content:'—';color:var(--clay)}
-    .hm-cta-row{display:flex;gap:12px;align-items:center;padding-top:6px;margin-top:auto;padding-bottom:2px;flex-wrap:wrap}
+    .hm-cta-row{display:flex;gap:16px;align-items:center;margin-top:auto;flex-wrap:wrap;position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--sand);padding:14px 0 20px;z-index:2}
     .hm-btn-book{display:inline-block;background:var(--moto-red);color:var(--white);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;padding:14px 28px;text-decoration:none;transition:background 0.25s,transform 0.2s,box-shadow 0.25s;font-family:'DM Sans',sans-serif;font-weight:600;position:relative;overflow:hidden}
     .hm-btn-book::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.18) 50%,transparent 100%);transform:translateX(-120%);transition:transform 0.5s ease;pointer-events:none}
     .hm-btn-book:hover{background:var(--charcoal);transform:translateY(-1px);box-shadow:0 4px 18px rgba(26,26,24,0.25)}
@@ -237,7 +222,6 @@
     .hm-btn-close-text:hover{color:var(--charcoal);opacity:1}
     /* card clickable */
     .hotel-card[data-hotel]{cursor:pointer}
-    .featured-pick[data-hotel]{cursor:pointer}
 
     /* FOOTER */
     footer{background:var(--charcoal);padding:40px 3rem 28px;border-top:1px solid rgba(255,255,255,0.06)}
@@ -260,29 +244,39 @@
     @media(max-width:960px){
       .hm-inner{flex-direction:column}
       .hm-gallery{flex:0 0 42vh;min-height:42vh}
-      .hm-content{padding:24px 24px 60px}
+      .hm-content{padding:24px 24px 0}
       .hm-thumbs{flex:0 0 72px}
       .hm-thumb,.hm-thumb-wrap{height:66px}
     }
     @media(max-width:1024px){
-      .featured-picks-grid{grid-template-columns:1fr}
       .hotels-grid{grid-template-columns:repeat(2,1fr)}
     }
     @media(max-width:768px){
-      .featured-picks-grid{grid-template-columns:1fr}
-    }
-    @media(max-width:768px){
-      nav{padding:1rem 1.25rem}.nav-links,.nav-cta{display:none}.nav-burger{display:flex}
-      .page-header,.featured,.hotels-main{padding-left:1.25rem;padding-right:1.25rem}
+      nav,nav.scrolled{padding:0.8rem 1.25rem}.nav-links,.nav-cta{display:none}.nav-burger{display:flex}
+      .nav-logo{white-space:nowrap}
+      .page-header,.hotels-main{padding-left:1.25rem;padding-right:1.25rem}
       .filter-bar{padding-left:0;padding-right:0;top:57px}
       .filter-row-1{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:10px 1.25rem;gap:6px;flex-wrap:nowrap}
       .filter-row-1::-webkit-scrollbar{display:none}
       .filter-lbl{display:none}
       .filter-count{display:none}
+      .filter-sep{margin:0 4px}
+      .sort-wrap{margin-left:8px}
       .continent-tabs{gap:6px;flex-shrink:0}
-      .c-tab{padding:8px 16px;font-size:10px}
-      .hotels-grid{grid-template-columns:1fr}
-      .featured-body{padding:28px}
+      .c-tab{padding:6px 12px;font-size:13px}
+      .hotels-grid{grid-template-columns:1fr;gap:10px}
+      .hotel-card{display:grid!important;grid-template-columns:112px 1fr}
+      .hotel-img{aspect-ratio:auto;height:100%;min-height:150px}
+      .hotel-badge,.hotel-new-badge{font-size:10px;padding:2px 6px;top:6px;left:6px;right:auto}
+      .hotel-new-badge{top:auto;bottom:6px}
+      .hotel-body{padding:12px 14px}
+      .hotel-name{font-size:19px;margin-bottom:6px}
+      .hotel-tags{display:none}
+      .hotel-desc{font-size:13px;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:none}
+      .hotel-footer{padding-top:10px;margin-top:auto}
+      .score-num{font-size:24px}
+      .score-subs{display:none}
+      .hotel-book{padding:8px 12px}
       .footer-aff{text-align:left}
       .country-chips{padding:6px 1.25rem 10px}
     }
@@ -329,138 +323,43 @@
   <p class="header-sub">Every property personally stayed in. No press trips, no comped nights. Europe, the Americas, and growing.</p>
 </div>
 
-<!-- 360 FEATURE -->
-<div class="pano-feature">
-  <div class="pano-feature-head reveal">
-    <div>
-      <p class="pano-eyebrow">New · Interactive Feature</p>
-      <h2 class="pano-title">Step Inside, <em>360°</em></h2>
-    </div>
-    <p class="pano-sub">Pick a hotel and drag around the rooms we actually stayed in. Use the arrows to move from room to room.</p>
-  </div>
-  <div class="pano-tabs reveal" id="panoTabs" role="tablist" aria-label="Choose a hotel"></div>
-  <div class="pano-frame reveal">
-    <span class="pano-badge">360°</span>
-    <span class="pano-hint">Drag to Look Around</span>
-    <button class="pano-nav pano-nav-prev" onclick="navPano(-1)" aria-label="Previous 360 photo">&#8592;</button>
-    <button class="pano-nav pano-nav-next" onclick="navPano(1)" aria-label="Next 360 photo">&#8594;</button>
-    <span class="pano-counter" id="panoCounter"></span>
-    <div class="pano-viewer" id="panoViewer"></div>
-  </div>
-  <p class="pano-caption" id="panoCaption"></p>
-</div>
-
-<!-- FEATURED HOTEL -->
-<div class="featured">
-  <div class="featured-strip-head reveal">
-    <p class="pano-eyebrow">Editor's Recommended Hotels</p>
-    <h2 class="pano-title">Discoverist <em>Picks</em></h2>
-  </div>
-  <div class="featured-picks-grid reveal">
-
-    <!-- Pick 0: Hagastrand -->
-    <div class="featured-pick featured-pick--new">
-      <span class="featured-new-badge">New Review</span>
-      <div class="featured-img">
-        <img src="Media/Hotels/hagastrand-stockholm/cover.jpg" alt="Hagastrand, Autograph Collection hotel facade at dusk, Stockholm Sweden" loading="lazy">
-      </div>
-      <div class="featured-body">
-        <span class="featured-badge">Discoverist Pick</span>
-        <p class="featured-country">🇸🇪 Solna, Stockholm, Sweden</p>
-        <h2 class="featured-name">Hagastrand <em>Autograph Collection</em></h2>
-        <div class="featured-tags">
-          <span class="feat-tag">Spa &amp; Pool</span>
-          <span class="feat-tag">Haga Park</span>
-          <span class="feat-tag">Design Hotel</span>
-        </div>
-        <p class="featured-desc">The first Autograph Collection hotel in Scandinavia, in a 1920 building on the shore of Brunnsviken inside the Royal Haga Park. Interiors by Wingårdhs, a glass-roofed atrium, and a 2,500 sqm spa with an 18 m pool that plays music underwater.</p>
-        <a href="https://prf.hn/l/QL208Ed/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
-      </div>
-    </div>
-
-    <!-- Pick 1: Le Méridien Vienna -->
-    <div class="featured-pick">
-      <div class="featured-img">
-        <img src="Media/Hotels/le-meridien-Vienna/cover.jpg" alt="Le Méridien Vienna hotel exterior facade, Austria" loading="lazy">
-      </div>
-      <div class="featured-body">
-        <span class="featured-badge">Discoverist Pick</span>
-        <p class="featured-country">🇦🇹 Vienna, Austria</p>
-        <h2 class="featured-name">Le Méridien <em>Vienna</em></h2>
-        <div class="featured-tags">
-          <span class="feat-tag">City Center</span>
-          <span class="feat-tag">Full Breakfast</span>
-          <span class="feat-tag">Pool &amp; Gym</span>
-        </div>
-        <p class="featured-desc">Right on the Ring, walking distance to everything in the center. Rooms are properly comfortable, breakfast is a serious spread with plenty of choice, and the staff are consistently friendly. Strong shower pressure, a well-maintained pool, and a gym that's a bit tight on space but well equipped. Feels like a proper Le Méridien.</p>
-        <a href="https://prf.hn/l/mA5BoXq/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
-      </div>
-    </div>
-
-    <!-- Pick 2: Vigilius -->
-    <div class="featured-pick">
-      <div class="featured-img">
-        <img src="Media/Hotels/Vigilius/for-hotel-review/cover.jpg" alt="Vigilius Mountain Resort South Tyrol Italy" loading="lazy" style="object-position: center 65%">
-      </div>
-      <div class="featured-body">
-        <span class="featured-badge">Discoverist Pick</span>
-        <p class="featured-country">🇮🇹 Lana, South Tyrol, Italy</p>
-        <h2 class="featured-name">Vigilius Mountain <em>Resort</em></h2>
-        <div class="featured-tags">
-          <span class="feat-tag">Spa</span>
-          <span class="feat-tag">Cable Car Access</span>
-          <span class="feat-tag">Pass Proximity</span>
-        </div>
-        <p class="featured-desc">Cable car only — no road access. At 1,500m above Lana, the noise of the day simply doesn't follow you up. Best spa in South Tyrol, hiking trails from the hotel, complimentary mountain bikes, and a staff that feels effortlessly good.</p>
-        <a href="https://prf.hn/l/DLkmPaZ/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
-      </div>
-    </div>
-
-    <!-- Pick 3: The Cambrian -->
-    <div class="featured-pick">
-      <div class="featured-img">
-        <img src="Media/Hotels/The-cambrian/cover.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
-      </div>
-      <div class="featured-body">
-        <span class="featured-badge">Discoverist Pick</span>
-        <p class="featured-country">🇨🇭 Adelboden, Switzerland</p>
-        <h2 class="featured-name">The <em>Cambrian</em></h2>
-        <div class="featured-tags">
-          <span class="feat-tag">Covered Parking</span>
-          <span class="feat-tag">Spa</span>
-          <span class="feat-tag">Early Breakfast</span>
-          <span class="feat-tag">Design Hotel</span>
-        </div>
-        <p class="featured-desc">Heated pool with alpine views, Michelin-starred restaurant next door, and MINI Cooper access for Ambassador Elite guests. Breakfast, gym, and staff all exceptional. The Bernese Oberland done properly.</p>
-        <a href="https://prf.hn/l/kVGw1Zv/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
-      </div>
-    </div>
-
-  </div>
-</div>
-
+<section class="hotels-section">
 <!-- FILTER BAR -->
 <div class="filter-bar" id="filterBar">
   <div class="filter-row-1" id="filterRow1">
     <span class="filter-lbl">Region</span>
     <div class="continent-tabs">
-      <button class="c-tab active" onclick="setContinent('all',this)">All Hotels</button>
+      <button class="c-tab active" onclick="setContinent('all',this)">All</button>
       <button class="c-tab" onclick="setContinent('europe',this)">Europe</button>
       <button class="c-tab" onclick="setContinent('americas',this)">Americas</button>
     </div>
-    <div class="filter-count"><span id="countNum">27</span><span>hotels</span></div>
+    <span class="filter-sep" aria-hidden="true"></span>
+    <div class="feature-chips" role="group" aria-label="Filter by feature">
+      <button class="f-chip" data-feature="spa" aria-pressed="false" onclick="toggleFeature(this)">Spa</button>
+      <button class="f-chip" data-feature="pool" aria-pressed="false" onclick="toggleFeature(this)">Pool</button>
+      <button class="f-chip" data-feature="parking" aria-pressed="false" onclick="toggleFeature(this)">Parking</button>
+      <button class="f-chip" data-feature="train" aria-pressed="false" onclick="toggleFeature(this)">Train access</button>
+    </div>
+    <label class="sort-wrap">Sort
+      <select id="sortSel" onchange="applySort()">
+        <option value="featured">Featured</option>
+        <option value="score">Top rated</option>
+      </select>
+    </label>
+    <div class="filter-count"><span id="countNum">26</span><span>hotels</span></div>
   </div>
   <div class="country-chips" id="countryChips"></div>
 </div>
 
 <!-- HOTELS GRID -->
 <div class="hotels-main">
+  <p class="grid-note">Scores out of 10 are my own, from nights I stayed. No press trips, no comped rooms.</p>
   <div class="hotels-grid" id="hotelsGrid">
 
     <!-- ── NEW: EUROPE / SWEDEN (Sept 2026) ── -->
-    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-country="sweden">
+    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-features="spa pool" data-country="sweden">
       <div class="hotel-img">
-        <span class="hotel-new-badge">New Hotel</span>
+        <span class="hotel-new-badge">New · Sept 2026</span>
         <img src="Media/Hotels/hagastrand-stockholm/cover.jpg" alt="Hagastrand, Autograph Collection hotel facade at dusk, Stockholm Sweden" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
@@ -476,9 +375,9 @@
       </div>
     </div>
 
-    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-country="sweden">
+    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-features="" data-country="sweden">
       <div class="hotel-img">
-        <span class="hotel-new-badge">New Hotel</span>
+        <span class="hotel-new-badge">New · Sept 2026</span>
         <img src="Media/Hotels/stallmastaregarden-stockholm/cover.jpg" alt="Stallmästaregården historic yellow inn and courtyard, Stockholm Sweden" loading="lazy">
       </div>
       <div class="hotel-body">
@@ -493,9 +392,9 @@
       </div>
     </div>
 
-    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-country="sweden">
+    <div class="hotel-card hotel-card--new reveal" data-continent="europe" data-features="train" data-country="sweden">
       <div class="hotel-img">
-        <span class="hotel-new-badge">New Hotel</span>
+        <span class="hotel-new-badge">New · Sept 2026</span>
         <img src="Media/Hotels/ac-stockholm/cover.jpg" alt="AC Hotel Stockholm Ulriksdal guest room with king bed and window seating, Sweden" loading="lazy">
       </div>
       <div class="hotel-body">
@@ -511,7 +410,7 @@
     </div>
 
     <!-- ── EUROPE / ITALY ── -->
-    <div class="hotel-card reveal" data-continent="europe" data-country="italy">
+    <div class="hotel-card reveal" data-continent="europe" data-features="spa pool parking" data-country="italy">
       <div class="hotel-img">
         <img src="Media/Hotels/Vigilius/for-hotel-review/cover.jpg" alt="Vigilius Mountain Resort" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
@@ -529,7 +428,7 @@
     </div>
 
     <!-- ── EUROPE / SWITZERLAND ── -->
-    <div class="hotel-card reveal" data-continent="europe" data-country="switzerland">
+    <div class="hotel-card reveal" data-continent="europe" data-features="spa pool parking train" data-country="switzerland">
       <div class="hotel-img">
         <img src="Media/Hotels/The-cambrian/cover.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
@@ -546,7 +445,7 @@
       </div>
     </div>
 
-    <div class="hotel-card reveal" data-continent="europe" data-country="switzerland">
+    <div class="hotel-card reveal" data-continent="europe" data-features="parking" data-country="switzerland">
       <div class="hotel-img">
         <img src="Media/Hotels/Hotel-lucerne/hotel-lucern-for-index.jpg" alt="The Hotel Lucerne room with Lucerne city view, Switzerland" loading="lazy">
       </div>
@@ -563,10 +462,9 @@
     </div>
 
     <!-- ── EUROPE / AUSTRIA ── -->
-    <div class="hotel-card reveal" data-continent="europe" data-country="austria">
+    <div class="hotel-card reveal" data-continent="europe" data-features="train" data-country="austria">
       <div class="hotel-img">
         <img src="Media/Hotels/ac-innsbruck/ac-hotel-innsbruck-innsbruck-city-panorama-alps-winter.jpg" alt="AC Hotel Innsbruck city panorama with snow-capped Alps" loading="lazy">
-        <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇦🇹 Innsbruck, Austria</p>
@@ -580,7 +478,7 @@
       </div>
     </div>
 
-    <div class="hotel-card reveal" data-continent="europe" data-country="austria">
+    <div class="hotel-card reveal" data-continent="europe" data-features="pool" data-country="austria">
       <div class="hotel-img">
         <img src="Media/Hotels/le-meridien-Vienna/cover.jpg" alt="Le Méridien Vienna hotel exterior facade" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
@@ -598,7 +496,7 @@
     </div>
 
     <!-- ── AMERICAS / ARGENTINA ── -->
-    <div class="hotel-card" data-continent="americas" data-country="argentina">
+    <div class="hotel-card" data-continent="americas" data-features="pool" data-country="argentina">
       <div class="hotel-img">
         <img src="Media/Hotels/Sheraton-buenos-aires/sheraton-buenos-aires-for-index.jpg" alt="Sheraton Buenos Aires view of Torre Inglesa and Retiro Park, Argentina" loading="lazy">
       </div>
@@ -614,7 +512,7 @@
       </div>
     </div>
 
-    <div class="hotel-card" data-continent="americas" data-country="argentina">
+    <div class="hotel-card" data-continent="americas" data-features="spa pool" data-country="argentina">
       <div class="hotel-img">
         <img src="Media/Hotels/Sheraton-pilar/sheraton-pilar-outdoor-pool-cabanas-gardens.png" alt="Sheraton Pilar outdoor pool with cabanas and lush gardens, Buenos Aires Argentina" loading="lazy">
       </div>
@@ -631,7 +529,7 @@
     </div>
 
     <!-- ── AMERICAS / BOLIVIA ── -->
-    <div class="hotel-card" data-continent="americas" data-country="bolivia">
+    <div class="hotel-card" data-continent="americas" data-features="spa pool" data-country="bolivia">
       <div class="hotel-img">
         <img src="Media/Hotels/Marriott-santa-cruz/marriott-santa-cruz-rooftop-pool-night-illuminated.png" alt="Marriott Santa Cruz rooftop pool illuminated at night, Bolivia" loading="lazy">
       </div>
@@ -648,7 +546,7 @@
     </div>
 
     <!-- ── AMERICAS / CANADA ── -->
-    <div class="hotel-card" data-continent="americas" data-country="canada">
+    <div class="hotel-card" data-continent="americas" data-features="pool" data-country="canada">
       <div class="hotel-img">
         <img src="Media/Hotels/Delta-hotels-whistler/delta-hotels-whistler-snowy-trees-village-exterior.jpg" alt="Delta Hotels Whistler snowy trees and village exterior, Whistler British Columbia" loading="lazy">
       </div>
@@ -665,10 +563,9 @@
     </div>
 
     <!-- ── AMERICAS / CHILE ── -->
-    <div class="hotel-card" data-continent="americas" data-country="chile">
+    <div class="hotel-card" data-continent="americas" data-features="parking" data-country="chile">
       <div class="hotel-img">
         <img src="Media/Hotels/AC-hotel-santiago/ac-hotel-santiago-sunset-cityscape-santiago-chile.jpg" alt="AC Hotel Santiago sunset cityscape panorama of Santiago, Chile" loading="lazy">
-        <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇨🇱 Santiago, Chile</p>
@@ -683,7 +580,7 @@
     </div>
 
     <!-- ── AMERICAS / COLOMBIA ── -->
-    <div class="hotel-card" data-continent="americas" data-country="colombia">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="colombia">
       <div class="hotel-img">
         <img src="Media/Hotels/W-bogota/w-bogota-hotel-exterior-night-blue-lights.png" alt="W Bogotá hotel exterior at night with blue LED lighting, Colombia" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
@@ -700,7 +597,7 @@
       </div>
     </div>
 
-    <div class="hotel-card" data-continent="americas" data-country="colombia">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="colombia">
       <div class="hotel-img">
         <img src="Media/Hotels/Courtyard-bogota-airport/courtyard-bogota-airport-hotel-exterior-modern-facade.png" alt="Courtyard Bogotá Airport hotel modern facade exterior, Colombia" loading="lazy">
       </div>
@@ -716,10 +613,9 @@
       </div>
     </div>
 
-    <div class="hotel-card reveal" data-continent="americas" data-country="colombia">
+    <div class="hotel-card reveal" data-continent="americas" data-features="pool" data-country="colombia">
       <div class="hotel-img">
         <img src="Media/Hotels/guatape-the-brown/cover.jpg" alt="The Brown Guatapé Autograph Collection hotel exterior, Colombia" loading="lazy">
-        <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇨🇴 Guatapé, Colombia</p>
@@ -733,7 +629,8 @@
       </div>
     </div>
 
-    <div class="hotel-card reveal" data-continent="americas" data-country="colombia">
+    <!-- Hidden until reviewed:
+    <div class="hotel-card reveal" data-continent="americas" data-features="" data-country="colombia">
       <div class="hotel-img">
         <img src="Media/Hotels/Marriott-santa-marta/marriott-santa-marta-for-index.jpg" alt="Marriott Santa Marta Resort beach bar with tropical garden and Caribbean ocean view, Colombia" loading="lazy">
       </div>
@@ -749,11 +646,12 @@
       </div>
     </div>
 
-    <!-- ── AMERICAS / COSTA RICA ── -->
-    <div class="hotel-card" data-continent="americas" data-country="costa-rica">
+    <!- - ── AMERICAS / COSTA RICA ── - ->
+    -->
+
+    <div class="hotel-card" data-continent="americas" data-features="parking" data-country="costa-rica">
       <div class="hotel-img">
         <img src="Media/Hotels/Sheraton-san-jose/sheraton-san-jose-hotel-exterior-dusk-casino-rooftop.png" alt="Sheraton San José hotel exterior at dusk with casino and rooftop, Costa Rica" loading="lazy">
-        <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇨🇷 San José, Costa Rica</p>
@@ -768,10 +666,9 @@
     </div>
 
     <!-- ── AMERICAS / DOMINICAN REPUBLIC ── -->
-    <div class="hotel-card" data-continent="americas" data-country="dominican-republic">
+    <div class="hotel-card" data-continent="americas" data-features="parking pool" data-country="dominican-republic">
       <div class="hotel-img">
         <img src="Media/Hotels/Courtyard-santo-domingo/courtyard-santo-domingo-room-king-bed-modern-interior.jpg" alt="Courtyard Santo Domingo Piantini king bed modern room interior, Dominican Republic" loading="lazy">
-        <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇩🇴 Santo Domingo, Dominican Republic</p>
@@ -786,7 +683,7 @@
     </div>
 
     <!-- ── AMERICAS / EL SALVADOR ── -->
-    <div class="hotel-card" data-continent="americas" data-country="el-salvador">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="el-salvador">
       <div class="hotel-img">
         <img src="Media/Hotels/Courtyard-san-salvador/courtyard-san-salvador-welcome-local-art-bird-sculpture.jpg" alt="Courtyard San Salvador welcome gift with local art bird sculpture, El Salvador" loading="lazy">
       </div>
@@ -803,7 +700,7 @@
     </div>
 
     <!-- ── AMERICAS / GUATEMALA ── -->
-    <div class="hotel-card" data-continent="americas" data-country="guatemala">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="guatemala">
       <div class="hotel-img">
         <img src="Media/Hotels/Courtyard-guatemala-city/courtyard-guatemala-city-hotel-exterior-entrance-night.png" alt="Courtyard Guatemala City hotel exterior entrance at night, Guatemala" loading="lazy">
       </div>
@@ -820,10 +717,9 @@
     </div>
 
     <!-- ── AMERICAS / MEXICO ── -->
-    <div class="hotel-card" data-continent="americas" data-country="mexico">
+    <div class="hotel-card" data-continent="americas" data-features="spa" data-country="mexico">
       <div class="hotel-img">
         <img src="Media/Hotels/W-mexico-city/w-mexico-city-hotel-exterior-night-polanco.png" alt="W Mexico City hotel exterior at night, Polanco Mexico City" loading="lazy">
-        <span class="hotel-badge badge-pick">Discoverist Pick</span>
       </div>
       <div class="hotel-body">
         <p class="hotel-country">🇲🇽 Mexico City, Mexico</p>
@@ -838,7 +734,7 @@
     </div>
 
     <!-- ── AMERICAS / PARAGUAY ── -->
-    <div class="hotel-card" data-continent="americas" data-country="paraguay">
+    <div class="hotel-card" data-continent="americas" data-features="pool" data-country="paraguay">
       <div class="hotel-img">
         <img src="Media/Hotels/Sheraton-asuncion/sheraton-asuncion-hotel-exterior-night-city-view.png" alt="Sheraton Asunción hotel exterior at night with city skyline, Paraguay" loading="lazy">
       </div>
@@ -855,7 +751,7 @@
     </div>
 
     <!-- ── AMERICAS / PERU ── -->
-    <div class="hotel-card" data-continent="americas" data-country="peru">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="peru">
       <div class="hotel-img">
         <img src="Media/Hotels/Westin-lima/limwi-exterior-7624-hor-clsc.jpg.webp" alt="The Westin Lima hotel exterior classic view, Miraflores Lima Peru" loading="lazy">
         <span class="hotel-badge badge-pick">Discoverist Pick</span>
@@ -872,7 +768,7 @@
       </div>
     </div>
 
-    <div class="hotel-card" data-continent="americas" data-country="peru">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="peru">
       <div class="hotel-img">
         <img src="Media/Hotels/AC-hotel-lima-miraflores/ac-hotel-lima-miraflores-for-index.jpg" alt="AC Hotel Lima Miraflores Pacific Ocean view from room window, Miraflores Peru" loading="lazy">
       </div>
@@ -889,7 +785,7 @@
     </div>
 
     <!-- ── AMERICAS / TRINIDAD ── -->
-    <div class="hotel-card" data-continent="americas" data-country="trinidad">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="trinidad">
       <div class="hotel-img">
         <img src="Media/Hotels/The-brix-autograph-collection/the-brix-autograph-collection-hotel-exterior-entrance-night.png" alt="The Brix Autograph Collection hotel exterior entrance at night, Port of Spain Trinidad" loading="lazy">
       </div>
@@ -906,7 +802,7 @@
     </div>
 
     <!-- ── AMERICAS / USA ── -->
-    <div class="hotel-card" data-continent="americas" data-country="usa">
+    <div class="hotel-card" data-continent="americas" data-features="" data-country="usa">
       <div class="hotel-img">
         <img src="Media/Hotels/Element-miami-brickell/element-miami-brickell-hotel-exterior-night-brickell.png" alt="Element Miami Brickell hotel exterior at night, Brickell Miami" loading="lazy">
       </div>
@@ -927,6 +823,29 @@
   </div>
 </div>
 
+</section>
+
+<!-- 360 FEATURE -->
+<div class="pano-feature">
+  <div class="pano-feature-head reveal">
+    <div>
+      <p class="pano-eyebrow">Room tours</p>
+      <h2 class="pano-title">Step Inside, <em>360°</em></h2>
+    </div>
+    <p class="pano-sub">Pick a hotel and drag around the rooms we actually stayed in. Use the arrows to move from room to room.</p>
+  </div>
+  <div class="pano-tabs reveal" id="panoTabs" role="tablist" aria-label="Choose a hotel"></div>
+  <div class="pano-frame reveal">
+    <span class="pano-badge">360°</span>
+    <span class="pano-hint">Drag to look around</span>
+    <button class="pano-nav pano-nav-prev" onclick="navPano(-1)" aria-label="Previous 360 photo">&#8592;</button>
+    <button class="pano-nav pano-nav-next" onclick="navPano(1)" aria-label="Next 360 photo">&#8594;</button>
+    <span class="pano-counter" id="panoCounter"></span>
+    <div class="pano-viewer" id="panoViewer"></div>
+  </div>
+  <p class="pano-caption" id="panoCaption"></p>
+</div>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-bottom">
@@ -944,6 +863,7 @@
   <div class="hm-inner">
     <div class="hm-gallery" id="hmGallery">
       <div class="hm-viewer" id="hmViewer"></div>
+      <div class="hm-gtabs" id="hmGtabs" role="group" aria-label="Gallery sections"></div>
       <div class="hm-thumbs" id="hmThumbs"></div>
     </div>
     <div class="hm-content" id="hmContent"></div>
@@ -1050,7 +970,7 @@
                 {key:'paraguay',label:'🇵🇾 Paraguay'}, {key:'peru',label:'🇵🇪 Peru'},
                 {key:'trinidad',label:'🇹🇹 Trinidad & Tobago'}, {key:'usa',label:'🇺🇸 United States'} ]
   };
-  let state = { continent: 'all', country: null };
+  let state = { continent: 'all', country: null, features: new Set() };
 
   function setContinent(c, btn) {
     state.continent = c;
@@ -1085,8 +1005,10 @@
     const cards = document.querySelectorAll('.hotel-card[data-continent]');
     let count = 0;
     cards.forEach(card => {
+      const feats = (card.dataset.features || '').split(' ');
       const show = (state.continent === 'all' || card.dataset.continent === state.continent)
-                && (!state.country || card.dataset.country === state.country);
+                && (!state.country || card.dataset.country === state.country)
+                && [...state.features].every(f => feats.includes(f));
       if (show) {
         count++;
         if (card.style.display === 'none' || card.style.display === '') {
@@ -1108,6 +1030,29 @@
     document.getElementById('noResults').classList.toggle('visible', count === 0);
   }
 
+  function toggleFeature(btn) {
+    const f = btn.dataset.feature;
+    const on = !state.features.has(f);
+    on ? state.features.add(f) : state.features.delete(f);
+    btn.setAttribute('aria-pressed', on);
+    applyFilter();
+  }
+
+  /* ── SORT ── Featured: new reviews, then Discoverist Picks, then the rest in page order */
+  const GRID = document.getElementById('hotelsGrid');
+  [...GRID.querySelectorAll('.hotel-card')].forEach((c, i) => c.dataset.order = i);
+  function applySort() {
+    const mode = document.getElementById('sortSel').value;
+    const rank = c => c.classList.contains('hotel-card--new') ? 0 : c.querySelector('.badge-pick') ? 1 : 2;
+    const score = c => parseFloat(c.querySelector('.score-num')?.textContent) || 0;
+    const cards = [...GRID.querySelectorAll('.hotel-card')].sort((a, b) =>
+      mode === 'score' ? score(b) - score(a) || a.dataset.order - b.dataset.order
+                       : rank(a) - rank(b) || a.dataset.order - b.dataset.order);
+    cards.forEach(c => GRID.appendChild(c));
+    GRID.appendChild(document.getElementById('noResults'));
+  }
+  applySort();
+
   /* ── MOBILE MENU ── */
   function openMobile()  { document.getElementById('mobileMenu').classList.add('open');    document.body.style.overflow = 'hidden'; }
   function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
@@ -1117,6 +1062,7 @@
     /* Stockholm (Sept 2026). DRAFT: reviews written from hotel facts only, scores are estimates.
        Replace with David's own experience and scores. */
     'hagastrand': {
+      stayed:'September 2026',
       scores:[{n:'9.3',l:'Overall'},{n:'9.7',l:'Spa'},{n:'9.5',l:'Design'},{n:'8.6',l:'Location'}], /* DRAFT scores */
       media:[
         {type:'youtube',src:'dHkrz2PHDng'},
@@ -1157,6 +1103,7 @@
       book:'https://prf.hn/l/QL208Ed/'
     },
     'ac-stockholm': {
+      stayed:'September 2026',
       scores:[{n:'8.4',l:'Overall'},{n:'8.8',l:'Transport'},{n:'8.5',l:'Rooms'},{n:'8.6',l:'Value'}], /* DRAFT scores */
       media:[
         {type:'youtube',src:'LcQ70cLveus'},
@@ -1171,6 +1118,7 @@
       book:'https://prf.hn/l/eOlm0D8/'
     },
     'stallmastaregarden': {
+      stayed:'September 2026',
       scores:[{n:'8.9',l:'Overall'},{n:'9.6',l:'Setting'},{n:'9.2',l:'Restaurant'},{n:'8.6',l:'Rooms'}], /* DRAFT scores */
       media:[
         {type:'youtube',src:'CA9I2NgwRws'},
@@ -1617,11 +1565,11 @@
     const slug = NAME_TO_SLUG[nameEl.textContent.trim()];
     if (slug) card.dataset.hotel = slug;
   });
-  document.querySelectorAll('.featured-pick').forEach(card => {
-    const nameEl = card.querySelector('.featured-name');
-    if (!nameEl) return;
-    const slug = NAME_TO_SLUG[nameEl.textContent.trim()];
-    if (slug) card.dataset.hotel = slug;
+  /* Two sub-scores next to each card's overall score */
+  document.querySelectorAll('.hotel-card[data-hotel]').forEach(card => {
+    const subs = (HOTEL_DATA[card.dataset.hotel]?.scores || []).filter(x => x.l !== 'Overall').slice(0, 2);
+    const box = card.querySelector('.hotel-score');
+    if (subs.length && box) box.insertAdjacentHTML('beforeend', `<span class="score-subs">${subs.map(x => x.l + ' ' + x.n).join(' · ')}</span>`);
   });
 
   /* ── MODAL STATE ── */
@@ -1661,13 +1609,25 @@
     // Update counter
     const ctr = viewer.parentElement.querySelector('.hm-media-counter');
     if (ctr) ctr.textContent = (idx+1) + ' / ' + _media.length;
-    // Update active thumb
-    document.querySelectorAll('.hm-thumb,.hm-thumb-wrap').forEach((t,i) => t.classList.toggle('active', i===idx));
+    // Update active thumb and gallery tab
+    document.querySelectorAll('.hm-thumb,.hm-thumb-wrap').forEach((t,i) => {
+      t.classList.toggle('active', i===idx);
+      if (i===idx) t.scrollIntoView({block:'nearest', inline:'nearest'});
+    });
+    document.querySelectorAll('.hm-gtab').forEach(t => t.classList.toggle('active', t.dataset.group === mediaGroup(m)));
     // Update nav visibility
     const prev = document.getElementById('hmNavPrev');
     const next = document.getElementById('hmNavNext');
     if (prev) prev.classList.toggle('hidden', _media.length <= 1);
     if (next) next.classList.toggle('hidden', _media.length <= 1);
+  }
+
+  const mediaGroup = m => (m.type === 'youtube' || m.type === 'vimeo' || m.type === 'video') ? 'video' : m.type === 'pano' ? 'pano' : 'photo';
+  const GROUP_LABEL = { video:'Video', pano:'360°', photo:'Photos' };
+
+  function jumpToGroup(g) {
+    const i = _media.findIndex(m => mediaGroup(m) === g);
+    if (i >= 0) setViewerMedia(i);
   }
 
   function navMedia(dir) {
@@ -1680,6 +1640,12 @@
     _mediaIdx = 0;
     const viewer = document.getElementById('hmViewer');
     const thumbs = document.getElementById('hmThumbs');
+
+    const groups = Object.keys(GROUP_LABEL).filter(g => _media.some(m => mediaGroup(m) === g));
+    const gtabs = document.getElementById('hmGtabs');
+    gtabs.innerHTML = groups.length > 1 ? groups.map(g =>
+      `<button class="hm-gtab" data-group="${g}" onclick="jumpToGroup('${g}')">${GROUP_LABEL[g]} ${_media.filter(m => mediaGroup(m) === g).length}</button>`).join('') : '';
+    gtabs.style.display = groups.length > 1 ? 'flex' : 'none';
 
     if (!_media.length) {
       viewer.innerHTML = '<div class="hm-no-media">📷&nbsp;&nbsp;Photos Coming Soon</div>';
@@ -1746,6 +1712,7 @@
       ${badgeHtml}
       <p class="hm-loc">${loc}</p>
       <h2 class="hm-name">${name}</h2>
+      ${data.stayed ? `<p class="hm-stayed">Stayed ${data.stayed}</p>` : ''}
       <div class="hm-tags">${tags}</div>
       <div class="hm-scores">${scores}</div>
       <p class="hm-review">${data.review}</p>
@@ -1769,6 +1736,7 @@
     document.getElementById('hmPanel').classList.add('open');
     document.body.style.overflow = 'hidden';
     document.getElementById('hmCloseBtn').focus();
+    if (location.hash !== '#' + slug) history.replaceState(null, '', '#' + slug);
   }
 
   function closeHotelModal() {
@@ -1780,6 +1748,7 @@
     document.getElementById('hmOverlay').classList.remove('open');
     document.getElementById('hmPanel').classList.remove('open');
     document.body.style.overflow = '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   }
 
   /* Card click → open modal */
@@ -1788,11 +1757,14 @@
     const card = e.target.closest('.hotel-card[data-hotel]');
     if (card) openHotelModal(card.dataset.hotel);
   });
-  document.querySelector('.featured-picks-grid').addEventListener('click', e => {
-    if (e.target.closest('.btn-book')) return;
-    const card = e.target.closest('.featured-pick[data-hotel]');
-    if (card) openHotelModal(card.dataset.hotel);
-  });
+
+  /* Shareable links: /hotels#hagastrand opens that review */
+  function openFromHash() {
+    const slug = decodeURIComponent(location.hash.slice(1));
+    if (HOTEL_DATA[slug]) openHotelModal(slug);
+  }
+  window.addEventListener('hashchange', openFromHash);
+  openFromHash();
 
   /* Keyboard: Escape closes */
   document.addEventListener('keydown', e => {
