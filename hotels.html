@@ -85,7 +85,12 @@
     .pano-nav-next{right:16px}
     .pano-counter{position:absolute;bottom:16px;right:16px;z-index:5;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);background:rgba(26,26,24,0.55);padding:6px 12px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);pointer-events:none}
     .pano-caption{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--clay);margin-top:12px}
-    @media(max-width:768px){ .pano-viewer{height:320px} }
+    .pano-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .pano-frame .pnlm-controls-container{top:48px}
+    .pano-tab{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:8px 18px;border:1px solid var(--sand);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.72;transition:opacity 0.25s,border-color 0.25s,background 0.25s,box-shadow 0.25s;white-space:nowrap}
+    .pano-tab:hover{opacity:1;box-shadow:inset 0 -2px 0 rgba(214,66,48,0.4)}
+    .pano-tab.active{border-color:var(--moto-red);color:var(--charcoal);background:rgba(214,66,48,0.1);opacity:1;font-weight:600;box-shadow:inset 0 -3px 0 var(--moto-red)}
+    @media(max-width:768px){ .pano-viewer{height:320px} .pano-tab{padding:7px 12px;font-size:10px} }
 
     /* FEATURED HOTEL */
     .featured{max-width:1200px;margin:72px auto 0;padding:0 3rem}
@@ -198,6 +203,10 @@
     .hm-thumb-wrap.active{opacity:1;border-color:var(--moto-red)}
     .hm-thumb-wrap img{width:100%;height:100%;object-fit:cover}
     .hm-thumb-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:13px;background:rgba(0,0,0,0.32)}
+    .hm-thumb-wrap.is-pano{width:120px}
+    .hm-thumb-360{position:absolute;left:4px;bottom:4px;font-size:8px;letter-spacing:0.15em;color:var(--white);background:rgba(214,66,48,0.92);padding:2px 6px;font-family:'DM Sans',sans-serif;font-weight:600}
+    .hm-pano{width:100%;height:100%}
+    .hm-pano-label{position:absolute;left:12px;bottom:12px;z-index:3;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.8);background:rgba(26,26,24,0.55);padding:5px 10px;font-family:'DM Sans',sans-serif;pointer-events:none}
     /* content */
     .hm-content{flex:1;overflow-y:auto;padding:32px 40px 48px;display:flex;flex-direction:column;gap:0;min-width:0}
     .hm-badge-lbl{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--white);background:var(--moto-red);padding:4px 12px;display:inline-block;margin-bottom:16px;align-self:flex-start}
@@ -324,8 +333,9 @@
       <p class="pano-eyebrow">New · Interactive Feature</p>
       <h2 class="pano-title">Step Inside, <em>360°</em></h2>
     </div>
-    <p class="pano-sub">A new way to preview our hotels — drag around Le Méridien Vienna's rooms, exactly as we experienced them.</p>
+    <p class="pano-sub">Pick a hotel and drag around the rooms we actually stayed in. Use the arrows to move from room to room.</p>
   </div>
+  <div class="pano-tabs reveal" id="panoTabs" role="tablist" aria-label="Choose a hotel"></div>
   <div class="pano-frame reveal">
     <span class="pano-badge">360°</span>
     <span class="pano-hint">Drag to Look Around</span>
@@ -345,9 +355,28 @@
   </div>
   <div class="featured-picks-grid reveal">
 
-    <!-- Pick 0: Le Méridien Vienna -->
+    <!-- Pick 0: Hagastrand -->
     <div class="featured-pick featured-pick--new">
       <span class="featured-new-badge">New Review</span>
+      <div class="featured-img">
+        <img src="Media/Hotels/hagastrand-stockholm/cover.jpg" alt="Hagastrand, Autograph Collection hotel facade at dusk, Stockholm Sweden" loading="lazy">
+      </div>
+      <div class="featured-body">
+        <span class="featured-badge">Discoverist Pick</span>
+        <p class="featured-country">🇸🇪 Solna, Stockholm, Sweden</p>
+        <h2 class="featured-name">Hagastrand <em>Autograph Collection</em></h2>
+        <div class="featured-tags">
+          <span class="feat-tag">Spa &amp; Pool</span>
+          <span class="feat-tag">Haga Park</span>
+          <span class="feat-tag">Design Hotel</span>
+        </div>
+        <p class="featured-desc">The first Autograph Collection hotel in Scandinavia, in a 1920 building on the shore of Brunnsviken inside the Royal Haga Park. Interiors by Wingårdhs, a glass-roofed atrium, and a 2,500 sqm spa with an 18 m pool that plays music underwater.</p>
+        <a href="https://prf.hn/l/QL208Ed/" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
+      </div>
+    </div>
+
+    <!-- Pick 1: Le Méridien Vienna -->
+    <div class="featured-pick">
       <div class="featured-img">
         <img src="Media/Hotels/le-meridien-Vienna/cover.jpg" alt="Le Méridien Vienna hotel exterior facade, Austria" loading="lazy">
       </div>
@@ -365,7 +394,7 @@
       </div>
     </div>
 
-    <!-- Pick 1: Vigilius -->
+    <!-- Pick 2: Vigilius -->
     <div class="featured-pick">
       <div class="featured-img">
         <img src="Media/Hotels/Vigilius/for-hotel-review/cover.jpg" alt="Vigilius Mountain Resort South Tyrol Italy" loading="lazy" style="object-position: center 65%">
@@ -384,7 +413,7 @@
       </div>
     </div>
 
-    <!-- Pick 2: The Cambrian -->
+    <!-- Pick 3: The Cambrian -->
     <div class="featured-pick">
       <div class="featured-img">
         <img src="Media/Hotels/The-cambrian/cover.JPG" alt="The Cambrian Adelboden Switzerland" loading="lazy">
@@ -404,26 +433,6 @@
       </div>
     </div>
 
-    <!-- Pick 3: The Brown Guatapé -->
-    <div class="featured-pick">
-      <div class="featured-img">
-        <img src="Media/Hotels/guatape-the-brown/cover.jpg" alt="The Brown Guatapé Autograph Collection, Colombia" loading="lazy">
-      </div>
-      <div class="featured-body">
-        <span class="featured-badge">Discoverist Pick</span>
-        <p class="featured-country">🇨🇴 Guatapé, Colombia</p>
-        <h2 class="featured-name">The Brown <em>Guatapé</em></h2>
-        <div class="featured-tags">
-          <span class="feat-tag">Reservoir Views</span>
-          <span class="feat-tag">Infinity Pool</span>
-          <span class="feat-tag">Jet Ski & Helicopter</span>
-          <span class="feat-tag">Nature Immersive</span>
-        </div>
-        <p class="featured-desc">Perched above the Embalse de Guatapé with an infinity pool, suite terrace jacuzzi, and views that change by the hour. Breakfast is a 10. One of the best nature-integrated luxury hotels in Colombia.</p>
-        <a href="#" target="_blank" rel="noopener" class="btn-book">Check Availability →</a>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -436,7 +445,7 @@
       <button class="c-tab" onclick="setContinent('europe',this)">Europe</button>
       <button class="c-tab" onclick="setContinent('americas',this)">Americas</button>
     </div>
-    <div class="filter-count"><span id="countNum">24</span><span>hotels</span></div>
+    <div class="filter-count"><span id="countNum">27</span><span>hotels</span></div>
   </div>
   <div class="country-chips" id="countryChips"></div>
 </div>
@@ -528,6 +537,56 @@
         <div class="hotel-footer">
           <div class="hotel-score"><span class="score-num">9.2</span><span class="score-max">/10</span></div>
           <a href="https://prf.hn/l/mA5BoXq/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EUROPE / SWEDEN ── -->
+    <div class="hotel-card reveal" data-continent="europe" data-country="sweden">
+      <div class="hotel-img">
+        <img src="Media/Hotels/hagastrand-stockholm/cover.jpg" alt="Hagastrand, Autograph Collection hotel facade at dusk, Stockholm Sweden" loading="lazy">
+        <span class="hotel-badge badge-pick">Discoverist Pick</span>
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇸🇪 Solna, Stockholm, Sweden</p>
+        <h3 class="hotel-name">Hagastrand, Autograph Collection</h3>
+        <div class="hotel-tags"><span class="h-tag">Spa &amp; Pool</span><span class="h-tag">Haga Park</span><span class="h-tag">Design Hotel</span></div>
+        <p class="hotel-desc">Scandinavia's first Autograph Collection, on Brunnsviken in the Royal Haga Park. Wingårdhs interiors, a glass-roofed atrium, and a 2,500 sqm spa with snow room and underwater music.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">9.3</span><span class="score-max">/10</span></div><!-- DRAFT score -->
+          <a href="https://prf.hn/l/QL208Ed/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-card reveal" data-continent="europe" data-country="sweden">
+      <div class="hotel-img">
+        <img src="Media/Hotels/stallmastaregarden-stockholm/cover.jpg" alt="Stallmästaregården historic yellow inn and courtyard, Stockholm Sweden" loading="lazy">
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇸🇪 Stockholm, Sweden</p>
+        <h3 class="hotel-name">Stallmästaregården</h3>
+        <div class="hotel-tags"><span class="h-tag">Historic Inn</span><span class="h-tag">Waterfront</span><span class="h-tag">Design Hotels</span></div>
+        <p class="hotel-desc">An inn since the 1600s on the shore of Brunnsviken, at the edge of the Royal Haga Park. A yellow main house, a gravel courtyard, and a restaurant under old wooden beams.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">8.9</span><span class="score-max">/10</span></div><!-- DRAFT score -->
+          <a href="https://prf.hn/l/jXGDlX0/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hotel-card reveal" data-continent="europe" data-country="sweden">
+      <div class="hotel-img">
+        <img src="Media/Hotels/ac-stockholm/cover.jpg" alt="AC Hotel Stockholm Ulriksdal guest room with king bed and window seating, Sweden" loading="lazy">
+      </div>
+      <div class="hotel-body">
+        <p class="hotel-country">🇸🇪 Solna, Stockholm, Sweden</p>
+        <h3 class="hotel-name">AC Hotel Stockholm Ulriksdal</h3>
+        <div class="hotel-tags"><span class="h-tag">Train to City</span><span class="h-tag">Arena &amp; Mall</span><span class="h-tag">24h Gym</span></div>
+        <p class="hotel-desc">Steps from Ulriksdal station, with commuter trains to Stockholm City in about 10 to 15 minutes. Five minutes by car to Strawberry Arena and Mall of Scandinavia.</p>
+        <div class="hotel-footer">
+          <div class="hotel-score"><span class="score-num">8.4</span><span class="score-max">/10</span></div><!-- DRAFT score -->
+          <a href="https://prf.hn/l/eOlm0D8/" target="_blank" rel="noopener" class="hotel-book">Book →</a>
         </div>
       </div>
     </div>
@@ -899,40 +958,83 @@
   /* ── 360 FEATURE GALLERY ── */
   /* Panoramas are served from GitHub raw, not the local /Media path — Hostinger's
      CDN silently caps all images to 1600px wide, which is unusable for a 360 viewer. */
-  const PANO_BASE = 'https://raw.githubusercontent.com/df1190/discoveristjournal/main/Media/Hotels/le-meridien-Vienna/';
-  const PANO_ITEMS = [
-    {src:PANO_BASE+'le-meridien-vienna-360-panorama-guest-room.jpg', label:'Guest Room'},
-    {src:PANO_BASE+'le-meridien-vienna-360-panorama-guest-room-desk-wardrobe.jpg', label:'Guest Room — Desk & Wardrobe'},
-    {src:PANO_BASE+'le-meridien-vienna-360-panorama-guest-room-balcony-view.jpg', label:'Guest Room — Balcony View'},
-    {src:PANO_BASE+'le-meridien-vienna-360-panorama-bathroom.jpg', label:'Bathroom'},
-    {src:PANO_BASE+'le-meridien-vienna-360-panorama-bathroom-vanity.jpg', label:'Bathroom — Vanity'}
-  ];
-  let _panoIdx = 0, _panoInst = null;
+  const PANO_REMOTE = 'https://raw.githubusercontent.com/df1190/discoveristjournal/main/';
+  /* Local preview (localhost / file://) loads the same files from the working copy */
+  const PANO_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|)$/.test(location.hostname);
+  const panoUrl = path => (PANO_LOCAL ? '' : PANO_REMOTE) + path;
+
+  /* One set per hotel: dir + [file name without .jpg, label]. Thumbs live in <dir>360-thumbs/<file>-thumb.jpg */
+  const PANO_SETS = {
+    'hagastrand': {name:'Hagastrand', flag:'🇸🇪', dir:'Media/Hotels/hagastrand-stockholm/', items:[
+      ['hagastrand-stockholm-360-panorama-private-terrace','Suite · Private Terrace'],
+      ['hagastrand-stockholm-360-panorama-suite-living-room','Suite · Living Room'],
+      ['hagastrand-stockholm-360-panorama-bedroom-window-day','Suite · Bedroom'],
+      ['hagastrand-stockholm-360-panorama-bedroom-wardrobe','Suite · Bedroom & Wardrobe'],
+      ['hagastrand-stockholm-360-panorama-bathroom-terrazzo','Suite · Terrazzo Bathroom'],
+      ['hagastrand-stockholm-360-panorama-suite-entrance-hall','Suite · Entrance Hall'],
+      ['hagastrand-stockholm-360-panorama-bedroom-dusk','Suite · Bedroom at Dusk'],
+      ['hagastrand-stockholm-360-panorama-bedroom-evening','Suite · Bedroom in the Evening']
+    ]},
+    'ac-stockholm': {name:'AC Hotel Stockholm Ulriksdal', tab:'AC Stockholm Ulriksdal', flag:'🇸🇪', dir:'Media/Hotels/ac-stockholm/', items:[
+      ['ac-hotel-stockholm-ulriksdal-360-panorama-guest-room-bed','Guest Room'],
+      ['ac-hotel-stockholm-ulriksdal-360-panorama-guest-room-window','Guest Room · Window'],
+      ['ac-hotel-stockholm-ulriksdal-360-panorama-bathroom','Bathroom']
+    ]},
+    'le-meridien-vienna': {name:'Le Méridien Vienna', flag:'🇦🇹', dir:'Media/Hotels/le-meridien-Vienna/', items:[
+      ['le-meridien-vienna-360-panorama-guest-room','Guest Room'],
+      ['le-meridien-vienna-360-panorama-guest-room-desk-wardrobe','Guest Room · Desk & Wardrobe'],
+      ['le-meridien-vienna-360-panorama-guest-room-balcony-view','Guest Room · Balcony View'],
+      ['le-meridien-vienna-360-panorama-bathroom','Bathroom'],
+      ['le-meridien-vienna-360-panorama-bathroom-vanity','Bathroom · Vanity']
+    ]}
+  };
+  /* 360s as modal media entries for a hotel */
+  const panoMedia = slug => PANO_SETS[slug].items.map(([f, label]) => ({
+    type:'pano', src:panoUrl(PANO_SETS[slug].dir + f + '.jpg'),
+    thumb:PANO_SETS[slug].dir + '360-thumbs/' + f + '-thumb.jpg', label
+  }));
+
+  let _panoSet = Object.keys(PANO_SETS)[0], _panoIdx = 0, _panoInst = null;
 
   function loadPano(idx) {
-    _panoIdx = (idx + PANO_ITEMS.length) % PANO_ITEMS.length;
-    const item = PANO_ITEMS[_panoIdx];
+    const set = PANO_SETS[_panoSet];
+    _panoIdx = (idx + set.items.length) % set.items.length;
+    const [file, label] = set.items[_panoIdx];
     if (_panoInst) { _panoInst.destroy(); _panoInst = null; }
     _panoInst = pannellum.viewer('panoViewer', {
       type: 'equirectangular',
-      panorama: item.src,
+      panorama: panoUrl(set.dir + file + '.jpg'),
       autoLoad: true,
       compass: false,
       showZoomCtrl: true,
       hfov: 100
     });
-    document.getElementById('panoCaption').textContent = '🇦🇹 Le Méridien Vienna — ' + item.label;
-    document.getElementById('panoCounter').textContent = (_panoIdx + 1) + ' / ' + PANO_ITEMS.length;
+    document.getElementById('panoCaption').textContent = set.flag + ' ' + set.name + ' · ' + label;
+    document.getElementById('panoCounter').textContent = (_panoIdx + 1) + ' / ' + set.items.length;
   }
 
   function navPano(dir) { loadPano(_panoIdx + dir); }
 
-  loadPano(0);
+  function setPanoHotel(slug) {
+    _panoSet = slug;
+    document.querySelectorAll('.pano-tab').forEach(t => {
+      const on = t.dataset.set === slug;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on);
+    });
+    loadPano(0);
+  }
+
+  document.getElementById('panoTabs').innerHTML = Object.entries(PANO_SETS).map(([slug, s]) =>
+    `<button class="pano-tab" role="tab" data-set="${slug}" onclick="setPanoHotel('${slug}')">${s.flag} ${s.tab || s.name}</button>`
+  ).join('');
+  setPanoHotel(_panoSet);
 
   /* ── FILTER STATE ── */
   const COUNTRIES = {
     europe:   [ {key:'italy',label:'🇮🇹 Italy'}, {key:'switzerland',label:'🇨🇭 Switzerland'},
-                {key:'norway',label:'🇳🇴 Norway'}, {key:'austria',label:'🇦🇹 Austria'} ],
+                {key:'norway',label:'🇳🇴 Norway'}, {key:'austria',label:'🇦🇹 Austria'},
+                {key:'sweden',label:'🇸🇪 Sweden'} ],
     americas: [ {key:'argentina',label:'🇦🇷 Argentina'}, {key:'bolivia',label:'🇧🇴 Bolivia'},
                 {key:'canada',label:'🇨🇦 Canada'}, {key:'chile',label:'🇨🇱 Chile'},
                 {key:'colombia',label:'🇨🇴 Colombia'}, {key:'costa-rica',label:'🇨🇷 Costa Rica'},
@@ -1005,6 +1107,73 @@
 
   /* ── HOTEL MODAL DATA ── */
   const HOTEL_DATA = {
+    /* Stockholm (Sept 2026). DRAFT: reviews written from hotel facts only, scores are estimates.
+       Replace with David's own experience and scores; add the YouTube walkthroughs to media. */
+    'hagastrand': {
+      scores:[{n:'9.3',l:'Overall'},{n:'9.7',l:'Spa'},{n:'9.5',l:'Design'},{n:'8.6',l:'Location'}], /* DRAFT scores */
+      media:[
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/cover.jpg',alt:'Hagastrand, Autograph Collection hotel facade at dusk, Stockholm Sweden'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-facade-illuminated-sign-dusk-stockholm.jpg',alt:'Hagastrand, Autograph Collection facade with illuminated sign at dusk, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-illuminated-sign-entrance-canopy.jpg',alt:'Hagastrand, Autograph Collection illuminated sign over the entrance canopy, Stockholm'},
+        ...panoMedia('hagastrand'),
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-atrium-bulb-lights-long-table.jpg',alt:'Hagastrand, Autograph Collection atrium with bulb lights over a long table, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-atrium-light-ceiling-communal-table.jpg',alt:'Hagastrand, Autograph Collection atrium light ceiling and communal table, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-atrium-lounge-evening.jpg',alt:'Hagastrand, Autograph Collection atrium lounge in the evening, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-atrium-glass-roof-lounge.jpg',alt:'Hagastrand, Autograph Collection atrium lounge under the glass roof, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-atrium-bar-counter.jpg',alt:'Hagastrand, Autograph Collection atrium bar counter, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-atrium-staircase-art-installation.jpg',alt:'Hagastrand, Autograph Collection atrium staircase and art installation, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-vaulted-corridor-bar.jpg',alt:'Hagastrand, Autograph Collection vaulted corridor leading to the bar, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-suite-living-room-sofa.jpg',alt:'Hagastrand, Autograph Collection suite living room with sofa, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-guest-room-king-bed.jpg',alt:'Hagastrand, Autograph Collection guest room king bed, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-guest-room-bed-reading-lamp.jpg',alt:'Hagastrand, Autograph Collection guest room bed and reading lamp, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-guest-room-bed-wood-panelling.jpg',alt:'Hagastrand, Autograph Collection guest room bed with wood panelling, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-bathroom-walk-in-shower-terrazzo.jpg',alt:'Hagastrand, Autograph Collection terrazzo bathroom with walk-in shower, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-bathroom-terrazzo-vanity.jpg',alt:'Hagastrand, Autograph Collection terrazzo bathroom vanity, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-room-climate-control-dial.jpg',alt:'Hagastrand, Autograph Collection room climate control dial, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-hotel-corridor-staircase.jpg',alt:'Hagastrand, Autograph Collection hotel corridor and staircase, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-spa-reception-desk.jpg',alt:'Hagastrand Spa reception desk, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-spa-lobby-gongs-lounge.jpg',alt:'Hagastrand Spa lobby with gongs and lounge, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-spa-gong-wall-boutique.jpg',alt:'Hagastrand Spa gong wall and boutique, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-spa-corridor-dried-flowers.jpg',alt:'Hagastrand Spa corridor with dried flowers, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-dinner-table-burger-steak.jpg',alt:'Hagastrand, Autograph Collection dinner table with burger and steak, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-dinner-burger-fries-beer.jpg',alt:'Hagastrand, Autograph Collection dinner burger, fries and beer, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-dinner-steak-salad.jpg',alt:'Hagastrand, Autograph Collection dinner steak and salad, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-neoclassical-facade-blue-sky-stockholm.jpg',alt:'Hagastrand, Autograph Collection neoclassical facade under blue sky, Stockholm'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-facade-entrance-portico-solna.jpg',alt:'Hagastrand, Autograph Collection facade and entrance portico, Solna'},
+        {type:'image',src:'Media/Hotels/hagastrand-stockholm/hagastrand-autograph-collection-entrance-canopy-dusk-stockholm.jpg',alt:'Hagastrand, Autograph Collection entrance canopy at dusk, Stockholm'}
+      ],
+      review:'Hagastrand is the first Autograph Collection hotel in Scandinavia. It sits in a 1920 building on the shore of Brunnsviken, inside the Royal Haga Park in Solna, and is run by Nobis Hospitality Group, the people behind Nobis Hotel Stockholm. Wingårdhs did the interiors: warm wood, terrazzo bathrooms, soft light, and a glass-roofed atrium with rows of bulbs hanging over long communal tables. The 215 rooms and suites are calm and pared back, and some suites have a private rooftop terrace looking out over the park. The main draw is Hagastrand Spa, 2,500 square metres with an 18 m pool that plays music underwater, a snow room for cold therapy, an event sauna for guided rituals, and a gong sound installation. Restaurant Njord and a cocktail bar mean you never have to leave for dinner. Central Stockholm is a short ride away, but this is a hotel built for staying put.',
+      highlights:['First Autograph Collection hotel in Scandinavia, inside the Royal Haga Park','2,500 sqm Hagastrand Spa: 18 m pool with underwater music, snow room, event sauna','Interiors by Wingårdhs: terrazzo bathrooms, warm wood, glass-roofed atrium','Suites with a private rooftop terrace over the park','Restaurant Njord and a cocktail bar on site'],
+      considerations:['Solna, not the old town: plan on a bus or taxi into central Stockholm','Check what your rate includes for spa access and treatments before you arrive'],
+      book:'https://prf.hn/l/QL208Ed/'
+    },
+    'ac-stockholm': {
+      scores:[{n:'8.4',l:'Overall'},{n:'8.8',l:'Transport'},{n:'8.5',l:'Rooms'},{n:'8.6',l:'Value'}], /* DRAFT scores */
+      media:[
+        {type:'image',src:'Media/Hotels/ac-stockholm/cover.jpg',alt:'AC Hotel Stockholm Ulriksdal guest room with king bed and window seating, Sweden'},
+        {type:'image',src:'Media/Hotels/ac-stockholm/ac-hotel-stockholm-ulriksdal-lobby-reception-desk.jpg',alt:'AC Hotel Stockholm Ulriksdal lobby reception desk, Solna Sweden'},
+        {type:'image',src:'Media/Hotels/ac-stockholm/ac-hotel-stockholm-ulriksdal-lobby-ring-chandelier.jpg',alt:'AC Hotel Stockholm Ulriksdal lobby ring chandelier, Solna Sweden'},
+        ...panoMedia('ac-stockholm')
+      ],
+      review:'AC Hotel Stockholm Ulriksdal is a practical base on the north side of the city, in Solna\'s business district. Ulriksdal station is a few steps away, with commuter trains to Stockholm City in about 10 to 15 minutes and Arlanda Airport roughly 30 minutes out. Strawberry Arena and Mall of Scandinavia are a five minute drive. Rooms follow the AC formula: clean lines, a padded headboard, a small seating corner by the window, and a bathroom with a walk-in shower and towel rail. The lobby is tall and open, with the bar and dining area in the same space, and breakfast is a buffet with vegetarian and vegan options. A good pick for a concert, a match, or an early flight.',
+      highlights:['Steps from Ulriksdal station: commuter train to Stockholm City in about 10 to 15 minutes','Around 30 minutes to Arlanda Airport','Five minutes by car to Strawberry Arena and Mall of Scandinavia','Modern AC rooms with a seating corner by the window','Buffet breakfast with vegetarian and vegan options','24 hour gym'],
+      considerations:['Business district location: not much to walk to in the evening','Parking is a paid public lot across the road, paid by app'],
+      book:'https://prf.hn/l/eOlm0D8/'
+    },
+    'stallmastaregarden': {
+      scores:[{n:'8.9',l:'Overall'},{n:'9.6',l:'Setting'},{n:'9.2',l:'Restaurant'},{n:'8.6',l:'Rooms'}], /* DRAFT scores */
+      media:[
+        {type:'image',src:'Media/Hotels/stallmastaregarden-stockholm/cover.jpg',alt:'Stallmästaregården historic yellow inn and courtyard, Stockholm Sweden'},
+        {type:'image',src:'Media/Hotels/stallmastaregarden-stockholm/stallmastaregarden-stockholm-courtyard-pavilion-brunnsviken.jpg',alt:'Stallmästaregården courtyard and pavilion on Brunnsviken, Stockholm Sweden'},
+        {type:'image',src:'Media/Hotels/stallmastaregarden-stockholm/stallmastaregarden-stockholm-pavilion-linden-trees-brunnsviken.jpg',alt:'Stallmästaregården pavilion between old trees on Brunnsviken, Stockholm Sweden'},
+        {type:'image',src:'Media/Hotels/stallmastaregarden-stockholm/stallmastaregarden-stockholm-restaurant-dining-room-wood-beams.jpg',alt:'Stallmästaregården restaurant dining room with wooden beams, Stockholm Sweden'},
+        {type:'image',src:'Media/Hotels/stallmastaregarden-stockholm/stallmastaregarden-stockholm-junior-suite-staircase.jpg',alt:'Stallmästaregården junior suite staircase, Stockholm Sweden'}
+      ],
+      review:'Stallmästaregården has worked as an inn since the 17th century, which makes it the oldest in the Stockholm area still doing the same job. Queen Kristina held her midsummer celebration here in 1645. It sits on Brunnsviken at the edge of the Royal Haga Park: a yellow main house around a gravel courtyard, with an old green-roofed pavilion between two big trees right on the water. There are 49 rooms with wooden floors and light, neutral tones, and the Junior Suites run over two levels, with a living room downstairs and the bedroom up a wooden staircase. The restaurant is in the historic main house, under exposed wooden beams. It is a Member of Design Hotels, part of the MICHELIN Guide hotel selection, and you earn Marriott Bonvoy points here. Central Stockholm is close, but the setting feels like the countryside.',
+      highlights:['An inn since the 1600s, the oldest in the Stockholm area still running as one','Waterfront setting on Brunnsviken, at the edge of the Royal Haga Park','Restaurant in the historic main house, under exposed wooden beams','Junior Suites on two levels with a living room downstairs','Member of Design Hotels, in the MICHELIN Guide hotel selection, earns Bonvoy points'],
+      considerations:['Outside the centre: a short taxi or bus ride to central Stockholm','Historic buildings: room size and layout vary a lot by category'],
+      book:'https://prf.hn/l/jXGDlX0/'
+    },
     'le-meridien-vienna': {
       scores:[{n:'9.2',l:'Overall'},{n:'9.5',l:'Location'},{n:'9.3',l:'Breakfast'},{n:'9.0',l:'Service'}],
       media:[
@@ -1397,6 +1566,10 @@
   /* Map hotel name text → slug */
   const NAME_TO_SLUG = {
     'Le Méridien Vienna':'le-meridien-vienna',
+    'Hagastrand, Autograph Collection':'hagastrand',
+    'Hagastrand Autograph Collection':'hagastrand',
+    'AC Hotel Stockholm Ulriksdal':'ac-stockholm',
+    'Stallmästaregården':'stallmastaregarden',
     'Vigilius Mountain Resort':'vigilius',
     'The Brown Guatapé':'the-brown-guatape',
     'Bormio — Pass Base':'bormio',
@@ -1441,20 +1614,31 @@
   });
 
   /* ── MODAL STATE ── */
-  let _media = [], _mediaIdx = 0;
+  let _media = [], _mediaIdx = 0, _hmPanoInst = null;
+
+  function destroyModalPano() {
+    if (_hmPanoInst) { _hmPanoInst.destroy(); _hmPanoInst = null; }
+  }
 
   function setViewerMedia(idx) {
     _mediaIdx = idx;
     const m = _media[idx];
     const viewer = document.getElementById('hmViewer');
-    // stop any existing video or vimeo
+    // stop any existing video, vimeo or 360 viewer
     const prevVid = viewer.querySelector('video');
     if (prevVid) prevVid.pause();
     const prevFrame = viewer.querySelector('iframe');
     if (prevFrame) prevFrame.src = '';
+    destroyModalPano();
 
     if (!m) return;
-    if (m.type === 'video') {
+    if (m.type === 'pano') {
+      viewer.innerHTML = `<div class="hm-pano" id="hmPano"></div><span class="hm-pano-label">360° · ${m.label} · Drag to look around</span>`;
+      _hmPanoInst = pannellum.viewer('hmPano', {
+        type: 'equirectangular', panorama: m.src, autoLoad: true,
+        compass: false, showZoomCtrl: true, keyboardZoom: false, hfov: 100
+      });
+    } else if (m.type === 'video') {
       viewer.innerHTML = `<video src="${m.src}"${m.poster?' poster="'+m.poster+'"':''} controls muted playsinline></video>`;
     } else if (m.type === 'vimeo') {
       viewer.innerHTML = `<iframe src="https://player.vimeo.com/video/${m.src}?autoplay=1&loop=1&muted=1&color=d64230&title=0&byline=0&portrait=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
@@ -1509,6 +1693,12 @@
 
     // Thumbnails
     thumbs.innerHTML = _media.map((m, i) => {
+      if (m.type === 'pano') {
+        return `<div class="hm-thumb-wrap is-pano${i===0?' active':''}" onclick="setViewerMedia(${i})">
+          <img src="${m.thumb}" alt="" loading="lazy">
+          <span class="hm-thumb-360">360°</span>
+        </div>`;
+      }
       if (m.type === 'video') {
         return `<div class="hm-thumb-wrap${i===0?' active':''}" onclick="setViewerMedia(${i})">
           ${m.poster?`<img src="${m.poster}" alt="">` : '<div style="background:#1a1a18;width:100%;height:100%"></div>'}
@@ -1575,6 +1765,7 @@
     if (vid) vid.pause();
     const frames = document.querySelectorAll('#hmViewer iframe');
     frames.forEach(f => f.src = '');
+    destroyModalPano();
     document.getElementById('hmOverlay').classList.remove('open');
     document.getElementById('hmPanel').classList.remove('open');
     document.body.style.overflow = '';
@@ -1595,6 +1786,8 @@
   /* Keyboard: Escape closes */
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeHotelModal();
+    // Arrows page the modal gallery only while it's open, and not while a 360 viewer has focus (it pans instead)
+    if (!document.getElementById('hmPanel').classList.contains('open') || e.target.closest('.pnlm-container')) return;
     if (e.key === 'ArrowLeft')  navMedia(-1);
     if (e.key === 'ArrowRight') navMedia(1);
   });
