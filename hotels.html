@@ -66,7 +66,7 @@
     .header-sub{font-size:15px;font-weight:400;color:rgba(253,252,251,0.88);max-width:520px;line-height:1.7}
 
     /* 360 FEATURE */
-    .pano-feature{max-width:1200px;margin:0 auto;padding:24px 3rem 100px}
+    .pano-feature{max-width:1200px;margin:0 auto;padding:56px 3rem 64px}
     .pano-feature-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px}
     .pano-eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink);opacity:0.6;margin-bottom:10px;display:flex;align-items:center;gap:8px;font-weight:500}
     .pano-eyebrow::before{content:'';width:16px;height:1px;background:var(--ink)}
@@ -82,13 +82,16 @@
     .pano-nav-prev{left:16px}
     .pano-nav-next{right:16px}
     .pano-counter{position:absolute;bottom:16px;right:16px;z-index:5;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7);background:rgba(26,26,24,0.55);padding:6px 12px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(4px);pointer-events:none}
-    .pano-caption{font-size:13px;color:var(--ink);opacity:0.7;margin-top:12px}
+    .pano-foot{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:12px}
+    .pano-caption{font-size:13px;color:var(--ink);opacity:0.7}
+    .pano-review{font:500 14px 'DM Sans',sans-serif;color:var(--charcoal);background:none;border:none;border-bottom:1px solid var(--charcoal);padding:0 0 2px;cursor:pointer}
+    .pano-review:hover{opacity:0.7}
     .pano-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
     .pano-frame .pnlm-controls-container{top:48px}
     .pano-tab{font-size:13px;padding:8px 16px;border:1px solid var(--sand);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:none;color:var(--ink);opacity:0.72;transition:opacity 0.25s,border-color 0.25s,background 0.25s,box-shadow 0.25s;white-space:nowrap}
     .pano-tab:hover{opacity:1;border-color:var(--clay)}
     .pano-tab.active{border-color:var(--charcoal);color:var(--white);background:var(--charcoal);opacity:1}
-    @media(max-width:768px){ .pano-viewer{height:320px} .pano-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -1.25rem 14px;padding:0 1.25rem} .pano-tabs::-webkit-scrollbar{display:none} .pano-tab{padding:7px 12px;font-size:12px;flex-shrink:0} .pano-feature{padding:8px 1.25rem 72px} }
+    @media(max-width:768px){ .pano-viewer{height:320px} .pano-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -1.25rem 14px;padding:0 1.25rem} .pano-tabs::-webkit-scrollbar{display:none} .pano-tab{padding:7px 12px;font-size:12px;flex-shrink:0} .pano-feature{padding:40px 1.25rem 40px} }
 
 
     /* FILTER BAR */
@@ -321,6 +324,30 @@
   <p class="header-eyebrow">Personal Reviews · Real Nights · Honest Assessments</p>
   <h1 class="header-title">Hotels<br><em>Worth the Rate</em></h1>
   <p class="header-sub">Every property personally stayed in. No press trips, no comped nights. Europe, the Americas, and growing.</p>
+</div>
+
+<!-- 360 FEATURE -->
+<div class="pano-feature">
+  <div class="pano-feature-head reveal">
+    <div>
+      <p class="pano-eyebrow">Room tours</p>
+      <h2 class="pano-title">Step Inside, <em>360°</em></h2>
+    </div>
+    <p class="pano-sub">Stand in the rooms I actually stayed in. Drag to look around, use the arrows to move from room to room, then read the full review.</p>
+  </div>
+  <div class="pano-tabs reveal" id="panoTabs" role="tablist" aria-label="Choose a hotel"></div>
+  <div class="pano-frame reveal">
+    <span class="pano-badge">360°</span>
+    <span class="pano-hint">Drag to look around</span>
+    <button class="pano-nav pano-nav-prev" onclick="navPano(-1)" aria-label="Previous 360 photo">&#8592;</button>
+    <button class="pano-nav pano-nav-next" onclick="navPano(1)" aria-label="Next 360 photo">&#8594;</button>
+    <span class="pano-counter" id="panoCounter"></span>
+    <div class="pano-viewer" id="panoViewer"></div>
+  </div>
+  <div class="pano-foot">
+    <p class="pano-caption" id="panoCaption"></p>
+    <button class="pano-review" id="panoReview" onclick="openHotelModal(_panoSet)"></button>
+  </div>
 </div>
 
 <section class="hotels-section">
@@ -825,27 +852,6 @@
 
 </section>
 
-<!-- 360 FEATURE -->
-<div class="pano-feature">
-  <div class="pano-feature-head reveal">
-    <div>
-      <p class="pano-eyebrow">Room tours</p>
-      <h2 class="pano-title">Step Inside, <em>360°</em></h2>
-    </div>
-    <p class="pano-sub">Pick a hotel and drag around the rooms we actually stayed in. Use the arrows to move from room to room.</p>
-  </div>
-  <div class="pano-tabs reveal" id="panoTabs" role="tablist" aria-label="Choose a hotel"></div>
-  <div class="pano-frame reveal">
-    <span class="pano-badge">360°</span>
-    <span class="pano-hint">Drag to look around</span>
-    <button class="pano-nav pano-nav-prev" onclick="navPano(-1)" aria-label="Previous 360 photo">&#8592;</button>
-    <button class="pano-nav pano-nav-next" onclick="navPano(1)" aria-label="Next 360 photo">&#8594;</button>
-    <span class="pano-counter" id="panoCounter"></span>
-    <div class="pano-viewer" id="panoViewer"></div>
-  </div>
-  <p class="pano-caption" id="panoCaption"></p>
-</div>
-
 <footer>
   <div class="footer-inner">
     <div class="footer-bottom">
@@ -938,6 +944,7 @@
     });
     document.getElementById('panoCaption').textContent = set.flag + ' ' + set.name + ' · ' + label;
     document.getElementById('panoCounter').textContent = (_panoIdx + 1) + ' / ' + set.items.length;
+    document.getElementById('panoReview').textContent = 'Read the ' + set.name + ' review →';
   }
 
   function navPano(dir) { loadPano(_panoIdx + dir); }
