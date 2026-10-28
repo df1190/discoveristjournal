@@ -1235,6 +1235,13 @@ body.mode-animated .static-only{display:none!important}
 </div>
 
 <script>
+// MapLibre 5.24 rejects a promise with "reading 'signal'" when a style switch
+// cancels terrain tiles still in flight (seen with the Chase camera close in).
+// The map loads fine afterwards; keep that one known message out of the console.
+window.addEventListener("unhandledrejection", e => {
+  if (/reading 'signal'/.test(e.reason && e.reason.message) && /maplibre/.test(e.reason.stack || "")) e.preventDefault();
+});
+
 // ─── Analytics ────────────────────────────────────────────────────────────────
 // GA4 events for the funnel: route loaded → export started → export finished.
 function track(name, params = {}) {
@@ -3967,6 +3974,11 @@ function loadTemplates() {
 function storeTemplates(list) {
   try { localStorage.setItem(TPL_KEY, JSON.stringify(list)); return true; } catch (_) { return false; }
 }
+// Highlighted buttons that are navigation, not settings: the sidebar's jump
+// bar and the preset look cards. Saving them made applying a look scroll the
+// sidebar, and re-click the preset (which then overrode the saved look).
+const NOT_SETTINGS = "#side-nav, #look-grid";
+const PICK_NAMES = { style: "map style", camera: "camera", rotate: "rotation", layout: "title layout", font: "font", asp: "format", res: "size", fps: "fps", quality: "quality" };
 function captureTemplate() {
   const inputs = {}, picks = [];
   document.querySelectorAll(".tpl-scope input[id], .tpl-scope select[id]").forEach(el => {
@@ -3975,17 +3987,22 @@ function captureTemplate() {
   });
   document.querySelectorAll(".tpl-scope .active").forEach(el => {
     const attr = Object.keys(el.dataset)[0];
-    if (!attr) return;
+    if (!attr || el.closest(NOT_SETTINGS)) return;
     picks.push({ group: el.parentElement.id || null, attr, value: el.dataset[attr] });
   });
   return { inputs, picks, routeColorsAuto, overlayColorsAuto };
 }
+// Applies a saved look. Returns the settings it couldn't restore (options that
+// no longer exist, e.g. a removed map style), so the caller can say so.
 function applyTemplate(t) {
   const attrName = a => a.replace(/[A-Z]/g, c => "-" + c.toLowerCase());
+  const missing = [];
   t.picks.forEach(({ group, attr, value }) => {
+    if (group === "side-nav" || group === "look-grid") return; // saved by older versions
     const scope = group ? `#${group} ` : ".tpl-scope ";
     const el = document.querySelector(`${scope}[data-${attrName(attr)}="${CSS.escape(value)}"]`);
-    if (el && !el.classList.contains("active")) el.click();
+    if (!el) { missing.push(`${PICK_NAMES[attr] || attr} "${value}"`); return; }
+    if (!el.classList.contains("active")) el.click();
   });
   document.querySelectorAll(".tpl-scope input[id], .tpl-scope select[id]").forEach(el => {
     if (!(el.id in t.inputs)) return;
@@ -3997,6 +4014,12 @@ function applyTemplate(t) {
   routeColorsAuto = !!t.routeColorsAuto;
   overlayColorsAuto = t.overlayColorsAuto !== false;
   animStartTs = null;
+  return missing;
+}
+function appliedMessage(name, missing) {
+  return missing.length
+    ? `Applied "${name}", except ${missing.join(", ")}: no longer available, kept the current one`
+    : `Applied "${name}"`;
 }
 function renderTemplateList(selectName) {
   const list = loadTemplates(), sel = $("tpl-select");
@@ -4079,12 +4102,13 @@ function applyLook(d, { keepExport = false } = {}) {
   if (oc) OVERLAY_COLOR_IDS.forEach(id => delete inputs[id]);
   Object.assign(inputs, d.i || {});
   const picks = Object.entries({ ...pickMap(DEFAULT_LOOK.picks), ...(d.p || {}) })
-    .filter(([k]) => { const g = k.split("|")[0]; return !LOOK_SKIP_GROUPS.has(g) && !(keepExport && EXPORT_GROUPS.has(g)); })
+    .filter(([k]) => { const g = k.split("|")[0]; return !LOOK_SKIP_GROUPS.has(g) && g !== "look-grid" && !(keepExport && EXPORT_GROUPS.has(g)); })
     .map(([k, value]) => { const [group, attr] = k.split("|"); return { group: group || null, attr, value }; });
   routeColorsAuto = rc; overlayColorsAuto = oc; // so a style change brings its colors
-  applyTemplate({ inputs, picks, routeColorsAuto: rc, overlayColorsAuto: oc });
+  const missing = applyTemplate({ inputs, picks, routeColorsAuto: rc, overlayColorsAuto: oc });
   if (rc) applyRoutePreset(currentMapStyle);
   if (oc) applyOverlayTheme();
+  return missing;
 }
 // Look links: #look=<base64url JSON>, short because only changes are kept.
 function encodeLook(d) {
@@ -4469,7 +4493,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   $("tpl-apply").addEventListener("click",()=>{
     const t = loadTemplates().find(t => t.name === $("tpl-select").value);
-    if (t) { applyTemplate(t); showStatus(`Applied "${t.name}"`); }
+    if (t) { const missing = applyTemplate(t); showStatus(appliedMessage(t.name, missing), missing.length ? 6000 : 2600); }
   });
   $("tpl-delete").addEventListener("click",()=>{
     const name = $("tpl-select").value;
@@ -4594,6 +4618,13 @@ document.addEventListener("DOMContentLoaded", () => {
   DEFAULT_LOOK = captureTemplate();
   renderLookGrid();
   $("try-sample").addEventListener("click", () => loadSampleRide("empty_state"));
+  const unmarkPreset = e => {
+    if (!e.isTrusted || e.target.closest(NOT_SETTINGS)) return;
+    if (e.type === "click" && !e.target.closest("button[data-style],button[data-camera],button[data-rotate],button[data-layout],.seg-btn,.asp-btn,.style-btn")) return;
+    $("look-grid").querySelectorAll(".look-card.active").forEach(c => c.classList.remove("active"));
+  };
+  // (Toolbar changes like format or fps aren't part of a look, so they don't count.)
+  ["input", "click"].forEach(type => $("sidebar").addEventListener(type, unmarkPreset));
   $("try-sample-side").addEventListener("click", () => loadSampleRide("sidebar"));
   $("done-close").addEventListener("click", hideFinish);
   $("done-overlay").addEventListener("click", e => { if (e.target === $("done-overlay")) hideFinish(); });
@@ -4615,9 +4646,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const hash = new URLSearchParams(location.hash.slice(1));
   if (hash.has("look")) {
     try {
-      applyLook(decodeLook(hash.get("look")));
+      const missing = applyLook(decodeLook(hash.get("look")));
       track("look_link_opened");
-      loadSampleRide("look_link").then(() => showStatus("Look applied. Drop your GPX to use it on your ride.", 5000));
+      loadSampleRide("look_link").then(() => showStatus(missing.length
+        ? `Look applied, except ${missing.join(", ")}. Drop your GPX to use it on your ride.`
+        : "Look applied. Drop your GPX to use it on your ride.", 6000));
     } catch (_) { showStatus("This look link is broken, so the default look is used.", 4000); }
   } else if (hash.has("sample") || new URLSearchParams(location.search).has("sample")) {
     loadSampleRide("link");
