@@ -3,12 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Map Generator — Discoverist</title>
+<title>Map Generator · Route Posters | Discoverist</title>
+<meta name="description" content="Turn a GPX ride or a mountain pass into a print-ready topographic poster: contour lines, hillshade, your route, elevation profile and stats. Free, no sign-up.">
+<!-- Not linked from the site yet; keep it out of search until it is. -->
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&family=Bebas+Neue&family=Oswald:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@400;700;900&family=Barlow+Condensed:wght@300;400;700&family=Cormorant+Garamond:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-contour@0.1.1/dist/index.min.js"></script>
 <style>
 /* ── Design tokens (Apple HIG) ───────────────────────────────────────── */
 :root {
@@ -299,7 +303,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 
 /* ── MapLibre overrides ──────────────────────────────────────────────── */
 .maplibregl-ctrl-attrib,.maplibregl-ctrl-logo{display:none!important}
-.maplibregl-ctrl-bottom-right{display:block!important;bottom:8px!important;right:8px!important}
+.maplibregl-ctrl-top-right{display:block!important;top:8px!important;right:8px!important}
 .maplibregl-ctrl-group{
   background:rgba(255,255,255,.88)!important;
   backdrop-filter:blur(8px)!important;
@@ -311,6 +315,25 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 .maplibregl-ctrl-group button{background:transparent!important;border-bottom:1px solid var(--sep2)!important}
 .maplibregl-ctrl-group button:last-child{border-bottom:none!important}
 .maplibregl-ctrl-group button:hover{background:var(--gold-f)!important}
+
+/* ── Added 2026-10-28 ────────────────────────────────────────────────── */
+#hdr-sub{font-size:11.5px;color:var(--lbl3)}
+.link-btn{background:none;border:none;padding:2px 0 0;font:600 11.5px var(--font);color:var(--gold-lo);cursor:pointer;text-align:center}
+.link-btn:hover{text-decoration:underline}
+.hint{font-size:10.5px;color:var(--lbl3);line-height:1.45}
+.tlbl small{display:block;font-size:10px;color:var(--lbl4);margin-top:1px}
+.panel .btn-gen{margin-top:2px}
+#empty-state{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;
+  background:rgba(30,30,40,.35);color:#fff;font-size:13px;font-weight:500;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+#empty-state .btn{width:auto;padding:10px 18px}
+#empty-state[hidden]{display:none}
+@media (max-width:820px){
+  body{height:auto;min-height:100vh;overflow:auto}
+  #hdr-hint,#hdr-sub{display:none}
+  #main{flex-direction:column;overflow:visible}
+  #prev{order:1;height:64vh;height:64dvh;flex:none;padding:12px}
+  #sidebar{order:2;width:100%;border-right:0;overflow:visible;padding:10px 12px 40px}
+}
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KQMYMPEGLT"></script>
@@ -332,73 +355,109 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     </svg>
   </div>
   <h1>Map Generator</h1>
-  <span id="hdr-hint">Right-click drag to rotate</span>
+  <span id="hdr-sub">Print-ready route posters</span>
+  <span id="hdr-hint">Drag to move · right-drag to rotate · scroll to zoom</span>
 </div>
 
 <!-- ── Layout ──────────────────────────────────────────────────────── -->
 <div id="main">
 <div id="sidebar">
 
-  <!-- Route Input -->
+  <!-- Route -->
   <div class="card">
-    <div class="ctitle">Route Input</div>
+    <div class="ctitle">Route</div>
     <div class="seg" id="mode-seg">
-      <button class="seg-btn active" data-mode="name">Pass Name</button>
+      <button class="seg-btn active" data-mode="file">GPX / KML</button>
+      <button class="seg-btn" data-mode="name">Pass name</button>
       <button class="seg-btn" data-mode="coords">Coords</button>
-      <button class="seg-btn" data-mode="file">File</button>
     </div>
 
-    <div class="panel on" id="panel-name">
+    <div class="panel on" id="panel-file">
+      <div class="fdrop" id="file-drop">
+        <svg class="fdrop-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M10 13V4M6 7.5l4-4 4 4"/><path d="M3 16.5h14"/>
+        </svg>
+        <div class="fdrop-txt" id="file-lbl">Drop GPX or KML</div>
+        <div class="fdrop-sub">One file, or one file per day for a trip</div>
+        <input type="file" id="route-files" accept=".gpx,.kml,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml" multiple>
+      </div>
+      <button class="link-btn" id="try-sample" type="button">No file handy? Try the Stelvio Pass</button>
+    </div>
+
+    <div class="panel" id="panel-name">
       <div class="field">
-        <label class="flbl">Mountain pass or route</label>
+        <label class="flbl" for="pass-name">Mountain pass or road</label>
         <input type="text" id="pass-name" placeholder="Stelvio Pass, Col du Galibier…">
       </div>
+      <button class="btn btn-gen" id="btn-generate">Find route</button>
     </div>
 
     <div class="panel" id="panel-coords">
       <div class="field">
-        <label class="flbl">Start</label>
+        <label class="flbl" for="coord-from">Start</label>
         <input type="text" id="coord-from" placeholder="46.52, 10.45">
       </div>
       <div class="field">
-        <label class="flbl">End</label>
+        <label class="flbl" for="coord-to">End</label>
         <input type="text" id="coord-to" placeholder="46.61, 10.52">
       </div>
+      <button class="btn btn-gen" id="btn-generate-coords">Find route</button>
     </div>
+    <div id="progress">
+      <div class="pstep" id="s1"><div class="pdot"></div><span id="s1-txt">Reading route</span></div>
+      <div class="pstep" id="s2"><div class="pdot"></div><span>Drawing the map</span></div>
+    </div>
+    <div id="status-line"></div>
+  </div>
 
-    <div class="panel" id="panel-file">
-      <div class="fdrop" id="gpx-drop">
-        <svg class="fdrop-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-          <path d="M10 13V4M6 7.5l4-4 4 4"/><path d="M3 16.5h14"/>
-        </svg>
-        <div class="fdrop-txt" id="gpx-lbl">GPX File</div>
-        <div class="fdrop-sub">Click to select .gpx</div>
-        <input type="file" id="gpx-file" accept=".gpx">
-      </div>
-      <div class="fdrop" id="kml-drop">
-        <svg class="fdrop-ico" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-          <path d="M10 13V4M6 7.5l4-4 4 4"/><path d="M3 16.5h14"/>
-        </svg>
-        <div class="fdrop-txt" id="kml-lbl">KML File</div>
-        <div class="fdrop-sub">Google My Maps export</div>
-        <input type="file" id="kml-file" accept=".kml,.kmz">
-      </div>
+  <!-- Stats (shown after loading) -->
+  <div id="stats-card">
+    <div class="st-row">
+      <span class="st-v" id="st-dist">-</span><span class="st-u">km</span>
+      <span class="st-sep">·</span>
+      <span class="st-v" id="st-gain">-</span><span class="st-u">m climbed</span>
+      <span class="st-sep">·</span>
+      <span class="st-v" id="st-top">-</span><span class="st-u">m top</span>
     </div>
+    <div class="st-coord" id="st-coord"></div>
+  </div>
+
+  <!-- Poster size -->
+  <div class="card">
+    <div class="ctitle">Poster size</div>
+    <select id="paper-select" class="fsel" aria-label="Paper size">
+      <option value="30x40">30 × 40 cm</option>
+      <option value="50x70" selected>50 × 70 cm</option>
+      <option value="a3">A3 · 29.7 × 42 cm</option>
+      <option value="a2">A2 · 42 × 59.4 cm</option>
+      <option value="18x24">18 × 24 in</option>
+      <option value="61x91">61 × 91 cm · 24 × 36 in</option>
+    </select>
+    <div class="seg" id="orient-seg">
+      <button class="seg-btn active" data-orient="portrait">Portrait</button>
+      <button class="seg-btn" data-orient="landscape">Landscape</button>
+    </div>
+    <div class="seg" id="dpi-seg">
+      <button class="seg-btn" data-dpi="150">150 DPI</button>
+      <button class="seg-btn" data-dpi="200">200 DPI</button>
+      <button class="seg-btn active" data-dpi="300">300 DPI</button>
+    </div>
+    <div class="hint" id="paper-meta"></div>
   </div>
 
   <!-- Poster Text -->
   <div class="card">
-    <div class="ctitle">Poster Text</div>
+    <div class="ctitle">Poster text</div>
     <div class="field">
-      <label class="flbl">Title</label>
+      <label class="flbl" for="title-input">Title</label>
       <input type="text" id="title-input" placeholder="STELVIO PASS">
     </div>
     <div class="field">
-      <label class="flbl">Subtitle</label>
+      <label class="flbl" for="subtitle-input">Subtitle</label>
       <input type="text" id="subtitle-input" placeholder="Italy · The Alps">
     </div>
     <div class="field">
-      <label class="flbl">Font</label>
+      <label class="flbl" for="font-select">Font</label>
       <select id="font-select" class="fsel">
         <option value="inter">Inter</option>
         <option value="bebas">Bebas Neue</option>
@@ -412,14 +471,14 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     </div>
     <div class="rng-wrap">
       <div class="rng-hdr">
-        <span class="rng-lbl">Title Size</span>
+        <span class="rng-lbl">Title size</span>
         <span class="rng-val" id="title-size-val">100%</span>
       </div>
       <input type="range" id="title-size" min="50" max="300" step="5" value="100">
     </div>
     <div class="rng-wrap">
       <div class="rng-hdr">
-        <span class="rng-lbl">Subtitle Size</span>
+        <span class="rng-lbl">Subtitle size</span>
         <span class="rng-val" id="sub-size-val">100%</span>
       </div>
       <input type="range" id="sub-size" min="50" max="300" step="5" value="100">
@@ -428,46 +487,43 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 
   <!-- Info Panel -->
   <div class="card">
-    <div class="ctitle">Info Panel</div>
+    <div class="ctitle">Info panel</div>
     <div class="info-pair">
       <input type="text" class="info-lbl" id="info-lbl-1" placeholder="LABEL" value="RIDER">
-      <input type="text" class="info-val" id="info-val-1" placeholder="Value" value="">
+      <input type="text" class="info-val" id="info-val-1" placeholder="Your name" value="">
     </div>
     <div class="info-pair">
       <input type="text" class="info-lbl" id="info-lbl-2" placeholder="LABEL" value="DATE">
-      <input type="text" class="info-val" id="info-val-2" placeholder="Value" value="">
+      <input type="text" class="info-val" id="info-val-2" placeholder="From the GPX" value="">
     </div>
     <div class="info-pair">
-      <input type="text" class="info-lbl" id="info-lbl-3" placeholder="LABEL" value="TIME">
-      <input type="text" class="info-val" id="info-val-3" placeholder="Value" value="">
+      <input type="text" class="info-lbl" id="info-lbl-3" placeholder="LABEL" value="DISTANCE">
+      <input type="text" class="info-val" id="info-val-3" placeholder="From the GPX" value="">
     </div>
+    <div class="info-pair">
+      <input type="text" class="info-lbl" id="info-lbl-4" placeholder="LABEL" value="CLIMB">
+      <input type="text" class="info-val" id="info-val-4" placeholder="From the GPX" value="">
+    </div>
+    <div class="hint">Date, distance and climb fill in from your file. Edit any of them.</div>
   </div>
 
   <!-- Style -->
   <div class="card">
     <div class="ctitle">Style</div>
-
     <div class="color-row">
       <div class="cswatch">
-        <label class="cswatch-circle">
-          <input type="color" id="color-bg" value="#1E1E28">
-        </label>
+        <label class="cswatch-circle"><input type="color" id="color-bg" value="#1E1E28"></label>
         <span class="cswatch-lbl">Background</span>
       </div>
       <div class="cswatch">
-        <label class="cswatch-circle">
-          <input type="color" id="color-road" value="#C8906A">
-        </label>
+        <label class="cswatch-circle"><input type="color" id="color-road" value="#C8906A"></label>
         <span class="cswatch-lbl">Contours</span>
       </div>
       <div class="cswatch">
-        <label class="cswatch-circle">
-          <input type="color" id="color-route" value="#E8A880">
-        </label>
+        <label class="cswatch-circle"><input type="color" id="color-route" value="#E8A880"></label>
         <span class="cswatch-lbl">Route</span>
       </div>
     </div>
-
     <div>
       <div class="flbl" style="margin-bottom:6px">Presets</div>
       <div class="presets">
@@ -483,16 +539,36 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
           style="background:linear-gradient(90deg,#F7F3EC 50%,#7A6044 100%)"></button>
       </div>
     </div>
-
-    <div>
-      <div class="flbl" style="margin-bottom:6px">Vignette</div>
-      <div class="rng-wrap">
-        <div class="rng-hdr">
-          <span class="rng-lbl">Intensity</span>
-          <span class="rng-val" id="vignette-val">40%</span>
-        </div>
-        <input type="range" id="vignette-intensity" min="0" max="100" step="5" value="40">
+    <div class="rng-wrap">
+      <div class="rng-hdr">
+        <span class="rng-lbl">Route width</span>
+        <span class="rng-val" id="route-width-val">100%</span>
       </div>
+      <input type="range" id="route-width" min="50" max="250" step="10" value="100">
+    </div>
+    <div class="rng-wrap">
+      <div class="rng-hdr">
+        <span class="rng-lbl">Vignette</span>
+        <span class="rng-val" id="vignette-val">40%</span>
+      </div>
+      <input type="range" id="vignette-intensity" min="0" max="100" step="5" value="40">
+    </div>
+  </div>
+
+  <!-- On the poster -->
+  <div class="card">
+    <div class="ctitle">On the poster</div>
+    <div class="toggle-row">
+      <span class="tlbl">Elevation profile</span>
+      <label class="toggle"><input type="checkbox" id="toggle-profile" checked><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <span class="tlbl">Start and finish dots</span>
+      <label class="toggle"><input type="checkbox" id="toggle-markers" checked><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <span class="tlbl">Waypoint names<small id="wpt-count">None in this file</small></span>
+      <label class="toggle"><input type="checkbox" id="toggle-wpts" checked><span class="slider"></span></label>
     </div>
   </div>
 
@@ -501,10 +577,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div class="ctitle">Terrain</div>
     <div class="toggle-row">
       <span class="tlbl">Hillshading</span>
-      <label class="toggle">
-        <input type="checkbox" id="toggle-hillshade" checked>
-        <span class="slider"></span>
-      </label>
+      <label class="toggle"><input type="checkbox" id="toggle-hillshade" checked><span class="slider"></span></label>
     </div>
     <div class="rng-wrap" id="hs-wrap">
       <div class="rng-hdr">
@@ -515,35 +588,29 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     </div>
     <div class="rng-wrap">
       <div class="rng-hdr">
-        <span class="rng-lbl">Contour Lines</span>
+        <span class="rng-lbl">Contour lines</span>
         <span class="rng-val" id="contour-val">70%</span>
       </div>
       <input type="range" id="contour-intensity" min="0" max="100" step="5" value="70">
     </div>
-  </div>
-
-  <!-- Stats (shown after generate) -->
-  <div id="stats-card">
-    <div class="st-row">
-      <span class="st-v" id="st-dist">—</span><span class="st-u">km</span>
-      <span class="st-sep">·</span>
-      <span class="st-v" id="st-gain">—</span><span class="st-u">m gain</span>
+    <div class="flbl">Contour detail</div>
+    <div class="seg" id="detail-seg">
+      <button class="seg-btn" data-detail="1">Fewer</button>
+      <button class="seg-btn active" data-detail="0">Auto</button>
+      <button class="seg-btn" data-detail="-1">More</button>
     </div>
-    <div class="st-coord" id="st-coord"></div>
+    <div class="hint" id="contour-meta"></div>
   </div>
 
-  <!-- Generate + Export -->
+  <!-- Export -->
   <div class="card">
-    <button class="btn btn-gen" id="btn-generate">Generate Map</button>
-    <div id="progress">
-      <div class="pstep" id="s1"><div class="pdot"></div><span>Resolving route</span></div>
-      <div class="pstep" id="s2"><div class="pdot"></div><span>Rendering map</span></div>
-    </div>
-    <div id="status-line"></div>
+    <div class="ctitle">Export</div>
+    <button class="btn btn-gen" id="btn-png" disabled>Download PNG for print</button>
     <div class="exp-row">
-      <button class="btn-exp" id="btn-svg" disabled>SVG</button>
-      <button class="btn-exp" id="btn-png" disabled>PNG 300 DPI</button>
+      <button class="btn-exp" id="btn-jpg" disabled title="Smaller file, same size">JPG</button>
+      <button class="btn-exp" id="btn-svg" disabled title="Route, profile and text only, without the map">SVG · lines</button>
     </div>
+    <div class="hint">The print file matches the preview exactly, at the size and DPI above. SVG has the route, profile and text only (no terrain).</div>
   </div>
 
 </div><!-- /sidebar -->
@@ -553,6 +620,10 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div id="map"></div>
     <canvas id="vignette-canvas"></canvas>
     <canvas id="overlay-canvas"></canvas>
+    <div id="empty-state">
+      <span>Drop a GPX or KML file, search a pass, or</span>
+      <button class="btn btn-gen" id="try-sample-2" type="button">Try the Stelvio Pass</button>
+    </div>
   </div>
 </div>
 </div><!-- /main -->
@@ -561,10 +632,36 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 
 <script>
 // ── Constants ──────────────────────────────────────────────────────────────
-const MAPTILER_KEY = 'pO4p3paZcjFsfdNEcYDM';
-const POSTER_W = 2400, POSTER_H = 3400;
-const MAP_H = POSTER_H; // full-bleed: contours cover entire poster
-const PRINT_SCALE = 3;
+const $ = id => document.getElementById(id);
+// Terrain for the hillshade and the contour lines: Mapterhorn (open data, no
+// key, no quota), as in Route Video. No MapTiler at all, so no quota limits.
+const TERRAIN_DEM = { type: "raster-dem", tiles: ["https://tiles.mapterhorn.com/{z}/{x}/{y}.webp"],
+  encoding: "terrarium", tileSize: 512, maxzoom: 15 };
+// Contour lines are computed in the browser from the terrain tiles
+// (maplibre-contour), so they exist at every zoom, even for a 3-day trip.
+const demSource = new mlcontour.DemSource({
+  url: "https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", encoding: "terrarium", maxzoom: 12, worker: true, timeoutMs: 20000,
+});
+demSource.setupMaplibre(maplibregl);
+function contourTiles(step) {
+  // One threshold for every zoom: the print (rendered more zoomed in) gets exactly the preview's lines.
+  return demSource.contourProtocolUrl({ thresholds: { 1: [step, step * 5] }, elevationKey: "ele", levelKey: "level", contourLayer: "contours" });
+}
+// Contour spacing (m). Picked from the preview zoom and then kept for the
+// print, so the printed poster has exactly the lines you see on screen.
+const CONTOUR_STEPS = [10, 20, 50, 100, 200, 500];
+// Paper sizes in mm (portrait).
+const PAPERS = {
+  "30x40": { w: 300, h: 400, label: "30 × 40 cm" },
+  "50x70": { w: 500, h: 700, label: "50 × 70 cm" },
+  "a3":    { w: 297, h: 420, label: "A3" },
+  "a2":    { w: 420, h: 594, label: "A2" },
+  "18x24": { w: 457.2, h: 609.6, label: "18 × 24 in" },
+  "61x91": { w: 610, h: 914, label: "61 × 91 cm" },
+};
+// Map line widths as a fraction of the poster width, so the print and the
+// preview have the same proportions at any size.
+const W_ROUTE = 0.0062, W_GLOW = 0.026, W_BLUR = 0.010, W_SHINE = 0.0021, W_MINOR = 0.0016, W_INDEX = 0.0026;
 
 const OVERPASS_MIRRORS = [
   "https://overpass.private.coffee/api/interpreter",
@@ -587,829 +684,824 @@ const FONTS = {
 
 // ── State ──────────────────────────────────────────────────────────────────
 let map             = null;
-let routePoints     = [];
-let routeStats      = {};
+let segments        = [];   // [[{lat, lon, ele, time}]]: each GPX segment / day, never joined
+let waypoints       = [];   // [{lat, lon, name}]
+let routeStats      = null;
+let profile         = null; // { d: [0..1], e: [m], min, max }
 let posterReady     = false;
 let titleScale      = 1.0;
 let subtitleScale   = 1.0;
+let routeScale      = 1.0;
 let selectedFontKey = "inter";
+let paperKey        = "50x70";
+let landscape       = false;
+let dpi             = 300;
+let contourShift    = 0;    // -1 more lines, +1 fewer
+let contourStep     = 100;
+let exporting       = false;
 let _toastTimer     = null;
+const allPoints = () => segments.flat();
+function track(name, params = {}) { try { if (typeof gtag === "function") gtag("event", name, params); } catch (_) {} }
 
-// ── Layout ─────────────────────────────────────────────────────────────────
+// ── Paper + layout ─────────────────────────────────────────────────────────
+function paperMM() { const p = PAPERS[paperKey]; return landscape ? { w: p.h, h: p.w } : { w: p.w, h: p.h }; }
+function printSize() { const m = paperMM(); return { W: Math.round(m.w / 25.4 * dpi), H: Math.round(m.h / 25.4 * dpi) }; }
+function updatePaperMeta() {
+  const { W, H } = printSize();
+  $("paper-meta").textContent = `${W.toLocaleString()} × ${H.toLocaleString()} px at ${dpi} DPI · ${(W * H / 1e6).toFixed(0)} megapixels`;
+}
+function previewSize() { const m = $("map"); return { pw: m.clientWidth, ph: m.clientHeight }; }
+
 function layoutPoster() {
-  const area = document.getElementById("prev");
-  const wrap = document.getElementById("poster");
-
-  const aw = area.clientWidth  - 40;
-  const ah = area.clientHeight - 40;
-  const aspect = POSTER_W / POSTER_H;
-
+  const area = $("prev"), wrap = $("poster");
+  const aw = area.clientWidth - 40, ah = area.clientHeight - 40;
+  const m = paperMM(), aspect = m.w / m.h;
   const pw = (aw / ah < aspect) ? aw : ah * aspect;
-  const ph = pw * POSTER_H / POSTER_W;
-
-  wrap.style.width  = pw + "px";
-  wrap.style.height = ph + "px";
-  document.getElementById("map").style.height = ph + "px";
-
+  const ph = pw / aspect;
+  wrap.style.width = pw + "px"; wrap.style.height = ph + "px";
+  $("map").style.height = ph + "px";
   ["vignette-canvas", "overlay-canvas"].forEach(id => {
-    const c = document.getElementById(id);
-    c.width  = Math.round(pw * 2);
-    c.height = Math.round(ph * 2);
-    c.style.width  = pw + "px";
-    c.style.height = ph + "px";
+    const c = $(id);
+    c.width = Math.round(pw * 2); c.height = Math.round(ph * 2);
+    c.style.width = pw + "px"; c.style.height = ph + "px";
   });
-
-  if (map) map.resize();
-  drawVignette();
-  drawOverlay();
+  if (map) { map.resize(); applyWidths(map, pw); }
+  drawVignette(); drawOverlay(); updatePaperMeta();
 }
-window.addEventListener("resize", layoutPoster);
+window.addEventListener("resize", () => { layoutPoster(); if (segments.length) fitRoute(); });
 
-// ── Contour helpers ────────────────────────────────────────────────────────
-function contourIntensityVal() {
-  return parseInt(document.getElementById("contour-intensity").value) / 100;
-}
-
-// ── MapLibre style builder — topo contours ─────────────────────────────────
+// ── Map style: topo contours + hillshade ───────────────────────────────────
+function contourIntensityVal() { return parseInt($("contour-intensity").value) / 100; }
 function hillshadeExp() {
-  if (!document.getElementById("toggle-hillshade").checked) return 0;
-  return (parseInt(document.getElementById("hillshade-intensity").value) / 100) * 0.8;
+  if (!$("toggle-hillshade").checked) return 0;
+  return (parseInt($("hillshade-intensity").value) / 100) * 0.8;
+}
+function contourIntervalFor(zoom) {
+  const base = zoom < 8 ? 500 : zoom < 9.5 ? 200 : zoom < 10.7 ? 100 : zoom < 11.8 ? 50 : zoom < 13 ? 20 : 10;
+  const i = Math.min(CONTOUR_STEPS.length - 1, Math.max(0, CONTOUR_STEPS.indexOf(base) + contourShift));
+  return CONTOUR_STEPS[i];
 }
 
-function buildStyle(bgColor, roadColor) {
-  const ci = contourIntensityVal();
+function buildStyle() {
+  const bg = $("color-bg").value, rd = $("color-road").value, ci = contourIntensityVal();
   return {
     version: 8,
-    glyphs: `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${MAPTILER_KEY}`,
     sources: {
-      terrain: {
-        type: "raster-dem",
-        tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
-        encoding: "terrarium",
-        tileSize: 256,
-        maxzoom: 14,
-      },
-      contours: {
-        type: "vector",
-        url: `https://api.maptiler.com/tiles/contours-v2/tiles.json?key=${MAPTILER_KEY}`,
-      }
+      terrain: { ...TERRAIN_DEM },
+      contours: { type: "vector", tiles: [contourTiles(contourStep)], maxzoom: 15 },
     },
     layers: [
-      { id: "bg", type: "background", paint: { "background-color": bgColor } },
-      {
-        id: "hillshade", type: "hillshade", source: "terrain",
-        paint: {
-          "hillshade-shadow-color":           "#000000",
-          "hillshade-highlight-color":        "#ffffff",
-          "hillshade-illumination-direction": 315,
-          "hillshade-illumination-anchor":    "map",
-          "hillshade-exaggeration":           hillshadeExp(),
-          "hillshade-accent-color":           bgColor,
-        }
-      },
-      {
-        id: "contour-minor", type: "line",
-        source: "contours", "source-layer": "contour",
-        filter: ["!=", ["%", ["to-number", ["get", "ele"]], 100], 0],
-        paint: {
-          "line-color":   roadColor,
-          "line-opacity": ci * 0.45,
-          "line-width": ["interpolate",["linear"],["zoom"], 7,0.35, 12,0.65, 16,1.0],
-        }
-      },
-      {
-        id: "contour-index", type: "line",
-        source: "contours", "source-layer": "contour",
-        filter: ["==", ["%", ["to-number", ["get", "ele"]], 100], 0],
-        paint: {
-          "line-color":   roadColor,
-          "line-opacity": ci * 0.80,
-          "line-width": ["interpolate",["linear"],["zoom"], 7,0.65, 12,1.1, 16,1.8],
-        }
-      }
-    ]
+      { id: "bg", type: "background", paint: { "background-color": bg } },
+      { id: "hillshade", type: "hillshade", source: "terrain", paint: {
+          "hillshade-shadow-color": "#000000", "hillshade-highlight-color": "#ffffff",
+          "hillshade-illumination-direction": 315, "hillshade-illumination-anchor": "map",
+          "hillshade-exaggeration": hillshadeExp(), "hillshade-accent-color": bg } },
+      { id: "contour-minor", type: "line", source: "contours", "source-layer": "contours", filter: ["==", ["get", "level"], 0],
+        paint: { "line-color": rd, "line-opacity": ci * 0.62, "line-width": 0.9 } },
+      { id: "contour-index", type: "line", source: "contours", "source-layer": "contours", filter: ["==", ["get", "level"], 1],
+        paint: { "line-color": rd, "line-opacity": ci * 0.92, "line-width": 1.5 } },
+    ],
   };
+}
+// Line widths follow the width of the map they're drawn on (preview or print).
+function applyWidths(m, cw) {
+  if (!m.getLayer("contour-minor")) return;
+  m.setPaintProperty("contour-minor", "line-width", Math.max(0.3, cw * W_MINOR));
+  m.setPaintProperty("contour-index", "line-width", Math.max(0.5, cw * W_INDEX));
+}
+function setContourStep(m, step) {
+  const src = m.getSource("contours");
+  if (src && src.setTiles) src.setTiles([contourTiles(step)]);
+}
+function updateContourStep() {
+  if (!map) return;
+  const s = contourIntervalFor(map.getZoom());
+  if (s !== contourStep) { contourStep = s; setContourStep(map, s); }
+  $("contour-meta").textContent = `A line every ${contourStep} m, a bold one every ${contourStep * 5} m`;
+}
+
+// ── Route ──────────────────────────────────────────────────────────────────
+// The route is drawn on the poster canvas, not as map layers: one smooth
+// stroke with a soft blurred glow. Map line layers made star-shaped spikes and
+// broken highlights at tight hairpins, which showed on large prints.
+function addRouteLayers() {}
+function drawRoute(ctx, W, project) {
+  const path = new Path2D();
+  segments.forEach(s => s.forEach((p, i) => { const q = project(p.lon, p.lat); i ? path.lineTo(q.x, q.y) : path.moveTo(q.x, q.y); }));
+  const color = $("color-route").value, r = routeScale;
+  ctx.save();
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  const glow = (width, blur, alpha) => {
+    ctx.filter = `blur(${Math.max(0.5, blur).toFixed(1)}px)`; ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.stroke(path);
+  };
+  glow(W * 0.026 * r, W * 0.010 * r, 0.30);
+  glow(W * 0.012 * r, W * 0.004 * r, 0.45);
+  ctx.filter = "none"; ctx.globalAlpha = 1;
+  ctx.strokeStyle = color; ctx.lineWidth = W * W_ROUTE * r; ctx.stroke(path);
+  ctx.strokeStyle = "rgba(255,255,255,0.45)"; ctx.lineWidth = Math.max(0.5, W * W_SHINE * r); ctx.stroke(path);
+  ctx.restore();
 }
 
 // ── Init map ───────────────────────────────────────────────────────────────
 function initMap() {
-  const bg = document.getElementById("color-bg").value;
-  const rd = document.getElementById("color-road").value;
   map = new maplibregl.Map({
-    container: "map",
-    style: buildStyle(bg, rd),
-    center: [10.45, 46.52],
-    zoom: 9,
-    preserveDrawingBuffer: true,
-    attributionControl: false,
+    container: "map", style: buildStyle(), center: [10.45, 46.52], zoom: 9,
+    preserveDrawingBuffer: true, attributionControl: false, fadeDuration: 0,
+    maxPitch: 0, pitchWithRotate: false, doubleClickZoom: false,
   });
-  map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-right");
-  map.on("styledata", () => { if (routePoints.length && map.isStyleLoaded()) addMapLayers(map); });
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "top-right");
+  map.on("load", () => {
+    map.__ready = true;
+    applyWidths(map, previewSize().pw);
+    updateContourStep();
+    if (segments.length) addRouteLayers(map, previewSize().pw);
+  });
+  map.on("move", drawOverlay);
+  map.on("moveend", () => { updateContourStep(); drawOverlay(); });
 }
-
-// ── Add route layers to a MapLibre instance ────────────────────────────────
-function addMapLayers(m) {
-  const routeColor = document.getElementById("color-route").value;
-
-  ["route-glow","route-line","route-shine"].forEach(id => { if (m.getLayer(id)) m.removeLayer(id); });
-  if (m.getSource("route")) m.removeSource("route");
-
-  if (routePoints.length) {
-    m.addSource("route", {
-      type: "geojson",
-      data: { type: "Feature", geometry: { type: "LineString",
-        coordinates: routePoints.map(p => [p.lon, p.lat]) }}
-    });
-    // Outer halo — wide soft blur in route color
-    m.addLayer({ id: "route-glow", type: "line", source: "route",
-      paint: { "line-color": routeColor, "line-opacity": .18, "line-width": 18, "line-blur": 10 },
-      layout: { "line-cap": "round", "line-join": "round" } });
-    // Colored route stroke
-    m.addLayer({ id: "route-line", type: "line", source: "route",
-      paint: { "line-color": routeColor, "line-opacity": 1, "line-width": 3.5 },
-      layout: { "line-cap": "round", "line-join": "round" } });
-    // White inner highlight — the premium "lift" effect
-    m.addLayer({ id: "route-shine", type: "line", source: "route",
-      paint: { "line-color": "#ffffff", "line-opacity": .45, "line-width": 1.2 },
-      layout: { "line-cap": "round", "line-join": "round" } });
+// "load" fires once; remember it (m.loaded() goes false again whenever tiles are loading).
+function mapReady(m) { return new Promise(res => (m.__ready ? res() : m.once("load", () => { m.__ready = true; res(); }))); }
+// Waits until every tile is in and the map has painted (Route Video's lesson:
+// "idle" alone can fire before slow tiles arrive).
+async function settle(m, maxMs = 30000) {
+  const t0 = performance.now();
+  await mapReady(m);
+  while (performance.now() - t0 < maxMs) {
+    if (m.areTilesLoaded() && m.loaded()) break;
+    await new Promise(r => setTimeout(r, 120));
   }
+  m.triggerRepaint();
+  await new Promise(r => m.once("render", r));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 }
 
-function updateMapLayers() {
-  if (!map || !map.isStyleLoaded()) return;
-  addMapLayers(map);
+// ── Parsing: segments and waypoints, never joined ──────────────────────────
+function num(v) { const n = parseFloat(v); return isNaN(n) ? null : n; }
+function parseRouteText(text, isKML) {
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  const segs = [], wpts = [];
+  let name = "";
+  if (isKML) {
+    name = doc.querySelector("Document > name, Folder > name, Placemark > name")?.textContent.trim() || "";
+    doc.querySelectorAll("LineString coordinates").forEach(c => {
+      const pts = c.textContent.trim().split(/\s+/).map(t => t.split(",").map(Number))
+        .filter(a => a.length >= 2 && !isNaN(a[0]) && !isNaN(a[1])).map(a => ({ lat: a[1], lon: a[0], ele: a.length > 2 && !isNaN(a[2]) ? a[2] : null, time: null }));
+      if (pts.length > 1) segs.push(pts);
+    });
+    doc.querySelectorAll("Placemark").forEach(pm => {
+      const c = pm.querySelector("Point coordinates"), n = pm.querySelector("name");
+      if (!c || !n) return;
+      const [lon, lat] = c.textContent.trim().split(",").map(Number);
+      if (!isNaN(lat) && !isNaN(lon) && n.textContent.trim()) wpts.push({ lat, lon, name: n.textContent.trim() });
+    });
+    return { name, segments: segs, waypoints: wpts };
+  }
+  name = doc.querySelector("metadata > name, trk > name, rte > name")?.textContent.trim() || "";
+  const pt = el => ({ lat: num(el.getAttribute("lat")), lon: num(el.getAttribute("lon")),
+    ele: num(el.querySelector("ele")?.textContent), time: el.querySelector("time") ? Date.parse(el.querySelector("time").textContent) || null : null });
+  doc.querySelectorAll("trkseg").forEach(seg => {
+    const pts = [...seg.querySelectorAll("trkpt")].map(pt).filter(p => p.lat != null && p.lon != null);
+    if (pts.length > 1) segs.push(pts);
+  });
+  if (!segs.length) doc.querySelectorAll("rte").forEach(r => {
+    const pts = [...r.querySelectorAll("rtept")].map(pt).filter(p => p.lat != null && p.lon != null);
+    if (pts.length > 1) segs.push(pts);
+  });
+  doc.querySelectorAll("wpt").forEach(w => {
+    const n = w.querySelector("name")?.textContent.trim(), lat = num(w.getAttribute("lat")), lon = num(w.getAttribute("lon"));
+    if (n && lat != null && lon != null) wpts.push({ lat, lon, name: n });
+  });
+  return { name, segments: segs, waypoints: wpts };
+}
+// Keeps every segment's shape but caps the total points the map has to draw.
+function downsampleSegments(segs, max = 6000) {
+  const total = segs.reduce((n, s) => n + s.length, 0);
+  if (total <= max) return segs;
+  const step = Math.ceil(total / max);
+  return segs.map(s => s.filter((_, i) => i % step === 0 || i === s.length - 1));
 }
 
-// ── Overpass API (used only for pass-name route resolution) ────────────────
+// ── Elevation from terrain (for routed passes without altitude) ────────────
+const demTiles = new Map();
+function demTile(z, x, y) {
+  const key = `${z}/${x}/${y}`;
+  if (!demTiles.has(key)) demTiles.set(key, (async () => {
+    const r = await fetch(`https://tiles.mapterhorn.com/${z}/${x}/${y}.webp`);
+    if (!r.ok) throw new Error("terrain tile " + r.status);
+    const bmp = await createImageBitmap(await r.blob());
+    const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height;
+    const ctx = c.getContext("2d", { willReadFrequently: true }); ctx.drawImage(bmp, 0, 0);
+    return { size: bmp.width, data: ctx.getImageData(0, 0, bmp.width, bmp.height).data };
+  })());
+  return demTiles.get(key);
+}
+async function fillElevation(pts) {
+  const z = 12, n = 2 ** z;
+  for (const p of pts) {
+    if (p.ele != null) continue;
+    const xt = (p.lon + 180) / 360 * n;
+    const lr = p.lat * Math.PI / 180;
+    const yt = (1 - Math.log(Math.tan(lr) + 1 / Math.cos(lr)) / Math.PI) / 2 * n;
+    try {
+      const t = await demTile(z, Math.floor(xt), Math.floor(yt));
+      const px = Math.min(t.size - 1, Math.floor((xt % 1) * t.size)), py = Math.min(t.size - 1, Math.floor((yt % 1) * t.size));
+      const i = (py * t.size + px) * 4;
+      p.ele = t.data[i] * 256 + t.data[i + 1] + t.data[i + 2] / 256 - 32768;
+    } catch (_) { return false; }
+  }
+  return true;
+}
+
+// ── Stats ──────────────────────────────────────────────────────────────────
+function haversine(la1, lo1, la2, lo2) {
+  const R = 6371000, dLa = (la2 - la1) * Math.PI / 180, dLo = (lo2 - lo1) * Math.PI / 180;
+  const a = Math.sin(dLa / 2) ** 2 + Math.cos(la1 * Math.PI / 180) * Math.cos(la2 * Math.PI / 180) * Math.sin(dLo / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+// Climbing counted like GPS watches do: a rise only counts once it passes 2 m
+// (same rule as Route Video, within about 2% of Garmin Connect).
+const GAIN_STEP_M = 2;
+function calcStats(segs) {
+  let dist = 0, gain = 0, moving = 0, top = -Infinity, low = Infinity;
+  const times = [];
+  segs.forEach(s => {
+    let ref = null;
+    for (let i = 0; i < s.length; i++) {
+      const p = s[i];
+      if (p.ele != null) {
+        top = Math.max(top, p.ele); low = Math.min(low, p.ele);
+        if (ref == null || p.ele < ref - GAIN_STEP_M) ref = p.ele;
+        else if (p.ele > ref + GAIN_STEP_M) { gain += p.ele - ref; ref = p.ele; }
+      }
+      if (p.time) times.push(p.time);
+      if (i > 0) {
+        const d = haversine(s[i - 1].lat, s[i - 1].lon, p.lat, p.lon);
+        dist += d;
+        if (p.time && s[i - 1].time) { const dt = (p.time - s[i - 1].time) / 1000; if (dt > 0 && d / dt * 3.6 > 3) moving += dt; }
+      }
+    }
+  });
+  const pts = segs.flat(), lats = pts.map(p => p.lat), lons = pts.map(p => p.lon);
+  return {
+    distKm: dist / 1000, gain: Math.round(gain), hasEle: top > -Infinity,
+    top: top > -Infinity ? Math.round(top) : null, low: low < Infinity ? Math.round(low) : null,
+    start: times.length ? Math.min(...times) : null, end: times.length ? Math.max(...times) : null, movingS: moving,
+    bbox: { s: Math.min(...lats), w: Math.min(...lons), n: Math.max(...lats), e: Math.max(...lons) },
+  };
+}
+function buildProfile(segs) {
+  const d = [0], e = [];
+  segs.forEach((s, k) => s.forEach((p, i) => {
+    if (i > 0) d.push(d[d.length - 1] + haversine(s[i - 1].lat, s[i - 1].lon, p.lat, p.lon));
+    else if (k > 0) d.push(d[d.length - 1]); // no distance across a gap between days
+    e.push(p.ele);
+  }));
+  if (e.filter(v => v != null).length < 2) return null;
+  const total = d[d.length - 1] || 1, N = 400, out = [];
+  let j = 0, last = e.find(v => v != null);
+  for (let i = 0; i <= N; i++) {
+    const target = i / N * total;
+    while (j < d.length - 1 && d[j + 1] < target) j++;
+    if (e[j] != null) last = e[j];
+    out.push(last);
+  }
+  const sm = out.map((v, i) => (out[Math.max(0, i - 1)] + v + out[Math.min(N, i + 1)]) / 3);
+  return { e: sm, min: Math.min(...sm), max: Math.max(...sm) };
+}
+const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+function fmtDateRange(a, b) {
+  if (!a) return "";
+  const A = new Date(a), B = new Date(b || a);
+  const day = d => d.getDate(), mon = d => MONTHS[d.getMonth()], yr = d => d.getFullYear();
+  if (A.toDateString() === B.toDateString()) return `${day(A)} ${mon(A)} ${yr(A)}`;
+  if (mon(A) === mon(B) && yr(A) === yr(B)) return `${day(A)}-${day(B)} ${mon(A)} ${yr(A)}`;
+  return `${day(A)} ${mon(A)}-${day(B)} ${mon(B)} ${yr(B)}`;
+}
+function fmtCoord(lat, lon) {
+  return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}  /  ${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? "E" : "W"}`;
+}
+
+// ── Geocoding + routing (pass name / coordinates) ──────────────────────────
 async function overpass(query) {
   const body = "data=" + encodeURIComponent(query);
   for (const mirror of OVERPASS_MIRRORS) {
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), 90000);
-      const r = await fetch(mirror, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body, signal: ctrl.signal
-      });
+      const r = await fetch(mirror, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body, signal: ctrl.signal });
       clearTimeout(t);
       if (r.ok) return (await r.json()).elements || [];
-      console.warn(mirror, r.status);
-    } catch(e) { console.warn(mirror, e.message); }
+    } catch (e) { console.warn(mirror, e.message); }
   }
-  throw new Error("OpenStreetMap server unavailable. Check your connection.");
+  throw new Error("The OpenStreetMap server isn't answering. Try again in a minute.");
 }
-
-// ── Parse GPX ─────────────────────────────────────────────────────────────
-function parseGPX(text) {
-  const doc = new DOMParser().parseFromString(text, "text/xml");
-  return [...doc.querySelectorAll("trkpt,rtept,wpt")].map(el => {
-    const ele = el.querySelector("ele");
-    return { lat: +el.getAttribute("lat"), lon: +el.getAttribute("lon"), ele: ele ? +ele.textContent : null };
-  }).filter(p => !isNaN(p.lat) && !isNaN(p.lon));
-}
-
-// ── Parse KML ─────────────────────────────────────────────────────────────
-function parseKML(text) {
-  const doc = new DOMParser().parseFromString(text, "text/xml");
-  for (const el of doc.querySelectorAll("coordinates")) {
-    const pts = el.textContent.trim().split(/\s+/).map(s => {
-      const [lon,lat,ele] = s.split(",").map(Number);
-      return { lat, lon, ele: isNaN(ele) ? null : ele };
-    }).filter(p => !isNaN(p.lat));
-    if (pts.length > 1) return pts;
-  }
-  return [...doc.querySelectorAll("coord")].map(c => {
-    const [lon,lat,ele] = c.textContent.trim().split(" ").map(Number);
-    return { lat, lon, ele: isNaN(ele) ? null : ele };
-  }).filter(p => !isNaN(p.lat));
-}
-
-// ── Geocoding + routing ────────────────────────────────────────────────────
 async function geocode(name) {
-  const r = await fetch(
-    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,
-    { headers: { "User-Agent": "DiscoveristMapGenerator/2.0" } }
-  );
+  const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`);
   const d = await r.json();
-  if (!d.length) throw new Error(`Location not found: "${name}"`);
+  if (!d.length) throw new Error(`Couldn't find "${name}"`);
   return { lat: +d[0].lat, lon: +d[0].lon };
 }
-
 async function routeOSRM(la1, lo1, la2, lo2) {
-  const r = await fetch(
-    `https://router.project-osrm.org/route/v1/driving/${lo1},${la1};${lo2},${la2}?overview=full&geometries=geojson`
-  );
+  const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${lo1},${la1};${lo2},${la2}?overview=full&geometries=geojson`);
   const d = await r.json();
-  if (!d.routes?.length) throw new Error("No route found between these coordinates.");
-  return d.routes[0].geometry.coordinates.map(([lon,lat]) => ({ lat, lon, ele: null }));
+  if (!d.routes?.length) throw new Error("No road route between these points.");
+  return d.routes[0].geometry.coordinates.map(([lon, lat]) => ({ lat, lon, ele: null, time: null }));
 }
-
 async function resolvePassName(name) {
-  setStep(1);
-  const c = await geocode(name);
-  const pad = .15;
-  const els = await overpass(
-    `[out:json][timeout:60];(way["highway"~"primary|secondary|tertiary|unclassified|trunk|motorway"](${c.lat-pad},${c.lon-pad},${c.lat+pad},${c.lon+pad}););out geom;`
-  );
-  if (!els.length) throw new Error("No roads found near this location.");
+  const c = await geocode(name), pad = .15;
+  const els = await overpass(`[out:json][timeout:60];(way["highway"~"primary|secondary|tertiary|unclassified|trunk|motorway"](${c.lat - pad},${c.lon - pad},${c.lat + pad},${c.lon + pad}););out geom;`);
+  if (!els.length) throw new Error("No roads found near this place.");
   let best = null, bestD = Infinity;
-  for (const w of els.filter(e => e.type === "way" && e.geometry?.length > 5)) {
-    for (const p of w.geometry) {
-      const d = Math.hypot(p.lat - c.lat, p.lon - c.lon);
-      if (d < bestD) { bestD = d; best = w; }
-    }
-  }
-  if (!best) throw new Error("Could not find a road near this location.");
+  for (const w of els.filter(e => e.type === "way" && e.geometry?.length > 5))
+    for (const p of w.geometry) { const d = Math.hypot(p.lat - c.lat, p.lon - c.lon); if (d < bestD) { bestD = d; best = w; } }
+  if (!best) throw new Error("Couldn't find a road near this place.");
   const g = best.geometry, s = g[0], e = g[g.length - 1];
   return routeOSRM(s.lat, s.lon, e.lat, e.lon);
 }
-
-// ── Stats ──────────────────────────────────────────────────────────────────
-function haversine(la1, lo1, la2, lo2) {
-  const R = 6371000, dLa = (la2-la1)*Math.PI/180, dLo = (lo2-lo1)*Math.PI/180;
-  const a = Math.sin(dLa/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+// "Umbria · Italy" from the middle of the route (OpenStreetMap, no key).
+async function placeSubtitle(lat, lon) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=6&lat=${lat}&lon=${lon}&accept-language=en`);
+    const a = (await r.json()).address || {};
+    return [a.state || a.region || a.county, a.country].filter(Boolean).join(" · ");
+  } catch (_) { return ""; }
 }
 
-function calcStats(pts) {
-  let dist = 0, gain = 0;
-  for (let i = 1; i < pts.length; i++) {
-    dist += haversine(pts[i-1].lat, pts[i-1].lon, pts[i].lat, pts[i].lon);
-    if (pts[i].ele != null && pts[i-1].ele != null && pts[i].ele > pts[i-1].ele)
-      gain += pts[i].ele - pts[i-1].ele;
-  }
-  const lats = pts.map(p => p.lat), lons = pts.map(p => p.lon);
-  return {
-    distKm:    (dist / 1000).toFixed(1),
-    elevGain:  Math.round(gain),
-    hasEle:    pts.some(p => p.ele != null),
-    centerLat: (Math.min(...lats) + Math.max(...lats)) / 2,
-    centerLon: (Math.min(...lons) + Math.max(...lons)) / 2,
-    bbox:      [Math.min(...lats), Math.min(...lons), Math.max(...lats), Math.max(...lons)]
-  };
-}
-
-function fmtCoord(lat, lon) {
-  return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}  /  ${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? "E" : "W"}`;
-}
-
-// ── Font loading for canvas ────────────────────────────────────────────────
+// ── Fonts for the canvas ───────────────────────────────────────────────────
 async function ensureFonts() {
   if (!document.fonts?.load) return;
   const f = FONTS[selectedFontKey];
-  const name = f.label;
   await Promise.all([
-    document.fonts.load(`${f.titleW} 88px "${name}"`),
-    document.fonts.load(`${f.subW} 28px "${name}"`),
-    document.fonts.load(`300 15px "JetBrains Mono"`),
+    document.fonts.load(`${f.titleW} 88px "${f.label}"`),
+    document.fonts.load(`${f.subW} 28px "${f.label}"`),
+    document.fonts.load(`700 20px "Inter"`), document.fonts.load(`300 28px "Inter"`),
   ]).catch(() => {});
 }
 
-// ── Overlay renderer ───────────────────────────────────────────────────────
-function renderOverlay(ctx, W, H, sc) {
-  const gold  = document.getElementById("color-road").value;
-  const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
-  const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
-  const fnt   = FONTS[selectedFontKey];
-  const ts    = titleScale;
-  const ss    = subtitleScale;
+// ── Poster overlay (text, info panel, dots, profile, credits) ───────────────
+// Sizes are in units of a 2400 px wide poster (sc = W / 2400), so the preview
+// and every print size share the same layout. project(lon, lat) → canvas px.
+function infoPairs() {
+  return [1, 2, 3, 4].map(i => ({ label: ($(`info-lbl-${i}`).value || "").toUpperCase(), value: $(`info-val-${i}`).value }))
+    .filter(p => p.label || p.value);
+}
+function titleLayout(W, H) {
+  const sc = W / 2400, ts = titleScale, ss = subtitleScale, fnt = FONTS[selectedFontKey];
+  const titleSz = Math.round(76 * sc * ts);
+  const titleY = H - Math.round(220 * sc * ts);
+  const subSz = Math.round(24 * sc * ss);
+  const subY = titleY + Math.round(titleSz * 0.18 + subSz * 0.92 + 10 * sc);
+  return { sc, fnt, titleSz, titleY, subSz, subY };
+}
+function profileBox(W, H) {
+  const { sc, titleSz, titleY } = titleLayout(W, H);
+  const w = W * 0.62, h = Math.round(H * 0.055), x = (W - w) / 2;
+  const y1 = titleY - titleSz * 0.95 - Math.round(36 * sc), y0 = y1 - h;
+  return { x, y0, w, h };
+}
+function renderOverlay(ctx, W, H, project, clear = true) {
+  const accent = $("color-road").value, routeC = $("color-route").value, bg = $("color-bg").value;
+  const title = ($("title-input").value || "MOUNTAIN PASS").toUpperCase();
+  const sub = ($("subtitle-input").value || "").toUpperCase();
+  const { sc, fnt, titleSz, titleY, subSz, subY } = titleLayout(W, H);
+  if (clear) ctx.clearRect(0, 0, W, H);
+  ctx.save();
 
-  ctx.clearRect(0, 0, W, H);
-
-  // ── Custom info panel — top-left ──────────────────────────────────────
-  const infoPairs = [
-    { label: (document.getElementById("info-lbl-1").value || "").toUpperCase(),
-      value: document.getElementById("info-val-1").value },
-    { label: (document.getElementById("info-lbl-2").value || "").toUpperCase(),
-      value: document.getElementById("info-val-2").value },
-    { label: (document.getElementById("info-lbl-3").value || "").toUpperCase(),
-      value: document.getElementById("info-val-3").value },
-  ].filter(p => p.label || p.value);
-
-  if (infoPairs.length) {
-    const sx       = Math.round(90 * sc);
-    let   sy       = Math.round(110 * sc);
-    const lblSz    = Math.round(20 * sc);
-    const valSz    = Math.round(28 * sc);
-    const innerGap = Math.round(5 * sc);
-    const entryGap = Math.round(26 * sc);
-
+  // Info panel, top left
+  const pairs = infoPairs();
+  if (pairs.length) {
+    const sx = Math.round(90 * sc), lblSz = Math.round(20 * sc), valSz = Math.round(28 * sc);
+    let sy = Math.round(110 * sc);
     ctx.textAlign = "left";
-    infoPairs.forEach(({ label, value }) => {
+    pairs.forEach(({ label, value }) => {
       sy += lblSz;
-      ctx.font = `700 ${lblSz}px "Inter", Arial, sans-serif`;
-      ctx.fillStyle = gold; ctx.globalAlpha = 1;
+      ctx.font = `700 ${lblSz}px "Inter", Arial, sans-serif`; ctx.fillStyle = accent; ctx.globalAlpha = 1;
       ctx.letterSpacing = `${Math.round(3 * sc)}px`;
       if (label) ctx.fillText(label, sx, sy);
-      sy += innerGap + valSz;
-
-      if (value) {
-        ctx.font = `300 ${valSz}px "Inter", Arial, sans-serif`;
-        ctx.globalAlpha = 0.65;
-        ctx.letterSpacing = "0px";
-        ctx.fillText(value, sx, sy);
-      }
-      sy += entryGap;
+      sy += Math.round(5 * sc) + valSz;
+      if (value) { ctx.font = `300 ${valSz}px "Inter", Arial, sans-serif`; ctx.globalAlpha = 0.65; ctx.letterSpacing = "0px"; ctx.fillText(value, sx, sy); }
+      sy += Math.round(26 * sc);
     });
     ctx.globalAlpha = 1;
   }
 
-  // ── Start / end markers ───────────────────────────────────────────────
-  if (routePoints.length >= 2 && map) {
-    const previewW = document.getElementById("map").clientWidth;
-    const k = W / (previewW * 2);
-    [[routePoints[0], false], [routePoints[routePoints.length - 1], true]].forEach(([pt, isEnd]) => {
-      const p = map.project([pt.lon, pt.lat]);
-      const px = p.x * 2 * k, py = p.y * 2 * k;
-      const r = Math.round(11 * sc);
-      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.fillStyle = gold; ctx.globalAlpha = 1; ctx.fill();
-      if (isEnd) {
-        ctx.beginPath(); ctx.arc(px, py, Math.round(4.5 * sc), 0, Math.PI * 2);
-        ctx.fillStyle = document.getElementById("color-bg").value; ctx.fill();
-      }
-    });
+  if (project && segments.length) {
+    drawRoute(ctx, W, project);
+    // Waypoint names
+    if ($("toggle-wpts").checked && waypoints.length) {
+      ctx.font = `600 ${Math.round(17 * sc)}px "Inter", Arial, sans-serif`; ctx.letterSpacing = `${Math.round(2 * sc)}px`;
+      ctx.textAlign = "left";
+      waypoints.forEach(w => {
+        const p = project(w.lon, w.lat);
+        if (p.x < 0 || p.y < 0 || p.x > W || p.y > H) return;
+        ctx.globalAlpha = 1; ctx.fillStyle = routeC;
+        ctx.beginPath(); ctx.arc(p.x, p.y, Math.round(6 * sc), 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = accent; ctx.globalAlpha = 0.85;
+        ctx.fillText(w.name.toUpperCase(), p.x + Math.round(14 * sc), p.y + Math.round(6 * sc));
+      });
+      ctx.globalAlpha = 1; ctx.letterSpacing = "0px";
+    }
+    // Start and finish dots
+    if ($("toggle-markers").checked) {
+      const first = segments[0][0], lastSeg = segments[segments.length - 1], last = lastSeg[lastSeg.length - 1];
+      [[first, false], [last, true]].forEach(([pt, isEnd]) => {
+        const p = project(pt.lon, pt.lat), r = Math.round(11 * sc);
+        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fillStyle = accent; ctx.fill();
+        if (isEnd) { ctx.beginPath(); ctx.arc(p.x, p.y, Math.round(4.5 * sc), 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill(); }
+      });
+    }
   }
 
-  // ── Title area fade — white vignette lifts text off contours ──────────
-  const fadeStart = H * 0.75;
-  const fadeGrad = ctx.createLinearGradient(0, fadeStart, 0, H);
-  fadeGrad.addColorStop(0,   "rgba(0,0,0,0)");
-  fadeGrad.addColorStop(0.5, "rgba(255,255,255,0.10)");
-  fadeGrad.addColorStop(1,   "rgba(255,255,255,0.28)");
-  ctx.fillStyle = fadeGrad;
-  ctx.globalAlpha = 1;
-  ctx.fillRect(0, fadeStart, W, H - fadeStart);
+  // Soft fade behind the title
+  const fadeStart = H * 0.72;
+  const fade = ctx.createLinearGradient(0, fadeStart, 0, H);
+  fade.addColorStop(0, "rgba(0,0,0,0)"); fade.addColorStop(0.5, "rgba(255,255,255,0.10)"); fade.addColorStop(1, "rgba(255,255,255,0.28)");
+  ctx.fillStyle = fade; ctx.fillRect(0, fadeStart, W, H - fadeStart);
 
-  // ── Title — bottom center ─────────────────────────────────────────────
+  // Elevation profile above the title
+  if ($("toggle-profile").checked && profile) {
+    const { x, y0, w, h } = profileBox(W, H), range = Math.max(1, profile.max - profile.min), n = profile.e.length;
+    const X = i => x + i / (n - 1) * w, Y = v => y0 + h - (v - profile.min) / range * h;
+    const path = new Path2D(); path.moveTo(X(0), y0 + h);
+    profile.e.forEach((v, i) => path.lineTo(X(i), Y(v)));
+    path.lineTo(X(n - 1), y0 + h); path.closePath();
+    ctx.globalAlpha = 0.22; ctx.fillStyle = routeC; ctx.fill(path);
+    const line = new Path2D(); profile.e.forEach((v, i) => (i ? line.lineTo(X(i), Y(v)) : line.moveTo(X(i), Y(v))));
+    ctx.globalAlpha = 0.95; ctx.strokeStyle = routeC; ctx.lineWidth = Math.max(1, 2.4 * sc); ctx.lineJoin = "round"; ctx.stroke(line);
+    ctx.globalAlpha = 0.55; ctx.fillStyle = accent; ctx.font = `500 ${Math.round(15 * sc)}px "Inter", Arial, sans-serif`; ctx.letterSpacing = `${Math.round(2 * sc)}px`;
+    ctx.textAlign = "right"; ctx.fillText(`${Math.round(profile.max).toLocaleString("en-US")} M`, x + w, y0 - Math.round(10 * sc));
+    ctx.textAlign = "left"; ctx.fillText(`${Math.round(profile.min).toLocaleString("en-US")} M`, x, y0 - Math.round(10 * sc));
+    ctx.globalAlpha = 1; ctx.letterSpacing = "0px";
+  }
+
+  // Title and subtitle
   ctx.textAlign = "center";
-  const titleSz = Math.round(76 * sc * ts);
-  const titleY  = H - Math.round(220 * sc * ts);
-
-  ctx.font = `${fnt.titleW} ${titleSz}px ${fnt.stack}`;
-  ctx.fillStyle = gold;
-  ctx.globalAlpha = 1;
-  ctx.letterSpacing = `${Math.round(fnt.spacing * sc * ts)}px`;
+  ctx.font = `${fnt.titleW} ${titleSz}px ${fnt.stack}`; ctx.fillStyle = accent; ctx.globalAlpha = 1;
+  ctx.letterSpacing = `${Math.round(fnt.spacing * sc * titleScale)}px`;
   ctx.fillText(title, W / 2, titleY);
-
   if (sub) {
-    const subSz = Math.round(24 * sc * ss);
-    // subY adapts to both title size and subtitle size so it never overlaps
-    const subY = titleY + Math.round(titleSz * 0.18 + subSz * 0.92 + 10 * sc);
-    ctx.font = `${fnt.subW} ${subSz}px ${fnt.stack}`;
-    ctx.globalAlpha = 0.72;
-    ctx.letterSpacing = `${Math.round(fnt.subSpacing * sc * ss)}px`;
+    ctx.font = `${fnt.subW} ${subSz}px ${fnt.stack}`; ctx.globalAlpha = 0.72;
+    ctx.letterSpacing = `${Math.round(fnt.subSpacing * sc * subtitleScale)}px`;
     ctx.fillText(sub, W / 2, subY);
-    ctx.globalAlpha = 1;
   }
 
-  // ── Attribution ────────────────────────────────────────────────────────
-  ctx.textAlign = "center";
-  ctx.font = `300 ${Math.round(11 * sc)}px "Inter", Arial, sans-serif`;
-  ctx.globalAlpha = 0.22;
-  ctx.letterSpacing = "0px";
-  ctx.fillText("© OpenStreetMap contributors  ·  © MapTiler", W / 2, H - Math.round(28 * sc));
-  ctx.globalAlpha = 1;
+  // Map data credits (required by the licences)
+  ctx.font = `300 ${Math.round(11 * sc)}px "Inter", Arial, sans-serif`; ctx.globalAlpha = 0.28; ctx.letterSpacing = "0px";
+  ctx.fillText("Terrain © Mapterhorn  ·  © OpenStreetMap contributors", W / 2, H - Math.round(28 * sc));
+  ctx.restore();
 }
-
+function previewProjector(W, H) {
+  const { pw, ph } = previewSize();
+  return (lon, lat) => { const p = map.project([lon, lat]); return { x: p.x * W / pw, y: p.y * H / ph }; };
+}
 function drawOverlay() {
-  const oc = document.getElementById("overlay-canvas");
+  const oc = $("overlay-canvas");
   if (!oc.width) return;
-  renderOverlay(oc.getContext("2d"), oc.width, oc.height, oc.width / POSTER_W);
+  renderOverlay(oc.getContext("2d"), oc.width, oc.height, map && segments.length ? previewProjector(oc.width, oc.height) : null);
 }
 
 // ── Vignette ───────────────────────────────────────────────────────────────
-function vignetteIntensity() {
-  return parseInt(document.getElementById("vignette-intensity").value) / 100;
-}
-
-function renderVignetteToCtx(ctx, W, H) {
+function vignetteIntensity() { return parseInt($("vignette-intensity").value) / 100; }
+function renderVignetteToCtx(ctx, W, H, clear = true) {
   const intensity = vignetteIntensity();
-  ctx.clearRect(0, 0, W, H);
+  if (clear) ctx.clearRect(0, 0, W, H);
   if (intensity <= 0) return;
-  const cx = W / 2, cy = H / 2;
-  const r  = Math.sqrt(cx * cx + cy * cy);
+  const cx = W / 2, cy = H / 2, r = Math.sqrt(cx * cx + cy * cy);
   const grad = ctx.createRadialGradient(cx, cy, r * 0.25, cx, cy, r);
-  grad.addColorStop(0,   "rgba(255,255,255,0)");
+  grad.addColorStop(0, "rgba(255,255,255,0)");
   grad.addColorStop(0.6, `rgba(255,255,255,${intensity * 0.20})`);
-  grad.addColorStop(1,   `rgba(255,255,255,${intensity * 0.55})`);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
+  grad.addColorStop(1, `rgba(255,255,255,${intensity * 0.55})`);
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 }
-
 function drawVignette() {
-  const vc = document.getElementById("vignette-canvas");
-  if (!vc.width) return;
-  renderVignetteToCtx(vc.getContext("2d"), vc.width, vc.height);
+  const vc = $("vignette-canvas");
+  if (vc.width) renderVignetteToCtx(vc.getContext("2d"), vc.width, vc.height);
 }
 
-// ── Progress steps ─────────────────────────────────────────────────────────
-function setStep(n) {
-  document.getElementById("progress").classList.add("on");
-  ["s1","s2"].forEach((id, i) => {
-    const el = document.getElementById(id);
-    el.classList.remove("active", "done");
-    if (i + 1 < n)  el.classList.add("done");
+// ── Progress, status, toast ────────────────────────────────────────────────
+function setStep(n, label) {
+  $("progress").classList.add("on");
+  if (label) $("s1-txt").textContent = label;
+  ["s1", "s2"].forEach((id, i) => {
+    const el = $(id); el.classList.remove("active", "done");
+    if (i + 1 < n) el.classList.add("done");
     if (i + 1 === n) el.classList.add("active");
   });
 }
-function clearSteps() {
-  document.getElementById("progress").classList.remove("on");
-  ["s1","s2"].forEach(id => document.getElementById(id).classList.remove("active","done"));
-}
-
-// ── Status + toast ─────────────────────────────────────────────────────────
-function setStatus(msg, cls = "") {
-  const el = document.getElementById("status-line");
-  el.textContent = msg; el.className = cls;
-}
-
+function clearSteps() { $("progress").classList.remove("on"); ["s1", "s2"].forEach(id => $(id).classList.remove("active", "done")); }
+function setStatus(msg, cls = "") { const el = $("status-line"); el.textContent = msg; el.className = cls; }
 function toast(msg, cls = "", dur = 3500) {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.className = "show" + (cls ? " " + cls : "");
+  const el = $("toast"); el.textContent = msg; el.className = "show" + (cls ? " " + cls : "");
   clearTimeout(_toastTimer);
   if (dur > 0) _toastTimer = setTimeout(() => { el.className = ""; }, dur);
 }
 
-// ── Generate ───────────────────────────────────────────────────────────────
-async function generate() {
-  const btn = document.getElementById("btn-generate");
-  btn.disabled = true;
-  btn.textContent = "Generating…";
-  posterReady = false;
-  document.getElementById("btn-svg").disabled = true;
-  document.getElementById("btn-png").disabled = true;
-  document.getElementById("stats-card").classList.remove("on");
-  setStatus(""); clearSteps();
+// ── Loading a route ────────────────────────────────────────────────────────
+function fitRoute() {
+  if (!map || !routeStats) return;
+  const b = routeStats.bbox, { pw, ph } = previewSize();
+  const bottom = $("toggle-profile").checked && profile ? 0.36 : 0.30;
+  map.fitBounds([[b.w, b.s], [b.e, b.n]], {
+    padding: { top: ph * 0.17, bottom: ph * bottom, left: pw * 0.09, right: pw * 0.09 },
+    bearing: map.getBearing(), duration: 0,
+  });
+}
+// Fills a value in the info panel unless the person typed their own.
+function autoFill(i, value) {
+  const el = $(`info-val-${i}`);
+  if (!el.value || el.dataset.auto === "1") { el.value = value; el.dataset.auto = "1"; }
+}
+async function loadRoute({ segs, wpts = [], name = "", source }) {
+  if (!segs.length) throw new Error("No track found in this file.");
+  setStep(2);
+  if (segs.some(s => s.some(p => p.ele == null))) await fillElevation(segs.flat().filter((p, i, a) => a.length < 4000 || i % Math.ceil(a.length / 4000) === 0));
+  segs.forEach(s => { let last = null; s.forEach(p => { if (p.ele == null) p.ele = last; else last = p.ele; }); });
+  // Stats and profile from the full track; only the drawn line is thinned
+  // (thinning first cut corners: 500 km instead of 523 on a 3-day trip).
+  routeStats = calcStats(segs);
+  profile = buildProfile(segs);
+  segments = downsampleSegments(segs); waypoints = wpts;
+  const st = routeStats;
+  $("st-dist").textContent = st.distKm.toFixed(1);
+  $("st-gain").textContent = st.hasEle ? st.gain.toLocaleString("en-US") : "-";
+  $("st-top").textContent = st.top != null ? st.top.toLocaleString("en-US") : "-";
+  $("st-coord").textContent = fmtCoord((st.bbox.s + st.bbox.n) / 2, (st.bbox.w + st.bbox.e) / 2);
+  $("stats-card").classList.add("on");
+  $("wpt-count").textContent = wpts.length ? `${wpts.length} in this file` : "None in this file";
+  if (st.start) autoFill(2, fmtDateRange(st.start, st.end));
+  autoFill(3, `${st.distKm.toFixed(st.distKm < 100 ? 1 : 0)} KM`);
+  if (st.hasEle) autoFill(4, `${st.gain.toLocaleString("en-US")} M`);
+  // Title and subtitle follow each new route until the person types their own.
+  const autoText = (id, v) => { const el = $(id); if (v && (!el.value || el.dataset.auto === "1")) { el.value = v; el.dataset.auto = "1"; } };
+  autoText("title-input", name.toUpperCase());
+  placeSubtitle((st.bbox.s + st.bbox.n) / 2, (st.bbox.w + st.bbox.e) / 2).then(t => { autoText("subtitle-input", t); drawOverlay(); });
 
+  await mapReady(map);
+  addRouteLayers(map, previewSize().pw);
+  fitRoute();
+  updateContourStep();
+  await ensureFonts();
+  drawOverlay();
+  $("empty-state").hidden = true;
+  await settle(map, 15000);
+  posterReady = true;
+  ["btn-png", "btn-jpg", "btn-svg"].forEach(id => { $(id).disabled = false; });
+  clearSteps();
+  setStatus(`${segments.length > 1 ? segments.length + " parts · " : ""}${st.distKm.toFixed(1)} km loaded`, "ok");
+  track("poster_route_loaded", { source, km: Math.round(st.distKm), parts: segments.length });
+}
+async function loadFiles(fileList) {
+  const files = [...fileList].filter(f => /\.(gpx|kml)$/i.test(f.name))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }));
+  if (!files.length) { toast(/\.kmz$/i.test(fileList[0]?.name || "") ? "KMZ isn't supported: export KML instead" : "Choose a .gpx or .kml file", "err"); return; }
+  setStatus(""); setStep(1, "Reading route");
   try {
-    let pts = [];
-    const gpx  = document.getElementById("gpx-file").files[0];
-    const kml  = document.getElementById("kml-file").files[0];
-    const name = document.getElementById("pass-name").value.trim();
-    const cf   = document.getElementById("coord-from").value.trim();
-    const ct   = document.getElementById("coord-to").value.trim();
-
-    setStep(1);
-
-    if (gpx) {
-      setStatus("Parsing GPX…");
-      pts = parseGPX(await gpx.text());
-      if (!pts.length) throw new Error("No track points found in GPX.");
-    } else if (kml) {
-      setStatus("Parsing KML…");
-      pts = parseKML(await kml.text());
-      if (!pts.length) throw new Error("No route in KML. Export from Google My Maps.");
-    } else if (cf && ct) {
-      setStatus("Routing…");
-      const [la1, lo1] = cf.split(",").map(Number);
-      const [la2, lo2] = ct.split(",").map(Number);
-      if ([la1, lo1, la2, lo2].some(isNaN)) throw new Error("Invalid coordinates. Use: 46.52, 10.45");
+    const parsed = await Promise.all(files.map(async f => ({ f, ...parseRouteText(await f.text(), /\.kml$/i.test(f.name)) })));
+    $("file-lbl").textContent = files.length > 1 ? `${files.length} files · one per day` : files[0].name;
+    $("file-drop").classList.add("has-file");
+    await loadRoute({ segs: parsed.flatMap(p => p.segments), wpts: parsed.flatMap(p => p.waypoints),
+      name: parsed[0].name || files[0].name.replace(/\.(gpx|kml)$/i, ""), source: "file" });
+  } catch (e) { clearSteps(); setStatus(e.message, "err"); toast(e.message, "err"); console.error(e); }
+}
+async function loadSample() {
+  setStep(1, "Loading the Stelvio sample");
+  try {
+    const r = await fetch("samples/stelvio-pass.gpx");
+    if (!r.ok) throw new Error("Couldn't load the sample ride");
+    const p = parseRouteText(await r.text(), false);
+    $("file-lbl").textContent = "Stelvio Pass (sample)"; $("file-drop").classList.add("has-file");
+    await loadRoute({ segs: p.segments, wpts: p.waypoints, name: p.name || "Stelvio Pass", source: "sample" });
+  } catch (e) { clearSteps(); setStatus(e.message, "err"); toast(e.message, "err"); }
+}
+async function generateFrom(mode) {
+  setStatus(""); setStep(1, mode === "name" ? "Finding the road" : "Routing");
+  try {
+    let pts, name = "";
+    if (mode === "coords") {
+      const [la1, lo1] = $("coord-from").value.split(",").map(Number), [la2, lo2] = $("coord-to").value.split(",").map(Number);
+      if ([la1, lo1, la2, lo2].some(isNaN)) throw new Error("Use coordinates like 46.52, 10.45");
       pts = await routeOSRM(la1, lo1, la2, lo2);
-    } else if (name) {
-      pts = await resolvePassName(name);
     } else {
-      throw new Error("Enter a pass name, coordinates, or upload a file.");
+      name = $("pass-name").value.trim();
+      if (!name) throw new Error("Type a pass or road name");
+      pts = await resolvePassName(name);
     }
-
-    if (pts.length < 2) throw new Error("Route has too few points.");
-
-    if (pts.length > 3000) {
-      const step = Math.ceil(pts.length / 3000);
-      pts = pts.filter((_, i) => i % step === 0 || i === pts.length - 1);
-    }
-
-    routePoints = pts;
-    routeStats  = calcStats(pts);
-
-    if (name && !document.getElementById("title-input").value)
-      document.getElementById("title-input").value = name.toUpperCase();
-
-    const st = routeStats;
-    document.getElementById("st-dist").textContent = st.distKm;
-    document.getElementById("st-gain").textContent = st.hasEle && st.elevGain > 0 ? st.elevGain.toLocaleString() : "—";
-    document.getElementById("st-coord").textContent = fmtCoord(st.centerLat, st.centerLon);
-    document.getElementById("stats-card").classList.add("on");
-
-    setStep(2);
-    setStatus("Rendering…");
-    const [S, W, N, E] = st.bbox;
-    if (!map.isStyleLoaded()) await new Promise(res => map.once("style.load", res));
-    map.fitBounds([[W, S], [E, N]], { padding: 60, duration: 600 });
-    updateMapLayers();
-    await ensureFonts();
-    drawOverlay();
-
-    await new Promise(res => map.once("idle", res));
-    updateMapLayers();
-    drawVignette();
-
-    posterReady = true;
-    clearSteps();
-    document.getElementById("btn-svg").disabled = false;
-    document.getElementById("btn-png").disabled = false;
-    setStatus("Map ready", "ok");
-    toast("Map ready", "ok");
-
-  } catch(e) {
-    clearSteps();
-    setStatus(e.message, "err");
-    toast(e.message, "err");
-    console.error(e);
-  }
-
-  btn.disabled = false;
-  btn.textContent = "Generate Map";
+    await loadRoute({ segs: [pts], wpts: [], name, source: mode });
+  } catch (e) { clearSteps(); setStatus(e.message, "err"); toast(e.message, "err"); console.error(e); }
 }
 
-// ── SVG Export (route + title only — contours are vector tiles) ────────────
+// ── Print export: the preview, re-rendered at print size ───────────────────
+// The print map has the preview's framing; it's made k× larger (more terrain
+// detail) with all line widths scaled to match, then rendered at the pixel
+// ratio that gives the exact print size. Contour spacing stays as previewed.
+function maxGpuSize() {
+  try { const gl = map.painter.context.gl; return Math.min(16384, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), gl.getParameter(gl.MAX_VIEWPORT_DIMS)[0]); }
+  catch (_) { return 8192; }
+}
+async function renderPoster() {
+  const { W, H } = printSize();
+  const { pw, ph } = previewSize();
+  const k = Math.max(1, Math.min(3, Math.round(1500 / pw)));
+  const cw = pw * k, ch = ph * k, ratio = W / cw;
+  const holder = document.createElement("div");
+  // Kept in the viewport (behind the page) so the GPU actually renders it.
+  holder.style.cssText = `position:fixed;left:0;top:0;width:${cw}px;height:${ch}px;opacity:0;pointer-events:none;z-index:-1;`;
+  document.body.appendChild(holder);
+  const pm = new maplibregl.Map({
+    container: holder, style: buildStyle(), center: map.getCenter(), zoom: map.getZoom() + Math.log2(k),
+    bearing: map.getBearing(), pixelRatio: ratio, preserveDrawingBuffer: true, attributionControl: false,
+    interactive: false, fadeDuration: 0,
+    // MapLibre caps the canvas at 4096 px by default, which silently made
+    // every "300 DPI" print smaller. Allow what the graphics card supports.
+    maxCanvasSize: [maxGpuSize(), maxGpuSize()],
+  });
+  try {
+    await mapReady(pm);
+    addRouteLayers(pm, cw);
+    await settle(pm);
+    const canvas = pm.getCanvas();
+    if (canvas.width < W * 0.98) throw new Error(`this browser can render up to ${canvas.width} px wide. Choose a lower DPI.`);
+    const out = document.createElement("canvas");
+    out.width = W; out.height = H;
+    const ctx = out.getContext("2d");
+    ctx.drawImage(canvas, 0, 0, W, H);
+    renderVignetteToCtx(ctx, W, H, false);   // drawn straight on top: one full-size canvas, not three
+    await ensureFonts();
+    renderOverlay(ctx, W, H, (lon, lat) => { const p = pm.project([lon, lat]); return { x: p.x * W / cw, y: p.y * H / ch }; }, false);
+    return out;
+  } finally {
+    pm.remove(); holder.remove();
+  }
+}
+function fileBase() {
+  const t = ($("title-input").value || "route-poster").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return `${t || "route-poster"}-${paperKey}${landscape ? "-landscape" : ""}-${dpi}dpi`;
+}
+async function exportRaster(type) {
+  if (!posterReady || exporting) return;
+  exporting = true;
+  const { W, H } = printSize();
+  toast(`Rendering ${W.toLocaleString()} × ${H.toLocaleString()} px…`, "", 0);
+  ["btn-png", "btn-jpg"].forEach(id => { $(id).disabled = true; });
+  try {
+    const out = await renderPoster();
+    const blob = await new Promise(res => out.toBlob(res, type, 0.95));
+    if (!blob) throw new Error("the browser couldn't create the file. Try a lower DPI.");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = `${fileBase()}.${type === "image/png" ? "png" : "jpg"}`;
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast(`Saved ${W.toLocaleString()} × ${H.toLocaleString()} px · ${(blob.size / 1e6).toFixed(0)} MB`, "ok", 5000);
+    track("poster_export", { format: type === "image/png" ? "png" : "jpg", paper: paperKey, dpi });
+  } catch (e) {
+    toast("Export failed: " + e.message, "err", 7000); console.error(e);
+  } finally {
+    exporting = false;
+    ["btn-png", "btn-jpg"].forEach(id => { $(id).disabled = false; });
+  }
+}
+
+// ── SVG export: route, profile and text as vectors (no terrain) ────────────
 function buildSVG() {
-  if (!routePoints.length) return null;
-  const [S, W, N, E] = routeStats.bbox;
-  const pad = .05, mn = S-pad, mx = N+pad, mw = W-pad, me = E+pad;
-  const merY = la => Math.log(Math.tan(Math.PI/4 + la*Math.PI/360));
-  const y0 = merY(mn), y1 = merY(mx), xR = me-mw, yR = y1-y0;
-  const proj = (la, lo) => [
-    (lo-mw)/xR*POSTER_W,
-    MAP_H - (merY(la)-y0)/yR*MAP_H
-  ];
-  const road  = document.getElementById("color-road").value;
-  const route = document.getElementById("color-route").value;
-  const bg    = document.getElementById("color-bg").value;
-  const title = (document.getElementById("title-input").value || "MOUNTAIN PASS").toUpperCase();
-  const sub   = (document.getElementById("subtitle-input").value || "").toUpperCase();
-
-  const rd = "M " + routePoints.map(p => proj(p.lat, p.lon).map(v => v.toFixed(1)).join(",")).join(" L ");
-  const st = routeStats;
-
-  const vi = vignetteIntensity();
-  const vigSvg = vi > 0
-    ? `<defs><radialGradient id="vgr" cx="50%" cy="50%" r="80%" gradientUnits="userSpaceOnUse">
-        <stop offset="25%" stop-color="#000" stop-opacity="0"/>
-        <stop offset="100%" stop-color="#000" stop-opacity="${(vi * 0.72).toFixed(2)}"/>
-       </radialGradient></defs>
-       <rect x="0" y="0" width="${POSTER_W}" height="${MAP_H}" fill="url(#vgr)"/>`
-    : "";
-
-  const fnt     = FONTS[selectedFontKey];
-  const titleSz = Math.round(76 * titleScale);
-  const subSz   = Math.round(24 * subtitleScale);
-  const titleY  = POSTER_H - Math.round(220 * titleScale);
-  const subY    = titleY + Math.round(titleSz * 0.18 + subSz * 0.92 + 10);
-
-  // Custom info panel top-left
-  const sx = 90;
-  let svgInfo = "";
-  const infoPairs = [
-    { label: (document.getElementById("info-lbl-1").value || "").toUpperCase(),
-      value: document.getElementById("info-val-1").value },
-    { label: (document.getElementById("info-lbl-2").value || "").toUpperCase(),
-      value: document.getElementById("info-val-2").value },
-    { label: (document.getElementById("info-lbl-3").value || "").toUpperCase(),
-      value: document.getElementById("info-val-3").value },
-  ].filter(p => p.label || p.value);
-  let sy = 110;
-  infoPairs.forEach(({ label, value }) => {
+  if (!segments.length) return null;
+  const W = 2400, { pw, ph } = previewSize(), H = Math.round(W * ph / pw);
+  const P = (lon, lat) => { const p = map.project([lon, lat]); return [p.x * W / pw, p.y * H / ph]; };
+  const road = $("color-road").value, route = $("color-route").value, bg = $("color-bg").value;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const title = esc(($("title-input").value || "MOUNTAIN PASS").toUpperCase()), sub = esc(($("subtitle-input").value || "").toUpperCase());
+  const { fnt, titleSz, titleY, subSz, subY } = titleLayout(W, H);
+  const d = segments.map(s => "M " + s.map(p => P(p.lon, p.lat).map(v => v.toFixed(1)).join(",")).join(" L ")).join(" ");
+  const rw = W * W_ROUTE * routeScale;
+  let info = "", sy = 110;
+  infoPairs().forEach(({ label, value }) => {
     sy += 20;
-    if (label) svgInfo += `<text x="${sx}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700" fill="${road}" letter-spacing="3">${label}</text>`;
+    if (label) info += `<text x="90" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700" fill="${road}" letter-spacing="3">${esc(label)}</text>`;
     sy += 33;
-    if (value) svgInfo += `<text x="${sx}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="300" fill="${road}" opacity=".65">${value}</text>`;
+    if (value) info += `<text x="90" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="300" fill="${road}" opacity=".65">${esc(value)}</text>`;
     sy += 26;
   });
-
-  // Start / end dots (bbox projection)
-  let svgDots = "";
-  if (routePoints.length >= 2) {
-    [[routePoints[0], false], [routePoints[routePoints.length - 1], true]].forEach(([pt, isEnd]) => {
-      const [dx, dy] = proj(pt.lat, pt.lon);
-      svgDots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="11" fill="${route}" opacity="1"/>`;
-      if (isEnd) svgDots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="4.5" fill="${bg}"/>`;
-    });
+  let dots = "";
+  if ($("toggle-markers").checked) {
+    const a = segments[0][0], ls = segments[segments.length - 1], b = ls[ls.length - 1];
+    const [ax, ay] = P(a.lon, a.lat), [bx, by] = P(b.lon, b.lat);
+    dots = `<circle cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="11" fill="${road}"/><circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="11" fill="${road}"/><circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="4.5" fill="${bg}"/>`;
   }
-
-  const fadeH = Math.round(POSTER_H * 0.25);
-  const fadeY = POSTER_H - fadeH;
-
-  return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">
-<defs>
-  <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
-    <stop offset="50%" stop-color="#fff" stop-opacity=".10"/>
-    <stop offset="100%" stop-color="#fff" stop-opacity=".28"/>
-  </linearGradient>
-</defs>
-<rect width="${POSTER_W}" height="${POSTER_H}" fill="${bg}"/>
-<path d="${rd}" stroke="${route}" stroke-opacity=".18" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
-<path d="${rd}" stroke="${route}" stroke-opacity="1" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="${rd}" stroke="#fff" stroke-opacity=".45" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-${svgDots}
-${vigSvg}
-<rect x="0" y="${fadeY}" width="${POSTER_W}" height="${fadeH}" fill="url(#fade)"/>
-${svgInfo}
-<text x="${POSTER_W/2}" y="${titleY}" font-family="${fnt.stack}" font-size="${titleSz}" font-weight="${fnt.titleW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.spacing}">${title}</text>
-${sub ? `<text x="${POSTER_W/2}" y="${subY}" font-family="${fnt.stack}" font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing}" opacity=".72">${sub}</text>` : ""}
-<text x="${POSTER_W/2}" y="${POSTER_H-28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".22">© OpenStreetMap contributors  ·  © MapTiler</text>
+  let prof = "";
+  if ($("toggle-profile").checked && profile) {
+    const { x, y0, w, h } = profileBox(W, H), range = Math.max(1, profile.max - profile.min), n = profile.e.length;
+    const pts = profile.e.map((v, i) => `${(x + i / (n - 1) * w).toFixed(1)},${(y0 + h - (v - profile.min) / range * h).toFixed(1)}`);
+    prof = `<path d="M ${x.toFixed(1)},${(y0 + h).toFixed(1)} L ${pts.join(" L ")} L ${(x + w).toFixed(1)},${(y0 + h).toFixed(1)} Z" fill="${route}" opacity=".22"/><path d="M ${pts.join(" L ")}" fill="none" stroke="${route}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+<defs><filter id="glow"><feGaussianBlur stdDeviation="${(W * W_BLUR * routeScale / 2).toFixed(1)}"/></filter></defs>
+<rect width="${W}" height="${H}" fill="${bg}"/>
+<path d="${d}" stroke="${route}" stroke-opacity=".18" stroke-width="${(W * W_GLOW * routeScale).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+<path d="${d}" stroke="${route}" stroke-width="${rw.toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="${d}" stroke="#fff" stroke-opacity=".45" stroke-width="${(W * W_SHINE * routeScale).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+${dots}${prof}${info}
+<text x="${W / 2}" y="${titleY}" font-family='${fnt.stack}' font-size="${titleSz}" font-weight="${fnt.titleW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.spacing * titleScale}">${title}</text>
+${sub ? `<text x="${W / 2}" y="${subY}" font-family='${fnt.stack}' font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing * subtitleScale}" opacity=".72">${sub}</text>` : ""}
+<text x="${W / 2}" y="${H - 28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".28">Terrain © Mapterhorn  ·  © OpenStreetMap contributors</text>
 </svg>`;
 }
-
 function downloadSVG() {
   const svg = buildSVG();
-  if (!svg) { toast("No route data", "err"); return; }
+  if (!svg) { toast("Load a route first", "err"); return; }
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
-  a.download = (document.getElementById("title-input").value || "moto-map").toLowerCase().replace(/\s+/g, "-") + ".svg";
-  a.click(); URL.revokeObjectURL(a.href);
-  toast("SVG downloaded", "ok");
+  a.download = `${fileBase().replace(/-\d+dpi$/, "")}-lines.svg`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast("SVG saved: route, profile and text", "ok");
+  track("poster_export", { format: "svg", paper: paperKey });
 }
 
-// ── PNG Export ─────────────────────────────────────────────────────────────
-async function exportPNG() {
-  if (!posterReady) return;
-  toast("Generating 300 DPI PNG…", "", 0);
-  document.getElementById("btn-png").disabled = true;
-
-  try {
-    const PW = POSTER_W * PRINT_SCALE;
-    const PH = POSTER_H * PRINT_SCALE;
-
-    const offDiv = document.createElement("div");
-    // Keep in viewport so WebGL actually renders (off-screen elements may be skipped by GPU)
-    offDiv.style.cssText = `position:fixed;left:0;top:0;width:${POSTER_W}px;height:${POSTER_H}px;opacity:0;pointer-events:none;z-index:-1;`;
-    document.body.appendChild(offDiv);
-
-    const previewW = document.getElementById("map").clientWidth;
-    const printZoom = map.getZoom() + Math.log2(POSTER_W / previewW);
-
-    const bg = document.getElementById("color-bg").value;
-    const rd = document.getElementById("color-road").value;
-    const printMap = new maplibregl.Map({
-      container: offDiv,
-      style: buildStyle(bg, rd),
-      center: map.getCenter(),
-      zoom: printZoom,
-      bearing: map.getBearing(),
-      pitch: map.getPitch(),
-      pixelRatio: PRINT_SCALE,
-      preserveDrawingBuffer: true,
-      attributionControl: false,
-      interactive: false,
-    });
-
-    await new Promise((res, rej) => {
-      printMap.on("load", res);
-      setTimeout(() => rej(new Error("Print map timeout")), 40000);
-    });
-
-    printMap.setPaintProperty("hillshade", "hillshade-exaggeration", hillshadeExp());
-    addMapLayers(printMap);
-
-    await new Promise((res, rej) => {
-      printMap.once("idle", () => {
-        // Two rAF cycles to ensure WebGL has fully painted after tiles load
-        requestAnimationFrame(() => requestAnimationFrame(res));
-      });
-      setTimeout(() => rej(new Error("Render timeout")), 40000);
-    });
-
-    const mapCanvas = printMap.getCanvas();
-    const final = document.createElement("canvas");
-    final.width = PW; final.height = PH;
-    const ctx = final.getContext("2d");
-    ctx.drawImage(mapCanvas, 0, 0, PW, PH);
-    renderVignetteToCtx(ctx, PW, PH);
-    await ensureFonts();
-    renderOverlay(ctx, PW, PH, PW / POSTER_W);
-
-    await new Promise((res, rej) => {
-      final.toBlob(blob => {
-        if (!blob) { rej(new Error("Canvas export failed — canvas may be tainted by cross-origin content")); return; }
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = (document.getElementById("title-input").value || "moto-map").toLowerCase().replace(/\s+/g, "-") + "-print.png";
-        a.click(); URL.revokeObjectURL(a.href);
-        res();
-      }, "image/png");
-    });
-
-    printMap.remove();
-    document.body.removeChild(offDiv);
-    toast("PNG downloaded (7200 × 10200 px)", "ok");
-
-  } catch(e) {
-    toast("Export failed: " + e.message, "err");
-    console.error(e);
-  }
-  document.getElementById("btn-png").disabled = false;
-}
-
-// ── Live color / terrain updates ───────────────────────────────────────────
+// ── Live style updates ─────────────────────────────────────────────────────
 function onColorChange() {
-  if (!map) return;
-  const bg = document.getElementById("color-bg").value;
-  const rd = document.getElementById("color-road").value;
+  if (!map || !map.getLayer("bg")) return;
+  const bg = $("color-bg").value, rd = $("color-road").value, rt = $("color-route").value;
   map.setPaintProperty("bg", "background-color", bg);
   map.setPaintProperty("hillshade", "hillshade-accent-color", bg);
-  if (map.getLayer("contour-minor")) {
-    map.setPaintProperty("contour-minor", "line-color", rd);
-    map.setPaintProperty("contour-index", "line-color", rd);
-  }
-  updateMapLayers();
+  map.setPaintProperty("contour-minor", "line-color", rd);
+  map.setPaintProperty("contour-index", "line-color", rd);
   drawOverlay();
 }
-
 function onContourChange() {
-  if (!map) return;
+  $("contour-val").textContent = $("contour-intensity").value + "%";
+  if (!map || !map.getLayer("contour-minor")) return;
   const ci = contourIntensityVal();
-  document.getElementById("contour-val").textContent = document.getElementById("contour-intensity").value + "%";
-  if (map.getLayer("contour-minor")) {
-    map.setPaintProperty("contour-minor", "line-opacity", ci * 0.45);
-    map.setPaintProperty("contour-index", "line-opacity", ci * 0.80);
-  }
+  map.setPaintProperty("contour-minor", "line-opacity", ci * 0.62);
+  map.setPaintProperty("contour-index", "line-opacity", ci * 0.92);
 }
-
 function onHillshadeChange() {
-  if (!map) return;
-  const on  = document.getElementById("toggle-hillshade").checked;
-  const val = document.getElementById("hillshade-intensity").value;
-  document.getElementById("hillshade-val").textContent = on ? val + "%" : "Off";
-  document.getElementById("hs-wrap").classList.toggle("off", !on);
-  map.setPaintProperty("hillshade", "hillshade-exaggeration", hillshadeExp());
+  const on = $("toggle-hillshade").checked, val = $("hillshade-intensity").value;
+  $("hillshade-val").textContent = on ? val + "%" : "Off";
+  $("hs-wrap").classList.toggle("off", !on);
+  if (map && map.getLayer("hillshade")) map.setPaintProperty("hillshade", "hillshade-exaggeration", hillshadeExp());
+}
+function wireSeg(id, attr, fn) {
+  $(id).addEventListener("click", e => {
+    const b = e.target.closest(".seg-btn"); if (!b) return;
+    $(id).querySelectorAll(".seg-btn").forEach(x => x.classList.toggle("active", x === b));
+    fn(b.dataset[attr]);
+  });
 }
 
-// ── Mode segmented control ─────────────────────────────────────────────────
-const PANELS = { name: "panel-name", coords: "panel-coords", file: "panel-file" };
-document.getElementById("mode-seg").addEventListener("click", e => {
-  const btn = e.target.closest(".seg-btn");
-  if (!btn) return;
-  const mode = btn.dataset.mode;
-  document.querySelectorAll("#mode-seg .seg-btn").forEach(b => b.classList.toggle("active", b === btn));
-  Object.entries(PANELS).forEach(([m, id]) => document.getElementById(id).classList.toggle("on", m === mode));
-});
+// ── Wiring ─────────────────────────────────────────────────────────────────
+const PANELS = { file: "panel-file", name: "panel-name", coords: "panel-coords" };
+wireSeg("mode-seg", "mode", mode => Object.entries(PANELS).forEach(([m, id]) => $(id).classList.toggle("on", m === mode)));
+wireSeg("orient-seg", "orient", v => { landscape = v === "landscape"; layoutPoster(); if (segments.length) fitRoute(); });
+wireSeg("dpi-seg", "dpi", v => { dpi = parseInt(v); updatePaperMeta(); });
+wireSeg("detail-seg", "detail", v => { contourShift = parseInt(v); contourStep = -1; updateContourStep(); });
+$("paper-select").addEventListener("change", e => { paperKey = e.target.value; layoutPoster(); if (segments.length) fitRoute(); });
 
-// ── Color presets ──────────────────────────────────────────────────────────
-document.querySelectorAll(".preset-pill").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.getElementById("color-bg").value    = btn.dataset.bg;
-    document.getElementById("color-road").value  = btn.dataset.rd;
-    document.getElementById("color-route").value = btn.dataset.rt;
-    document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    onColorChange();
-  });
-});
+document.querySelectorAll(".preset-pill").forEach(btn => btn.addEventListener("click", () => {
+  $("color-bg").value = btn.dataset.bg; $("color-road").value = btn.dataset.rd; $("color-route").value = btn.dataset.rt;
+  document.querySelectorAll(".preset-pill").forEach(b => b.classList.toggle("active", b === btn));
+  onColorChange();
+}));
 
-// ── File drop UI ───────────────────────────────────────────────────────────
-document.getElementById("gpx-file").addEventListener("change", e => {
-  const f = e.target.files[0];
-  document.getElementById("gpx-drop").classList.toggle("has-file", !!f);
-  document.getElementById("gpx-lbl").textContent = f ? f.name : "GPX File";
-});
-document.getElementById("kml-file").addEventListener("change", e => {
-  const f = e.target.files[0];
-  document.getElementById("kml-drop").classList.toggle("has-file", !!f);
-  document.getElementById("kml-lbl").textContent = f ? f.name : "KML File";
-});
+$("route-files").addEventListener("change", e => { if (e.target.files.length) loadFiles(e.target.files); e.target.value = ""; });
+const drop = $("file-drop");
+["dragover", "dragenter"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("has-file"); }));
+drop.addEventListener("dragleave", () => { if (!segments.length) drop.classList.remove("has-file"); });
+drop.addEventListener("drop", e => { e.preventDefault(); if (e.dataTransfer.files.length) loadFiles(e.dataTransfer.files); });
+// Dropping a file anywhere on the preview works too.
+$("prev").addEventListener("dragover", e => e.preventDefault());
+$("prev").addEventListener("drop", e => { e.preventDefault(); if (e.dataTransfer.files.length) loadFiles(e.dataTransfer.files); });
+$("try-sample").addEventListener("click", loadSample);
+$("try-sample-2").addEventListener("click", loadSample);
+$("btn-generate").addEventListener("click", () => generateFrom("name"));
+$("btn-generate-coords").addEventListener("click", () => generateFrom("coords"));
+$("pass-name").addEventListener("keydown", e => { if (e.key === "Enter") generateFrom("name"); });
 
-// ── Event listeners ────────────────────────────────────────────────────────
-document.getElementById("btn-generate").addEventListener("click", generate);
-document.getElementById("btn-svg").addEventListener("click", downloadSVG);
-document.getElementById("btn-png").addEventListener("click", exportPNG);
-document.getElementById("pass-name").addEventListener("keydown", e => { if (e.key === "Enter") generate(); });
-["color-bg","color-road","color-route"].forEach(id =>
-  document.getElementById(id).addEventListener("input", onColorChange));
-["title-input","subtitle-input","info-lbl-1","info-val-1","info-lbl-2","info-val-2","info-lbl-3","info-val-3"].forEach(id =>
-  document.getElementById(id).addEventListener("input", drawOverlay));
-document.getElementById("toggle-hillshade").addEventListener("change", onHillshadeChange);
-document.getElementById("hillshade-intensity").addEventListener("input", () => {
-  document.getElementById("hillshade-val").textContent = document.getElementById("hillshade-intensity").value + "%";
-  onHillshadeChange();
-});
-document.getElementById("font-select").addEventListener("change", e => {
-  selectedFontKey = e.target.value;
-  ensureFonts().then(() => drawOverlay());
-});
-document.getElementById("title-size").addEventListener("input", e => {
-  titleScale = parseInt(e.target.value) / 100;
-  document.getElementById("title-size-val").textContent = e.target.value + "%";
-  drawOverlay();
-});
-document.getElementById("sub-size").addEventListener("input", e => {
-  subtitleScale = parseInt(e.target.value) / 100;
-  document.getElementById("sub-size-val").textContent = e.target.value + "%";
-  drawOverlay();
-});
-document.getElementById("vignette-intensity").addEventListener("input", e => {
-  document.getElementById("vignette-val").textContent = e.target.value + "%";
-  drawVignette();
-});
-document.getElementById("contour-intensity").addEventListener("input", onContourChange);
+$("btn-png").addEventListener("click", () => exportRaster("image/png"));
+$("btn-jpg").addEventListener("click", () => exportRaster("image/jpeg"));
+$("btn-svg").addEventListener("click", downloadSVG);
+
+["color-bg", "color-road", "color-route"].forEach(id => $(id).addEventListener("input", () => {
+  document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
+  onColorChange();
+}));
+["info-lbl-1", "info-lbl-2", "info-lbl-3", "info-lbl-4"].forEach(id => $(id).addEventListener("input", drawOverlay));
+["title-input", "subtitle-input"].forEach(id => $(id).addEventListener("input", e => { e.target.dataset.auto = "0"; drawOverlay(); }));
+[1, 2, 3, 4].forEach(i => $(`info-val-${i}`).addEventListener("input", e => { e.target.dataset.auto = "0"; drawOverlay(); }));
+["toggle-markers", "toggle-wpts"].forEach(id => $(id).addEventListener("change", drawOverlay));
+$("toggle-profile").addEventListener("change", () => { if (segments.length) fitRoute(); drawOverlay(); });
+$("toggle-hillshade").addEventListener("change", onHillshadeChange);
+$("hillshade-intensity").addEventListener("input", onHillshadeChange);
+$("contour-intensity").addEventListener("input", onContourChange);
+$("font-select").addEventListener("change", e => { selectedFontKey = e.target.value; ensureFonts().then(drawOverlay); });
+$("title-size").addEventListener("input", e => { titleScale = e.target.value / 100; $("title-size-val").textContent = e.target.value + "%"; if (segments.length) fitRoute(); drawOverlay(); });
+$("sub-size").addEventListener("input", e => { subtitleScale = e.target.value / 100; $("sub-size-val").textContent = e.target.value + "%"; drawOverlay(); });
+$("route-width").addEventListener("input", e => { routeScale = e.target.value / 100; $("route-width-val").textContent = e.target.value + "%"; drawOverlay(); });
+$("vignette-intensity").addEventListener("input", e => { $("vignette-val").textContent = e.target.value + "%"; drawVignette(); });
 
 // ── Boot ───────────────────────────────────────────────────────────────────
 layoutPoster();
 initMap();
+ensureFonts().then(drawOverlay);
+if (new URLSearchParams(location.hash.slice(1)).has("sample")) loadSample();
 </script>
 </body>
 </html>
