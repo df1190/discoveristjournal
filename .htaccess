@@ -17,6 +17,8 @@ Redirect 301 /moto/moto-tools /tools/route-video
 # RewriteRules (not Redirect) so they run before the .html rule below.
 RewriteRule ^tools/strava-overlay(\.html)?$ /tools/route-video [R=301,L]
 RewriteRule ^route-video/?$ /tools/route-video [R=301,L]
+# The World Cup 2026 Marriott planner was removed after the tournament.
+RewriteRule ^world-cup/ /blog/best-marriott-hotels-world-cup-2026-new-york/ [R=301,L]
 # Unpublished for now (unfinished): the Alpine Passes guide and the Moto
 # Tools page. Temporary redirects while they're drafts; the files live in
 # _drafts/, which is never served.
