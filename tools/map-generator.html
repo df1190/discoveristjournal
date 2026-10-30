@@ -531,6 +531,13 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
       <input type="text" class="info-lbl" id="info-lbl-8" placeholder="LABEL" value="TIME">
       <input type="text" class="info-val" id="info-val-8" placeholder="From the GPX" value="">
     </div>
+    <div class="rng-wrap">
+      <div class="rng-hdr">
+        <span class="rng-lbl">Text size</span>
+        <span class="rng-val" id="info-size-val">140%</span>
+      </div>
+      <input type="range" id="info-size" min="60" max="250" step="5" value="140">
+    </div>
     <div class="hint">Rows 1 to 5 are the ride, 6 to 8 are you. Everything from your file fills in; edit or clear any row.</div>
   </div>
 
@@ -726,6 +733,7 @@ let posterReady     = false;
 let titleScale      = 1.0;
 let subtitleScale   = 1.0;
 let routeScale      = 1.0;
+let infoScale       = 1.4;    // info panel text size (David found 100% too small)
 let selectedFontKey = "jost";
 let posterStyle     = "minimal"; // "minimal" (matte, solid route) | "glow" (hillshade, glowing route)
 // What each poster style sets; everything stays adjustable afterwards.
@@ -1134,22 +1142,23 @@ function drawInfoPanel(ctx, W, H, sc, labelC, valueC, valueA) {
   const pairs = infoPairs();
   if (!pairs.length) return;
   const minimal = posterStyle === "minimal";
+  const k = infoScale;
   const sx = Math.round((minimal ? 120 : 90) * sc);
   let sy = Math.round((minimal ? 140 : 110) * sc), prev = 0;
   ctx.textAlign = "left";
   pairs.forEach(({ i, label, value }) => {
-    if (minimal && prev && prev <= INFO_SPLIT && i > INFO_SPLIT) sy += Math.round(64 * sc); // gap between ride and rider
+    if (minimal && prev && prev <= INFO_SPLIT && i > INFO_SPLIT) sy += Math.round(64 * sc * k); // gap between ride and rider
     prev = i;
-    const lblSz = Math.round((minimal ? 36 : 20) * sc), valSz = Math.round((minimal ? 30 : 28) * sc);
+    const lblSz = Math.round((minimal ? 36 : 20) * sc * k), valSz = Math.round((minimal ? 30 : 28) * sc * k);
     sy += lblSz;
     ctx.font = minimal ? `600 ${lblSz}px "Barlow Condensed", "Arial Narrow", sans-serif` : `700 ${lblSz}px "Inter", Arial, sans-serif`;
-    ctx.fillStyle = labelC; ctx.globalAlpha = 1; ctx.letterSpacing = `${Math.round((minimal ? 2 : 3) * sc)}px`;
+    ctx.fillStyle = labelC; ctx.globalAlpha = 1; ctx.letterSpacing = `${Math.round((minimal ? 2 : 3) * sc * k)}px`;
     if (label) ctx.fillText(label, sx, sy);
-    sy += Math.round((minimal ? 4 : 5) * sc) + valSz;
+    sy += Math.round((minimal ? 4 : 5) * sc * k) + valSz;
     ctx.font = minimal ? `400 ${valSz}px "Barlow Condensed", "Arial Narrow", sans-serif` : `300 ${valSz}px "Inter", Arial, sans-serif`;
-    ctx.fillStyle = valueC; ctx.globalAlpha = valueA; ctx.letterSpacing = minimal ? `${Math.round(1 * sc)}px` : "0px";
+    ctx.fillStyle = valueC; ctx.globalAlpha = valueA; ctx.letterSpacing = minimal ? `${Math.round(1 * sc * k)}px` : "0px";
     ctx.fillText(value, sx, sy);
-    sy += Math.round((minimal ? 24 : 26) * sc);
+    sy += Math.round((minimal ? 24 : 26) * sc * k);
   });
   ctx.globalAlpha = 1; ctx.letterSpacing = "0px";
 }
@@ -1309,7 +1318,7 @@ function fitRoute() {
   const bottom = ($("toggle-profile").checked && profile ? 0.36 : 0.30) - (posterStyle === "minimal" ? 0.05 : 0);
   // Minimal: the route sits right of the info panel and fills the rest, like a gallery print.
   const pad = posterStyle === "minimal"
-    ? { top: ph * 0.07, bottom: ph * bottom, left: pw * 0.30, right: pw * 0.08 }
+    ? { top: ph * 0.07, bottom: ph * bottom, left: pw * Math.min(0.42, 0.14 + 0.115 * infoScale), right: pw * 0.08 }
     : { top: ph * 0.17, bottom: ph * bottom, left: pw * 0.09, right: pw * 0.09 };
   map.fitBounds([[b.w, b.s], [b.e, b.n]], {
     padding: pad,
@@ -1490,14 +1499,14 @@ function buildSVG() {
   const rw = W * W_ROUTE * routeScale;
   let info = "", sy = minimal ? 140 : 110, prev = 0;
   const lf = minimal ? '"Barlow Condensed","Arial Narrow",sans-serif' : "Inter,Arial,sans-serif";
-  const ls = minimal ? 36 : 20, vs = minimal ? 30 : 28, x0 = minimal ? 120 : 90;
+  const k = infoScale, ls = (minimal ? 36 : 20) * k, vs = (minimal ? 30 : 28) * k, x0 = minimal ? 120 : 90;
   infoPairs().forEach(({ i, label, value }) => {
-    if (minimal && prev && prev <= INFO_SPLIT && i > INFO_SPLIT) sy += 64;
+    if (minimal && prev && prev <= INFO_SPLIT && i > INFO_SPLIT) sy += 64 * k;
     prev = i; sy += ls;
-    if (label) info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${ls}" font-weight="${minimal ? 600 : 700}" fill="${road}" letter-spacing="${minimal ? 2 : 3}">${esc(label)}</text>`;
-    sy += (minimal ? 4 : 5) + vs;
+    if (label) info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${ls}" font-weight="${minimal ? 600 : 700}" fill="${road}" letter-spacing="${(minimal ? 2 : 3) * k}">${esc(label)}</text>`;
+    sy += (minimal ? 4 : 5) * k + vs;
     info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${vs}" font-weight="${minimal ? 400 : 300}" fill="${minimal ? VALUE_GREY : road}"${minimal ? "" : ' opacity=".65"'}>${esc(value)}</text>`;
-    sy += minimal ? 24 : 26;
+    sy += (minimal ? 24 : 26) * k;
   });
   let dots = "";
   if ($("toggle-markers").checked) {
@@ -1641,6 +1650,11 @@ $("contour-intensity").addEventListener("input", onContourChange);
 $("font-select").addEventListener("change", e => { selectedFontKey = e.target.value; ensureFonts().then(drawOverlay); });
 $("title-size").addEventListener("input", e => { titleScale = e.target.value / 100; $("title-size-val").textContent = e.target.value + "%"; if (segments.length) fitRoute(); drawOverlay(); });
 $("sub-size").addEventListener("input", e => { subtitleScale = e.target.value / 100; $("sub-size-val").textContent = e.target.value + "%"; drawOverlay(); });
+$("info-size").addEventListener("input", e => {
+  infoScale = e.target.value / 100; $("info-size-val").textContent = e.target.value + "%";
+  drawOverlay();
+  clearTimeout(window.__infoFit); window.__infoFit = setTimeout(() => { if (segments.length) fitRoute(); }, 250);
+});
 $("route-width").addEventListener("input", e => { routeScale = e.target.value / 100; $("route-width-val").textContent = e.target.value + "%"; drawOverlay(); });
 $("vignette-intensity").addEventListener("input", e => { $("vignette-val").textContent = e.target.value + "%"; drawVignette(); });
 
