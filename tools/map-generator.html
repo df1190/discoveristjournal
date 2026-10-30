@@ -427,6 +427,11 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div class="ctitle">Poster style</div>
     <div class="seg" id="style-seg">
       <button class="seg-btn active" data-pstyle="minimal">Minimal</button>
+      <button class="seg-btn" data-pstyle="white">Gallery white</button>
+      <button class="seg-btn" data-pstyle="gold">Night gold</button>
+    </div>
+    <div class="seg" id="style-seg-2">
+      <button class="seg-btn" data-pstyle="multiday">Multi-day</button>
       <button class="seg-btn" data-pstyle="glow">Topo glow</button>
     </div>
     <div class="hint" id="style-hint">Matte charcoal, quiet contour lines, a solid copper route.</div>
@@ -593,6 +598,10 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
   <div class="card">
     <div class="ctitle">On the poster</div>
     <div class="toggle-row">
+      <span class="tlbl">Stats band<small>Big numbers above the title</small></span>
+      <label class="toggle"><input type="checkbox" id="toggle-band"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
       <span class="tlbl">Elevation profile</span>
       <label class="toggle"><input type="checkbox" id="toggle-profile" checked><span class="slider"></span></label>
     </div>
@@ -603,6 +612,29 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div class="toggle-row">
       <span class="tlbl">Waypoint names<small id="wpt-count">None in this file</small></span>
       <label class="toggle"><input type="checkbox" id="toggle-wpts"><span class="slider"></span></label>
+    </div>
+  </div>
+
+  <!-- Photo -->
+  <div class="card">
+    <div class="ctitle">Photo</div>
+    <div class="fdrop" id="photo-drop">
+      <div class="fdrop-txt" id="photo-lbl">Add a photo from the ride</div>
+      <div class="fdrop-sub">Stays on your computer. 3000 px or more for a sharp print</div>
+      <input type="file" id="photo-file" accept="image/*">
+    </div>
+    <div class="seg" id="photo-seg">
+      <button class="seg-btn active" data-photo="none">None</button>
+      <button class="seg-btn" data-photo="top">Top half</button>
+      <button class="seg-btn" data-photo="badge">Round badge</button>
+    </div>
+    <div class="rng-wrap" id="photo-pos-wrap">
+      <div class="rng-hdr"><span class="rng-lbl">Photo position</span><span class="rng-val" id="photo-pos-val">50%</span></div>
+      <input type="range" id="photo-pos" min="0" max="100" step="1" value="50">
+    </div>
+    <div class="rng-wrap" id="photo-size-wrap">
+      <div class="rng-hdr"><span class="rng-lbl">Photo size</span><span class="rng-val" id="photo-size-val">100%</span></div>
+      <input type="range" id="photo-size" min="60" max="160" step="5" value="100">
     </div>
   </div>
 
@@ -685,7 +717,7 @@ const demSmooth = new mlcontour.DemSource({
 demSmooth.setupMaplibre(maplibregl);
 function contourTiles(step) {
   // One threshold for every zoom: the print (rendered more zoomed in) gets exactly the preview's lines.
-  return (posterStyle === "minimal" ? demSmooth : demSource).contourProtocolUrl({ thresholds: { 1: [step, step * 5] }, elevationKey: "ele", levelKey: "level", contourLayer: "contours" });
+  return (isFlat() ? demSmooth : demSource).contourProtocolUrl({ thresholds: { 1: [step, step * 5] }, elevationKey: "ele", levelKey: "level", contourLayer: "contours" });
 }
 // Contour spacing (m). Picked from the preview zoom and then kept for the
 // print, so the printed poster has exactly the lines you see on screen.
@@ -733,17 +765,33 @@ let posterReady     = false;
 let titleScale      = 1.0;
 let subtitleScale   = 1.0;
 let routeScale      = 1.0;
+let photoImg        = null;    // the ride photo, full resolution (never uploaded)
+let photoMode       = "none";  // "none" | "top" | "badge"
+let photoPos        = 0.5;     // vertical focus of the crop
+let photoScale      = 1.0;
+let segDays         = [];      // day index of each segment (one GPX file = one day)
+let dayKm           = [];      // km per day, from the full-resolution track
 let infoScale       = 1.4;    // info panel text size (David found 100% too small)
 let selectedFontKey = "jost";
 let posterStyle     = "minimal"; // "minimal" (matte, solid route) | "glow" (hillshade, glowing route)
 // What each poster style sets; everything stays adjustable afterwards.
+// value: the grey for info values. band: stats band on by default.
 const POSTER_STYLES = {
-  minimal: { bg: "#232327", road: "#8E8E93", route: "#E9A47E", hillshade: false, vignette: 0, profile: false, contour: 60, shift: 1, font: "jost",
-             hint: "Matte charcoal, quiet contour lines, a solid copper route." },
-  glow:    { bg: "#1E1E28", road: "#C8906A", route: "#E8A880", hillshade: true, vignette: 40, profile: true, contour: 70, shift: 0, font: "inter",
-             hint: "Hillshaded terrain, copper contours, a glowing route." },
+  minimal:  { bg: "#232327", road: "#8E8E93", route: "#E9A47E", value: "#A6A6AB", hillshade: false, vignette: 0, profile: false, band: false, contour: 60, shift: 1, font: "jost",
+              hint: "Matte charcoal, quiet contour lines, a solid copper route." },
+  white:    { bg: "#F3EFE7", road: "#A39C90", route: "#1F1F21", value: "#6E6960", hillshade: false, vignette: 0, profile: false, band: true, contour: 70, shift: 1, font: "jost",
+              hint: "Warm paper white, fine grey contours, a deep black route. Calm and Scandinavian." },
+  gold:     { bg: "#0D0D0E", road: "#7D6A3F", route: "#D9B45A", value: "#B9AC8C", hillshade: false, vignette: 0, profile: false, band: true, contour: 55, shift: 1, font: "jost",
+              hint: "Deep black and gold, like a foil print." },
+  multiday: { bg: "#232327", road: "#8E8E93", route: "#E9A47E", value: "#A6A6AB", hillshade: false, vignette: 0, profile: false, band: true, contour: 55, shift: 1, font: "jost",
+              hint: "One colour per day with a legend. Load one GPX per day." },
+  glow:     { bg: "#1E1E28", road: "#C8906A", route: "#E8A880", value: null, hillshade: true, vignette: 40, profile: true, band: false, contour: 70, shift: 0, font: "inter",
+              hint: "Hillshaded terrain, copper contours, a glowing route." },
 };
-const VALUE_GREY = "#A6A6AB";
+// Day colours for the Multi-day style: copper first, then calm tones that sit together.
+const DAY_COLORS = ["#E9A47E", "#7FB7BE", "#E6C77E", "#C493B8", "#9DC49A", "#EF8A6F", "#8FA8D8"];
+function isFlat() { return posterStyle !== "glow"; }
+function valueGrey() { return POSTER_STYLES[posterStyle].value || "#A6A6AB"; }
 let paperKey        = "50x70";
 let landscape       = false;
 let dpi             = 300;
@@ -817,13 +865,13 @@ function buildStyle() {
 // Line widths follow the width of the map they're drawn on (preview or print).
 function contourOpacity() {
   const ci = contourIntensityVal();
-  return posterStyle === "minimal" ? [ci * 0.55, ci * 0.8] : [ci * 0.62, ci * 0.92];
+  return isFlat() ? [ci * 0.55, ci * 0.8] : [ci * 0.62, ci * 0.92];
 }
 function applyWidths(m, cw) {
   if (!m.getLayer("contour-minor")) return;
-  const k = posterStyle === "minimal" ? 0.72 : 1;
+  const k = isFlat() ? 0.72 : 1;
   m.setPaintProperty("contour-minor", "line-width", Math.max(0.3, cw * W_MINOR * k));
-  m.setPaintProperty("contour-index", "line-width", Math.max(0.5, cw * W_INDEX * k * (posterStyle === "minimal" ? 0.85 : 1)));
+  m.setPaintProperty("contour-index", "line-width", Math.max(0.5, cw * W_INDEX * k * (isFlat() ? 0.85 : 1)));
   const [a, b] = contourOpacity();
   m.setPaintProperty("contour-minor", "line-opacity", a);
   m.setPaintProperty("contour-index", "line-opacity", b);
@@ -844,14 +892,23 @@ function updateContourStep() {
 // stroke with a soft blurred glow. Map line layers made star-shaped spikes and
 // broken highlights at tight hairpins, which showed on large prints.
 function addRouteLayers() {}
+function numDays() { return segDays.length ? Math.max(...segDays) + 1 : 1; }
+function dayColor(d) { return d === 0 ? $("color-route").value : DAY_COLORS[d % DAY_COLORS.length]; }
 function drawRoute(ctx, W, project) {
   const path = new Path2D();
   segments.forEach(s => s.forEach((p, i) => { const q = project(p.lon, p.lat); i ? path.lineTo(q.x, q.y) : path.moveTo(q.x, q.y); }));
   const color = $("color-route").value, r = routeScale;
   ctx.save();
   ctx.lineCap = "round"; ctx.lineJoin = "round";
-  if (posterStyle === "minimal") {   // one solid line, nothing else
-    ctx.strokeStyle = color; ctx.lineWidth = W * 0.0085 * r; ctx.stroke(path);
+  if (isFlat()) {   // one solid line, nothing else
+    ctx.lineWidth = W * 0.0085 * r;
+    if (posterStyle === "multiday" && numDays() > 1) {
+      segments.forEach((sg, k) => {
+        const p = new Path2D();
+        sg.forEach((q, i) => { const c = project(q.lon, q.lat); i ? p.lineTo(c.x, c.y) : p.moveTo(c.x, c.y); });
+        ctx.strokeStyle = dayColor(segDays[k]); ctx.stroke(p);
+      });
+    } else { ctx.strokeStyle = color; ctx.stroke(path); }
     ctx.restore();
     return;
   }
@@ -1126,7 +1183,7 @@ function infoPairs() {
 }
 function titleLayout(W, H) {
   const sc = W / 2400, ts = titleScale, ss = subtitleScale, fnt = FONTS[selectedFontKey];
-  if (posterStyle === "minimal") {
+  if (isFlat()) {
     const titleSz = Math.round(104 * sc * ts), subSz = Math.round(30 * sc * ss);
     const titleY = H - Math.round(250 * sc) - Math.round(subSz * 1.6);
     return { sc, fnt, titleSz, titleY, subSz, subY: titleY + Math.round(titleSz * 0.25 + subSz * 1.5) };
@@ -1138,13 +1195,13 @@ function titleLayout(W, H) {
   return { sc, fnt, titleSz, titleY, subSz, subY };
 }
 // Copper labels over grey values (minimal) or the original Inter panel (glow).
-function drawInfoPanel(ctx, W, H, sc, labelC, valueC, valueA) {
+function drawInfoPanel(ctx, W, H, sc, labelC, valueC, valueA, top = 0) {
   const pairs = infoPairs();
-  if (!pairs.length) return;
-  const minimal = posterStyle === "minimal";
+  if (!pairs.length) return top;
+  const minimal = isFlat();
   const k = infoScale;
   const sx = Math.round((minimal ? 120 : 90) * sc);
-  let sy = Math.round((minimal ? 140 : 110) * sc), prev = 0;
+  let sy = top + Math.round((minimal ? 140 : 110) * sc) - (top ? Math.round(40 * sc) : 0), prev = 0;
   ctx.textAlign = "left";
   pairs.forEach(({ i, label, value }) => {
     if (minimal && prev && prev <= INFO_SPLIT && i > INFO_SPLIT) sy += Math.round(64 * sc * k); // gap between ride and rider
@@ -1161,6 +1218,7 @@ function drawInfoPanel(ctx, W, H, sc, labelC, valueC, valueA) {
     sy += Math.round((minimal ? 24 : 26) * sc * k);
   });
   ctx.globalAlpha = 1; ctx.letterSpacing = "0px";
+  return sy;
 }
 // Finish: a checkered flag in a circle; start: a solid dot.
 function drawFinishFlag(ctx, x, y, r, color, bg) {
@@ -1173,14 +1231,70 @@ function drawFinishFlag(ctx, x, y, r, color, bg) {
   ctx.restore();
   ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.strokeStyle = color; ctx.lineWidth = r * 0.24; ctx.stroke();
 }
-function profileBox(W, H) {
+function bandOn() { return $("toggle-band").checked && !!routeStats; }
+function legendOn() { return posterStyle === "multiday" && numDays() > 1; }
+// From the title upwards: stats band, day legend, elevation profile.
+function bottomStack(W, H) {
   const { sc, titleSz, titleY } = titleLayout(W, H);
-  const w = W * 0.62, h = Math.round(H * 0.055), x = (W - w) / 2;
-  const y1 = titleY - titleSz * 0.95 - Math.round(36 * sc), y0 = y1 - h;
-  return { x, y0, w, h };
+  let y = titleY - titleSz * 0.95 - Math.round(56 * sc);
+  const out = {};
+  if (bandOn()) { const h = Math.round(126 * sc); out.band = { y0: y - h, y1: y }; y -= h + Math.round(58 * sc); }
+  if (legendOn()) { out.legend = { y: y - Math.round(16 * sc) }; y -= Math.round(84 * sc); }
+  if ($("toggle-profile").checked && profile) { const h = Math.round(H * 0.055); out.profile = { y0: y - h, y1: y }; y -= h + Math.round(40 * sc); }
+  out.top = y;
+  return out;
 }
+function profileBox(W, H) {
+  const st = bottomStack(W, H), w = W * 0.62, x = (W - w) / 2;
+  return { x, y0: st.profile.y0, w, h: st.profile.y1 - st.profile.y0 };
+}
+function bandItems() {
+  const s = routeStats, items = [];
+  if (!s) return items;
+  items.push([`${s.distKm.toFixed(s.distKm < 100 ? 1 : 0)}`, "KM"]);
+  if (s.hasEle) items.push([s.gain.toLocaleString("en-US"), "M CLIMBED"]);
+  if (s.top != null) items.push([s.top.toLocaleString("en-US"), "M HIGHEST"]);
+  if (numDays() > 1) items.push([String(numDays()), "DAYS"]);
+  else if (s.avgGrade) items.push([s.avgGrade.toFixed(1) + "%", "AVG GRADE"]);
+  return items;
+}
+function drawBand(ctx, W, H, y0, y1, accent, grey, fnt, sc) {
+  const items = bandItems(), n = items.length;
+  if (!n) return;
+  const w = W * 0.80, x0 = (W - w) / 2, cw = w / n;
+  ctx.save(); ctx.textAlign = "center";
+  items.forEach(([v, l], i) => {
+    const cx = x0 + cw * (i + 0.5);
+    ctx.font = `500 ${Math.round(66 * sc)}px ${fnt.stack}`; ctx.fillStyle = accent; ctx.letterSpacing = `${Math.round(2 * sc)}px`;
+    ctx.fillText(v, cx, y0 + Math.round(66 * sc));
+    ctx.font = `600 ${Math.round(30 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.fillStyle = grey; ctx.letterSpacing = `${Math.round(3 * sc)}px`;
+    ctx.fillText(l, cx, y1);
+    if (i) { ctx.globalAlpha = 0.35; ctx.fillStyle = accent; ctx.fillRect(x0 + cw * i - Math.round(1 * sc), y0 + Math.round(8 * sc), Math.max(1, Math.round(2 * sc)), y1 - y0 - Math.round(16 * sc)); ctx.globalAlpha = 1; }
+  });
+  ctx.restore();
+}
+function drawLegend(ctx, W, y, grey, sc) {
+  const n = numDays(), items = Array.from({ length: n }, (_, d) => `DAY ${d + 1}  ${Math.round(dayKm[d] || 0)} KM`);
+  ctx.save(); ctx.font = `600 ${Math.round(32 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(2 * sc)}px`;
+  const sw = Math.round(54 * sc), gap = Math.round(16 * sc), pad = Math.round(54 * sc);
+  const widths = items.map(t => sw + gap + ctx.measureText(t).width);
+  let x = (W - widths.reduce((a, b) => a + b, 0) - pad * (n - 1)) / 2;
+  items.forEach((t, d) => {
+    ctx.fillStyle = dayColor(d); ctx.beginPath(); ctx.roundRect(x, y - Math.round(16 * sc), sw, Math.round(10 * sc), Math.round(5 * sc)); ctx.fill();
+    ctx.fillStyle = grey; ctx.textAlign = "left"; ctx.fillText(t, x + sw + gap, y);
+    x += widths[d] + pad;
+  });
+  ctx.restore();
+}
+// Photo helpers: cover-fit crop with a vertical focus.
+function drawCover(ctx, img, x, y, w, h, focus) {
+  const s = Math.max(w / img.naturalWidth, h / img.naturalHeight), sw = w / s, sh = h / s;
+  const sx = (img.naturalWidth - sw) / 2, sy = (img.naturalHeight - sh) * focus;
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
+function photoTopH(H) { return photoImg && photoMode === "top" ? Math.round(H * 0.44 * photoScale) : 0; }
 function renderOverlay(ctx, W, H, project, clear = true) {
-  const minimal = posterStyle === "minimal";
+  const minimal = isFlat();
   const routeC = $("color-route").value, bg = $("color-bg").value;
   // Minimal: text in the route's copper; glow: text in the contour colour (the original look).
   const accent = minimal ? routeC : $("color-road").value;
@@ -1190,8 +1304,26 @@ function renderOverlay(ctx, W, H, project, clear = true) {
   if (clear) ctx.clearRect(0, 0, W, H);
   ctx.save();
 
-  // Info panel, top left
-  drawInfoPanel(ctx, W, H, sc, accent, minimal ? VALUE_GREY : accent, minimal ? 1 : 0.65);
+  // Photo across the top, fading into the poster colour
+  const topH = photoTopH(H);
+  if (topH) {
+    drawCover(ctx, photoImg, 0, 0, W, topH, photoPos);
+    const g = ctx.createLinearGradient(0, topH * 0.62, 0, topH);
+    g.addColorStop(0, bg + "00"); g.addColorStop(1, bg);
+    ctx.fillStyle = g; ctx.fillRect(0, topH * 0.62 - 1, W, topH * 0.38 + 2);
+  }
+
+  // Info panel, top left (below the photo when there is one)
+  const panelBottom = drawInfoPanel(ctx, W, H, sc, accent, minimal ? valueGrey() : accent, minimal ? 1 : 0.65, topH);
+
+  // Round photo badge under the info panel
+  if (photoImg && photoMode === "badge") {
+    const d = Math.round(W * 0.2 * photoScale), x = Math.round((minimal ? 120 : 90) * sc), y = (panelBottom || Math.round(140 * sc)) + Math.round(50 * sc);
+    ctx.save(); ctx.beginPath(); ctx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2); ctx.clip();
+    drawCover(ctx, photoImg, x, y, d, d, photoPos); ctx.restore();
+    ctx.beginPath(); ctx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2);
+    ctx.strokeStyle = accent; ctx.lineWidth = Math.max(2, Math.round(7 * sc)); ctx.stroke();
+  }
 
   if (project && segments.length) {
     drawRoute(ctx, W, project);
@@ -1213,8 +1345,9 @@ function renderOverlay(ctx, W, H, project, clear = true) {
     if ($("toggle-markers").checked && minimal) {
       const first = segments[0][0], lastSeg = segments[segments.length - 1], last = lastSeg[lastSeg.length - 1];
       const a = project(first.lon, first.lat), b = project(last.lon, last.lat);
-      ctx.beginPath(); ctx.arc(a.x, a.y, W * 0.0105 * routeScale, 0, Math.PI * 2); ctx.fillStyle = routeC; ctx.fill();
-      drawFinishFlag(ctx, b.x, b.y, W * 0.0115 * routeScale, routeC, bg);
+      const multi = posterStyle === "multiday" && numDays() > 1;
+      ctx.beginPath(); ctx.arc(a.x, a.y, W * 0.0105 * routeScale, 0, Math.PI * 2); ctx.fillStyle = multi ? dayColor(0) : routeC; ctx.fill();
+      drawFinishFlag(ctx, b.x, b.y, W * 0.0115 * routeScale, multi ? dayColor(numDays() - 1) : routeC, bg);
     } else if ($("toggle-markers").checked) {
       const first = segments[0][0], lastSeg = segments[segments.length - 1], last = lastSeg[lastSeg.length - 1];
       [[first, false], [last, true]].forEach(([pt, isEnd]) => {
@@ -1232,6 +1365,11 @@ function renderOverlay(ctx, W, H, project, clear = true) {
     fade.addColorStop(0, "rgba(0,0,0,0)"); fade.addColorStop(0.5, "rgba(255,255,255,0.10)"); fade.addColorStop(1, "rgba(255,255,255,0.28)");
     ctx.fillStyle = fade; ctx.fillRect(0, fadeStart, W, H - fadeStart);
   }
+
+  // Stats band and day legend above the title
+  const stack = bottomStack(W, H);
+  if (stack.band) drawBand(ctx, W, H, stack.band.y0, stack.band.y1, accent, minimal ? valueGrey() : accent, fnt, sc);
+  if (stack.legend) drawLegend(ctx, W, stack.legend.y, minimal ? valueGrey() : accent, sc);
 
   // Elevation profile above the title
   if ($("toggle-profile").checked && profile) {
@@ -1315,10 +1453,12 @@ function toast(msg, cls = "", dur = 3500) {
 function fitRoute() {
   if (!map || !routeStats) return;
   const b = routeStats.bbox, { pw, ph } = previewSize();
-  const bottom = ($("toggle-profile").checked && profile ? 0.36 : 0.30) - (posterStyle === "minimal" ? 0.05 : 0);
-  // Minimal: the route sits right of the info panel and fills the rest, like a gallery print.
-  const pad = posterStyle === "minimal"
-    ? { top: ph * 0.07, bottom: ph * bottom, left: pw * Math.min(0.42, 0.14 + 0.115 * infoScale), right: pw * 0.08 }
+  const stackTop = bottomStack(pw * 2, ph * 2).top / 2;          // the overlay canvas is 2× the preview
+  const bottom = Math.min(0.62, (ph - stackTop) / ph + 0.03);
+  const topFrac = photoTopH(ph * 2) / 2 / ph;
+  // Flat styles: the route sits right of the info panel and fills the rest, like a gallery print.
+  const pad = isFlat()
+    ? { top: ph * (0.07 + topFrac), bottom: ph * bottom, left: pw * (photoMode === "badge" && photoImg ? 0.36 : Math.min(0.42, 0.14 + 0.115 * infoScale)), right: pw * 0.08 }
     : { top: ph * 0.17, bottom: ph * bottom, left: pw * 0.09, right: pw * 0.09 };
   map.fitBounds([[b.w, b.s], [b.e, b.n]], {
     padding: pad,
@@ -1330,7 +1470,7 @@ function autoFill(i, value) {
   const el = $(`info-val-${i}`);
   if (!el.value || el.dataset.auto === "1") { el.value = value; el.dataset.auto = "1"; }
 }
-async function loadRoute({ segs, wpts = [], name = "", source }) {
+async function loadRoute({ segs, wpts = [], name = "", source, days = null }) {
   if (!segs.length) throw new Error("No track found in this file.");
   setStep(2);
   if (segs.some(s => s.some(p => p.ele == null))) await fillElevation(segs.flat().filter((p, i, a) => a.length < 4000 || i % Math.ceil(a.length / 4000) === 0));
@@ -1339,6 +1479,9 @@ async function loadRoute({ segs, wpts = [], name = "", source }) {
   // (thinning first cut corners: 500 km instead of 523 on a 3-day trip).
   routeStats = calcStats(segs);
   profile = buildProfile(segs);
+  segDays = days || segs.map(() => 0);
+  dayKm = [];
+  segs.forEach((sg, k) => { let d = 0; for (let i = 1; i < sg.length; i++) d += haversine(sg[i - 1].lat, sg[i - 1].lon, sg[i].lat, sg[i].lon); dayKm[segDays[k]] = (dayKm[segDays[k]] || 0) + d / 1000; });
   segments = downsampleSegments(segs); waypoints = wpts;
   const st = routeStats;
   $("st-dist").textContent = st.distKm.toFixed(1);
@@ -1384,7 +1527,7 @@ async function loadFiles(fileList) {
     const parsed = await Promise.all(files.map(async f => ({ f, ...parseRouteText(await f.text(), /\.kml$/i.test(f.name)) })));
     $("file-lbl").textContent = files.length > 1 ? `${files.length} files · one per day` : files[0].name;
     $("file-drop").classList.add("has-file");
-    await loadRoute({ segs: parsed.flatMap(p => p.segments), wpts: parsed.flatMap(p => p.waypoints),
+    await loadRoute({ segs: parsed.flatMap(p => p.segments), days: parsed.flatMap((p, d) => p.segments.map(() => d)), wpts: parsed.flatMap(p => p.waypoints),
       name: parsed[0].name || files[0].name.replace(/\.(gpx|kml)$/i, ""), source: "file" });
   } catch (e) { clearSteps(); setStatus(e.message, "err"); toast(e.message, "err"); console.error(e); }
 }
@@ -1490,7 +1633,7 @@ function buildSVG() {
   if (!segments.length) return null;
   const W = 2400, { pw, ph } = previewSize(), H = Math.round(W * ph / pw);
   const P = (lon, lat) => { const p = map.project([lon, lat]); return [p.x * W / pw, p.y * H / ph]; };
-  const minimal = posterStyle === "minimal";
+  const minimal = isFlat();
   const route = $("color-route").value, bg = $("color-bg").value, road = minimal ? route : $("color-road").value;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const title = esc(($("title-input").value || "MOUNTAIN PASS").toUpperCase()), sub = esc(($("subtitle-input").value || "").toUpperCase());
@@ -1505,7 +1648,7 @@ function buildSVG() {
     prev = i; sy += ls;
     if (label) info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${ls}" font-weight="${minimal ? 600 : 700}" fill="${road}" letter-spacing="${(minimal ? 2 : 3) * k}">${esc(label)}</text>`;
     sy += (minimal ? 4 : 5) * k + vs;
-    info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${vs}" font-weight="${minimal ? 400 : 300}" fill="${minimal ? VALUE_GREY : road}"${minimal ? "" : ' opacity=".65"'}>${esc(value)}</text>`;
+    info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${vs}" font-weight="${minimal ? 400 : 300}" fill="${minimal ? valueGrey() : road}"${minimal ? "" : ' opacity=".65"'}>${esc(value)}</text>`;
     sy += (minimal ? 24 : 26) * k;
   });
   let dots = "";
@@ -1579,7 +1722,8 @@ function wireSeg(id, attr, fn) {
 function applyPosterStyle(key) {
   posterStyle = key;
   const c = POSTER_STYLES[key];
-  $("style-seg").querySelectorAll(".seg-btn").forEach(b => b.classList.toggle("active", b.dataset.pstyle === key));
+  document.querySelectorAll("[data-pstyle]").forEach(b => b.classList.toggle("active", b.dataset.pstyle === key));
+  $("toggle-band").checked = c.band;
   $("style-hint").textContent = c.hint;
   $("color-bg").value = c.bg; $("color-road").value = c.road; $("color-route").value = c.route;
   document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
@@ -1603,7 +1747,29 @@ function applyPosterStyle(key) {
 // ── Wiring ─────────────────────────────────────────────────────────────────
 const PANELS = { file: "panel-file", name: "panel-name", coords: "panel-coords" };
 wireSeg("mode-seg", "mode", mode => Object.entries(PANELS).forEach(([m, id]) => $(id).classList.toggle("on", m === mode)));
-wireSeg("style-seg", "pstyle", v => { applyPosterStyle(v); track("poster_style", { style: v }); });
+["style-seg", "style-seg-2"].forEach(id => $(id).addEventListener("click", e => {
+  const b = e.target.closest("[data-pstyle]"); if (!b) return;
+  applyPosterStyle(b.dataset.pstyle); track("poster_style", { style: b.dataset.pstyle });
+}));
+wireSeg("photo-seg", "photo", v => { photoMode = v; if (v !== "none" && !photoImg) toast("Add a photo first"); drawOverlay(); if (segments.length) fitRoute(); });
+$("photo-file").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => {
+    photoImg = img;
+    $("photo-lbl").textContent = `${f.name} · ${img.naturalWidth} × ${img.naturalHeight}`;
+    $("photo-drop").classList.add("has-file");
+    if (photoMode === "none") { photoMode = "top"; $("photo-seg").querySelectorAll(".seg-btn").forEach(b => b.classList.toggle("active", b.dataset.photo === "top")); }
+    const { W } = printSize();
+    if (img.naturalWidth < W * 0.6) toast(`This photo is ${img.naturalWidth} px wide: it may look soft on a ${PAPERS[paperKey].label} print`, "", 6000);
+    drawOverlay(); if (segments.length) fitRoute();
+    track("poster_photo", { mode: photoMode });
+  };
+  img.src = URL.createObjectURL(f);
+});
+$("photo-pos").addEventListener("input", e => { photoPos = e.target.value / 100; $("photo-pos-val").textContent = e.target.value + "%"; drawOverlay(); });
+$("photo-size").addEventListener("input", e => { photoScale = e.target.value / 100; $("photo-size-val").textContent = e.target.value + "%"; drawOverlay(); });
+$("toggle-band").addEventListener("change", drawOverlay);
 wireSeg("orient-seg", "orient", v => { landscape = v === "landscape"; layoutPoster(); if (segments.length) fitRoute(); });
 wireSeg("dpi-seg", "dpi", v => { dpi = parseInt(v); updatePaperMeta(); });
 wireSeg("detail-seg", "detail", v => { contourShift = parseInt(v); contourStep = -1; updateContourStep(); });
