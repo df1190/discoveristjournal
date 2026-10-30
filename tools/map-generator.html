@@ -9,7 +9,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&family=Bebas+Neue&family=Oswald:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@400;700;900&family=Barlow+Condensed:wght@300;400;700&family=Cormorant+Garamond:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Jost:wght@400;500;600&family=JetBrains+Mono:wght@300;400&family=Bebas+Neue&family=Oswald:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@400;700;900&family=Barlow+Condensed:wght@300;400;700&family=Cormorant+Garamond:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/maplibre-contour@0.1.1/dist/index.min.js"></script>
@@ -422,6 +422,16 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div class="st-coord" id="st-coord"></div>
   </div>
 
+  <!-- Poster style -->
+  <div class="card">
+    <div class="ctitle">Poster style</div>
+    <div class="seg" id="style-seg">
+      <button class="seg-btn active" data-pstyle="minimal">Minimal</button>
+      <button class="seg-btn" data-pstyle="glow">Topo glow</button>
+    </div>
+    <div class="hint" id="style-hint">Matte charcoal, quiet contour lines, a solid copper route.</div>
+  </div>
+
   <!-- Poster size -->
   <div class="card">
     <div class="ctitle">Poster size</div>
@@ -459,6 +469,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     <div class="field">
       <label class="flbl" for="font-select">Font</label>
       <select id="font-select" class="fsel">
+        <option value="jost">Jost · geometric</option>
         <option value="inter">Inter</option>
         <option value="bebas">Bebas Neue</option>
         <option value="oswald">Oswald</option>
@@ -489,22 +500,38 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
   <div class="card">
     <div class="ctitle">Info panel</div>
     <div class="info-pair">
-      <input type="text" class="info-lbl" id="info-lbl-1" placeholder="LABEL" value="RIDER">
-      <input type="text" class="info-val" id="info-val-1" placeholder="Your name" value="">
+      <input type="text" class="info-lbl" id="info-lbl-1" placeholder="LABEL" value="LOCATION">
+      <input type="text" class="info-val" id="info-val-1" placeholder="From the map" value="">
     </div>
     <div class="info-pair">
-      <input type="text" class="info-lbl" id="info-lbl-2" placeholder="LABEL" value="DATE">
+      <input type="text" class="info-lbl" id="info-lbl-2" placeholder="LABEL" value="DISTANCE">
       <input type="text" class="info-val" id="info-val-2" placeholder="From the GPX" value="">
     </div>
     <div class="info-pair">
-      <input type="text" class="info-lbl" id="info-lbl-3" placeholder="LABEL" value="DISTANCE">
+      <input type="text" class="info-lbl" id="info-lbl-3" placeholder="LABEL" value="ELEV GAIN">
       <input type="text" class="info-val" id="info-val-3" placeholder="From the GPX" value="">
     </div>
     <div class="info-pair">
-      <input type="text" class="info-lbl" id="info-lbl-4" placeholder="LABEL" value="CLIMB">
+      <input type="text" class="info-lbl" id="info-lbl-4" placeholder="LABEL" value="HIGHEST POINT">
       <input type="text" class="info-val" id="info-val-4" placeholder="From the GPX" value="">
     </div>
-    <div class="hint">Date, distance and climb fill in from your file. Edit any of them.</div>
+    <div class="info-pair">
+      <input type="text" class="info-lbl" id="info-lbl-5" placeholder="LABEL" value="AVG GRADE">
+      <input type="text" class="info-val" id="info-val-5" placeholder="From the GPX" value="">
+    </div>
+    <div class="info-pair">
+      <input type="text" class="info-lbl" id="info-lbl-6" placeholder="LABEL" value="RIDER">
+      <input type="text" class="info-val" id="info-val-6" placeholder="Your name" value="">
+    </div>
+    <div class="info-pair">
+      <input type="text" class="info-lbl" id="info-lbl-7" placeholder="LABEL" value="DATE">
+      <input type="text" class="info-val" id="info-val-7" placeholder="From the GPX" value="">
+    </div>
+    <div class="info-pair">
+      <input type="text" class="info-lbl" id="info-lbl-8" placeholder="LABEL" value="TIME">
+      <input type="text" class="info-val" id="info-val-8" placeholder="From the GPX" value="">
+    </div>
+    <div class="hint">Rows 1 to 5 are the ride, 6 to 8 are you. Everything from your file fills in; edit or clear any row.</div>
   </div>
 
   <!-- Style -->
@@ -643,9 +670,15 @@ const demSource = new mlcontour.DemSource({
   url: "https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", encoding: "terrarium", maxzoom: 12, worker: true, timeoutMs: 20000,
 });
 demSource.setupMaplibre(maplibregl);
+// Minimal style: contours from coarser terrain, so the lines flow smoothly
+// like a hand-drawn print instead of following every gully.
+const demSmooth = new mlcontour.DemSource({
+  url: "https://tiles.mapterhorn.com/{z}/{x}/{y}.webp", encoding: "terrarium", maxzoom: 8, worker: true, timeoutMs: 20000,
+});
+demSmooth.setupMaplibre(maplibregl);
 function contourTiles(step) {
   // One threshold for every zoom: the print (rendered more zoomed in) gets exactly the preview's lines.
-  return demSource.contourProtocolUrl({ thresholds: { 1: [step, step * 5] }, elevationKey: "ele", levelKey: "level", contourLayer: "contours" });
+  return (posterStyle === "minimal" ? demSmooth : demSource).contourProtocolUrl({ thresholds: { 1: [step, step * 5] }, elevationKey: "ele", levelKey: "level", contourLayer: "contours" });
 }
 // Contour spacing (m). Picked from the preview zoom and then kept for the
 // print, so the printed poster has exactly the lines you see on screen.
@@ -672,6 +705,7 @@ const OVERPASS_MIRRORS = [
 
 // ── Font configs ───────────────────────────────────────────────────────────
 const FONTS = {
+  jost:       { label:"Jost",               stack:'"Jost","Futura","Century Gothic",Arial,sans-serif', titleW:500, subW:500, spacing:8,  subSpacing:9 },
   inter:      { label:"Inter",              stack:'"Inter","Arial",sans-serif',                       titleW:700, subW:400, spacing:7,  subSpacing:4 },
   bebas:      { label:"Bebas Neue",         stack:'"Bebas Neue","Arial Narrow",Arial,sans-serif',     titleW:400, subW:400, spacing:10, subSpacing:5 },
   oswald:     { label:"Oswald",             stack:'"Oswald","Arial Narrow",Arial,sans-serif',         titleW:700, subW:300, spacing:8,  subSpacing:5 },
@@ -692,7 +726,16 @@ let posterReady     = false;
 let titleScale      = 1.0;
 let subtitleScale   = 1.0;
 let routeScale      = 1.0;
-let selectedFontKey = "inter";
+let selectedFontKey = "jost";
+let posterStyle     = "minimal"; // "minimal" (matte, solid route) | "glow" (hillshade, glowing route)
+// What each poster style sets; everything stays adjustable afterwards.
+const POSTER_STYLES = {
+  minimal: { bg: "#232327", road: "#8E8E93", route: "#E9A47E", hillshade: false, vignette: 0, profile: false, contour: 60, shift: 1, font: "jost",
+             hint: "Matte charcoal, quiet contour lines, a solid copper route." },
+  glow:    { bg: "#1E1E28", road: "#C8906A", route: "#E8A880", hillshade: true, vignette: 40, profile: true, contour: 70, shift: 0, font: "inter",
+             hint: "Hillshaded terrain, copper contours, a glowing route." },
+};
+const VALUE_GREY = "#A6A6AB";
 let paperKey        = "50x70";
 let landscape       = false;
 let dpi             = 300;
@@ -764,10 +807,18 @@ function buildStyle() {
   };
 }
 // Line widths follow the width of the map they're drawn on (preview or print).
+function contourOpacity() {
+  const ci = contourIntensityVal();
+  return posterStyle === "minimal" ? [ci * 0.55, ci * 0.8] : [ci * 0.62, ci * 0.92];
+}
 function applyWidths(m, cw) {
   if (!m.getLayer("contour-minor")) return;
-  m.setPaintProperty("contour-minor", "line-width", Math.max(0.3, cw * W_MINOR));
-  m.setPaintProperty("contour-index", "line-width", Math.max(0.5, cw * W_INDEX));
+  const k = posterStyle === "minimal" ? 0.72 : 1;
+  m.setPaintProperty("contour-minor", "line-width", Math.max(0.3, cw * W_MINOR * k));
+  m.setPaintProperty("contour-index", "line-width", Math.max(0.5, cw * W_INDEX * k * (posterStyle === "minimal" ? 0.85 : 1)));
+  const [a, b] = contourOpacity();
+  m.setPaintProperty("contour-minor", "line-opacity", a);
+  m.setPaintProperty("contour-index", "line-opacity", b);
 }
 function setContourStep(m, step) {
   const src = m.getSource("contours");
@@ -791,6 +842,11 @@ function drawRoute(ctx, W, project) {
   const color = $("color-route").value, r = routeScale;
   ctx.save();
   ctx.lineCap = "round"; ctx.lineJoin = "round";
+  if (posterStyle === "minimal") {   // one solid line, nothing else
+    ctx.strokeStyle = color; ctx.lineWidth = W * 0.0085 * r; ctx.stroke(path);
+    ctx.restore();
+    return;
+  }
   const glow = (width, blur, alpha) => {
     ctx.filter = `blur(${Math.max(0.5, blur).toFixed(1)}px)`; ctx.globalAlpha = alpha;
     ctx.strokeStyle = color; ctx.lineWidth = width; ctx.stroke(path);
@@ -923,16 +979,17 @@ function haversine(la1, lo1, la2, lo2) {
 // (same rule as Route Video, within about 2% of Garmin Connect).
 const GAIN_STEP_M = 2;
 function calcStats(segs) {
-  let dist = 0, gain = 0, moving = 0, top = -Infinity, low = Infinity;
+  let dist = 0, gain = 0, moving = 0, top = -Infinity, low = Infinity, climbDist = 0;
   const times = [];
   segs.forEach(s => {
-    let ref = null;
+    let ref = null, refD = 0, d0 = dist;
     for (let i = 0; i < s.length; i++) {
       const p = s[i];
+      if (i > 0) d0 += haversine(s[i - 1].lat, s[i - 1].lon, p.lat, p.lon);
       if (p.ele != null) {
         top = Math.max(top, p.ele); low = Math.min(low, p.ele);
-        if (ref == null || p.ele < ref - GAIN_STEP_M) ref = p.ele;
-        else if (p.ele > ref + GAIN_STEP_M) { gain += p.ele - ref; ref = p.ele; }
+        if (ref == null || p.ele < ref - GAIN_STEP_M) { ref = p.ele; refD = d0; }
+        else if (p.ele > ref + GAIN_STEP_M) { gain += p.ele - ref; climbDist += d0 - refD; ref = p.ele; refD = d0; }
       }
       if (p.time) times.push(p.time);
       if (i > 0) {
@@ -945,6 +1002,7 @@ function calcStats(segs) {
   const pts = segs.flat(), lats = pts.map(p => p.lat), lons = pts.map(p => p.lon);
   return {
     distKm: dist / 1000, gain: Math.round(gain), hasEle: top > -Infinity,
+    avgGrade: climbDist > 200 ? gain / climbDist * 100 : null,   // average grade of the climbing parts
     top: top > -Infinity ? Math.round(top) : null, low: low < Infinity ? Math.round(low) : null,
     start: times.length ? Math.min(...times) : null, end: times.length ? Math.max(...times) : null, movingS: moving,
     bbox: { s: Math.min(...lats), w: Math.min(...lons), n: Math.max(...lats), e: Math.max(...lons) },
@@ -978,6 +1036,7 @@ function fmtDateRange(a, b) {
   if (mon(A) === mon(B) && yr(A) === yr(B)) return `${day(A)}-${day(B)} ${mon(A)} ${yr(A)}`;
   return `${day(A)} ${mon(A)}-${day(B)} ${mon(B)} ${yr(B)}`;
 }
+function fmtDuration(s) { const h = Math.floor(s / 3600), m = Math.round(s % 3600 / 60); return h ? `${h}H ${String(m).padStart(2, "0")}M` : `${m}M`; }
 function fmtCoord(lat, lon) {
   return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? "N" : "S"}  /  ${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? "E" : "W"}`;
 }
@@ -1024,7 +1083,15 @@ async function placeSubtitle(lat, lon) {
   try {
     const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=6&lat=${lat}&lon=${lon}&accept-language=en`);
     const a = (await r.json()).address || {};
-    return [a.state || a.region || a.county, a.country].filter(Boolean).join(" · ");
+    return [a.state || a.region || a.county, a.country].filter(Boolean).join(" | ");
+  } catch (_) { return ""; }
+}
+// "Bormio, Italy" for the start of the route.
+async function placeName(lat, lon) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&lat=${lat}&lon=${lon}&accept-language=en`);
+    const a = (await r.json()).address || {};
+    return [a.village || a.town || a.city || a.municipality || a.county, a.country].filter(Boolean).join(", ");
   } catch (_) { return ""; }
 }
 
@@ -1036,23 +1103,66 @@ async function ensureFonts() {
     document.fonts.load(`${f.titleW} 88px "${f.label}"`),
     document.fonts.load(`${f.subW} 28px "${f.label}"`),
     document.fonts.load(`700 20px "Inter"`), document.fonts.load(`300 28px "Inter"`),
+    document.fonts.load(`600 36px "Barlow Condensed"`), document.fonts.load(`400 30px "Barlow Condensed"`),
   ]).catch(() => {});
 }
 
 // ── Poster overlay (text, info panel, dots, profile, credits) ───────────────
 // Sizes are in units of a 2400 px wide poster (sc = W / 2400), so the preview
 // and every print size share the same layout. project(lon, lat) → canvas px.
+const INFO_ROWS = 8, INFO_SPLIT = 5; // rows 1-5: the ride, 6-8: the rider
 function infoPairs() {
-  return [1, 2, 3, 4].map(i => ({ label: ($(`info-lbl-${i}`).value || "").toUpperCase(), value: $(`info-val-${i}`).value }))
-    .filter(p => p.label || p.value);
+  return Array.from({ length: INFO_ROWS }, (_, k) => k + 1)
+    .map(i => ({ i, label: ($(`info-lbl-${i}`).value || "").toUpperCase(), value: ($(`info-val-${i}`).value || "").toUpperCase() }))
+    .filter(p => p.value);
 }
 function titleLayout(W, H) {
   const sc = W / 2400, ts = titleScale, ss = subtitleScale, fnt = FONTS[selectedFontKey];
+  if (posterStyle === "minimal") {
+    const titleSz = Math.round(104 * sc * ts), subSz = Math.round(30 * sc * ss);
+    const titleY = H - Math.round(250 * sc) - Math.round(subSz * 1.6);
+    return { sc, fnt, titleSz, titleY, subSz, subY: titleY + Math.round(titleSz * 0.25 + subSz * 1.5) };
+  }
   const titleSz = Math.round(76 * sc * ts);
   const titleY = H - Math.round(220 * sc * ts);
   const subSz = Math.round(24 * sc * ss);
   const subY = titleY + Math.round(titleSz * 0.18 + subSz * 0.92 + 10 * sc);
   return { sc, fnt, titleSz, titleY, subSz, subY };
+}
+// Copper labels over grey values (minimal) or the original Inter panel (glow).
+function drawInfoPanel(ctx, W, H, sc, labelC, valueC, valueA) {
+  const pairs = infoPairs();
+  if (!pairs.length) return;
+  const minimal = posterStyle === "minimal";
+  const sx = Math.round((minimal ? 120 : 90) * sc);
+  let sy = Math.round((minimal ? 140 : 110) * sc), prev = 0;
+  ctx.textAlign = "left";
+  pairs.forEach(({ i, label, value }) => {
+    if (minimal && prev && prev <= INFO_SPLIT && i > INFO_SPLIT) sy += Math.round(64 * sc); // gap between ride and rider
+    prev = i;
+    const lblSz = Math.round((minimal ? 36 : 20) * sc), valSz = Math.round((minimal ? 30 : 28) * sc);
+    sy += lblSz;
+    ctx.font = minimal ? `600 ${lblSz}px "Barlow Condensed", "Arial Narrow", sans-serif` : `700 ${lblSz}px "Inter", Arial, sans-serif`;
+    ctx.fillStyle = labelC; ctx.globalAlpha = 1; ctx.letterSpacing = `${Math.round((minimal ? 2 : 3) * sc)}px`;
+    if (label) ctx.fillText(label, sx, sy);
+    sy += Math.round((minimal ? 4 : 5) * sc) + valSz;
+    ctx.font = minimal ? `400 ${valSz}px "Barlow Condensed", "Arial Narrow", sans-serif` : `300 ${valSz}px "Inter", Arial, sans-serif`;
+    ctx.fillStyle = valueC; ctx.globalAlpha = valueA; ctx.letterSpacing = minimal ? `${Math.round(1 * sc)}px` : "0px";
+    ctx.fillText(value, sx, sy);
+    sy += Math.round((minimal ? 24 : 26) * sc);
+  });
+  ctx.globalAlpha = 1; ctx.letterSpacing = "0px";
+}
+// Finish: a checkered flag in a circle; start: a solid dot.
+function drawFinishFlag(ctx, x, y, r, color, bg) {
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.clip();
+  ctx.fillStyle = bg; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+  const n = 4, q = 2 * r / n;
+  ctx.fillStyle = color;
+  for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) if ((a + b) % 2 === 0) ctx.fillRect(x - r + a * q, y - r + b * q, q, q);
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.strokeStyle = color; ctx.lineWidth = r * 0.24; ctx.stroke();
 }
 function profileBox(W, H) {
   const { sc, titleSz, titleY } = titleLayout(W, H);
@@ -1061,7 +1171,10 @@ function profileBox(W, H) {
   return { x, y0, w, h };
 }
 function renderOverlay(ctx, W, H, project, clear = true) {
-  const accent = $("color-road").value, routeC = $("color-route").value, bg = $("color-bg").value;
+  const minimal = posterStyle === "minimal";
+  const routeC = $("color-route").value, bg = $("color-bg").value;
+  // Minimal: text in the route's copper; glow: text in the contour colour (the original look).
+  const accent = minimal ? routeC : $("color-road").value;
   const title = ($("title-input").value || "MOUNTAIN PASS").toUpperCase();
   const sub = ($("subtitle-input").value || "").toUpperCase();
   const { sc, fnt, titleSz, titleY, subSz, subY } = titleLayout(W, H);
@@ -1069,22 +1182,7 @@ function renderOverlay(ctx, W, H, project, clear = true) {
   ctx.save();
 
   // Info panel, top left
-  const pairs = infoPairs();
-  if (pairs.length) {
-    const sx = Math.round(90 * sc), lblSz = Math.round(20 * sc), valSz = Math.round(28 * sc);
-    let sy = Math.round(110 * sc);
-    ctx.textAlign = "left";
-    pairs.forEach(({ label, value }) => {
-      sy += lblSz;
-      ctx.font = `700 ${lblSz}px "Inter", Arial, sans-serif`; ctx.fillStyle = accent; ctx.globalAlpha = 1;
-      ctx.letterSpacing = `${Math.round(3 * sc)}px`;
-      if (label) ctx.fillText(label, sx, sy);
-      sy += Math.round(5 * sc) + valSz;
-      if (value) { ctx.font = `300 ${valSz}px "Inter", Arial, sans-serif`; ctx.globalAlpha = 0.65; ctx.letterSpacing = "0px"; ctx.fillText(value, sx, sy); }
-      sy += Math.round(26 * sc);
-    });
-    ctx.globalAlpha = 1;
-  }
+  drawInfoPanel(ctx, W, H, sc, accent, minimal ? VALUE_GREY : accent, minimal ? 1 : 0.65);
 
   if (project && segments.length) {
     drawRoute(ctx, W, project);
@@ -1103,7 +1201,12 @@ function renderOverlay(ctx, W, H, project, clear = true) {
       ctx.globalAlpha = 1; ctx.letterSpacing = "0px";
     }
     // Start and finish dots
-    if ($("toggle-markers").checked) {
+    if ($("toggle-markers").checked && minimal) {
+      const first = segments[0][0], lastSeg = segments[segments.length - 1], last = lastSeg[lastSeg.length - 1];
+      const a = project(first.lon, first.lat), b = project(last.lon, last.lat);
+      ctx.beginPath(); ctx.arc(a.x, a.y, W * 0.0105 * routeScale, 0, Math.PI * 2); ctx.fillStyle = routeC; ctx.fill();
+      drawFinishFlag(ctx, b.x, b.y, W * 0.0115 * routeScale, routeC, bg);
+    } else if ($("toggle-markers").checked) {
       const first = segments[0][0], lastSeg = segments[segments.length - 1], last = lastSeg[lastSeg.length - 1];
       [[first, false], [last, true]].forEach(([pt, isEnd]) => {
         const p = project(pt.lon, pt.lat), r = Math.round(11 * sc);
@@ -1113,11 +1216,13 @@ function renderOverlay(ctx, W, H, project, clear = true) {
     }
   }
 
-  // Soft fade behind the title
-  const fadeStart = H * 0.72;
-  const fade = ctx.createLinearGradient(0, fadeStart, 0, H);
-  fade.addColorStop(0, "rgba(0,0,0,0)"); fade.addColorStop(0.5, "rgba(255,255,255,0.10)"); fade.addColorStop(1, "rgba(255,255,255,0.28)");
-  ctx.fillStyle = fade; ctx.fillRect(0, fadeStart, W, H - fadeStart);
+  // Soft fade behind the title (glow style only; minimal stays flat and matte)
+  if (!minimal) {
+    const fadeStart = H * 0.72;
+    const fade = ctx.createLinearGradient(0, fadeStart, 0, H);
+    fade.addColorStop(0, "rgba(0,0,0,0)"); fade.addColorStop(0.5, "rgba(255,255,255,0.10)"); fade.addColorStop(1, "rgba(255,255,255,0.28)");
+    ctx.fillStyle = fade; ctx.fillRect(0, fadeStart, W, H - fadeStart);
+  }
 
   // Elevation profile above the title
   if ($("toggle-profile").checked && profile) {
@@ -1141,7 +1246,7 @@ function renderOverlay(ctx, W, H, project, clear = true) {
   ctx.letterSpacing = `${Math.round(fnt.spacing * sc * titleScale)}px`;
   ctx.fillText(title, W / 2, titleY);
   if (sub) {
-    ctx.font = `${fnt.subW} ${subSz}px ${fnt.stack}`; ctx.globalAlpha = 0.72;
+    ctx.font = `${fnt.subW} ${subSz}px ${fnt.stack}`; ctx.globalAlpha = minimal ? 1 : 0.72;
     ctx.letterSpacing = `${Math.round(fnt.subSpacing * sc * subtitleScale)}px`;
     ctx.fillText(sub, W / 2, subY);
   }
@@ -1201,9 +1306,13 @@ function toast(msg, cls = "", dur = 3500) {
 function fitRoute() {
   if (!map || !routeStats) return;
   const b = routeStats.bbox, { pw, ph } = previewSize();
-  const bottom = $("toggle-profile").checked && profile ? 0.36 : 0.30;
+  const bottom = ($("toggle-profile").checked && profile ? 0.36 : 0.30) - (posterStyle === "minimal" ? 0.05 : 0);
+  // Minimal: the route sits right of the info panel and fills the rest, like a gallery print.
+  const pad = posterStyle === "minimal"
+    ? { top: ph * 0.07, bottom: ph * bottom, left: pw * 0.30, right: pw * 0.08 }
+    : { top: ph * 0.17, bottom: ph * bottom, left: pw * 0.09, right: pw * 0.09 };
   map.fitBounds([[b.w, b.s], [b.e, b.n]], {
-    padding: { top: ph * 0.17, bottom: ph * bottom, left: pw * 0.09, right: pw * 0.09 },
+    padding: pad,
     bearing: map.getBearing(), duration: 0,
   });
 }
@@ -1229,9 +1338,15 @@ async function loadRoute({ segs, wpts = [], name = "", source }) {
   $("st-coord").textContent = fmtCoord((st.bbox.s + st.bbox.n) / 2, (st.bbox.w + st.bbox.e) / 2);
   $("stats-card").classList.add("on");
   $("wpt-count").textContent = wpts.length ? `${wpts.length} in this file` : "None in this file";
-  if (st.start) autoFill(2, fmtDateRange(st.start, st.end));
-  autoFill(3, `${st.distKm.toFixed(st.distKm < 100 ? 1 : 0)} KM`);
-  if (st.hasEle) autoFill(4, `${st.gain.toLocaleString("en-US")} M`);
+  [1, 2, 3, 4, 5, 7, 8].forEach(i => { if ($(`info-val-${i}`).dataset.auto === "1") $(`info-val-${i}`).value = ""; });
+  autoFill(2, `${st.distKm.toFixed(st.distKm < 100 ? 1 : 0)} KM`);
+  if (st.hasEle) autoFill(3, `${st.gain.toLocaleString("en-US")} M`);
+  if (st.top != null) autoFill(4, `${st.top.toLocaleString("en-US")} M`);
+  if (st.avgGrade) autoFill(5, `${st.avgGrade.toFixed(1)}%`);
+  if (st.start) autoFill(7, fmtDateRange(st.start, st.end));
+  if (st.movingS > 60) autoFill(8, fmtDuration(st.movingS));
+  const s0 = segs[0][0];
+  placeName(s0.lat, s0.lon).then(t => { if (t) { autoFill(1, t.toUpperCase()); drawOverlay(); } });
   // Title and subtitle follow each new route until the person types their own.
   const autoText = (id, v) => { const el = $(id); if (v && (!el.value || el.dataset.auto === "1")) { el.value = v; el.dataset.auto = "1"; } };
   autoText("title-input", name.toUpperCase());
@@ -1366,19 +1481,23 @@ function buildSVG() {
   if (!segments.length) return null;
   const W = 2400, { pw, ph } = previewSize(), H = Math.round(W * ph / pw);
   const P = (lon, lat) => { const p = map.project([lon, lat]); return [p.x * W / pw, p.y * H / ph]; };
-  const road = $("color-road").value, route = $("color-route").value, bg = $("color-bg").value;
+  const minimal = posterStyle === "minimal";
+  const route = $("color-route").value, bg = $("color-bg").value, road = minimal ? route : $("color-road").value;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const title = esc(($("title-input").value || "MOUNTAIN PASS").toUpperCase()), sub = esc(($("subtitle-input").value || "").toUpperCase());
   const { fnt, titleSz, titleY, subSz, subY } = titleLayout(W, H);
   const d = segments.map(s => "M " + s.map(p => P(p.lon, p.lat).map(v => v.toFixed(1)).join(",")).join(" L ")).join(" ");
   const rw = W * W_ROUTE * routeScale;
-  let info = "", sy = 110;
-  infoPairs().forEach(({ label, value }) => {
-    sy += 20;
-    if (label) info += `<text x="90" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700" fill="${road}" letter-spacing="3">${esc(label)}</text>`;
-    sy += 33;
-    if (value) info += `<text x="90" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="300" fill="${road}" opacity=".65">${esc(value)}</text>`;
-    sy += 26;
+  let info = "", sy = minimal ? 140 : 110, prev = 0;
+  const lf = minimal ? '"Barlow Condensed","Arial Narrow",sans-serif' : "Inter,Arial,sans-serif";
+  const ls = minimal ? 36 : 20, vs = minimal ? 30 : 28, x0 = minimal ? 120 : 90;
+  infoPairs().forEach(({ i, label, value }) => {
+    if (minimal && prev && prev <= INFO_SPLIT && i > INFO_SPLIT) sy += 64;
+    prev = i; sy += ls;
+    if (label) info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${ls}" font-weight="${minimal ? 600 : 700}" fill="${road}" letter-spacing="${minimal ? 2 : 3}">${esc(label)}</text>`;
+    sy += (minimal ? 4 : 5) + vs;
+    info += `<text x="${x0}" y="${sy}" font-family='${lf}' font-size="${vs}" font-weight="${minimal ? 400 : 300}" fill="${minimal ? VALUE_GREY : road}"${minimal ? "" : ' opacity=".65"'}>${esc(value)}</text>`;
+    sy += minimal ? 24 : 26;
   });
   let dots = "";
   if ($("toggle-markers").checked) {
@@ -1396,12 +1515,12 @@ function buildSVG() {
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
 <defs><filter id="glow"><feGaussianBlur stdDeviation="${(W * W_BLUR * routeScale / 2).toFixed(1)}"/></filter></defs>
 <rect width="${W}" height="${H}" fill="${bg}"/>
-<path d="${d}" stroke="${route}" stroke-opacity=".18" stroke-width="${(W * W_GLOW * routeScale).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+${minimal ? `<path d="${d}" stroke="${route}" stroke-width="${(W * 0.0085 * routeScale).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` : `<path d="${d}" stroke="${route}" stroke-opacity=".18" stroke-width="${(W * W_GLOW * routeScale).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
 <path d="${d}" stroke="${route}" stroke-width="${rw.toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="${d}" stroke="#fff" stroke-opacity=".45" stroke-width="${(W * W_SHINE * routeScale).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="${d}" stroke="#fff" stroke-opacity=".45" stroke-width="${(W * W_SHINE * routeScale).toFixed(1)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`}
 ${dots}${prof}${info}
 <text x="${W / 2}" y="${titleY}" font-family='${fnt.stack}' font-size="${titleSz}" font-weight="${fnt.titleW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.spacing * titleScale}">${title}</text>
-${sub ? `<text x="${W / 2}" y="${subY}" font-family='${fnt.stack}' font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing * subtitleScale}" opacity=".72">${sub}</text>` : ""}
+${sub ? `<text x="${W / 2}" y="${subY}" font-family='${fnt.stack}' font-size="${subSz}" font-weight="${fnt.subW}" fill="${road}" text-anchor="middle" letter-spacing="${fnt.subSpacing * subtitleScale}"${minimal ? "" : ' opacity=".72"'}>${sub}</text>` : ""}
 <text x="${W / 2}" y="${H - 28}" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="300" fill="${road}" text-anchor="middle" opacity=".28">Terrain © Mapterhorn  ·  © OpenStreetMap contributors</text>
 </svg>`;
 }
@@ -1429,9 +1548,9 @@ function onColorChange() {
 function onContourChange() {
   $("contour-val").textContent = $("contour-intensity").value + "%";
   if (!map || !map.getLayer("contour-minor")) return;
-  const ci = contourIntensityVal();
-  map.setPaintProperty("contour-minor", "line-opacity", ci * 0.62);
-  map.setPaintProperty("contour-index", "line-opacity", ci * 0.92);
+  const [a, b] = contourOpacity();
+  map.setPaintProperty("contour-minor", "line-opacity", a);
+  map.setPaintProperty("contour-index", "line-opacity", b);
 }
 function onHillshadeChange() {
   const on = $("toggle-hillshade").checked, val = $("hillshade-intensity").value;
@@ -1447,9 +1566,35 @@ function wireSeg(id, attr, fn) {
   });
 }
 
+// ── Poster style ───────────────────────────────────────────────────────────
+function applyPosterStyle(key) {
+  posterStyle = key;
+  const c = POSTER_STYLES[key];
+  $("style-seg").querySelectorAll(".seg-btn").forEach(b => b.classList.toggle("active", b.dataset.pstyle === key));
+  $("style-hint").textContent = c.hint;
+  $("color-bg").value = c.bg; $("color-road").value = c.road; $("color-route").value = c.route;
+  document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
+  $("toggle-hillshade").checked = c.hillshade;
+  $("vignette-intensity").value = c.vignette; $("vignette-val").textContent = c.vignette + "%";
+  $("toggle-profile").checked = c.profile;
+  $("contour-intensity").value = c.contour;
+  contourShift = c.shift;
+  $("detail-seg").querySelectorAll(".seg-btn").forEach(b => b.classList.toggle("active", parseInt(b.dataset.detail) === c.shift));
+  selectedFontKey = c.font; $("font-select").value = c.font;
+  onColorChange(); onHillshadeChange(); onContourChange(); drawVignette();
+  if (map && map.getSource("contours")) {
+    contourStep = -1; updateContourStep();
+    setContourStep(map, contourStep);          // smooth or detailed terrain, even if the spacing is the same
+    applyWidths(map, previewSize().pw);
+  }
+  if (segments.length) fitRoute();
+  ensureFonts().then(drawOverlay);
+}
+
 // ── Wiring ─────────────────────────────────────────────────────────────────
 const PANELS = { file: "panel-file", name: "panel-name", coords: "panel-coords" };
 wireSeg("mode-seg", "mode", mode => Object.entries(PANELS).forEach(([m, id]) => $(id).classList.toggle("on", m === mode)));
+wireSeg("style-seg", "pstyle", v => { applyPosterStyle(v); track("poster_style", { style: v }); });
 wireSeg("orient-seg", "orient", v => { landscape = v === "landscape"; layoutPoster(); if (segments.length) fitRoute(); });
 wireSeg("dpi-seg", "dpi", v => { dpi = parseInt(v); updatePaperMeta(); });
 wireSeg("detail-seg", "detail", v => { contourShift = parseInt(v); contourStep = -1; updateContourStep(); });
@@ -1483,9 +1628,11 @@ $("btn-svg").addEventListener("click", downloadSVG);
   document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
   onColorChange();
 }));
-["info-lbl-1", "info-lbl-2", "info-lbl-3", "info-lbl-4"].forEach(id => $(id).addEventListener("input", drawOverlay));
 ["title-input", "subtitle-input"].forEach(id => $(id).addEventListener("input", e => { e.target.dataset.auto = "0"; drawOverlay(); }));
-[1, 2, 3, 4].forEach(i => $(`info-val-${i}`).addEventListener("input", e => { e.target.dataset.auto = "0"; drawOverlay(); }));
+[1, 2, 3, 4, 5, 6, 7, 8].forEach(i => {
+  $(`info-val-${i}`).addEventListener("input", e => { e.target.dataset.auto = "0"; drawOverlay(); });
+  $(`info-lbl-${i}`).addEventListener("input", drawOverlay);
+});
 ["toggle-markers", "toggle-wpts"].forEach(id => $(id).addEventListener("change", drawOverlay));
 $("toggle-profile").addEventListener("change", () => { if (segments.length) fitRoute(); drawOverlay(); });
 $("toggle-hillshade").addEventListener("change", onHillshadeChange);
@@ -1500,7 +1647,8 @@ $("vignette-intensity").addEventListener("input", e => { $("vignette-val").textC
 // ── Boot ───────────────────────────────────────────────────────────────────
 layoutPoster();
 initMap();
-ensureFonts().then(drawOverlay);
+map.once("load", () => applyPosterStyle("minimal"));
+applyPosterStyle("minimal");
 if (new URLSearchParams(location.hash.slice(1)).has("sample")) loadSample();
 </script>
 </body>
