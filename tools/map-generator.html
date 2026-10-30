@@ -602,7 +602,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
     </div>
     <div class="toggle-row">
       <span class="tlbl">Waypoint names<small id="wpt-count">None in this file</small></span>
-      <label class="toggle"><input type="checkbox" id="toggle-wpts" checked><span class="slider"></span></label>
+      <label class="toggle"><input type="checkbox" id="toggle-wpts"><span class="slider"></span></label>
     </div>
   </div>
 
@@ -1643,12 +1643,14 @@ $("btn-svg").addEventListener("click", downloadSVG);
   $(`info-lbl-${i}`).addEventListener("input", drawOverlay);
 });
 ["toggle-markers", "toggle-wpts"].forEach(id => $(id).addEventListener("change", drawOverlay));
-$("toggle-profile").addEventListener("change", () => { if (segments.length) fitRoute(); drawOverlay(); });
+$("toggle-profile").addEventListener("change", drawOverlay);
 $("toggle-hillshade").addEventListener("change", onHillshadeChange);
 $("hillshade-intensity").addEventListener("input", onHillshadeChange);
 $("contour-intensity").addEventListener("input", onContourChange);
 $("font-select").addEventListener("change", e => { selectedFontKey = e.target.value; ensureFonts().then(drawOverlay); });
-$("title-size").addEventListener("input", e => { titleScale = e.target.value / 100; $("title-size-val").textContent = e.target.value + "%"; if (segments.length) fitRoute(); drawOverlay(); });
+// Text and overlay controls never move the map; only loading a route, the paper
+// size/orientation and the poster style re-frame it.
+$("title-size").addEventListener("input", e => { titleScale = e.target.value / 100; $("title-size-val").textContent = e.target.value + "%"; drawOverlay(); });
 $("sub-size").addEventListener("input", e => { subtitleScale = e.target.value / 100; $("sub-size-val").textContent = e.target.value + "%"; drawOverlay(); });
 $("info-size").addEventListener("input", e => {
   // Only the text changes; the map keeps its framing (re-fitting zoomed the map out).
