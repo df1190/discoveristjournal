@@ -1651,9 +1651,9 @@ $("font-select").addEventListener("change", e => { selectedFontKey = e.target.va
 $("title-size").addEventListener("input", e => { titleScale = e.target.value / 100; $("title-size-val").textContent = e.target.value + "%"; if (segments.length) fitRoute(); drawOverlay(); });
 $("sub-size").addEventListener("input", e => { subtitleScale = e.target.value / 100; $("sub-size-val").textContent = e.target.value + "%"; drawOverlay(); });
 $("info-size").addEventListener("input", e => {
+  // Only the text changes; the map keeps its framing (re-fitting zoomed the map out).
   infoScale = e.target.value / 100; $("info-size-val").textContent = e.target.value + "%";
   drawOverlay();
-  clearTimeout(window.__infoFit); window.__infoFit = setTimeout(() => { if (segments.length) fitRoute(); }, 250);
 });
 $("route-width").addEventListener("input", e => { routeScale = e.target.value / 100; $("route-width-val").textContent = e.target.value + "%"; drawOverlay(); });
 $("vignette-intensity").addEventListener("input", e => { $("vignette-val").textContent = e.target.value + "%"; drawVignette(); });
