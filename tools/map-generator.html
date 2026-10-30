@@ -320,6 +320,16 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 #hdr-sub{font-size:11.5px;color:var(--lbl3)}
 .link-btn{background:none;border:none;padding:2px 0 0;font:600 11.5px var(--font);color:var(--gold-lo);cursor:pointer;text-align:center}
 .link-btn:hover{text-decoration:underline}
+.gpx-help{margin-top:2px;font-size:11.5px;color:var(--lbl2)}
+.gpx-help summary{cursor:pointer;font-weight:600;color:var(--lbl2);text-align:center;list-style:none;padding:2px 0}
+.gpx-help summary::-webkit-details-marker{display:none}
+.gpx-help summary::after{content:" ›";color:var(--lbl4)}
+.gpx-help[open] summary::after{content:" ⌄"}
+.gh-item{display:flex;flex-direction:column;gap:1px;padding:7px 0 0;border-top:1px solid var(--sep2);margin-top:6px;line-height:1.4}
+.gh-item b{font-weight:600;color:var(--lbl);font-size:11.5px}
+.gh-item em{font-style:normal;font-weight:600;color:var(--lbl)}
+#climb-opts{display:flex;flex-direction:column;gap:6px}
+#climb-opts[hidden]{display:none}
 .hint{font-size:10.5px;color:var(--lbl3);line-height:1.45}
 .tlbl small{display:block;font-size:10px;color:var(--lbl4);margin-top:1px}
 .panel .btn-gen{margin-top:2px}
@@ -382,6 +392,13 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
         <input type="file" id="route-files" accept=".gpx,.kml,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml" multiple>
       </div>
       <button class="link-btn" id="try-sample" type="button">No file handy? Try the Stelvio Pass</button>
+      <details class="gpx-help">
+        <summary>How do I get a GPX file?</summary>
+        <div class="gh-item"><b>Strava</b><span>On strava.com, open your ride, click the <em>···</em> button on the left, then <em>Export GPX</em>. (The phone app can't export.)</span></div>
+        <div class="gh-item"><b>Garmin Connect</b><span>On connect.garmin.com, open the activity, click the <em>⚙</em> gear at the top right, then <em>Export to GPX</em>.</span></div>
+        <div class="gh-item"><b>Komoot, Wahoo, others</b><span>Open the tour or ride and look for <em>Export</em> or <em>Download GPX</em> in its menu.</span></div>
+        <div class="gh-item"><b>A trip of several days</b><span>Export one GPX per day and drop them all here together.</span></div>
+      </details>
     </div>
 
     <div class="panel" id="panel-name">
@@ -431,8 +448,23 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
       <button class="seg-btn" data-pstyle="gold">Night gold</button>
     </div>
     <div class="seg" id="style-seg-2">
+      <button class="seg-btn" data-pstyle="climb">Climb</button>
+      <button class="seg-btn" data-pstyle="atlas">Atlas</button>
+      <button class="seg-btn" data-pstyle="satellite">Satellite noir</button>
+    </div>
+    <div class="seg" id="style-seg-3">
       <button class="seg-btn" data-pstyle="multiday">Multi-day</button>
       <button class="seg-btn" data-pstyle="glow">Topo glow</button>
+    </div>
+    <div id="climb-opts" hidden>
+      <div class="seg" id="climb-color-seg">
+        <button class="seg-btn active" data-ccolor="km">Colour per km</button>
+        <button class="seg-btn" data-ccolor="grade">By gradient</button>
+      </div>
+      <div class="seg" id="climb-focus-seg">
+        <button class="seg-btn active" data-cfocus="all">Whole climb</button>
+        <button class="seg-btn" data-cfocus="last">Last 10 km to the top</button>
+      </div>
     </div>
     <div class="hint" id="style-hint">Matte charcoal, quiet contour lines, a solid copper route.</div>
   </div>
@@ -703,6 +735,12 @@ const $ = id => document.getElementById(id);
 // key, no quota), as in Route Video. No MapTiler at all, so no quota limits.
 const TERRAIN_DEM = { type: "raster-dem", tiles: ["https://tiles.mapterhorn.com/{z}/{x}/{y}.webp"],
   encoding: "terrarium", tileSize: 512, maxzoom: 15 };
+// Satellite Noir: MapTiler imagery (the key only works on our own site).
+// Atlas: rivers, lakes, glaciers and borders from OpenFreeMap (no key).
+const MAPTILER_KEY = "pO4p3paZcjFsfdNEcYDM";
+const SAT_SOURCE = { type: "raster", url: `https://api.maptiler.com/tiles/satellite-v2/tiles.json?key=${MAPTILER_KEY}`, tileSize: 512 };
+const OFM_SOURCE = { type: "vector", url: "https://tiles.openfreemap.org/planet" };
+const ATLAS_LAYERS = ["a-ice", "a-water", "a-river", "a-border"];
 // Contour lines are computed in the browser from the terrain tiles
 // (maplibre-contour), so they exist at every zoom, even for a 3-day trip.
 const demSource = new mlcontour.DemSource({
@@ -787,6 +825,16 @@ const POSTER_STYLES = {
               hint: "One colour per day with a legend. Load one GPX per day." },
   glow:     { bg: "#1E1E28", road: "#C8906A", route: "#E8A880", value: null, hillshade: true, vignette: 40, profile: true, band: false, contour: 70, shift: 0, font: "inter",
               hint: "Hillshaded terrain, copper contours, a glowing route." },
+  // Layouts of their own (renderClimb / renderAtlas). relief/contours: map layers shown.
+  climb:    { bg: "#0B0B0C", road: "#5A5A5E", route: "#F4F4F1", value: "#9A9AA0", hillshade: false, vignette: 0, profile: true, band: true, contour: 0, shift: 1, font: "barlow",
+              relief: false, contours: false, panel: false, photo: false, svg: false,
+              hint: "Black print, each km in its own colour, km markers and gradients, the country and the climb profile." },
+  atlas:    { bg: "#E6E5E0", road: "#8E8D87", route: "#E8622C", value: "#77756F", hillshade: true, hsInt: 85, hsShadow: "#5C5C58", hsAccent: "#B9B8B2", vignette: 0, profile: false, band: false, contour: 25, shift: 1, font: "jost",
+              panel: false, photo: false, svg: false,
+              hint: "Light relief with rivers, lakes and glaciers, a thin orange route in a framed map." },
+  satellite:{ bg: "#101012", road: "#8E8E93", route: "#FF7A1A", value: "#F7A262", title: "#FFFFFF", hillshade: false, vignette: 0, profile: true, band: true, contour: 0, shift: 1, font: "jost",
+              relief: false, contours: false, panel: false, photo: false, svg: false,
+              hint: "Black and white satellite, an orange route and a soft sheen of light." },
 };
 // Day colours for the Multi-day style: copper first, then calm tones that sit together.
 const DAY_COLORS = ["#E9A47E", "#7FB7BE", "#E6C77E", "#C493B8", "#9DC49A", "#EF8A6F", "#8FA8D8"];
@@ -841,23 +889,52 @@ function contourIntervalFor(zoom) {
   return CONTOUR_STEPS[i];
 }
 
+// Which map layers each poster style shows. Hidden layers load no tiles.
+function styleLayers() {
+  const c = POSTER_STYLES[posterStyle];
+  return { sat: posterStyle === "satellite", hillshade: c.relief !== false, contours: c.contours !== false, atlas: posterStyle === "atlas" };
+}
+function setLayerVis(m) {
+  const v = styleLayers(), set = (id, on) => { if (m.getLayer(id)) m.setLayoutProperty(id, "visibility", on ? "visible" : "none"); };
+  set("sat", v.sat); set("hillshade", v.hillshade); set("contour-minor", v.contours); set("contour-index", v.contours);
+  ATLAS_LAYERS.forEach(id => set(id, v.atlas));
+  const c = POSTER_STYLES[posterStyle];
+  if (m.getLayer("hillshade")) {
+    m.setPaintProperty("hillshade", "hillshade-shadow-color", c.hsShadow || "#000000");
+    m.setPaintProperty("hillshade", "hillshade-accent-color", c.hsAccent || $("color-bg").value);
+  }
+}
 function buildStyle() {
-  const bg = $("color-bg").value, rd = $("color-road").value, ci = contourIntensityVal();
+  const bg = $("color-bg").value, rd = $("color-road").value, ci = contourIntensityVal(), c = POSTER_STYLES[posterStyle];
+  const v = styleLayers(), vis = on => ({ visibility: on ? "visible" : "none" });
   return {
     version: 8,
     sources: {
       terrain: { ...TERRAIN_DEM },
       contours: { type: "vector", tiles: [contourTiles(contourStep)], maxzoom: 15 },
+      sat: { ...SAT_SOURCE },
+      ofm: { ...OFM_SOURCE },
     },
     layers: [
       { id: "bg", type: "background", paint: { "background-color": bg } },
-      { id: "hillshade", type: "hillshade", source: "terrain", paint: {
-          "hillshade-shadow-color": "#000000", "hillshade-highlight-color": "#ffffff",
+      { id: "sat", type: "raster", source: "sat", layout: vis(v.sat), paint: {
+          "raster-saturation": -1, "raster-contrast": 0.18, "raster-brightness-max": 0.72, "raster-fade-duration": 0 } },
+      { id: "hillshade", type: "hillshade", source: "terrain", layout: vis(v.hillshade), paint: {
+          "hillshade-shadow-color": c.hsShadow || "#000000", "hillshade-highlight-color": "#ffffff",
           "hillshade-illumination-direction": 315, "hillshade-illumination-anchor": "map",
-          "hillshade-exaggeration": hillshadeExp(), "hillshade-accent-color": bg } },
-      { id: "contour-minor", type: "line", source: "contours", "source-layer": "contours", filter: ["==", ["get", "level"], 0],
+          "hillshade-exaggeration": hillshadeExp(), "hillshade-accent-color": c.hsAccent || bg } },
+      { id: "a-ice", type: "fill", source: "ofm", "source-layer": "landcover", filter: ["==", ["get", "class"], "ice"], layout: vis(v.atlas),
+        paint: { "fill-color": "#FFFFFF", "fill-opacity": 0.7 } },
+      { id: "a-water", type: "fill", source: "ofm", "source-layer": "water", layout: vis(v.atlas),
+        paint: { "fill-color": "#A9CBE1" } },
+      { id: "a-river", type: "line", source: "ofm", "source-layer": "waterway", filter: ["in", ["get", "class"], ["literal", ["river", "canal"]]], layout: { ...vis(v.atlas), "line-cap": "round", "line-join": "round" },
+        paint: { "line-color": "#A9CBE1", "line-width": 1.2 } },
+      { id: "a-border", type: "line", source: "ofm", "source-layer": "boundary",
+        filter: ["all", ["==", ["get", "admin_level"], 2], ["!=", ["get", "maritime"], 1]], layout: vis(v.atlas),
+        paint: { "line-color": "#77766F", "line-width": 1, "line-dasharray": [4, 3], "line-opacity": 0.8 } },
+      { id: "contour-minor", type: "line", source: "contours", "source-layer": "contours", filter: ["==", ["get", "level"], 0], layout: vis(v.contours),
         paint: { "line-color": rd, "line-opacity": ci * 0.62, "line-width": 0.9 } },
-      { id: "contour-index", type: "line", source: "contours", "source-layer": "contours", filter: ["==", ["get", "level"], 1],
+      { id: "contour-index", type: "line", source: "contours", "source-layer": "contours", filter: ["==", ["get", "level"], 1], layout: vis(v.contours),
         paint: { "line-color": rd, "line-opacity": ci * 0.92, "line-width": 1.5 } },
     ],
   };
@@ -875,6 +952,10 @@ function applyWidths(m, cw) {
   const [a, b] = contourOpacity();
   m.setPaintProperty("contour-minor", "line-opacity", a);
   m.setPaintProperty("contour-index", "line-opacity", b);
+  if (m.getLayer("a-river")) {
+    m.setPaintProperty("a-river", "line-width", Math.max(0.6, cw * 0.0011));
+    m.setPaintProperty("a-border", "line-width", Math.max(0.5, cw * 0.0008));
+  }
 }
 function setContourStep(m, step) {
   const src = m.getSource("contours");
@@ -900,6 +981,12 @@ function drawRoute(ctx, W, project) {
   const color = $("color-route").value, r = routeScale;
   ctx.save();
   ctx.lineCap = "round"; ctx.lineJoin = "round";
+  if (posterStyle === "satellite") {
+    ctx.strokeStyle = "rgba(0,0,0,0.55)"; ctx.lineWidth = W * 0.0125 * r; ctx.stroke(path);
+    ctx.strokeStyle = color; ctx.lineWidth = W * 0.0066 * r; ctx.stroke(path);
+    ctx.restore();
+    return;
+  }
   if (isFlat()) {   // one solid line, nothing else
     ctx.lineWidth = W * 0.0085 * r;
     if (posterStyle === "multiday" && numDays() > 1) {
@@ -1292,17 +1379,21 @@ function drawCover(ctx, img, x, y, w, h, focus) {
   const sx = (img.naturalWidth - sw) / 2, sy = (img.naturalHeight - sh) * focus;
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 }
-function photoTopH(H) { return photoImg && photoMode === "top" ? Math.round(H * 0.44 * photoScale) : 0; }
+function photoOK() { return !!photoImg && POSTER_STYLES[posterStyle].photo !== false; }
+function photoTopH(H) { return photoOK() && photoMode === "top" ? Math.round(H * 0.44 * photoScale) : 0; }
 function renderOverlay(ctx, W, H, project, clear = true) {
-  const minimal = isFlat();
+  if (posterStyle === "climb") return renderClimb(ctx, W, H, project, clear);
+  if (posterStyle === "atlas") return renderAtlas(ctx, W, H, project, clear);
+  const minimal = isFlat(), cfg = POSTER_STYLES[posterStyle];
   const routeC = $("color-route").value, bg = $("color-bg").value;
   // Minimal: text in the route's copper; glow: text in the contour colour (the original look).
-  const accent = minimal ? routeC : $("color-road").value;
+  const accent = cfg.title || (minimal ? routeC : $("color-road").value);
   const title = ($("title-input").value || "MOUNTAIN PASS").toUpperCase();
   const sub = ($("subtitle-input").value || "").toUpperCase();
   const { sc, fnt, titleSz, titleY, subSz, subY } = titleLayout(W, H);
   if (clear) ctx.clearRect(0, 0, W, H);
   ctx.save();
+  if (posterStyle === "satellite") drawSatFX(ctx, W, H);
 
   // Photo across the top, fading into the poster colour
   const topH = photoTopH(H);
@@ -1314,10 +1405,10 @@ function renderOverlay(ctx, W, H, project, clear = true) {
   }
 
   // Info panel, top left (below the photo when there is one)
-  const panelBottom = drawInfoPanel(ctx, W, H, sc, accent, minimal ? valueGrey() : accent, minimal ? 1 : 0.65, topH);
+  const panelBottom = cfg.panel === false ? topH : drawInfoPanel(ctx, W, H, sc, accent, minimal ? valueGrey() : accent, minimal ? 1 : 0.65, topH);
 
   // Round photo badge under the info panel
-  if (photoImg && photoMode === "badge") {
+  if (photoOK() && photoMode === "badge") {
     const d = Math.round(W * 0.2 * photoScale), x = Math.round((minimal ? 120 : 90) * sc), y = (panelBottom || Math.round(140 * sc)) + Math.round(50 * sc);
     ctx.save(); ctx.beginPath(); ctx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2); ctx.clip();
     drawCover(ctx, photoImg, x, y, d, d, photoPos); ctx.restore();
@@ -1400,7 +1491,491 @@ function renderOverlay(ctx, W, H, project, clear = true) {
 
   // Map data credits (required by the licences)
   ctx.font = `300 ${Math.round(11 * sc)}px "Inter", Arial, sans-serif`; ctx.globalAlpha = 0.28; ctx.letterSpacing = "0px";
-  ctx.fillText("Terrain © Mapterhorn  ·  © OpenStreetMap contributors", W / 2, H - Math.round(28 * sc));
+  ctx.fillText(posterStyle === "satellite" ? "Imagery © MapTiler  ·  © OpenStreetMap contributors" : "Terrain © Mapterhorn  ·  © OpenStreetMap contributors", W / 2, H - Math.round(28 * sc));
+  ctx.restore();
+}
+// ── Climb style (inspired by cycling climb prints) ─────────────────────────
+// The road is split into equal stretches (1 km on a climb, longer on long
+// rides); each stretch gets a colour and its average gradient.
+let climbData  = null;     // { total, eleAt(km) } from the full-resolution track
+let climbColor = "km";     // "km": one colour per stretch | "grade": coloured by gradient
+let climbFocus = "all";    // "all" | "last": zoom on the final 10 km
+const FOCUS_KM = 10;
+const STRETCH_COLORS = ["#6CC17A", "#B4D84B", "#EEDB4C", "#F3A847", "#EE6B8B", "#D650A0", "#A85FCB", "#5D7FE2", "#4DB4E4", "#52C7A6"];
+const GRADE_SCALE = [[0, "#8E8E93", "DESCENT"], [3, "#6CC17A", "0-3%"], [6, "#EEDB4C", "3-6%"], [9, "#F3A847", "6-9%"], [12, "#EE5A5F", "9-12%"], [Infinity, "#C3478F", "12%+"]];
+function gradeColor(g) { return GRADE_SCALE.find(([lim]) => g < lim)[1]; }
+// Marks every point with its distance (km, days joined) and keeps an elevation lookup.
+function buildClimbData(segs) {
+  let d = 0, topKm = 0, topE = -Infinity; const xs = [], es = [];
+  segs.forEach(s => s.forEach((p, i) => {
+    if (i) d += haversine(s[i - 1].lat, s[i - 1].lon, p.lat, p.lon) / 1000;
+    p.d = d;
+    if (p.ele != null) { xs.push(d); es.push(p.ele); if (p.ele > topE) { topE = p.ele; topKm = d; } }
+  }));
+  if (es.length < 2 || d < 0.3) return null;
+  const eleAt = km => {
+    let lo = 0, hi = xs.length - 1;
+    if (km <= xs[0]) return es[0];
+    if (km >= xs[hi]) return es[hi];
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; xs[mid] <= km ? lo = mid : hi = mid; }
+    const t = (km - xs[lo]) / ((xs[hi] - xs[lo]) || 1);
+    return es[lo] + (es[hi] - es[lo]) * t;
+  };
+  let maxGrade = 0;
+  for (let k = 0; k + 1 <= d; k++) maxGrade = Math.max(maxGrade, (eleAt(k + 1) - eleAt(k)) / 10);
+  const f = segs[0][0], ls = segs[segs.length - 1], l = ls[ls.length - 1];
+  return { total: d, eleAt, maxGrade, startEle: f.ele, endEle: l.ele, topKm };
+}
+// "Last 10 km to the top": the 10 km that end at the highest point (for a
+// climb that's the finish; for a ride over a pass, the top of the pass).
+function focusOn() { return climbFocus === "last" && climbData && climbData.topKm > FOCUS_KM + 2; }
+function focusRange() { const to = climbData.topKm; return [to - FOCUS_KM, to]; }
+// Stretch length: about 12 stretches over what the poster shows.
+function climbStretches() {
+  const cd = climbData; if (!cd) return null;
+  const view = focusOn() ? FOCUS_KM : cd.total;
+  const chunk = [1, 2, 5, 10, 20, 50, 100].find(n => n >= view / 12) || 100;
+  const stops = [];
+  for (let k = 0; k * chunk < cd.total - chunk * 0.35; k++) stops.push(k * chunk);
+  stops.push(cd.total);
+  const grades = stops.slice(0, -1).map((a, k) => (cd.eleAt(stops[k + 1]) - cd.eleAt(a)) / ((stops[k + 1] - a) * 10));
+  return { chunk, stops, grades };
+}
+function stretchColor(st, k) { return climbColor === "grade" ? gradeColor(st.grades[k]) : STRETCH_COLORS[k % STRETCH_COLORS.length]; }
+function climbLayout(W, H) {
+  const sc = Math.min(W, H / 1.4) / 2400, m = Math.round(130 * sc);
+  const L = { sc, m };
+  L.credY = H - Math.round(52 * sc);
+  const rowH = Math.round(236 * sc);
+  L.row = { y0: H - Math.round(150 * sc) - rowH, y1: H - Math.round(150 * sc) };
+  const showRow = bandOn() || ($("toggle-profile").checked && profile);
+  let y = showRow ? L.row.y0 - Math.round(96 * sc) : H - Math.round(170 * sc);
+  L.subSz = Math.round(40 * sc * subtitleScale); L.subY = y;
+  y -= L.subSz + Math.round(52 * sc);
+  L.titleSz = Math.round(230 * sc * titleScale); L.titleY = y;
+  L.titleTop = y - Math.round(L.titleSz * 0.74);
+  L.inset = { x: m, w: Math.round(430 * sc), h: Math.round(400 * sc) };
+  L.inset.y = L.titleTop - Math.round(70 * sc) - L.inset.h;
+  L.top = L.inset.y - Math.round(30 * sc);              // the route stays above this
+  L.over = { w: Math.round(520 * sc), h: Math.round(860 * sc), x: W - m - Math.round(520 * sc), y: m };
+  return L;
+}
+// Country silhouette for the corner map (Natural Earth via world-atlas, public domain).
+let countryCache = { key: null, polys: null };
+let worldPromise = null;
+function loadScript(src) { return new Promise((res, rej) => { const t = document.createElement("script"); t.src = src; t.onload = res; t.onerror = rej; document.head.appendChild(t); }); }
+function loadWorld() {
+  worldPromise ||= (async () => {
+    if (!window.topojson) await loadScript("https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js");
+    const t = await (await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json")).json();
+    return topojson.feature(t, t.objects.countries).features;
+  })().catch(e => { worldPromise = null; throw e; });
+  return worldPromise;
+}
+function ringContains(r, x, y) {
+  let inside = false;
+  for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+    const [xi, yi] = r[i], [xj, yj] = r[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function polyBox(poly) {
+  let w = Infinity, s = Infinity, e = -Infinity, n = -Infinity;
+  poly[0].forEach(([x, y]) => { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); });
+  return { w, s, e, n };
+}
+async function ensureCountry() {
+  if (!routeStats) return;
+  const b = routeStats.bbox, lat = (b.s + b.n) / 2, lon = (b.w + b.e) / 2, key = `${lat.toFixed(3)},${lon.toFixed(3)}`;
+  if (countryCache.key === key) return;
+  try {
+    const feats = await loadWorld();
+    let polys = null;
+    for (const f of feats) {
+      const g = f.geometry; if (!g) continue;
+      const ps = g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : [];
+      const main = ps.find(p => ringContains(p[0], lon, lat) && !p.slice(1).some(h => ringContains(h, lon, lat)));
+      if (!main) continue;
+      // Keep the mainland and nearby islands, not far-away territories.
+      const mb = polyBox(main), mw = mb.e - mb.w, mh = mb.n - mb.s;
+      polys = ps.filter(p => { const q = polyBox(p), cx = (q.w + q.e) / 2, cy = (q.s + q.n) / 2;
+        return cx > mb.w - mw * 0.5 && cx < mb.e + mw * 0.5 && cy > mb.s - mh * 0.5 && cy < mb.n + mh * 0.5; });
+      if (mw > 180) polys = null;
+      break;
+    }
+    countryCache = { key, polys, lat, lon };
+  } catch (e) { console.warn("country shape", e); countryCache = { key: null, polys: null }; }
+}
+function drawCountryInset(ctx, box, ink, sc) {
+  const c = countryCache; if (!c.polys) return;
+  let w = Infinity, s = Infinity, e = -Infinity, n = -Infinity;
+  c.polys.forEach(p => { const q = polyBox(p); w = Math.min(w, q.w); e = Math.max(e, q.e); s = Math.min(s, q.s); n = Math.max(n, q.n); });
+  const kx = Math.cos((s + n) / 2 * Math.PI / 180), gw = (e - w) * kx, gh = n - s;
+  const f = Math.min(box.w / gw, box.h / gh), ox = box.x, oy = box.y + box.h - gh * f;
+  const P = (x, y) => [ox + (x - w) * kx * f, oy + (n - y) * f];
+  const path = new Path2D();
+  c.polys.forEach(p => p.forEach(r => r.forEach(([x, y], i) => { const [X, Y] = P(x, y); i ? path.lineTo(X, Y) : path.moveTo(X, Y); })));
+  ctx.save();
+  ctx.clip(path, "evenodd");
+  ctx.fillStyle = ink; ctx.globalAlpha = 0.16; ctx.fillRect(box.x, box.y, box.w, box.h);
+  ctx.globalAlpha = 0.6; ctx.strokeStyle = ink; ctx.lineWidth = Math.max(1, 3 * sc);   // diagonal hatching
+  const step = Math.max(3, 11 * sc);
+  ctx.beginPath();
+  for (let t = -box.h; t < box.w; t += step) { ctx.moveTo(box.x + t, box.y + box.h); ctx.lineTo(box.x + t + box.h, box.y); }
+  ctx.stroke();
+  ctx.restore();
+  const [dx, dy] = P(c.lon, c.lat);
+  ctx.beginPath(); ctx.arc(dx, dy, 15 * sc, 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill();
+  ctx.lineWidth = 5 * sc; ctx.strokeStyle = $("color-bg").value; ctx.stroke();
+}
+// Labels go where there is the most room: away from the road and from each other.
+function makePlacer(area, pts) {
+  const placed = [];
+  const clearance = (x0, y0, x1, y1) => {
+    if (x0 < area.x0 || y0 < area.y0 || x1 > area.x1 || y1 > area.y1) return -1;
+    let best = Infinity;
+    for (const p of pts) {
+      const d = Math.hypot(Math.max(x0 - p.x, 0, p.x - x1), Math.max(y0 - p.y, 0, p.y - y1));
+      if (d < best) best = d;
+    }
+    for (const r of placed) {
+      const d = Math.hypot(Math.max(r.x0 - x1, 0, x0 - r.x1), Math.max(r.y0 - y1, 0, y0 - r.y1));
+      if (d < best) best = d;
+    }
+    return best;
+  };
+  // cands: [{rect:[x0,y0,x1,y1], ...}] in order of preference
+  const pick = (cands, need) => {
+    let best = null, bestC = -1;
+    for (const c of cands) {
+      const cl = clearance(...c.rect);
+      if (cl >= need) { best = c; break; }
+      if (cl > bestC) { bestC = cl; best = c; }
+    }
+    if (!best || clearance(...best.rect) < need * 0.55) return null;
+    placed.push({ x0: best.rect[0], y0: best.rect[1], x1: best.rect[2], y1: best.rect[3] });
+    return best;
+  };
+  return { pick, block: (x0, y0, x1, y1) => placed.push({ x0, y0, x1, y1 }) };
+}
+function inkOn(hex) {   // black or white text on a coloured bubble
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? "#111113" : "#FFFFFF";
+}
+function drawClimbRoute(ctx, W, H, project, L, st) {
+  const { sc, m } = L, ink = $("color-route").value, bg = $("color-bg").value, r = routeScale;
+  const F = []; segments.forEach(s => s.forEach((p, i) => { const q = project(p.lon, p.lat); F.push({ x: q.x, y: q.y, d: p.d ?? 0, br: i === 0 }); }));
+  const U = sc * 2400;   // poster width in portrait terms, so landscape lines aren't thicker
+  const wHalo = U * 0.0165 * r, wCol = U * 0.0115 * r, wCore = U * 0.0048 * r;
+  const full = new Path2D(); F.forEach(q => q.br ? full.moveTo(q.x, q.y) : full.lineTo(q.x, q.y));
+  ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round";
+  if (focusOn()) {   // the road runs off the poster: cut it cleanly above the title area
+    const cut = new Path2D(); cut.rect(0, 0, W, L.top); ctx.clip(cut);
+  }
+  ctx.strokeStyle = bg; ctx.lineWidth = wHalo; ctx.stroke(full);          // keeps hairpins apart
+  const kOf = d => { let k = 0; while (k < st.stops.length - 2 && d >= st.stops[k + 1]) k++; return k; };
+  if (st) {
+    ctx.lineWidth = wCol;
+    let path = null, k = -1;
+    const flush = () => { if (path) { ctx.strokeStyle = stretchColor(st, k); ctx.stroke(path); } };
+    F.forEach(q => {
+      const kk = kOf(q.d);
+      if (q.br || kk !== k) {
+        if (path && !q.br) path.lineTo(q.x, q.y);
+        flush(); path = new Path2D(); path.moveTo(q.x, q.y); k = kk;
+      } else path.lineTo(q.x, q.y);
+    });
+    flush();
+  } else { ctx.strokeStyle = "#F3A847"; ctx.lineWidth = wCol; ctx.stroke(full); }
+  ctx.strokeStyle = ink; ctx.lineWidth = wCore; ctx.stroke(full);
+  ctx.restore();
+  if (!st) return;
+
+  // Label area: the map part of the poster, minus the corner maps
+  const area = { x0: m * 0.55, y0: m * 0.55, x1: W - m * 0.55, y1: L.top };
+  const vis = F.filter(q => q.x > -50 && q.y > -50 && q.x < W + 50 && q.y < H + 50);
+  const stepPts = Math.max(1, Math.floor(vis.length / 1800));
+  const pl = makePlacer(area, vis.filter((_, i) => i % stepPts === 0));
+  pl.block(L.inset.x, L.inset.y, L.inset.x + L.inset.w, L.inset.y + L.inset.h);
+  if (focusOn()) pl.block(L.over.x, L.over.y, L.over.x + L.over.w, L.over.y + L.over.h);
+  const atKm = km => { let lo = 0, hi = F.length - 1; while (hi - lo > 1) { const mid = (lo + hi) >> 1; F[mid].d <= km ? lo = mid : hi = mid; } return lo; };
+  const normal = i => {
+    const a = F[Math.max(0, i - 4)], b = F[Math.min(F.length - 1, i + 4)];
+    const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1;
+    return { x: -dy / l, y: dx / l };
+  };
+  const inView = q => q.x > area.x0 && q.x < area.x1 && q.y > area.y0 && q.y < area.y1;
+  const need = wHalo * 0.6 + 6 * sc;
+  const inRange = km => { if (!focusOn()) return true; const [a, b] = focusRange(); return km >= a - 0.01 && km <= b + 0.01; };
+  ctx.save();
+
+  // Finish (and start, when it's on the poster): a flag and a label
+  const ends = [];
+  const first = F[0], last = F[F.length - 1];
+  const loop = Math.hypot(first.x - last.x, first.y - last.y) < 60 * sc;
+  ends.push({ q: last, text: loop ? "START · FINISH" : "FINISH" });
+  if (!loop && !focusOn()) ends.push({ q: first, text: "START" });
+  if (climbData.topKm < climbData.total - 0.5)   // the ride goes on past the top: mark the summit
+    ends.unshift({ q: F[atKm(climbData.topKm)], text: `SUMMIT ${Math.round(climbData.eleAt(climbData.topKm)).toLocaleString("en-US")} M` });
+  ctx.font = `700 ${Math.round(34 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(3 * sc)}px`;
+  ends.forEach(({ q, text }) => {
+    if (!inView(q)) return;
+    const tw = ctx.measureText(text).width, fs = Math.round(40 * sc), w = fs + 14 * sc + tw, h = Math.round(46 * sc), off = 34 * sc;
+    const cands = [[0, -1], [0, 1], [1, 0], [-1, 0], [1, -1], [-1, -1], [1, 1], [-1, 1]].map(([ax, ay]) => {
+      const cx = q.x + ax * (off + w / 2), cy = q.y + ay * (off + h / 2);
+      return { rect: [cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], cx, cy };
+    });
+    const c = pl.pick(cands, need);
+    ctx.beginPath(); ctx.arc(q.x, q.y, wCol * 0.75, 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill();
+    ctx.lineWidth = 3 * sc; ctx.strokeStyle = bg; ctx.stroke();
+    if (!c) return;
+    const x0 = c.cx - w / 2, yb = c.cy + h * 0.36;
+    if (text !== "START") drawFinishFlag(ctx, x0 + fs / 2, c.cy, fs / 2, ink, bg);
+    else { ctx.beginPath(); ctx.moveTo(x0 + 6 * sc, c.cy - fs * 0.4); ctx.lineTo(x0 + fs - 4 * sc, c.cy); ctx.lineTo(x0 + 6 * sc, c.cy + fs * 0.4); ctx.closePath(); ctx.fillStyle = ink; ctx.fill(); }
+    ctx.fillStyle = ink; ctx.textAlign = "left"; ctx.fillText(text, x0 + fs + 14 * sc, yb);
+  });
+
+  // Km markers: a white dot on the road and a leader line to "19 KM"
+  const kmSz = Math.round(38 * sc), unitSz = Math.round(22 * sc);
+  st.stops.slice(1, -1).forEach(km => {
+    const i = atKm(km), q = F[i];
+    if (!inView(q) || !inRange(km)) return;
+    const n = normal(i), label = String(Math.round(km * 10) / 10);
+    ctx.font = `700 ${kmSz}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(1 * sc)}px`;
+    const tw = ctx.measureText(label).width + 8 * sc + unitSz * 1.3, h = kmSz;
+    const cands = [];
+    [90, 140, 200].forEach(dist => [1, -1].forEach(sg => {
+      const ex = q.x + n.x * sg * dist * sc, ey = q.y + n.y * sg * dist * sc, right = ex >= q.x, tail = 46 * sc;
+      const lx = right ? ex + tail : ex - tail;
+      cands.push({ rect: right ? [lx + 8 * sc, ey - h / 2, lx + 8 * sc + tw, ey + h / 2] : [lx - 8 * sc - tw, ey - h / 2, lx - 8 * sc, ey + h / 2], ex, ey, lx, right });
+    }));
+    const c = pl.pick(cands, need);
+    if (c) {
+      ctx.strokeStyle = ink; ctx.globalAlpha = 0.75; ctx.lineWidth = Math.max(1, 2.4 * sc);
+      ctx.beginPath(); ctx.moveTo(q.x, q.y); ctx.lineTo(c.ex, c.ey); ctx.lineTo(c.lx, c.ey); ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.fillStyle = ink; ctx.textAlign = "left";
+      const tx = c.right ? c.lx + 8 * sc : c.lx - 8 * sc - tw;
+      ctx.fillText(label, tx, c.ey + kmSz * 0.36);
+      const lw = ctx.measureText(label).width;
+      ctx.font = `600 ${unitSz}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.fillText("KM", tx + lw + 8 * sc, c.ey + kmSz * 0.36);
+    }
+    ctx.beginPath(); ctx.arc(q.x, q.y, wCol * 0.62, 0, Math.PI * 2); ctx.fillStyle = ink; ctx.fill();
+  });
+
+  // Gradient bubbles: the stretch colour with its average gradient
+  // (only on climb-length stretches; a 50 km average says nothing).
+  const br = Math.round(40 * sc);
+  if (st.chunk <= 5) st.grades.forEach((g, k) => {
+    const mid = (st.stops[k] + st.stops[k + 1]) / 2, i = atKm(mid), q = F[i];
+    if (!inView(q) || !inRange(mid)) return;
+    const n = normal(i), cands = [];
+    [70, 100, 140, 190].forEach(dist => [1, -1].forEach(sg => {
+      const cx = q.x + n.x * sg * dist * sc, cy = q.y + n.y * sg * dist * sc;
+      cands.push({ rect: [cx - br, cy - br, cx + br, cy + br], cx, cy });
+    }));
+    const c = pl.pick(cands, need * 0.8);
+    if (!c) return;
+    const col = stretchColor(st, k);
+    ctx.beginPath(); ctx.arc(c.cx, c.cy, br, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill();
+    ctx.fillStyle = inkOn(col); ctx.textAlign = "center";
+    ctx.font = `700 ${Math.round(27 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = "0px";
+    ctx.fillText(`${g.toFixed(1)}%`, c.cx, c.cy + Math.round(10 * sc));
+  });
+  ctx.restore();
+}
+// Final 10 km: the whole climb, small, in the top right corner.
+function drawOverview(ctx, L, ink) {
+  const pts = segments.flat(), { sc } = L, b = routeStats.bbox;
+  const kx = Math.cos((b.s + b.n) / 2 * Math.PI / 180), gw = (b.e - b.w) * kx || 1e-6, gh = (b.n - b.s) || 1e-6;
+  const box = { x: L.over.x + 40 * sc, y: L.over.y + 60 * sc, w: L.over.w - 120 * sc, h: L.over.h - 120 * sc };
+  const f = Math.min(box.w / gw, box.h / gh), ox = box.x + (box.w - gw * f), oy = box.y + (box.h - gh * f) / 2;
+  const P = p => [ox + (p.lon - b.w) * kx * f, oy + (b.n - p.lat) * f];
+  const [from, to] = focusRange();
+  ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round";
+  const all = new Path2D(), fin = new Path2D(); let y0 = Infinity, y1 = -Infinity, started = false;
+  segments.forEach(s => s.forEach((p, i) => {
+    const [x, y] = P(p);
+    i ? all.lineTo(x, y) : all.moveTo(x, y);
+    if ((p.d ?? 0) >= from && (p.d ?? 0) <= to) { started ? fin.lineTo(x, y) : fin.moveTo(x, y); started = true; y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  }));
+  ctx.strokeStyle = ink; ctx.globalAlpha = 0.55; ctx.lineWidth = Math.max(1, 2.6 * sc); ctx.stroke(all);
+  ctx.globalAlpha = 1; ctx.lineWidth = Math.max(1.5, 5 * sc); ctx.stroke(fin);
+  // Dashed brackets around the final stretch
+  ctx.setLineDash([8 * sc, 8 * sc]); ctx.lineWidth = Math.max(1, 2 * sc); ctx.globalAlpha = 0.7;
+  [y0 - 14 * sc, y1 + 14 * sc].forEach(y => { ctx.beginPath(); ctx.moveTo(L.over.x, y); ctx.lineTo(L.over.x + L.over.w - 40 * sc, y); ctx.stroke(); });
+  ctx.setLineDash([]); ctx.globalAlpha = 0.9;
+  ctx.font = `600 ${Math.round(24 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(3 * sc)}px`;
+  ctx.fillStyle = ink; ctx.translate(L.over.x + L.over.w - 14 * sc, (y0 + y1) / 2); ctx.rotate(Math.PI / 2);
+  ctx.textAlign = "center"; ctx.fillText(`LAST ${FOCUS_KM} KM`, 0, 0);
+  ctx.restore();
+}
+function climbStats() {
+  const s = routeStats, cd = climbData; if (!s) return [];
+  const m = v => v == null ? null : Math.round(v).toLocaleString("en-US");
+  const time = numDays() > 1 ? ["DAYS", String(numDays()), ""] : s.movingS > 60 ? ["MOVING TIME", fmtDuration(s.movingS), ""] : ["HIGHEST POINT", m(s.top), "M"];
+  const out = [
+    ["DISTANCE", s.distKm.toFixed(s.distKm < 100 ? 1 : 0), "KM"], time, ["START", m(cd?.startEle), "M"],
+    ["ELEVATION GAIN", s.hasEle ? m(s.gain) : null, "M"], ["AVG GRADE", s.avgGrade ? s.avgGrade.toFixed(1) : null, "%"], ["FINISH", m(cd?.endEle), "M"],
+  ];
+  return out.map(([l, v, u]) => [l, v ?? "-", v == null ? "" : u]);
+}
+function renderClimb(ctx, W, H, project, clear) {
+  const L = climbLayout(W, H), { sc, m } = L, ink = $("color-route").value, grey = valueGrey(), fnt = FONTS[selectedFontKey];
+  const st = climbStretches();
+  if (clear) ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  if (project && segments.length) drawClimbRoute(ctx, W, H, project, L, st);
+  if (focusOn() && segments.length) drawOverview(ctx, L, ink);
+  drawCountryInset(ctx, L.inset, ink, sc);
+
+  // Title and subtitle, left aligned
+  const title = ($("title-input").value || "MOUNTAIN PASS").toUpperCase(), sub = ($("subtitle-input").value || "").toUpperCase();
+  ctx.textAlign = "left"; ctx.fillStyle = ink;
+  let tsz = L.titleSz;
+  const setT = () => { ctx.font = `${Math.max(fnt.titleW, 600)} ${tsz}px ${fnt.stack}`; ctx.letterSpacing = `${Math.round(3 * sc * tsz / L.titleSz)}px`; };
+  setT();
+  const maxW = W - 2 * m, tw = ctx.measureText(title).width;
+  if (tw > maxW) { tsz = Math.floor(tsz * maxW / tw); setT(); }
+  ctx.fillText(title, m - Math.round(6 * sc), L.titleY);
+  if (sub) {
+    ctx.font = `500 ${L.subSz}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(12 * sc * subtitleScale)}px`;
+    ctx.globalAlpha = 0.9; ctx.fillText(sub, m, L.subY); ctx.globalAlpha = 1;
+  }
+
+  // Bottom row: the profile silhouette, then the stats in a 2 x 3 grid
+  const { y0, y1 } = L.row;
+  let sx = m;
+  if ($("toggle-profile").checked && profile) {
+    const pw = Math.round(620 * sc), ph = y1 - y0, n = profile.e.length, range = Math.max(1, profile.max - profile.min);
+    const path = new Path2D(); path.moveTo(m, y1);
+    profile.e.forEach((v, i) => path.lineTo(m + i / (n - 1) * pw, y1 - (0.06 + 0.94 * (v - profile.min) / range) * ph));
+    path.lineTo(m + pw, y1); path.closePath();
+    ctx.fillStyle = ink; ctx.fill(path);
+    if (focusOn()) {   // the last 10 km to the top, picked out on the profile
+      const [a, b] = focusRange(), xa = m + a / climbData.total * pw, xb = m + b / climbData.total * pw;
+      ctx.save(); ctx.clip(path); ctx.fillStyle = $("color-bg").value; ctx.globalAlpha = 0.38;
+      ctx.fillRect(m, y0, xa - m, ph); ctx.fillRect(xb, y0, m + pw - xb, ph); ctx.restore();
+    }
+    sx = m + pw + Math.round(110 * sc);
+  }
+  if (bandOn()) {
+    const items = climbStats(), cw = Math.min((W - m - sx) / 3, 470 * sc), lbl = Math.round(25 * sc), val = Math.round(58 * sc), unit = Math.round(28 * sc);
+    items.forEach(([l, v, u], i) => {
+      const x = sx + (i % 3) * cw, yb = y0 + (i < 3 ? 0 : Math.round(126 * sc));
+      ctx.textAlign = "left";
+      ctx.font = `600 ${lbl}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(3 * sc)}px`; ctx.fillStyle = grey;
+      ctx.fillText(l, x, yb + lbl);
+      ctx.font = `600 ${val}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(1 * sc)}px`; ctx.fillStyle = ink;
+      ctx.fillText(v, x, yb + lbl + Math.round(14 * sc) + val * 0.8);
+      if (u) { const vw = ctx.measureText(v).width; ctx.font = `600 ${unit}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.fillStyle = grey; ctx.fillText(u, x + vw + 8 * sc, yb + lbl + Math.round(14 * sc) + val * 0.8); }
+    });
+  }
+  // Gradient key (only when the road is coloured by gradient)
+  if (climbColor === "grade" && st) {
+    const used = GRADE_SCALE.filter(([lim], j) => st.grades.some(g => g < lim && (j === 0 || g >= GRADE_SCALE[j - 1][0])));
+    ctx.font = `600 ${Math.round(24 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(2 * sc)}px`; ctx.textAlign = "left";
+    let x = W - m;
+    [...used].reverse().forEach(([, col, label]) => {
+      const tw = ctx.measureText(label).width; x -= tw;
+      ctx.fillStyle = grey; ctx.fillText(label, x, L.credY - Math.round(46 * sc));
+      x -= Math.round(44 * sc); ctx.fillStyle = col; ctx.beginPath(); ctx.roundRect(x, L.credY - Math.round(62 * sc), Math.round(34 * sc), Math.round(14 * sc), Math.round(7 * sc)); ctx.fill();
+      x -= Math.round(34 * sc);
+    });
+  }
+  ctx.font = `300 ${Math.round(16 * sc)}px "Inter", Arial, sans-serif`; ctx.globalAlpha = 0.3; ctx.letterSpacing = "0px"; ctx.fillStyle = ink; ctx.textAlign = "left";
+  ctx.fillText("© OpenStreetMap contributors  ·  Elevation © Mapterhorn  ·  Natural Earth", m, L.credY);
+  ctx.restore();
+}
+
+// ── Atlas style: framed relief map with a white title band ──────────────────
+function atlasLayout(W, H) {
+  const sc = Math.min(W, H / 1.4) / 2400, m = Math.round(110 * sc), band = Math.round(580 * sc);
+  return { sc, m, x0: m, y0: m, x1: W - m, y1: H - band };
+}
+function renderAtlas(ctx, W, H, project, clear) {
+  const A = atlasLayout(W, H), { sc } = A, paper = "#FBFAF6", ink = "#1E1E20", route = $("color-route").value, grey = valueGrey(), fnt = FONTS[selectedFontKey];
+  if (clear) ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  if (project && segments.length) {
+    ctx.save(); ctx.beginPath(); ctx.rect(A.x0, A.y0, A.x1 - A.x0, A.y1 - A.y0); ctx.clip();
+    const r = routeScale, path = new Path2D(), F = [];
+    segments.forEach((s, k) => s.forEach((p, i) => { const q = project(p.lon, p.lat); i ? path.lineTo(q.x, q.y) : path.moveTo(q.x, q.y); if (!i) F.push({ q, k }); }));
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(255,255,255,0.85)"; ctx.lineWidth = W * 0.0072 * r; ctx.stroke(path);
+    ctx.strokeStyle = route; ctx.lineWidth = W * 0.0036 * r; ctx.stroke(path);
+    // Overnight stops (one GPX per day), start and finish
+    const dot = (q, rad, fill) => { ctx.beginPath(); ctx.arc(q.x, q.y, rad, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = W * 0.0022; ctx.strokeStyle = route; ctx.stroke(); };
+    F.forEach(({ q, k }) => { if (k && segDays[k] !== segDays[k - 1]) dot(q, W * 0.0046, "#FFFFFF"); });
+    if ($("toggle-markers").checked) {
+      const a = segments[0][0], ls = segments[segments.length - 1], b = ls[ls.length - 1];
+      dot(project(b.lon, b.lat), W * 0.0058, "#FFFFFF"); dot(project(a.lon, a.lat), W * 0.0058, route);
+    }
+    if ($("toggle-wpts").checked && waypoints.length) {
+      ctx.font = `600 ${Math.round(24 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(2 * sc)}px`; ctx.textAlign = "left"; ctx.fillStyle = ink;
+      waypoints.forEach(w => { const p = project(w.lon, w.lat); ctx.beginPath(); ctx.arc(p.x, p.y, 6 * sc, 0, Math.PI * 2); ctx.fill(); ctx.fillText(w.name.toUpperCase(), p.x + 14 * sc, p.y + 8 * sc); });
+    }
+    // Scale bar, bottom left of the map
+    const b = routeStats.bbox, lat = (b.s + b.n) / 2, lon = (b.w + b.e) / 2;
+    const p1 = project(lon, lat), p2 = project(lon + 0.1, lat), pxKm = Math.hypot(p2.x - p1.x, p2.y - p1.y) / (11.132 * Math.cos(lat * Math.PI / 180));
+    const km = [1, 2, 5, 10, 20, 50, 100, 200, 500].filter(v => v * pxKm <= W * 0.16).pop();
+    if (km && pxKm > 0) {
+      const x = A.x0 + 70 * sc, y = A.y1 - 70 * sc, len = km * pxKm;
+      ctx.fillStyle = ink; ctx.fillRect(x, y, len, Math.max(1, 5 * sc));
+      [0, len].forEach(o => ctx.fillRect(x + o - 1.5 * sc, y - 12 * sc, Math.max(1, 3 * sc), 17 * sc));
+      ctx.font = `600 ${Math.round(26 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(2 * sc)}px`; ctx.textAlign = "left";
+      ctx.fillText(`${km} KM`, x, y - 22 * sc);
+    }
+    ctx.restore();
+  }
+  // Paper frame and the title band
+  ctx.fillStyle = paper;
+  ctx.fillRect(0, 0, W, A.y0); ctx.fillRect(0, A.y1, W, H - A.y1); ctx.fillRect(0, A.y0, A.x0, A.y1 - A.y0); ctx.fillRect(A.x1, A.y0, W - A.x1, A.y1 - A.y0);
+  ctx.strokeStyle = ink; ctx.lineWidth = Math.max(1, 3 * sc); ctx.strokeRect(A.x0, A.y0, A.x1 - A.x0, A.y1 - A.y0);
+  const title = ($("title-input").value || "MOUNTAIN PASS").toUpperCase(), sub = ($("subtitle-input").value || "").toUpperCase();
+  ctx.textAlign = "center"; ctx.fillStyle = ink;
+  let tsz = Math.round(126 * sc * titleScale);
+  const setT = () => { ctx.font = `${fnt.titleW} ${tsz}px ${fnt.stack}`; ctx.letterSpacing = `${Math.round(18 * sc * tsz / (126 * sc))}px`; };
+  setT();
+  const maxW = W - 2 * A.m - 80 * sc, tw = ctx.measureText(title).width;
+  if (tw > maxW) { tsz = Math.floor(tsz * maxW / tw); setT(); }
+  let y = A.y1 + Math.round(232 * sc);
+  ctx.fillText(title, W / 2, y);
+  if (sub) {
+    y += Math.round(88 * sc * subtitleScale);
+    ctx.font = `${fnt.subW} ${Math.round(34 * sc * subtitleScale)}px ${fnt.stack}`; ctx.letterSpacing = `${Math.round(10 * sc * subtitleScale)}px`; ctx.fillStyle = grey;
+    ctx.fillText(sub, W / 2, y);
+  }
+  const s = routeStats, parts = [];
+  if (s) {
+    const date = ($("info-val-7").value || "").toUpperCase();
+    if (date) parts.push(date);
+    parts.push(`${s.distKm.toFixed(s.distKm < 100 ? 1 : 0)} KM`);
+    if (s.hasEle) parts.push(`${s.gain.toLocaleString("en-US")} M D+`);
+    if (numDays() > 1) parts.push(`${numDays()} DAYS`);
+    else if (s.top != null) parts.push(`${s.top.toLocaleString("en-US")} M HIGHEST`);
+  }
+  if (parts.length) {
+    y += Math.round(84 * sc);
+    ctx.font = `600 ${Math.round(36 * sc)}px "Barlow Condensed", "Arial Narrow", sans-serif`; ctx.letterSpacing = `${Math.round(5 * sc)}px`; ctx.fillStyle = route;
+    ctx.fillText(parts.join("   •   "), W / 2, y);
+  }
+  ctx.font = `300 ${Math.round(15 * sc)}px "Inter", Arial, sans-serif`; ctx.globalAlpha = 0.45; ctx.letterSpacing = "0px"; ctx.fillStyle = grey;
+  ctx.fillText("Terrain © Mapterhorn  ·  © OpenMapTiles © OpenStreetMap contributors  ·  OpenFreeMap", W / 2, H - Math.round(48 * sc));
+  ctx.restore();
+}
+
+// Satellite noir: deepen the imagery, a diagonal sheen, a dark foot for the text.
+function drawSatFX(ctx, W, H) {
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.22)"; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(0.30, "rgba(255,255,255,0)"); g.addColorStop(0.42, "rgba(255,255,255,0.10)");
+  g.addColorStop(0.50, "rgba(255,255,255,0.03)"); g.addColorStop(0.58, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const f = ctx.createLinearGradient(0, H * 0.58, 0, H);
+  f.addColorStop(0, "rgba(0,0,0,0)"); f.addColorStop(0.55, "rgba(0,0,0,0.62)"); f.addColorStop(1, "rgba(0,0,0,0.88)");
+  ctx.fillStyle = f; ctx.fillRect(0, H * 0.58, W, H * 0.42);
   ctx.restore();
 }
 function previewProjector(W, H) {
@@ -1452,13 +2027,30 @@ function toast(msg, cls = "", dur = 3500) {
 // ── Loading a route ────────────────────────────────────────────────────────
 function fitRoute() {
   if (!map || !routeStats) return;
-  const b = routeStats.bbox, { pw, ph } = previewSize();
+  let b = routeStats.bbox;
+  const { pw, ph } = previewSize(), cfg = POSTER_STYLES[posterStyle];
+  if (posterStyle === "climb") {
+    const L = climbLayout(pw * 2, ph * 2);
+    if (focusOn()) {   // frame only the final 10 km; the rest runs off the poster
+      const [from, to] = focusRange(), pts = segments.flat().filter(p => (p.d ?? 0) >= from && (p.d ?? 0) <= to);
+      b = { s: Math.min(...pts.map(p => p.lat)), n: Math.max(...pts.map(p => p.lat)), w: Math.min(...pts.map(p => p.lon)), e: Math.max(...pts.map(p => p.lon)) };
+    }
+    const pad = { top: ph * 0.09, bottom: ph - L.top / 2 + ph * 0.02, left: pw * 0.12, right: focusOn() ? (pw * 2 - L.over.x) / 2 + pw * 0.04 : pw * 0.12 };
+    map.fitBounds([[b.w, b.s], [b.e, b.n]], { padding: pad, bearing: map.getBearing(), duration: 0 });
+    return;
+  }
+  if (posterStyle === "atlas") {
+    const A = atlasLayout(pw * 2, ph * 2);
+    const pad = { top: A.y0 / 2 + ph * 0.06, bottom: ph - A.y1 / 2 + ph * 0.06, left: A.x0 / 2 + pw * 0.07, right: A.x0 / 2 + pw * 0.07 };
+    map.fitBounds([[b.w, b.s], [b.e, b.n]], { padding: pad, bearing: map.getBearing(), duration: 0 });
+    return;
+  }
   const stackTop = bottomStack(pw * 2, ph * 2).top / 2;          // the overlay canvas is 2× the preview
   const bottom = Math.min(0.62, (ph - stackTop) / ph + 0.03);
   const topFrac = photoTopH(ph * 2) / 2 / ph;
   // Flat styles: the route sits right of the info panel and fills the rest, like a gallery print.
   const pad = isFlat()
-    ? { top: ph * (0.07 + topFrac), bottom: ph * bottom, left: pw * (photoMode === "badge" && photoImg ? 0.36 : Math.min(0.42, 0.14 + 0.115 * infoScale)), right: pw * 0.08 }
+    ? { top: ph * (0.07 + topFrac), bottom: ph * bottom, left: pw * (cfg.panel === false ? 0.09 : photoMode === "badge" && photoOK() ? 0.36 : Math.min(0.42, 0.14 + 0.115 * infoScale)), right: pw * (cfg.panel === false ? 0.09 : 0.08) }
     : { top: ph * 0.17, bottom: ph * bottom, left: pw * 0.09, right: pw * 0.09 };
   map.fitBounds([[b.w, b.s], [b.e, b.n]], {
     padding: pad,
@@ -1479,6 +2071,8 @@ async function loadRoute({ segs, wpts = [], name = "", source, days = null }) {
   // (thinning first cut corners: 500 km instead of 523 on a 3-day trip).
   routeStats = calcStats(segs);
   profile = buildProfile(segs);
+  climbData = buildClimbData(segs);
+  countryCache = { key: null, polys: null };
   segDays = days || segs.map(() => 0);
   dayKm = [];
   segs.forEach((sg, k) => { let d = 0; for (let i = 1; i < sg.length; i++) d += haversine(sg[i - 1].lat, sg[i - 1].lon, sg[i].lat, sg[i].lon); dayKm[segDays[k]] = (dayKm[segDays[k]] || 0) + d / 1000; });
@@ -1509,11 +2103,13 @@ async function loadRoute({ segs, wpts = [], name = "", source, days = null }) {
   fitRoute();
   updateContourStep();
   await ensureFonts();
+  if (posterStyle === "climb") await ensureCountry();
   drawOverlay();
   $("empty-state").hidden = true;
   await settle(map, 15000);
   posterReady = true;
-  ["btn-png", "btn-jpg", "btn-svg"].forEach(id => { $(id).disabled = false; });
+  ["btn-png", "btn-jpg"].forEach(id => { $(id).disabled = false; });
+  $("btn-svg").disabled = POSTER_STYLES[posterStyle].svg === false;
   clearSteps();
   setStatus(`${segments.length > 1 ? segments.length + " parts · " : ""}${st.distKm.toFixed(1)} km loaded`, "ok");
   track("poster_route_loaded", { source, km: Math.round(st.distKm), parts: segments.length });
@@ -1595,6 +2191,7 @@ async function renderPoster() {
     ctx.drawImage(canvas, 0, 0, W, H);
     renderVignetteToCtx(ctx, W, H, false);   // drawn straight on top: one full-size canvas, not three
     await ensureFonts();
+    if (posterStyle === "climb") await ensureCountry();
     renderOverlay(ctx, W, H, (lon, lat) => { const p = pm.project([lon, lat]); return { x: p.x * W / cw, y: p.y * H / ch }; }, false);
     return out;
   } finally {
@@ -1729,6 +2326,10 @@ function applyPosterStyle(key) {
   document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
   $("toggle-hillshade").checked = c.hillshade;
   $("vignette-intensity").value = c.vignette; $("vignette-val").textContent = c.vignette + "%";
+  $("hillshade-intensity").value = c.hsInt ?? 35;
+  $("climb-opts").hidden = key !== "climb";
+  if (posterReady) $("btn-svg").disabled = c.svg === false;
+  if (map && map.getLayer("bg")) setLayerVis(map);
   $("toggle-profile").checked = c.profile;
   $("contour-intensity").value = c.contour;
   contourShift = c.shift;
@@ -1742,15 +2343,18 @@ function applyPosterStyle(key) {
   }
   if (segments.length) fitRoute();
   ensureFonts().then(drawOverlay);
+  if (key === "climb" && routeStats) ensureCountry().then(drawOverlay);
 }
 
 // ── Wiring ─────────────────────────────────────────────────────────────────
 const PANELS = { file: "panel-file", name: "panel-name", coords: "panel-coords" };
 wireSeg("mode-seg", "mode", mode => Object.entries(PANELS).forEach(([m, id]) => $(id).classList.toggle("on", m === mode)));
-["style-seg", "style-seg-2"].forEach(id => $(id).addEventListener("click", e => {
+["style-seg", "style-seg-2", "style-seg-3"].forEach(id => $(id).addEventListener("click", e => {
   const b = e.target.closest("[data-pstyle]"); if (!b) return;
   applyPosterStyle(b.dataset.pstyle); track("poster_style", { style: b.dataset.pstyle });
 }));
+wireSeg("climb-color-seg", "ccolor", v => { climbColor = v; drawOverlay(); });
+wireSeg("climb-focus-seg", "cfocus", v => { climbFocus = v; if (segments.length) fitRoute(); drawOverlay(); });
 wireSeg("photo-seg", "photo", v => { photoMode = v; if (v !== "none" && !photoImg) toast("Add a photo first"); drawOverlay(); if (segments.length) fitRoute(); });
 $("photo-file").addEventListener("change", e => {
   const f = e.target.files[0]; if (!f) return;
