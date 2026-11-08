@@ -27,6 +27,9 @@ RewriteRule ^world-cup/ /blog/best-marriott-hotels-world-cup-2026-new-york/ [R=3
 RewriteRule ^moto/alpine-passes(\.html)?$ /moto/ [R=302,L]
 RewriteRule ^moto/tools(\.html)?$ /tools/route-video [R=302,L]
 RewriteRule ^_drafts(/|$) - [R=404,L]
+# Poster orders and their config are never served.
+RewriteRule ^_orders(/|$) - [R=404,L]
+RewriteRule ^order-config\.php$ - [R=404,L]
 
 # Legacy URL previously linked from the homepage (may still be indexed)
 Redirect 301 /weekend-in-the-middle-of-italian-alps /blog/lana-italy/

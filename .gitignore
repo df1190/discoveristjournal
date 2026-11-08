@@ -23,3 +23,8 @@ blog-drafts/
 
 # Originals and private files (full-size photos, raw GPX, renders): never published
 _private/
+
+# Poster orders: the config holds the email address, orders hold customer data
+order-config.php
+_orders/*
+!_orders/.htaccess

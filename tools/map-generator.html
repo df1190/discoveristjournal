@@ -330,6 +330,58 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 .gh-item em{font-style:normal;font-weight:600;color:var(--lbl)}
 #climb-opts{display:flex;flex-direction:column;gap:6px}
 #climb-opts[hidden]{display:none}
+/* ── Order modal ─────────────────────────────────────────────────────── */
+.order-card .btn{margin-top:2px}
+.om{position:fixed;inset:0;z-index:100;background:rgba(20,20,24,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}
+.om[hidden]{display:none}
+.om-card{position:relative;background:var(--surf);border-radius:var(--r-lg);box-shadow:var(--sh-lg);width:min(760px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:24px 26px}
+.om-x{position:absolute;top:10px;right:12px;width:32px;height:32px;border:none;border-radius:50%;background:var(--fill);font-size:20px;line-height:1;color:var(--lbl2);cursor:pointer}
+.om-head{display:flex;gap:20px;align-items:flex-start;margin-bottom:14px}
+#om-thumb{width:120px;border-radius:6px;box-shadow:var(--sh-md);background:var(--fill);flex-shrink:0;min-height:120px}
+.om-head h2{font-size:22px;font-weight:600;letter-spacing:-.01em;margin-bottom:10px}
+.om-steps{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:12px;color:var(--lbl2)}
+.om-steps li{display:flex;align-items:center;gap:7px}
+.om-steps b{width:20px;height:20px;border-radius:50%;background:var(--gold-f);color:var(--gold-lo);display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.om-steps span{color:var(--gold-lo);font-weight:600}
+.om-sec{margin-top:14px;display:block}
+.om-lbl,.om-grid label,.om-full{font-size:11px;font-weight:600;color:var(--lbl2);letter-spacing:.02em}
+.om-lbl{margin-bottom:7px}
+.om-prods{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.om-opt{display:flex;flex-direction:column;gap:2px;text-align:left;padding:10px 12px;border-radius:var(--r);border:1.5px solid var(--sep);background:var(--surf);cursor:pointer;font-family:var(--font)}
+.om-opt b{font-size:13px;color:var(--lbl)}
+.om-opt span{font-size:11px;color:var(--lbl3)}
+.om-chips{display:flex;flex-wrap:wrap;gap:6px}
+.om-chip,.om-sw{padding:7px 11px;border-radius:999px;border:1.5px solid var(--sep);background:var(--surf);font:500 12px var(--font);color:var(--lbl);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.om-sw i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.om-opt.on,.om-chip.on,.om-sw.on{border-color:var(--gold);background:var(--gold-f);box-shadow:0 0 0 3px var(--gold-r)}
+.om-note{font-size:11px;color:var(--gold-lo);margin-top:6px;min-height:0}
+.om-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.om-grid label,.om-full{display:flex;flex-direction:column;gap:5px}
+.om-grid small,.om-full small{font-weight:400;color:var(--lbl3)}
+.om-grid input,.om-full textarea{background:var(--fill);border:1.5px solid transparent;border-radius:var(--r-sm);font:400 13px var(--font);color:var(--lbl);padding:8px 10px;outline:none;resize:vertical}
+.om-grid input:focus,.om-full textarea:focus{background:var(--surf);border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-r)}
+.om-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.om-foot{display:flex;align-items:center;gap:16px;margin-top:18px}
+.om-foot .btn{width:auto;padding:11px 22px;margin-left:auto}
+.om-price{font-size:13px;font-weight:600;color:var(--lbl)}
+.om-fine{font-size:11.5px;color:var(--lbl3);margin-top:8px;text-align:right}
+.om-err{font-size:12px;color:#C0392B;margin-top:6px;text-align:right}
+#om-done{text-align:center;padding:16px 0 6px}
+#om-done h3{font-size:20px;font-weight:600;margin:10px 0 8px}
+#om-done p{font-size:13px;color:var(--lbl2);margin-bottom:6px}
+#om-done .btn{width:auto;padding:10px 22px;margin-top:12px}
+.om-check{width:52px;height:52px;border-radius:50%;background:var(--gold-f);color:var(--gold-lo);font-size:26px;display:inline-flex;align-items:center;justify-content:center}
+@media (max-width:640px){
+  .om-card{padding:20px 16px}
+  .om-head{gap:14px}
+  #om-thumb{width:84px;min-height:84px}
+  .om-steps{grid-template-columns:1fr}
+  .om-prods{grid-template-columns:1fr 1fr}
+  .om-grid{grid-template-columns:1fr}
+  .om-foot{flex-direction:column;align-items:stretch}
+  .om-foot .btn{margin-left:0;width:100%}
+  .om-fine,.om-err{text-align:left}
+}
 .hint{font-size:10.5px;color:var(--lbl3);line-height:1.45}
 .tlbl small{display:block;font-size:10px;color:var(--lbl4);margin-top:1px}
 .panel .btn-gen{margin-top:2px}
@@ -389,7 +441,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
         </svg>
         <div class="fdrop-txt" id="file-lbl">Drop GPX or KML</div>
         <div class="fdrop-sub">One file, or one file per day for a trip</div>
-        <input type="file" id="route-files" accept=".gpx,.kml,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml" multiple>
+        <input type="file" id="route-files" accept=".gpx,.kml,.json,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml,application/json,image/jpeg" multiple>
       </div>
       <button class="link-btn" id="try-sample" type="button">No file handy? Try the Stelvio Pass</button>
       <details class="gpx-help">
@@ -473,6 +525,9 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
   <div class="card">
     <div class="ctitle">Poster size</div>
     <select id="paper-select" class="fsel" aria-label="Paper size">
+      <option value="8x10">8 × 10 in · 20.3 × 25.4 cm</option>
+      <option value="11x14">11 × 14 in · 27.9 × 35.6 cm</option>
+      <option value="a4">A4 · 21 × 29.7 cm</option>
       <option value="30x40">30 × 40 cm</option>
       <option value="50x70" selected>50 × 70 cm</option>
       <option value="a3">A3 · 29.7 × 42 cm</option>
@@ -709,6 +764,14 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
       <button class="btn-exp" id="btn-svg" disabled title="Route, profile and text only, without the map">SVG · lines</button>
     </div>
     <div class="hint">The print file matches the preview exactly, at the size and DPI above. SVG has the route, profile and text only (no terrain).</div>
+    <button class="link-btn" id="btn-save-design" type="button">Save design file to continue later</button>
+  </div>
+
+  <!-- Order -->
+  <div class="card order-card">
+    <div class="ctitle">Get it printed</div>
+    <button class="btn btn-gen" id="btn-order" disabled>Order this print</button>
+    <div class="hint">Poster, framed, canvas or digital file. You get a proof by email before paying.</div>
   </div>
 
 </div><!-- /sidebar -->
@@ -726,6 +789,50 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 </div>
 </div><!-- /main -->
 
+<div id="order-modal" class="om" hidden>
+  <div class="om-card" role="dialog" aria-modal="true" aria-labelledby="om-title">
+    <button class="om-x" id="om-close" type="button" aria-label="Close">×</button>
+    <div class="om-head">
+      <img id="om-thumb" alt="Your poster">
+      <div>
+        <h2 id="om-title">Order this print</h2>
+        <ol class="om-steps">
+          <li><b>1</b>Design it <span>done</span></li>
+          <li><b>2</b>Send it here</li>
+          <li><b>3</b>Proof and payment link by email</li>
+          <li><b>4</b>Printed and shipped</li>
+        </ol>
+      </div>
+    </div>
+    <form id="om-form" novalidate>
+      <div class="om-sec"><div class="om-lbl">Product</div><div class="om-prods" id="om-prod"></div></div>
+      <div class="om-sec" id="om-size-sec"><div class="om-lbl">Size</div><div class="om-chips" id="om-sizes"></div><div class="om-note" id="om-size-note"></div></div>
+      <div class="om-sec" id="om-frame-sec" hidden><div class="om-lbl">Frame colour</div><div class="om-chips" id="om-frames"></div></div>
+      <div class="om-sec om-grid">
+        <label>Name<input name="name" required maxlength="100" autocomplete="name"></label>
+        <label>Email<input name="email" type="email" required maxlength="160" autocomplete="email"></label>
+        <label>Shipping country<input name="country" required maxlength="80" autocomplete="country-name"></label>
+        <label>Store order number <small>if you already bought it</small><input name="store_order" maxlength="60"></label>
+      </div>
+      <div class="om-sec" id="om-pay-sec"><div class="om-lbl">How would you like to pay?</div><div class="om-chips" id="om-pay"></div></div>
+      <label class="om-sec om-full">Anything we should know? <small>optional</small><textarea name="note" maxlength="1000" rows="2"></textarea></label>
+      <input name="website" class="om-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="om-foot">
+        <div class="om-price" id="om-price"></div>
+        <button class="btn btn-gen" type="submit" id="om-send">Send order request</button>
+      </div>
+      <div class="om-fine" id="om-fine"></div>
+      <div class="om-err" id="om-err" role="alert"></div>
+    </form>
+    <div id="om-done" hidden>
+      <div class="om-check">✓</div>
+      <h3>Order request sent</h3>
+      <p>Your reference: <b id="om-id"></b></p>
+      <p id="om-done-txt"></p>
+      <button class="btn btn-gen" type="button" id="om-done-close">Back to my poster</button>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -762,6 +869,9 @@ function contourTiles(step) {
 const CONTOUR_STEPS = [10, 20, 50, 100, 200, 500];
 // Paper sizes in mm (portrait).
 const PAPERS = {
+  "8x10":  { w: 203.2, h: 254, label: "8 × 10 in" },
+  "11x14": { w: 279.4, h: 355.6, label: "11 × 14 in" },
+  "a4":    { w: 210, h: 297, label: "A4" },
   "30x40": { w: 300, h: 400, label: "30 × 40 cm" },
   "50x70": { w: 500, h: 700, label: "50 × 70 cm" },
   "a3":    { w: 297, h: 420, label: "A3" },
@@ -827,13 +937,13 @@ const POSTER_STYLES = {
               hint: "Hillshaded terrain, copper contours, a glowing route." },
   // Layouts of their own (renderClimb / renderAtlas). relief/contours: map layers shown.
   climb:    { bg: "#0B0B0C", road: "#5A5A5E", route: "#F4F4F1", value: "#9A9AA0", hillshade: false, vignette: 0, profile: true, band: true, contour: 0, shift: 1, font: "barlow",
-              relief: false, contours: false, panel: false, photo: false, svg: false,
+              relief: false, contours: false, panel: false, svg: false,
               hint: "Black print, each km in its own colour, km markers and gradients, the country and the climb profile." },
   atlas:    { bg: "#E6E5E0", road: "#8E8D87", route: "#E8622C", value: "#77756F", hillshade: true, hsInt: 85, hsShadow: "#5C5C58", hsAccent: "#B9B8B2", vignette: 0, profile: false, band: false, contour: 25, shift: 1, font: "jost",
-              panel: false, photo: false, svg: false,
+              panel: false, svg: false,
               hint: "Light relief with rivers, lakes and glaciers, a thin orange route in a framed map." },
   satellite:{ bg: "#101012", road: "#8E8E93", route: "#FF7A1A", value: "#F7A262", title: "#FFFFFF", hillshade: false, vignette: 0, profile: true, band: true, contour: 0, shift: 1, font: "jost",
-              relief: false, contours: false, panel: false, photo: false, svg: false,
+              relief: false, contours: false, panel: false, svg: false,
               hint: "Black and white satellite, an orange route and a soft sheen of light." },
 };
 // Day colours for the Multi-day style: copper first, then calm tones that sit together.
@@ -845,6 +955,7 @@ let landscape       = false;
 let dpi             = 300;
 let contourShift    = 0;    // -1 more lines, +1 fewer
 let contourStep     = 100;
+let contourLock     = null; // contour spacing fixed by a loaded design file
 let exporting       = false;
 let _toastTimer     = null;
 const allPoints = () => segments.flat();
@@ -963,7 +1074,7 @@ function setContourStep(m, step) {
 }
 function updateContourStep() {
   if (!map) return;
-  const s = contourIntervalFor(map.getZoom());
+  const s = contourLock || contourIntervalFor(map.getZoom());
   if (s !== contourStep) { contourStep = s; setContourStep(map, s); }
   $("contour-meta").textContent = `A line every ${contourStep} m, a bold one every ${contourStep * 5} m`;
 }
@@ -1380,7 +1491,27 @@ function drawCover(ctx, img, x, y, w, h, focus) {
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 }
 function photoOK() { return !!photoImg && POSTER_STYLES[posterStyle].photo !== false; }
-function photoTopH(H) { return photoOK() && photoMode === "top" ? Math.round(H * 0.44 * photoScale) : 0; }
+const PHOTO_TOP = { climb: 0.34, atlas: 0.30 };   // share of the poster height; others 0.44
+function photoTopH(H) { return photoOK() && photoMode === "top" ? Math.round(H * (PHOTO_TOP[posterStyle] || 0.44) * photoScale) : 0; }
+// Top photo fading out at the bottom: into the poster colour, or (satellite)
+// into the imagery itself.
+function drawTopPhoto(ctx, W, topH, bg) {
+  if (posterStyle === "satellite") {
+    const c = document.createElement("canvas"); c.width = W; c.height = topH;
+    const x = c.getContext("2d");
+    drawCover(x, photoImg, 0, 0, W, topH, photoPos);
+    const g = x.createLinearGradient(0, topH * 0.55, 0, topH);
+    g.addColorStop(0, "rgba(0,0,0,1)"); g.addColorStop(1, "rgba(0,0,0,0)");
+    // One fill only: destination-in clears everything outside the shape drawn.
+    x.globalCompositeOperation = "destination-in"; x.fillStyle = g; x.fillRect(0, 0, W, topH);
+    ctx.drawImage(c, 0, 0);
+    return;
+  }
+  drawCover(ctx, photoImg, 0, 0, W, topH, photoPos);
+  const g = ctx.createLinearGradient(0, topH * 0.62, 0, topH);
+  g.addColorStop(0, bg + "00"); g.addColorStop(1, bg);
+  ctx.fillStyle = g; ctx.fillRect(0, topH * 0.62 - 1, W, topH * 0.38 + 2);
+}
 function renderOverlay(ctx, W, H, project, clear = true) {
   if (posterStyle === "climb") return renderClimb(ctx, W, H, project, clear);
   if (posterStyle === "atlas") return renderAtlas(ctx, W, H, project, clear);
@@ -1397,12 +1528,7 @@ function renderOverlay(ctx, W, H, project, clear = true) {
 
   // Photo across the top, fading into the poster colour
   const topH = photoTopH(H);
-  if (topH) {
-    drawCover(ctx, photoImg, 0, 0, W, topH, photoPos);
-    const g = ctx.createLinearGradient(0, topH * 0.62, 0, topH);
-    g.addColorStop(0, bg + "00"); g.addColorStop(1, bg);
-    ctx.fillStyle = g; ctx.fillRect(0, topH * 0.62 - 1, W, topH * 0.38 + 2);
-  }
+  if (topH) drawTopPhoto(ctx, W, topH, bg);
 
   // Info panel, top left (below the photo when there is one)
   const panelBottom = cfg.panel === false ? topH : drawInfoPanel(ctx, W, H, sc, accent, minimal ? valueGrey() : accent, minimal ? 1 : 0.65, topH);
@@ -1513,7 +1639,14 @@ function buildClimbData(segs) {
     if (p.ele != null) { xs.push(d); es.push(p.ele); if (p.ele > topE) { topE = p.ele; topKm = d; } }
   }));
   if (es.length < 2 || d < 0.3) return null;
-  const eleAt = km => {
+  const eleAt = makeEleAt(xs, es);
+  let maxGrade = 0;
+  for (let k = 0; k + 1 <= d; k++) maxGrade = Math.max(maxGrade, (eleAt(k + 1) - eleAt(k)) / 10);
+  const f = segs[0][0], ls = segs[segs.length - 1], l = ls[ls.length - 1];
+  return { total: d, eleAt, maxGrade, startEle: f.ele, endEle: l.ele, topKm };
+}
+function makeEleAt(xs, es) {
+  return km => {
     let lo = 0, hi = xs.length - 1;
     if (km <= xs[0]) return es[0];
     if (km >= xs[hi]) return es[hi];
@@ -1521,10 +1654,6 @@ function buildClimbData(segs) {
     const t = (km - xs[lo]) / ((xs[hi] - xs[lo]) || 1);
     return es[lo] + (es[hi] - es[lo]) * t;
   };
-  let maxGrade = 0;
-  for (let k = 0; k + 1 <= d; k++) maxGrade = Math.max(maxGrade, (eleAt(k + 1) - eleAt(k)) / 10);
-  const f = segs[0][0], ls = segs[segs.length - 1], l = ls[ls.length - 1];
-  return { total: d, eleAt, maxGrade, startEle: f.ele, endEle: l.ele, topKm };
 }
 // "Last 10 km to the top": the 10 km that end at the highest point (for a
 // climb that's the finish; for a ride over a pass, the top of the pass).
@@ -1556,8 +1685,14 @@ function climbLayout(W, H) {
   L.titleTop = y - Math.round(L.titleSz * 0.74);
   L.inset = { x: m, w: Math.round(430 * sc), h: Math.round(400 * sc) };
   L.inset.y = L.titleTop - Math.round(70 * sc) - L.inset.h;
-  L.top = L.inset.y - Math.round(30 * sc);              // the route stays above this
-  L.over = { w: Math.round(520 * sc), h: Math.round(860 * sc), x: W - m - Math.round(520 * sc), y: m };
+  L.photoTop = photoTopH(H);
+  if (photoOK() && photoMode === "badge") {   // round photo on the right, level with the country map
+    const d = Math.round(400 * sc * photoScale);
+    L.badge = { d, x: W - m - d, y: L.inset.y + L.inset.h - d };
+  }
+  L.top = Math.min(L.inset.y, L.badge ? L.badge.y : Infinity) - Math.round(30 * sc);   // the route stays above this
+  const oy = L.photoTop ? L.photoTop - Math.round(40 * sc) : m;
+  L.over = { w: Math.round(520 * sc), h: Math.max(Math.round(300 * sc), Math.min(Math.round(860 * sc), L.top - oy - Math.round(40 * sc))), x: W - m - Math.round(520 * sc), y: oy };
   return L;
 }
 // Country silhouette for the corner map (Natural Earth via world-atlas, public domain).
@@ -1693,11 +1828,12 @@ function drawClimbRoute(ctx, W, H, project, L, st) {
   if (!st) return;
 
   // Label area: the map part of the poster, minus the corner maps
-  const area = { x0: m * 0.55, y0: m * 0.55, x1: W - m * 0.55, y1: L.top };
+  const area = { x0: m * 0.55, y0: Math.max(m * 0.55, L.photoTop * 0.85), x1: W - m * 0.55, y1: L.top };
   const vis = F.filter(q => q.x > -50 && q.y > -50 && q.x < W + 50 && q.y < H + 50);
   const stepPts = Math.max(1, Math.floor(vis.length / 1800));
   const pl = makePlacer(area, vis.filter((_, i) => i % stepPts === 0));
   pl.block(L.inset.x, L.inset.y, L.inset.x + L.inset.w, L.inset.y + L.inset.h);
+  if (L.badge) pl.block(L.badge.x, L.badge.y, L.badge.x + L.badge.d, L.badge.y + L.badge.d);
   if (focusOn()) pl.block(L.over.x, L.over.y, L.over.x + L.over.w, L.over.y + L.over.h);
   const atKm = km => { let lo = 0, hi = F.length - 1; while (hi - lo > 1) { const mid = (lo + hi) >> 1; F[mid].d <= km ? lo = mid : hi = mid; } return lo; };
   const normal = i => {
@@ -1825,9 +1961,11 @@ function renderClimb(ctx, W, H, project, clear) {
   const st = climbStretches();
   if (clear) ctx.clearRect(0, 0, W, H);
   ctx.save();
+  if (L.photoTop) drawTopPhoto(ctx, W, L.photoTop, $("color-bg").value);
   if (project && segments.length) drawClimbRoute(ctx, W, H, project, L, st);
   if (focusOn() && segments.length) drawOverview(ctx, L, ink);
   drawCountryInset(ctx, L.inset, ink, sc);
+  if (L.badge) drawBadge(ctx, L.badge.x, L.badge.y, L.badge.d, ink, sc);
 
   // Title and subtitle, left aligned
   const title = ($("title-input").value || "MOUNTAIN PASS").toUpperCase(), sub = ($("subtitle-input").value || "").toUpperCase();
@@ -1891,14 +2029,17 @@ function renderClimb(ctx, W, H, project, clear) {
 // ── Atlas style: framed relief map with a white title band ──────────────────
 function atlasLayout(W, H) {
   const sc = Math.min(W, H / 1.4) / 2400, m = Math.round(110 * sc), band = Math.round(580 * sc);
-  return { sc, m, x0: m, y0: m, x1: W - m, y1: H - band };
+  const A = { sc, m, x0: m, y0: m, x1: W - m, y1: H - band, photoTop: photoTopH(H) };
+  A.my0 = A.y0 + A.photoTop;   // top of the map, under the photo
+  if (photoOK() && photoMode === "badge") { const d = Math.round(Math.min(band - 130 * sc, 420 * sc * photoScale)); A.badge = { d, x: A.x0 + Math.round(10 * sc), y: A.y1 + (band - d) / 2 }; }
+  return A;
 }
 function renderAtlas(ctx, W, H, project, clear) {
   const A = atlasLayout(W, H), { sc } = A, paper = "#FBFAF6", ink = "#1E1E20", route = $("color-route").value, grey = valueGrey(), fnt = FONTS[selectedFontKey];
   if (clear) ctx.clearRect(0, 0, W, H);
   ctx.save();
   if (project && segments.length) {
-    ctx.save(); ctx.beginPath(); ctx.rect(A.x0, A.y0, A.x1 - A.x0, A.y1 - A.y0); ctx.clip();
+    ctx.save(); ctx.beginPath(); ctx.rect(A.x0, A.my0, A.x1 - A.x0, A.y1 - A.my0); ctx.clip();
     const r = routeScale, path = new Path2D(), F = [];
     segments.forEach((s, k) => s.forEach((p, i) => { const q = project(p.lon, p.lat); i ? path.lineTo(q.x, q.y) : path.moveTo(q.x, q.y); if (!i) F.push({ q, k }); }));
     ctx.lineCap = "round"; ctx.lineJoin = "round";
@@ -1928,6 +2069,10 @@ function renderAtlas(ctx, W, H, project, clear) {
     }
     ctx.restore();
   }
+  if (A.photoTop) {   // photo across the top of the frame, a fine line under it
+    drawCover(ctx, photoImg, A.x0, A.y0, A.x1 - A.x0, A.photoTop, photoPos);
+    ctx.fillStyle = ink; ctx.fillRect(A.x0, A.my0 - Math.max(1, 1.5 * sc), A.x1 - A.x0, Math.max(1, 3 * sc));
+  }
   // Paper frame and the title band
   ctx.fillStyle = paper;
   ctx.fillRect(0, 0, W, A.y0); ctx.fillRect(0, A.y1, W, H - A.y1); ctx.fillRect(0, A.y0, A.x0, A.y1 - A.y0); ctx.fillRect(A.x1, A.y0, W - A.x1, A.y1 - A.y0);
@@ -1937,8 +2082,10 @@ function renderAtlas(ctx, W, H, project, clear) {
   let tsz = Math.round(126 * sc * titleScale);
   const setT = () => { ctx.font = `${fnt.titleW} ${tsz}px ${fnt.stack}`; ctx.letterSpacing = `${Math.round(18 * sc * tsz / (126 * sc))}px`; };
   setT();
-  const maxW = W - 2 * A.m - 80 * sc, tw = ctx.measureText(title).width;
+  const maxW = W - 2 * (A.badge ? A.badge.x + A.badge.d + 50 * sc : A.m + 40 * sc), tw = ctx.measureText(title).width;
   if (tw > maxW) { tsz = Math.floor(tsz * maxW / tw); setT(); }
+  if (A.badge) drawBadge(ctx, A.badge.x, A.badge.y, A.badge.d, route, sc);
+  ctx.fillStyle = ink;
   let y = A.y1 + Math.round(232 * sc);
   ctx.fillText(title, W / 2, y);
   if (sub) {
@@ -1965,6 +2112,12 @@ function renderAtlas(ctx, W, H, project, clear) {
   ctx.restore();
 }
 
+function drawBadge(ctx, x, y, d, ring, sc) {
+  ctx.save(); ctx.beginPath(); ctx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2); ctx.clip();
+  drawCover(ctx, photoImg, x, y, d, d, photoPos); ctx.restore();
+  ctx.beginPath(); ctx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2);
+  ctx.strokeStyle = ring; ctx.lineWidth = Math.max(2, Math.round(7 * sc)); ctx.stroke();
+}
 // Satellite noir: deepen the imagery, a diagonal sheen, a dark foot for the text.
 function drawSatFX(ctx, W, H) {
   ctx.save();
@@ -2035,13 +2188,13 @@ function fitRoute() {
       const [from, to] = focusRange(), pts = segments.flat().filter(p => (p.d ?? 0) >= from && (p.d ?? 0) <= to);
       b = { s: Math.min(...pts.map(p => p.lat)), n: Math.max(...pts.map(p => p.lat)), w: Math.min(...pts.map(p => p.lon)), e: Math.max(...pts.map(p => p.lon)) };
     }
-    const pad = { top: ph * 0.09, bottom: ph - L.top / 2 + ph * 0.02, left: pw * 0.12, right: focusOn() ? (pw * 2 - L.over.x) / 2 + pw * 0.04 : pw * 0.12 };
+    const pad = { top: ph * 0.09 + L.photoTop / 2, bottom: ph - L.top / 2 + ph * 0.02, left: pw * 0.12, right: focusOn() ? (pw * 2 - L.over.x) / 2 + pw * 0.04 : pw * 0.12 };
     map.fitBounds([[b.w, b.s], [b.e, b.n]], { padding: pad, bearing: map.getBearing(), duration: 0 });
     return;
   }
   if (posterStyle === "atlas") {
     const A = atlasLayout(pw * 2, ph * 2);
-    const pad = { top: A.y0 / 2 + ph * 0.06, bottom: ph - A.y1 / 2 + ph * 0.06, left: A.x0 / 2 + pw * 0.07, right: A.x0 / 2 + pw * 0.07 };
+    const pad = { top: A.my0 / 2 + ph * 0.06, bottom: ph - A.y1 / 2 + ph * 0.06, left: A.x0 / 2 + pw * 0.07, right: A.x0 / 2 + pw * 0.07 };
     map.fitBounds([[b.w, b.s], [b.e, b.n]], { padding: pad, bearing: map.getBearing(), duration: 0 });
     return;
   }
@@ -2050,12 +2203,21 @@ function fitRoute() {
   const topFrac = photoTopH(ph * 2) / 2 / ph;
   // Flat styles: the route sits right of the info panel and fills the rest, like a gallery print.
   const pad = isFlat()
-    ? { top: ph * (0.07 + topFrac), bottom: ph * bottom, left: pw * (cfg.panel === false ? 0.09 : photoMode === "badge" && photoOK() ? 0.36 : Math.min(0.42, 0.14 + 0.115 * infoScale)), right: pw * (cfg.panel === false ? 0.09 : 0.08) }
+    ? { top: ph * (0.07 + topFrac), bottom: ph * bottom, left: pw * (photoMode === "badge" && photoOK() ? 0.36 : cfg.panel === false ? 0.09 : Math.min(0.42, 0.14 + 0.115 * infoScale)), right: pw * (cfg.panel === false ? 0.09 : 0.08) }
     : { top: ph * 0.17, bottom: ph * bottom, left: pw * 0.09, right: pw * 0.09 };
   map.fitBounds([[b.w, b.s], [b.e, b.n]], {
     padding: pad,
     bearing: map.getBearing(), duration: 0,
   });
+}
+function showStats() {
+  const st = routeStats;
+  $("st-dist").textContent = st.distKm.toFixed(1);
+  $("st-gain").textContent = st.hasEle ? st.gain.toLocaleString("en-US") : "-";
+  $("st-top").textContent = st.top != null ? st.top.toLocaleString("en-US") : "-";
+  $("st-coord").textContent = fmtCoord((st.bbox.s + st.bbox.n) / 2, (st.bbox.w + st.bbox.e) / 2);
+  $("stats-card").classList.add("on");
+  $("wpt-count").textContent = waypoints.length ? `${waypoints.length} in this file` : "None in this file";
 }
 // Fills a value in the info panel unless the person typed their own.
 function autoFill(i, value) {
@@ -2077,13 +2239,9 @@ async function loadRoute({ segs, wpts = [], name = "", source, days = null }) {
   dayKm = [];
   segs.forEach((sg, k) => { let d = 0; for (let i = 1; i < sg.length; i++) d += haversine(sg[i - 1].lat, sg[i - 1].lon, sg[i].lat, sg[i].lon); dayKm[segDays[k]] = (dayKm[segDays[k]] || 0) + d / 1000; });
   segments = downsampleSegments(segs); waypoints = wpts;
+  contourLock = null;
   const st = routeStats;
-  $("st-dist").textContent = st.distKm.toFixed(1);
-  $("st-gain").textContent = st.hasEle ? st.gain.toLocaleString("en-US") : "-";
-  $("st-top").textContent = st.top != null ? st.top.toLocaleString("en-US") : "-";
-  $("st-coord").textContent = fmtCoord((st.bbox.s + st.bbox.n) / 2, (st.bbox.w + st.bbox.e) / 2);
-  $("stats-card").classList.add("on");
-  $("wpt-count").textContent = wpts.length ? `${wpts.length} in this file` : "None in this file";
+  showStats();
   [1, 2, 3, 4, 5, 7, 8].forEach(i => { if ($(`info-val-${i}`).dataset.auto === "1") $(`info-val-${i}`).value = ""; });
   autoFill(2, `${st.distKm.toFixed(st.distKm < 100 ? 1 : 0)} KM`);
   if (st.hasEle) autoFill(3, `${st.gain.toLocaleString("en-US")} M`);
@@ -2108,13 +2266,21 @@ async function loadRoute({ segs, wpts = [], name = "", source, days = null }) {
   $("empty-state").hidden = true;
   await settle(map, 15000);
   posterReady = true;
-  ["btn-png", "btn-jpg"].forEach(id => { $(id).disabled = false; });
+  ["btn-png", "btn-jpg", "btn-order"].forEach(id => { $(id).disabled = false; });
   $("btn-svg").disabled = POSTER_STYLES[posterStyle].svg === false;
   clearSteps();
   setStatus(`${segments.length > 1 ? segments.length + " parts · " : ""}${st.distKm.toFixed(1)} km loaded`, "ok");
   track("poster_route_loaded", { source, km: Math.round(st.distKm), parts: segments.length });
 }
 async function loadFiles(fileList) {
+  const design = [...fileList].find(f => /\.json$/i.test(f.name));
+  if (design) {
+    const photo = [...fileList].find(f => /^image\//.test(f.type));
+    setStatus(""); setStep(1, "Opening the design");
+    try { await restoreDesign(JSON.parse(await design.text()), photo); $("file-lbl").textContent = design.name; $("file-drop").classList.add("has-file"); }
+    catch (e) { clearSteps(); setStatus(e.message, "err"); toast(e.message, "err"); console.error(e); }
+    return;
+  }
   const files = [...fileList].filter(f => /\.(gpx|kml)$/i.test(f.name))
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }));
   if (!files.length) { toast(/\.kmz$/i.test(fileList[0]?.name || "") ? "KMZ isn't supported: export KML instead" : "Choose a .gpx or .kml file", "err"); return; }
@@ -2337,7 +2503,7 @@ function applyPosterStyle(key) {
   selectedFontKey = c.font; $("font-select").value = c.font;
   onColorChange(); onHillshadeChange(); onContourChange(); drawVignette();
   if (map && map.getSource("contours")) {
-    contourStep = -1; updateContourStep();
+    contourLock = null; contourStep = -1; updateContourStep();
     setContourStep(map, contourStep);          // smooth or detailed terrain, even if the spacing is the same
     applyWidths(map, previewSize().pw);
   }
@@ -2345,6 +2511,213 @@ function applyPosterStyle(key) {
   ensureFonts().then(drawOverlay);
   if (key === "climb" && routeStats) ensureCountry().then(drawOverlay);
 }
+
+// ── Design file: everything needed to re-create a poster exactly ───────────
+// Used for orders (David opens the customer's design and exports at 300 DPI)
+// and for "Save design" to continue later. The route travels with it.
+function designData() {
+  const fields = {};
+  document.querySelectorAll("#sidebar input[id], #sidebar select[id]").forEach(el => {
+    if (el.type === "file") return;
+    fields[el.id] = el.type === "checkbox" ? el.checked : el.value;
+  });
+  const r6 = v => Math.round(v * 1e6) / 1e6;
+  return {
+    app: "discoverist-map-generator", v: 1, saved: new Date().toISOString(),
+    fields,
+    state: { posterStyle, paperKey, landscape, contourShift, contourStep, climbColor, climbFocus, photoMode, selectedFontKey,
+             titleScale, subtitleScale, routeScale, infoScale, photoPos, photoScale },
+    view: { center: map.getCenter().toArray(), zoom: map.getZoom(), bearing: map.getBearing(), pw: previewSize().pw },
+    route: {
+      segments: segments.map(s => s.map(p => [r6(p.lon), r6(p.lat), p.ele == null ? null : Math.round(p.ele * 10) / 10, p.d == null ? null : Math.round(p.d * 1e4) / 1e4])),
+      segDays, dayKm, waypoints, stats: routeStats, profile,
+      climb: climbData && { total: climbData.total, maxGrade: climbData.maxGrade, startEle: climbData.startEle, endEle: climbData.endEle, topKm: climbData.topKm },
+    },
+  };
+}
+function loadImage(blob) {
+  return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = () => rej(new Error("Couldn't read the photo")); img.src = URL.createObjectURL(blob); });
+}
+async function restoreDesign(d, photoFile) {
+  if (!d || d.app !== "discoverist-map-generator" || !d.route?.segments?.length) throw new Error("This isn't a poster design file");
+  const R = d.route, S = d.state;
+  segments = R.segments.map(s => s.map(([lon, lat, ele, dd]) => ({ lon, lat, ele, d: dd ?? undefined, time: null })));
+  segDays = R.segDays || segments.map(() => 0); dayKm = R.dayKm || []; waypoints = R.waypoints || [];
+  routeStats = R.stats; profile = R.profile;
+  if (R.climb) {
+    const pts = segments.flat().filter(p => p.ele != null && p.d != null);
+    climbData = { ...R.climb, eleAt: makeEleAt(pts.map(p => p.d), pts.map(p => p.ele)) };
+  } else climbData = null;
+  countryCache = { key: null, polys: null };
+  if (photoFile) photoImg = await loadImage(photoFile);
+
+  applyPosterStyle(S.posterStyle);
+  Object.entries(d.fields || {}).forEach(([id, v]) => {
+    const el = $(id); if (!el) return;
+    if (el.type === "checkbox") el.checked = !!v; else el.value = v;
+    el.dataset.auto = "0";
+  });
+  ({ paperKey, landscape, contourShift, climbColor, climbFocus, photoMode, selectedFontKey,
+     titleScale, subtitleScale, routeScale, infoScale, photoPos, photoScale } = S);
+  if (!photoImg) photoMode = "none";
+  const seg = (id, attr, val) => $(id).querySelectorAll(".seg-btn").forEach(b => b.classList.toggle("active", b.dataset[attr] === String(val)));
+  seg("orient-seg", "orient", landscape ? "landscape" : "portrait"); seg("detail-seg", "detail", contourShift);
+  seg("climb-color-seg", "ccolor", climbColor); seg("climb-focus-seg", "cfocus", climbFocus); seg("photo-seg", "photo", photoMode);
+  [["title-size", "title-size-val"], ["sub-size", "sub-size-val"], ["info-size", "info-size-val"], ["route-width", "route-width-val"],
+   ["vignette-intensity", "vignette-val"], ["photo-pos", "photo-pos-val"], ["photo-size", "photo-size-val"]]
+    .forEach(([id, out]) => { if ($(out)) $(out).textContent = $(id).value + "%"; });
+  onColorChange(); onHillshadeChange(); onContourChange(); drawVignette();
+  layoutPoster();
+  await mapReady(map);
+  setLayerVis(map);
+  contourLock = S.contourStep; contourStep = -1; updateContourStep();
+  // Same framing as the customer saw, whatever the size of this screen.
+  map.jumpTo({ center: d.view.center, zoom: d.view.zoom + Math.log2(previewSize().pw / d.view.pw), bearing: d.view.bearing });
+  showStats();
+  await ensureFonts();
+  if (posterStyle === "climb") await ensureCountry();
+  drawOverlay();
+  $("empty-state").hidden = true;
+  await settle(map, 15000);
+  posterReady = true;
+  ["btn-png", "btn-jpg", "btn-order"].forEach(id => { $(id).disabled = false; });
+  $("btn-svg").disabled = POSTER_STYLES[posterStyle].svg === false;
+  clearSteps();
+  setStatus(`Design opened · ${PAPERS[paperKey].label}${landscape ? " landscape" : ""}`, "ok");
+}
+function downloadBlob(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function saveDesign() {
+  if (!posterReady) { toast("Load a route first", "err"); return; }
+  downloadBlob(new Blob([JSON.stringify(designData())], { type: "application/json" }), `${fileBase().replace(/-\d+dpi$/, "")}-design.json`);
+  toast("Design saved. Drop it on the route box to open it again", "ok", 5000);
+}
+// The preview as one image (map + vignette + text), for the order email.
+function previewJPEG(maxW = 1200) {
+  const mc = map.getCanvas(), oc = $("overlay-canvas"), vc = $("vignette-canvas");
+  const W = Math.min(maxW, oc.width), H = Math.round(W * oc.height / oc.width);
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  x.drawImage(mc, 0, 0, W, H); x.drawImage(vc, 0, 0, W, H); x.drawImage(oc, 0, 0, W, H);
+  return new Promise(res => c.toBlob(res, "image/jpeg", 0.86));
+}
+async function photoJPEG(maxSide = 3600) {
+  if (!photoImg || photoMode === "none") return null;
+  const k = Math.min(1, maxSide / Math.max(photoImg.naturalWidth, photoImg.naturalHeight));
+  const c = document.createElement("canvas");
+  c.width = Math.round(photoImg.naturalWidth * k); c.height = Math.round(photoImg.naturalHeight * k);
+  c.getContext("2d").drawImage(photoImg, 0, 0, c.width, c.height);
+  return new Promise(res => c.toBlob(res, "image/jpeg", 0.9));
+}
+
+// ── Order a print ───────────────────────────────────────────────────────────
+// Simple flow, no login: the customer sends the design here, David checks it,
+// emails a proof and a payment link, then orders it on Printify.
+// Edit products and prices here. Price null = "confirmed with your proof".
+const ORDER_CURRENCY = "€";
+const ORDER_PRODUCTS = {
+  poster:  { label: "Poster",       sub: "Unframed print",    sizes: ["8x10", "11x14", "a4", "a3", "a2", "30x40", "50x70", "61x91"] },
+  framed:  { label: "Framed",       sub: "Ready to hang",     sizes: ["8x10", "11x14", "a4", "30x40", "50x70"], frames: { black: "#1A1A1A", white: "#F4F4F2", natural: "#C9A87A" } },
+  canvas:  { label: "Canvas",       sub: "Gallery wrapped",   sizes: ["a4", "30x40", "50x70"] },
+  digital: { label: "Digital file", sub: "High-res PNG by email", sizes: null },
+};
+const ORDER_PRICES = {};   // e.g. "poster:50x70": 45, "framed:30x40": 79, "digital": 15
+const FRAME_NAMES = { black: "Black", white: "White", natural: "Natural wood" };
+const PAY_OPTIONS = { stripe: "Card (Stripe)", paypal: "PayPal", printify: "Printify checkout" };
+const order = { product: "poster", size: null, frame: "black", pay: "stripe" };
+function orderPrice() {
+  const v = ORDER_PRICES[order.product === "digital" ? "digital" : `${order.product}:${order.size}`];
+  return v == null ? null : `${ORDER_CURRENCY}${v}`;
+}
+function renderOrderForm() {
+  const P = ORDER_PRODUCTS[order.product];
+  $("om-prod").innerHTML = Object.entries(ORDER_PRODUCTS).map(([k, p]) =>
+    `<button type="button" class="om-opt${k === order.product ? " on" : ""}" data-prod="${k}"><b>${p.label}</b><span>${p.sub}</span></button>`).join("");
+  $("om-size-sec").hidden = !P.sizes;
+  if (P.sizes) {
+    if (!P.sizes.includes(order.size)) order.size = P.sizes.includes(paperKey) ? paperKey : P.sizes.includes("50x70") ? "50x70" : P.sizes[0];
+    $("om-sizes").innerHTML = P.sizes.map(k => `<button type="button" class="om-chip${k === order.size ? " on" : ""}" data-size="${k}">${PAPERS[k].label}</button>`).join("");
+  }
+  $("om-frame-sec").hidden = !P.frames;
+  if (P.frames) $("om-frames").innerHTML = Object.entries(P.frames).map(([k, c]) =>
+    `<button type="button" class="om-sw${k === order.frame ? " on" : ""}" data-frame="${k}" title="${FRAME_NAMES[k]}"><i style="background:${c}"></i>${FRAME_NAMES[k]}</button>`).join("");
+  const storeOrder = $("om-form").elements.store_order.value.trim();
+  $("om-pay-sec").hidden = !!storeOrder;
+  $("om-pay").innerHTML = Object.entries(PAY_OPTIONS).map(([k, l]) => `<button type="button" class="om-chip${k === order.pay ? " on" : ""}" data-pay="${k}">${l}</button>`).join("");
+  const price = orderPrice();
+  $("om-price").textContent = storeOrder ? "Already paid in our store" : price ? `${price} plus shipping` : "Price confirmed with your proof";
+  $("om-fine").textContent = storeOrder
+    ? "David checks your design and emails you a proof within 24 hours."
+    : "No payment now. David checks your design and emails you a proof and a payment link within 24 hours.";
+}
+async function refreshOrderThumb() {
+  await settle(map, 8000);
+  drawOverlay();
+  const b = await previewJPEG(600);
+  if (b) { const t = $("om-thumb"); if (t.src) URL.revokeObjectURL(t.src); t.src = URL.createObjectURL(b); }
+}
+// Ordering a size with another shape re-frames the poster to that size.
+async function setOrderSize(k) {
+  order.size = k; renderOrderForm();
+  if (k !== paperKey) {
+    paperKey = k; $("paper-select").value = k; layoutPoster(); if (segments.length) fitRoute();
+    $("om-size-note").textContent = "The preview has switched to this size.";
+    await refreshOrderThumb();
+  }
+}
+function openOrder() {
+  if (!posterReady) { toast("Load a route first", "err"); return; }
+  $("om-form").hidden = false; $("om-done").hidden = true; $("om-err").textContent = ""; $("om-size-note").textContent = "";
+  renderOrderForm();
+  $("order-modal").hidden = false;
+  if (ORDER_PRODUCTS[order.product].sizes && order.size !== paperKey) setOrderSize(order.size); else refreshOrderThumb();
+  track("poster_order_open", { style: posterStyle });
+}
+function closeOrder() { $("order-modal").hidden = true; }
+async function sendOrder(e) {
+  e.preventDefault();
+  const f = $("om-form"), btn = $("om-send");
+  if (!f.reportValidity()) return;
+  btn.disabled = true; btn.textContent = "Sending…"; $("om-err").textContent = "";
+  try {
+    const fd = new FormData(f);
+    fd.set("product", order.product); fd.set("size", ORDER_PRODUCTS[order.product].sizes ? order.size : "");
+    fd.set("frame", ORDER_PRODUCTS[order.product].frames ? order.frame : "");
+    fd.set("pay", fd.get("store_order") ? "" : order.pay);
+    fd.set("orient", landscape ? "landscape" : "portrait"); fd.set("style", posterStyle);
+    fd.set("title", $("title-input").value || "");
+    fd.set("design", new Blob([JSON.stringify(designData())], { type: "application/json" }), "design.json");
+    const prev = await previewJPEG(1200); if (prev) fd.set("preview", prev, "preview.jpg");
+    const ph = await photoJPEG(); if (ph) fd.set("photo", ph, "photo.jpg");
+    const r = await fetch("../poster-order.php", { method: "POST", body: fd });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || `the server answered ${r.status}`);
+    $("om-id").textContent = j.id;
+    $("om-done-txt").textContent = fd.get("store_order")
+      ? "David will email you a proof within 24 hours."
+      : "David will email you a proof and a payment link within 24 hours. Nothing is charged until you pay that link.";
+    f.hidden = true; $("om-done").hidden = false;
+    track("poster_order_sent", { product: order.product, size: order.size || "", style: posterStyle });
+  } catch (err) {
+    $("om-err").textContent = `Couldn't send: ${err.message}. Try again, or message @fmancillag on Instagram.`;
+    console.error(err);
+  } finally { btn.disabled = false; btn.textContent = "Send order request"; }
+}
+$("om-prod").addEventListener("click", e => { const b = e.target.closest("[data-prod]"); if (!b) return; order.product = b.dataset.prod; renderOrderForm(); const s = ORDER_PRODUCTS[order.product].sizes; if (s && order.size !== paperKey) setOrderSize(order.size); });
+$("om-sizes").addEventListener("click", e => { const b = e.target.closest("[data-size]"); if (b) setOrderSize(b.dataset.size); });
+$("om-frames").addEventListener("click", e => { const b = e.target.closest("[data-frame]"); if (b) { order.frame = b.dataset.frame; renderOrderForm(); } });
+$("om-pay").addEventListener("click", e => { const b = e.target.closest("[data-pay]"); if (b) { order.pay = b.dataset.pay; renderOrderForm(); } });
+$("om-form").elements.store_order.addEventListener("input", renderOrderForm);
+$("om-form").addEventListener("submit", sendOrder);
+$("om-close").addEventListener("click", closeOrder);
+$("om-done-close").addEventListener("click", closeOrder);
+$("order-modal").addEventListener("click", e => { if (e.target.id === "order-modal") closeOrder(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("order-modal").hidden) closeOrder(); });
+$("btn-order").addEventListener("click", openOrder);
+$("btn-save-design").addEventListener("click", saveDesign);
 
 // ── Wiring ─────────────────────────────────────────────────────────────────
 const PANELS = { file: "panel-file", name: "panel-name", coords: "panel-coords" };
@@ -2376,7 +2749,7 @@ $("photo-size").addEventListener("input", e => { photoScale = e.target.value / 1
 $("toggle-band").addEventListener("change", drawOverlay);
 wireSeg("orient-seg", "orient", v => { landscape = v === "landscape"; layoutPoster(); if (segments.length) fitRoute(); });
 wireSeg("dpi-seg", "dpi", v => { dpi = parseInt(v); updatePaperMeta(); });
-wireSeg("detail-seg", "detail", v => { contourShift = parseInt(v); contourStep = -1; updateContourStep(); });
+wireSeg("detail-seg", "detail", v => { contourShift = parseInt(v); contourLock = null; contourStep = -1; updateContourStep(); });
 $("paper-select").addEventListener("change", e => { paperKey = e.target.value; layoutPoster(); if (segments.length) fitRoute(); });
 
 document.querySelectorAll(".preset-pill").forEach(btn => btn.addEventListener("click", () => {
